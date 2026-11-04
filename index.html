@@ -4,12 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>mania8522191 Gallery</title>
-<meta name="description" content="mania8522191 的插畫作品集：星街すいせい、hololive、BanG Dream!、アズールレーン 同人插畫，共 35 件作品。">
+<meta name="description" content="mania8522191 的插畫作品集：星街すいせい、hololive、BanG Dream!、アズールレーン 同人插畫，共 37 件作品。">
+<link rel="alternate" hreflang="zh-Hant" href="https://mania8522191.github.io/?lang=zh">
+<link rel="alternate" hreflang="en" href="https://mania8522191.github.io/?lang=en">
+<link rel="alternate" hreflang="ja" href="https://mania8522191.github.io/?lang=ja">
+<link rel="alternate" hreflang="x-default" href="https://mania8522191.github.io/">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="apple-touch-icon" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <style>
 body{margin:0}[hidden]{display:none!important}img{max-width:100%}
 /* Layout: black gallery frame with a serif wordmark (template 2 look). Home = full-bleed hero + two-column staggered cover wall; each cover opens a project page of stacked full pages with previous / next (template 1 browsing). Single dark look by choice. */
@@ -189,8 +193,20 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .mini a:hover img{opacity:.8}
 .mini span{font-family:var(--f-display);font-size:14px;letter-spacing:.03em;line-height:1.5;overflow-wrap:anywhere}
 
+/* language: Japanese pages use Japanese glyph shapes; English pages show Japanese titles the same way */
+:root:lang(ja),:root:lang(en){--f-body:"Figtree","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif}
+.site-head .in{justify-content:flex-start}
+.nav{margin-left:auto}
+.lang{display:flex;align-items:center;gap:2px;margin-left:clamp(10px,1.8vw,26px);padding-left:clamp(8px,1.6vw,22px);border-left:1px solid var(--line)}
+.lang button{padding:6px 7px;border:0;background:none;color:var(--mute);font:inherit;font-size:12px;letter-spacing:.06em;cursor:pointer;transition:color .3s}
+.lang button:hover,.lang button[aria-pressed="true"]{color:var(--fg)}
+.lang button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.lang button:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
+.m-nav .lang{margin:clamp(14px,3vh,26px) 0 0;padding:0;border:0}
+.m-nav .lang button{font-family:var(--f-body);font-size:15px;padding:8px 12px;opacity:1;transform:none}
+
 /* mobile menu */
-.menu-btn{display:none;align-items:center;gap:10px;padding:8px 0;border:0;background:none;color:var(--fg);font:inherit;font-size:12px;letter-spacing:.2em;cursor:pointer}
+.menu-btn{display:none;margin-left:auto;align-items:center;gap:10px;padding:8px 0;border:0;background:none;color:var(--fg);font:inherit;font-size:12px;letter-spacing:.2em;cursor:pointer}
 .menu-btn:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .menu-ic{position:relative;width:22px;height:9px}
 .menu-ic::before,.menu-ic::after{content:"";position:absolute;left:0;right:0;height:1px;background:currentColor;transition:transform .5s var(--ease-out),top .5s var(--ease-out)}
@@ -381,7 +397,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @media (max-width:640px){
   .shot-thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}
   .feats{grid-template-columns:minmax(0,1fr)}
-  .nav{display:none}
+  .nav,.site-head .lang{display:none}
   .menu-btn{display:inline-flex}
   .m-nav{position:fixed;inset:0;z-index:19;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3.6vh,28px);background:var(--bg);padding:calc(var(--head) + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility 0s linear .45s}
   .menu-open .m-nav{opacity:1;visibility:visible;transition:opacity .45s var(--ease-out),visibility 0s}
@@ -419,6 +435,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 <script>
 /* start the intro before the first paint so the hero never flashes in its final state */
 (function () {
+  /* language: ?lang= in the address, else the visitor's last choice, else the browser's language */
+  var q = (location.search.match(/[?&]lang=(zh|en|ja)\b/) || [])[1], saved = null;
+  try { saved = localStorage.getItem('lang'); } catch (e) {}
+  var first = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+  var lang = q || (/^(zh|en|ja)$/.test(saved || '') ? saved : /^ja/.test(first) ? 'ja' : /^zh/.test(first) ? 'zh' : 'en');
+  window.__LANG = lang;
+  document.documentElement.lang = { zh: 'zh-Hant', en: 'en', ja: 'ja' }[lang];
   var h = location.hash.slice(1);
   var home = h === '' || h === 'home' || h === 'work';
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -430,22 +453,24 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 <header class="site-head">
   <div class="in">
     <a class="logo" href="#home">MANIA8522191</a>
-    <nav class="nav" aria-label="主選單">
+    <nav class="nav" aria-label="主選單" data-i18n-aria="nav.main">
       <a href="#work" data-v="home work">Work</a>
       <a href="#goods" data-v="goods item">Goods</a>
       <a href="#game" data-v="game">Game</a>
       <a href="#about" data-v="about">About</a>
       <a href="#contact" data-v="contact">Contact</a>
     </nav>
+    <div class="lang" role="group" aria-label="Language / 語言 / 言語"><button type="button" data-lang="zh" lang="zh-Hant">中文</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="ja" lang="ja">日本語</button></div>
     <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="m-nav"><span class="menu-lbl">MENU</span><span class="menu-ic" aria-hidden="true"></span></button>
   </div>
 </header>
-<nav class="m-nav" id="m-nav" aria-label="主選單">
+<nav class="m-nav" id="m-nav" aria-label="主選單" data-i18n-aria="nav.main">
   <a href="#work" data-v="home work">Work</a>
   <a href="#goods" data-v="goods item">Goods</a>
   <a href="#game" data-v="game">Game</a>
   <a href="#about" data-v="about">About</a>
   <a href="#contact" data-v="contact">Contact</a>
+  <div class="lang" role="group" aria-label="Language / 語言 / 言語"><button type="button" data-lang="zh" lang="zh-Hant">中文</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="ja" lang="ja">日本語</button></div>
 </nav>
 
 <main>
@@ -457,11 +482,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <p class="hero-by">Illustrations by</p>
         <h1 class="hero-name" aria-label="MANIA8522191"><span class="hl" aria-hidden="true" style="--i:0">M</span><span class="hl" aria-hidden="true" style="--i:1">A</span><span class="hl" aria-hidden="true" style="--i:2">N</span><span class="hl" aria-hidden="true" style="--i:3">I</span><span class="hl" aria-hidden="true" style="--i:4">A</span><span class="hl" aria-hidden="true" style="--i:5">8</span><span class="hl" aria-hidden="true" style="--i:6">5</span><span class="hl" aria-hidden="true" style="--i:7">2</span><span class="hl" aria-hidden="true" style="--i:8">2</span><span class="hl" aria-hidden="true" style="--i:9">1</span><span class="hl" aria-hidden="true" style="--i:10">9</span><span class="hl" aria-hidden="true" style="--i:11">1</span></h1>
       </div>
-      <a class="hero-cue" href="#work" aria-label="往下看作品"><span></span></a>
+      <a class="hero-cue" href="#work" aria-label="往下看作品" data-i18n-aria="hero.cue"><span></span></a>
     </section>
     <section class="works in" aria-labelledby="works">
       <h2 class="sec-title" id="works">WORKS</h2>
-      <p class="sec-sub">2019 — 2026 · 37 件作品 · 點選封面看完整作品</p>
+      <p class="sec-sub" data-i18n="works.sub">2019 — 2026 · 37 件作品 · 點選封面看完整作品</p>
       <div class="wall" id="wall"></div>
     </section>
   </div>
@@ -476,8 +501,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <ul class="proj-meta">
           <li id="wk-date"></li>
           <li id="wk-pages"></li>
-          <li><a id="wk-link" target="_blank" rel="noopener">在 pixiv 查看 ↗</a></li>
-          <li id="wk-tl-li" hidden><button type="button" class="meta-btn" id="wk-tl-jump">▶ 製作過程影片</button></li>
+          <li><a id="wk-link" target="_blank" rel="noopener" data-i18n="wk.pixiv">在 pixiv 查看 ↗</a></li>
+          <li id="wk-tl-li" hidden><button type="button" class="meta-btn" id="wk-tl-jump" data-i18n="wk.tlJump">▶ 製作過程影片</button></li>
         </ul>
         <ul class="proj-tags" id="wk-tags"></ul>
         <p class="proj-goods" id="wk-goods" hidden></p>
@@ -485,11 +510,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <div class="proj-imgs" id="wk-imgs"></div>
       <section class="tl" id="wk-tl" data-rv="up" hidden>
         <p class="g-k">PROCESS TIMELAPSE</p>
-        <h2 class="tl-h">製作過程影片</h2>
+        <h2 class="tl-h" data-i18n="tl.h">製作過程影片</h2>
         <div class="tl-box" id="wk-tl-box"></div>
-        <p class="tl-cap"><span id="wk-tl-title"></span><a id="wk-tl-link" target="_blank" rel="noopener">在 YouTube 觀看 ↗</a></p>
+        <p class="tl-cap"><span id="wk-tl-title"></span><a id="wk-tl-link" target="_blank" rel="noopener" data-i18n="tl.yt">在 YouTube 觀看 ↗</a></p>
       </section>
-      <nav class="proj-nav" aria-label="其他作品">
+      <nav class="proj-nav" aria-label="其他作品" data-i18n-aria="wk.others">
         <a id="wk-prev"><span class="lbl">← Previous Project</span><span class="nm" id="wk-prev-t"></span></a>
         <a id="wk-next" class="next"><span class="lbl">Next Project →</span><span class="nm" id="wk-next-t"></span></a>
       </nav>
@@ -499,14 +524,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <!-- goods list -->
   <section class="view goods in" id="v-goods" hidden>
     <h1 class="sec-title">GOODS</h1>
-    <p class="sec-sub">Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。</p>
+    <p class="sec-sub" data-i18n="goods.sub">Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。</p>
     <div class="g-grid" id="g-grid"></div>
     <div class="g-shop">
       <div>
         <p class="g-shop-k">ONLINE SHOP</p>
-        <p class="g-shop-n">買動漫賣場「Mania Art」</p>
+        <p class="g-shop-n" data-i18n="goods.shopName">買動漫賣場「Mania Art」</p>
       </div>
-      <a class="btn" href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener">前往賣場 ↗</a>
+      <a class="btn" href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener" data-i18n="goods.shopBtn">前往賣場 ↗</a>
     </div>
   </section>
 
@@ -523,16 +548,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <div class="gd-info">
           <dl class="gd-spec" id="it-spec"></dl>
           <div class="gd-actions">
-            <a class="btn" href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener">到買動漫賣場購買 ↗</a>
-            <a class="btn ghost" href="#w-148499079">看 FF47 完整品書</a>
+            <a class="btn" href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener" data-i18n="item.buy">到買動漫賣場購買 ↗</a>
+            <a class="btn ghost" href="#w-148499079" data-i18n="item.menu">看 FF47 完整品書</a>
           </div>
         </div>
       </div>
       <section class="gd-works" id="it-works-box">
-        <h2 class="gd-h">使用插畫</h2>
+        <h2 class="gd-h" data-i18n="item.used">使用插畫</h2>
         <div class="mini" id="it-works"></div>
       </section>
-      <nav class="proj-nav" aria-label="其他周邊">
+      <nav class="proj-nav" aria-label="其他周邊" data-i18n-aria="item.others">
         <a id="it-prev"><span class="lbl">← Previous Item</span><span class="nm" id="it-prev-t"></span></a>
         <a id="it-next" class="next"><span class="lbl">Next Item →</span><span class="nm" id="it-next-t"></span></a>
       </nav>
@@ -542,57 +567,57 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <!-- game: solo-developed indie card game, written for players -->
   <article class="view game" id="v-game" hidden>
     <section class="g-hero">
-      <div class="g-hero-media"><img src="img/game-cover.webp" width="1920" height="1080" alt="遊戲的戰場背景美術" loading="lazy"></div>
+      <div class="g-hero-media"><img src="img/game-cover.webp" width="1920" height="1080" alt="遊戲的戰場背景美術" data-i18n-alt="game.coverAlt" loading="lazy"></div>
       <div class="g-hero-txt in">
-        <p class="g-kicker">INDIE GAME・開發中</p>
+        <p class="g-kicker" data-i18n="game.kicker">INDIE GAME・開發中</p>
         <h1 class="g-title">mania8522191 Card Game</h1>
-        <p class="g-tag">組牌決策 × 魔力場站位 × 回合資源管理</p>
-        <p class="g-lead">讓每一次部署，成為下一個攻擊回合的優勢。</p>
+        <p class="g-tag" data-i18n="game.tag">組牌決策 × 魔力場站位 × 回合資源管理</p>
+        <p class="g-lead" data-i18n="game.lead">讓每一次部署，成為下一個攻擊回合的優勢。</p>
       </div>
     </section>
 
     <section class="g-sec in">
       <div class="g-intro">
         <p class="g-k" data-rv="up">ABOUT THE GAME</p>
-        <h2 class="g-h" data-rv="up" data-d=".08s">一個人做的卡牌策略遊戲</h2>
-        <p data-rv="up" data-d=".16s">用 54 張牌組成你的隊伍，在格子戰場上安排角色站位，一邊守住防線、一邊找機會反擊，把對手的總血量打到歸零。</p>
-        <p data-rv="up" data-d=".22s">從企劃、程式到美術，全部由 mania8522191 一個人製作。</p>
-        <ul class="chips" data-rv="up" data-d=".28s"><li>卡牌策略</li><li>回合制</li><li>Windows</li><li>開發中</li></ul>
+        <h2 class="g-h" data-rv="up" data-d=".08s" data-i18n="game.h">一個人做的卡牌策略遊戲</h2>
+        <p data-rv="up" data-d=".16s" data-i18n="game.p1">用 54 張牌組成你的隊伍，在格子戰場上安排角色站位，一邊守住防線、一邊找機會反擊，把對手的總血量打到歸零。</p>
+        <p data-rv="up" data-d=".22s" data-i18n="game.p2">從企劃、程式到美術，全部由 mania8522191 一個人製作。</p>
+        <ul class="chips" data-rv="up" data-d=".28s"><li data-i18n="chip.strategy">卡牌策略</li><li data-i18n="chip.turn">回合制</li><li>Windows</li><li data-i18n="chip.dev">開發中</li></ul>
       </div>
     </section>
 
     <section class="g-sec in">
-      <header class="g-head"><p class="g-k">SCREENSHOTS</p><h2 class="g-h">遊戲畫面</h2></header>
+      <header class="g-head"><p class="g-k">SCREENSHOTS</p><h2 class="g-h" data-i18n="shots.h">遊戲畫面</h2></header>
       <div class="shots">
         <figure class="shot-main" data-rv="up">
-          <button class="shot-big" id="shot-big" type="button" aria-label="放大看這張畫面"><img id="shot-img" src="img/shot1.webp" width="1600" height="900" alt="" loading="lazy"></button>
+          <button class="shot-big" id="shot-big" type="button" aria-label="放大看這張畫面" data-i18n-aria="shots.zoom"><img id="shot-img" src="img/shot1.webp" width="1600" height="900" alt="" loading="lazy"></button>
           <figcaption><b id="shot-no">01 / 08</b><span id="shot-cap"></span></figcaption>
         </figure>
         <div class="shot-thumbs" id="shot-thumbs" data-rv="up" data-d=".1s"></div>
-        <p class="shot-note" data-rv="up" data-d=".15s">開發中畫面，正式版可能會調整。</p>
+        <p class="shot-note" data-rv="up" data-d=".15s" data-i18n="shots.note">開發中畫面，正式版可能會調整。</p>
       </div>
     </section>
 
     <section class="g-sec in">
-      <header class="g-head"><p class="g-k">FEATURES</p><h2 class="g-h">玩法特色</h2></header>
+      <header class="g-head"><p class="g-k">FEATURES</p><h2 class="g-h" data-i18n="feat.h">玩法特色</h2></header>
       <div class="feats">
-        <div data-rv="up"><h3>自由組牌</h3><p>角色、裝備、事件、天使與惡魔，用 54 張牌組出屬於你的戰術。</p></div>
-        <div data-rv="up" data-d=".1s"><h3>站位決定勝負</h3><p>同一個角色，站的位置、帶的裝備不同，發揮也完全不一樣。</p></div>
-        <div data-rv="up" data-d=".2s"><h3>每回合都是取捨</h3><p>行動點數、活力和魔力要怎麼分配，決定你下一回合的攻勢。</p></div>
-        <div data-rv="up" data-d=".3s"><h3>生死之門</h3><p>10 回合內還沒分出勝負？雙方剩下的牌庫會被摧毀，打到有一方倒下為止。</p></div>
+        <div data-rv="up"><h3 data-i18n="f1.h">自由組牌</h3><p data-i18n="f1.p">角色、裝備、事件、天使與惡魔，用 54 張牌組出屬於你的戰術。</p></div>
+        <div data-rv="up" data-d=".1s"><h3 data-i18n="f2.h">站位決定勝負</h3><p data-i18n="f2.p">同一個角色，站的位置、帶的裝備不同，發揮也完全不一樣。</p></div>
+        <div data-rv="up" data-d=".2s"><h3 data-i18n="f3.h">每回合都是取捨</h3><p data-i18n="f3.p">行動點數、活力和魔力要怎麼分配，決定你下一回合的攻勢。</p></div>
+        <div data-rv="up" data-d=".3s"><h3 data-i18n="f4.h">生死之門</h3><p data-i18n="f4.p">10 回合內還沒分出勝負？雙方剩下的牌庫會被摧毀，打到有一方倒下為止。</p></div>
       </div>
     </section>
 
     <section class="g-sec in">
-      <header class="g-head"><p class="g-k">CHARACTERS</p><h2 class="g-h">角色一覽</h2></header>
-      <p class="g-body chars-sub" data-rv="up">共 18 位角色，立繪陸續公開中。點角色可以看完整立繪。</p>
+      <header class="g-head"><p class="g-k">CHARACTERS</p><h2 class="g-h" data-i18n="chars.h">角色一覽</h2></header>
+      <p class="g-body chars-sub" data-rv="up" data-i18n="chars.sub">共 18 位角色，立繪陸續公開中。點角色可以看完整立繪。</p>
       <ol class="chars" id="chars"></ol>
     </section>
 
     <section class="g-sec g-follow in" data-rv="up">
       <p class="g-k">FOLLOW</p>
-      <h2 class="g-h">追蹤最新消息</h2>
-      <p>遊戲還在開發中，上市時間和售價都還沒決定。想第一時間知道消息，可以追蹤這些地方。</p>
+      <h2 class="g-h" data-i18n="follow.h">追蹤最新消息</h2>
+      <p data-i18n="follow.p">遊戲還在開發中，上市時間和售價都還沒決定。想第一時間知道消息，可以追蹤這些地方。</p>
       <div class="g-follow-btns">
         <a class="btn" href="https://x.com/mania8522191" target="_blank" rel="noopener">X ↗</a>
         <a class="btn ghost" href="https://www.youtube.com/@mania852" target="_blank" rel="noopener">YouTube ↗</a>
@@ -607,15 +632,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <div class="in">
       <h1 class="sec-title">ABOUT</h1>
       <div class="about-grid">
-        <div class="about-fig" data-rv="clip"><span class="mask"><img src="img/about.webp" width="900" height="900" alt="mania8522191 的頭像：星街すいせい布偶" loading="lazy"></span></div>
+        <div class="about-fig" data-rv="clip"><span class="mask"><img src="img/about.webp" width="900" height="900" alt="mania8522191 的頭像：星街すいせい布偶" data-i18n-alt="about.alt" loading="lazy"></span></div>
         <div class="about-txt">
-          <p>mania8522191，以 hololive 的星街すいせい為主要題材的插畫創作者。2019 年開始在 pixiv 發表作品，內容包括紀念插畫、和其他 VTuber 的聯動圖，以及 BanG Dream!、アズールレーン 的同人創作。</p>
-          <p>也製作周邊，曾以攤位 J44 參加台灣 Fancy Frontier 47。</p>
-          <p>目前正一個人開發卡牌策略遊戲。<a href="#game">看遊戲介紹 →</a></p>
+          <p data-i18n="about.p1">mania8522191，以 hololive 的星街すいせい為主要題材的插畫創作者。2019 年開始在 pixiv 發表作品，內容包括紀念插畫、和其他 VTuber 的聯動圖，以及 BanG Dream!、アズールレーン 的同人創作。</p>
+          <p data-i18n="about.p2">也製作周邊，曾以攤位 J44 參加台灣 Fancy Frontier 47。</p>
+          <p><span data-i18n="about.p3">目前正一個人開發卡牌策略遊戲。</span><a href="#game" data-i18n="about.gameLink">看遊戲介紹 →</a></p>
           <dl class="facts">
-            <div><dt>件作品</dt><dd>37</dd></div>
-            <div><dt>張圖</dt><dd>77</dd></div>
-            <div><dt>開始在 pixiv 發表</dt><dd>2019</dd></div>
+            <div><dt data-i18n="facts.works">件作品</dt><dd>37</dd></div>
+            <div><dt data-i18n="facts.pages">張圖</dt><dd>77</dd></div>
+            <div><dt data-i18n="facts.since">開始在 pixiv 發表</dt><dd>2019</dd></div>
           </dl>
         </div>
       </div>
@@ -625,32 +650,32 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <!-- contact -->
   <section class="view contact in" id="v-contact" hidden>
     <h1 class="sec-title">CONTACT</h1>
-    <p class="sec-sub">在以下平台都找得到我。作品相關的聯絡，請直接私訊。</p>
+    <p class="sec-sub" data-i18n="contact.sub">在以下平台都找得到我。作品相關的聯絡，請直接私訊。</p>
     <div class="groups">
       <section aria-labelledby="g-social">
-        <h2 class="group-t" id="g-social">社群</h2>
+        <h2 class="group-t" id="g-social" data-i18n="grp.social">社群</h2>
         <ul class="channels">
           <li><a href="https://x.com/mania8522191" target="_blank" rel="noopener"><span class="ch">X</span><span class="hd">@mania8522191</span><span class="ar">↗</span></a></li>
           <li><a href="https://www.instagram.com/mania8522191/" target="_blank" rel="noopener"><span class="ch">Instagram</span><span class="hd">@mania8522191</span><span class="ar">↗</span></a></li>
-          <li><a href="https://www.facebook.com/mania8522191" target="_blank" rel="noopener"><span class="ch">Facebook</span><span class="hd">mania8522191・粉絲專頁</span><span class="ar">↗</span></a></li>
-          <li><a href="https://www.facebook.com/mania8522191p2/" target="_blank" rel="noopener"><span class="ch">Facebook</span><span class="hd">mania8522191p2・個人帳號</span><span class="ar">↗</span></a></li>
+          <li><a href="https://www.facebook.com/mania8522191" target="_blank" rel="noopener"><span class="ch">Facebook</span><span class="hd" data-i18n="h.fbPage">mania8522191・粉絲專頁</span><span class="ar">↗</span></a></li>
+          <li><a href="https://www.facebook.com/mania8522191p2/" target="_blank" rel="noopener"><span class="ch">Facebook</span><span class="hd" data-i18n="h.fbPersonal">mania8522191p2・個人帳號</span><span class="ar">↗</span></a></li>
           <li><a href="https://www.plurk.com/mncrew" target="_blank" rel="noopener"><span class="ch">Plurk</span><span class="hd">mncrew</span><span class="ar">↗</span></a></li>
-          <li><a href="https://discord.com/invite/wMApsgyxZj" target="_blank" rel="noopener"><span class="ch">Discord</span><span class="hd">加入伺服器</span><span class="ar">↗</span></a></li>
+          <li><a href="https://discord.com/invite/wMApsgyxZj" target="_blank" rel="noopener"><span class="ch">Discord</span><span class="hd" data-i18n="h.discord">加入伺服器</span><span class="ar">↗</span></a></li>
         </ul>
       </section>
       <section aria-labelledby="g-art">
-        <h2 class="group-t" id="g-art">作品</h2>
+        <h2 class="group-t" id="g-art" data-i18n="grp.works">作品</h2>
         <ul class="channels">
           <li><a href="https://www.pixiv.net/users/8522191" target="_blank" rel="noopener"><span class="ch">pixiv</span><span class="hd">users/8522191</span><span class="ar">↗</span></a></li>
           <li><a href="https://www.artstation.com/artist/mania" target="_blank" rel="noopener"><span class="ch">ArtStation</span><span class="hd">mania</span><span class="ar">↗</span></a></li>
-          <li><a href="https://home.gamer.com.tw/profile/index.php?owner=MNCrew" target="_blank" rel="noopener"><span class="ch">巴哈姆特</span><span class="hd">MNCrew</span><span class="ar">↗</span></a></li>
+          <li><a href="https://home.gamer.com.tw/profile/index.php?owner=MNCrew" target="_blank" rel="noopener"><span class="ch" data-i18n="ch.baha">巴哈姆特</span><span class="hd">MNCrew</span><span class="ar">↗</span></a></li>
           <li><a href="https://www.youtube.com/@mania852" target="_blank" rel="noopener"><span class="ch">YouTube</span><span class="hd">@mania852</span><span class="ar">↗</span></a></li>
         </ul>
       </section>
       <section aria-labelledby="g-shop">
-        <h2 class="group-t" id="g-shop">周邊</h2>
+        <h2 class="group-t" id="g-shop" data-i18n="grp.shop">周邊</h2>
         <ul class="channels">
-          <li><a href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener"><span class="ch">買動漫</span><span class="hd">賣場 217467</span><span class="ar">↗</span></a></li>
+          <li><a href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener"><span class="ch" data-i18n="ch.myacg">買動漫</span><span class="hd" data-i18n="h.shop">賣場 217467</span><span class="ar">↗</span></a></li>
         </ul>
       </section>
     </div>
@@ -659,48 +684,58 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 <footer class="site-foot">
   <div class="in">
-    <nav class="foot-links" aria-label="社群與作品平台">
+    <nav class="foot-links" aria-label="社群與作品平台" data-i18n-aria="foot.nav">
       <a href="https://x.com/mania8522191" target="_blank" rel="noopener">X</a>
       <a href="https://www.instagram.com/mania8522191/" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.facebook.com/mania8522191" target="_blank" rel="noopener">Facebook（粉專）</a>
-      <a href="https://www.facebook.com/mania8522191p2/" target="_blank" rel="noopener">Facebook（個人）</a>
+      <a href="https://www.facebook.com/mania8522191" target="_blank" rel="noopener" data-i18n="foot.fbPage">Facebook（粉專）</a>
+      <a href="https://www.facebook.com/mania8522191p2/" target="_blank" rel="noopener" data-i18n="foot.fbPersonal">Facebook（個人）</a>
       <a href="https://www.pixiv.net/users/8522191" target="_blank" rel="noopener">pixiv</a>
       <a href="https://www.artstation.com/artist/mania" target="_blank" rel="noopener">ArtStation</a>
       <a href="https://www.youtube.com/@mania852" target="_blank" rel="noopener">YouTube</a>
       <a href="https://discord.com/invite/wMApsgyxZj" target="_blank" rel="noopener">Discord</a>
       <a href="https://www.plurk.com/mncrew" target="_blank" rel="noopener">Plurk</a>
-      <a href="https://home.gamer.com.tw/profile/index.php?owner=MNCrew" target="_blank" rel="noopener">巴哈姆特</a>
-      <a href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener">買動漫</a>
+      <a href="https://home.gamer.com.tw/profile/index.php?owner=MNCrew" target="_blank" rel="noopener" data-i18n="foot.baha">巴哈姆特</a>
+      <a href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener" data-i18n="foot.myacg">買動漫</a>
     </nav>
-    <span>© 2019–2026 mania8522191 · 作品版權所有</span>
+    <span data-i18n="foot.copy">© 2019–2026 mania8522191 · 作品版權所有</span>
   </div>
 </footer>
 
-<div class="zv" id="zv" role="dialog" aria-modal="true" aria-label="圖片檢視" hidden>
+<div class="zv" id="zv" role="dialog" aria-modal="true" aria-label="圖片檢視" data-i18n-aria="zv.label" hidden>
   <div class="zv-bar">
     <p class="zv-cap" id="zv-cap"></p>
-    <button type="button" id="zv-zoom" aria-pressed="false">放大</button>
+    <button type="button" id="zv-zoom" aria-pressed="false" data-i18n="zv.zoom">放大</button>
     <button type="button" id="zv-close">CLOSE</button>
   </div>
   <div class="zv-stage" id="zv-stage"><div class="zv-canvas"><img class="zv-img" id="zv-img" alt="" draggable="false"></div></div>
-  <button type="button" class="zv-prev" id="zv-prev" aria-label="上一張">←</button>
-  <button type="button" class="zv-next" id="zv-next" aria-label="下一張">→</button>
-  <p class="zv-hint" id="zv-hint">點圖片放大，再點一下縮回</p>
-  <p class="zv-load" id="zv-load" hidden>載入高解析度⋯</p>
+  <button type="button" class="zv-prev" id="zv-prev" aria-label="上一張" data-i18n-aria="zv.prev">←</button>
+  <button type="button" class="zv-next" id="zv-next" aria-label="下一張" data-i18n-aria="zv.next">→</button>
+  <p class="zv-hint" id="zv-hint" data-i18n="zv.hint">點圖片放大，再點一下縮回</p>
+  <p class="zv-load" id="zv-load" hidden data-i18n="zv.load">載入高解析度⋯</p>
 </div>
 
 <script>
 window.SELF_HOSTED = true;
 const WORKS = [{"id":"148923743","t":"星街すいせい×AZKi-「AZKiと未来へ」","ym":"2026.08","d":"2026-08-27","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","AZKi"],"dims":[[900,2728,1500,4547]],"pos":"50% 31%","yt":{"id":"4jt6jOjVMuA","dur":"22:20","t":"星街すいせい×AZKi-「AZKiと未来へ」PROCESS TIMELAPSE- 202608"}},{"id":"148499079","t":"台湾FF47お品書き","ym":"","d":"2026-08-16","lab":"Fancy Frontier 47","tags":["バーチャルYouTuber","星街すいせい","さくらみこ","宝鐘マリン","一伊那尓栖","仲町あられ"],"dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]],"pos":"50% 35%"},{"id":"148494165","t":"星街すいせい×花譜-KAF-「DEADPOOL」","ym":"2026.08","d":"2026-08-16","lab":"hololive × 神椿スタジオ","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","神椿スタジオ"],"dims":[[900,2728,1500,4547]],"pos":"50% 29%","yt":{"id":"CqvN1sByvPU","dur":"21:41","t":"星街すいせい×花譜-KAF-「DEADPOOL」PROCESS TIMELAPSE- 202608"}},{"id":"148313240","t":"チビキーホルダー","ym":"2026.08","d":"2026-08-12","lab":"hololive","tags":["バーチャルYouTuber","hololive","星街すいせい","ほしまちぎゃらりー","HololiveEN","一伊那尓栖"],"dims":[[1000,1001],[1000,1001],[1000,1001],[1000,1001]],"pos":"50% 50%","yt":{"id":"T3Oaep-xdDw","dur":"12:42","t":"チビキーホルダーPROCESS TIMELAPSE- 202608"}},{"id":"148068024","t":"あのそよ「ブレンドの香る窓辺で」","ym":"2026.08","d":"2026-08-06","lab":"BanG Dream!","tags":["バンドリ","BanG_Dream!","千早愛音","長崎そよ","あのそよ"],"dims":[[1200,800,2560,1707],[1500,12000]],"pos":"50% 35%","yt":{"id":"JLrV-DkgcAM","dur":"57:59","t":"あのそよ「ブレンドの香る窓辺で」PROCESS TIMELAPSE- 202608"}},{"id":"147595537","t":"miComet「シュガーラッシュ」「Lollipop」","ym":"","d":"2026-07-25","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","miComet","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,2560,1707],[1500,12000]],"pos":"50% 35%","yt":{"id":"5IpNSzgaoDE","dur":"25:03","t":"miComet「シュガーラッシュ」「Lollipop」PROCESS TIMELAPSE- 202608"}},{"id":"146954644","t":"星街すいせい×宝鐘マリン「Chatter Chatter」","ym":"","d":"2026-07-08","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","ほしまちぎゃらりー","宝鐘マリン","マリンのお宝"],"dims":[[1200,675,2560,1440],[1200,8100]],"pos":"50% 35%","yt":{"id":"3D9UhNnYtnw","dur":"49:12","t":"星街すいせい×宝鐘マリン「Chatter Chatter」PROCESS TIMELAPSE- 202608"}},{"id":"146544263","t":"星街すいせい「SheenderellaDay」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","ほしまちぎゃらりー","アイドルマスターシンデレラガールズ","高垣楓"],"dims":[[1200,608,1500,760],[1500,4560]],"pos":"50% 35%"},{"id":"146544204","t":"星街すいせい「SheenderellaDay」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,608,1500,760],[1500,4560]],"pos":"50% 35%"},{"id":"146543533","t":"星街すいせい「ジュビリー」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,608,1500,760],[1500,6080]],"pos":"50% 35%"},{"id":"146541232","t":"星街すいせい「ジュビリー」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー","アイドルマスターシンデレラガールズ","高垣楓"],"dims":[[1200,608,1500,760],[750,4560]],"pos":"50% 35%"},{"id":"142549210","t":"星街すいせい「ビビデバ」","ym":"2026.08","d":"2026-03-21","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000],[750,4000]],"pos":"50% 35%","yt":{"id":"yWAYSn_4VsA","dur":"16:45","t":"星街すいせい「ビビデバ」PROCESS TIMELAPSE- 202608"}},{"id":"140064972","t":"星街すいせい「起点‧終点」","ym":"2026.02","d":"2026-01-18","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,675,1920,1080],[1000,1000],[1000,1000],[1000,1000],[1000,1000],[1000,1000],[1000,1000]],"pos":"50% 35%","yt":{"id":"rb2b--E93Do","dur":"32:58","t":"星街すいせい「起点‧終点」PROCESS TIMELAPSE- 202602"}},{"id":"140064141","t":"miComet「シュガーラッシュ」","ym":"2024.08","d":"2026-01-18","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","miComet","星街すいせい","さくらみこ","ほしまちぎゃらりー"],"dims":[[1000,1000],[1000,6000]],"pos":"50% 35%"},{"id":"139165109","t":"星街すいせい「じつげん」","ym":"2026.02","d":"2025-12-28","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,675,1778,1000],[889,6000]],"pos":"50% 35%","yt":{"id":"AI6gq6-lBoY","dur":"40:22","t":"星街すいせい「じつげん」PROCESS TIMELAPSE- 202602"}},{"id":"137386797","t":"星街すいせい「武道館」","ym":"2025.12","d":"2025-11-12","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000],[750,6000]],"pos":"50% 35%","yt":{"id":"VyM0Wds8Zbw","dur":"30:01","t":"星街すいせい「武道館」PROCESS TIMELAPSE- 202512"}},{"id":"137332578","t":"miComet「Lollipop」","ym":"2025.12","d":"2025-11-11","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","miComet","星街すいせい","さくらみこ","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000],[750,6000]],"pos":"50% 35%","yt":{"id":"PgKiIjXDjgo","dur":"30:01","t":"miComet「Lollipop」PROCESS TIMELAPSE- 202512"}},{"id":"137310133","t":"星街すいせい","ym":"2025.05","d":"2025-11-10","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1000,1000]],"pos":"50% 35%","yt":{"id":"5FlWXc-elA4","dur":"20:13","t":"星街すいせい「新星目録」PROCESS TIMELAPSE- 202508"}},{"id":"137309925","t":"星街すいせい「Super Nova」","ym":"2025.05","d":"2025-11-10","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[800,1200,1000,1500]],"pos":"50% 30%"},{"id":"137308455","t":"星街すいせい「7th Anniversary」","ym":"2025.05","d":"2025-11-10","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000]],"pos":"50% 35%","yt":{"id":"ZePHgBmgToQ","dur":"21:57","t":"星街すいせい「7th Anniversary」PROCESS TIMELAPSE- 202508"}},{"id":"137296812","t":"ガールズバンド","ym":"2024.12","d":"2025-11-10","lab":"MyGO!!!!! / ガールズバンドクライ","tags":["MyGO!!!!!","ガールズバンドクライ"],"dims":[[1200,1200,1500,1500],[1200,600,2560,1280],[1200,600,2560,1280],[1200,900,2000,1500],[1200,600,2560,1280]],"pos":"50% 35%"},{"id":"137293278","t":"星街すいせい","ym":"2024.08","d":"2025-11-09","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい"],"dims":[[1200,600,2560,1280],[1200,600,2560,1280],[1200,600,2560,1280]],"pos":"50% 35%"},{"id":"110349085","t":"みちづれ","ym":"","d":"2023-07-29","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[1200,600,2560,1280]],"pos":"50% 35%"},{"id":"110144237","t":"灼熱にて純情(wii-wii-woo)","ym":"","d":"2023-07-22","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[1200,600,2560,1280]],"pos":"50% 35%"},{"id":"104895616","t":"❤","ym":"","d":"2023-01-29","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[800,1200,1200,1800]],"pos":"50% 30%"},{"id":"99304739","t":"❤","ym":"","d":"2022-06-26","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[1200,600,1600,800]],"pos":"50% 35%"},{"id":"95387282","t":"❤","ym":"","d":"2022-01-08","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","VTuber"],"dims":[[681,1200,908,1600]],"pos":"50% 42%"},{"id":"94713402","t":"「KING」","ym":"","d":"2021-12-11","lab":"hololive","tags":["バーチャルYouTuber","星街すいせい","ホロライブ"],"dims":[[1200,681,1600,908]],"pos":"50% 35%"},{"id":"94112477","t":"「Honeycomb Summer」","ym":"","d":"2021-11-13","lab":"hololive × にじさんじ","tags":["バーチャルYouTuber","星街すいせい","戌亥とこ","とこまち","ホロライブ","にじさんじ"],"dims":[[1200,681,1600,908]],"pos":"50% 35%"},{"id":"93787913","t":"「今宵月の館にて」","ym":"","d":"2021-10-30","lab":"hololive × にじさんじ","tags":["バーチャルYouTuber","星街すいせい","戌亥とこ","とこまち","ホロライブ","にじさんじ"],"dims":[[1200,681,1600,908]],"pos":"50% 35%"},{"id":"92332684","t":"夏","ym":"","d":"2021-08-28","lab":"hololive","tags":["バーチャルYouTuber","猫又おかゆ","戌神ころね","水着","ホロライブ","おかころ"],"dims":[[1200,750,1600,1000]],"pos":"50% 35%"},{"id":"91801023","t":"夏","ym":"","d":"2021-08-08","lab":"hololive English","tags":["バーチャルYouTuber","一伊那尓栖","小鳥遊キアラ","森カリオペ","ワトソン・アメリア","がうる・ぐら"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%"},{"id":"91312872","t":"夏","ym":"","d":"2021-07-17","lab":"hololive","tags":["バーチャルYouTuber","天音かなた","桐生ココ","星街すいせい","水着"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%"},{"id":"78848192","t":"プリンツ・オイゲン","ym":"","d":"2020-01-12","lab":"アズールレーン","tags":["アズールレーン","プリンツ・オイゲン(アズールレーン)","私服"],"dims":[[900,1200],[900,1200]],"pos":"50% 35%"},{"id":"78715432","t":"ドイッチュラント","ym":"","d":"2020-01-05","lab":"アズールレーン","tags":["アズールレーン","ドイッチュラント(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%"},{"id":"78553188","t":"アドミラル・グラーフ・シュペー","ym":"","d":"2019-12-29","lab":"アズールレーン","tags":["アズールレーン","アドミラル・グラーフ・シュペー(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%"},{"id":"78409231","t":"アドミラル・ヒッパー","ym":"","d":"2019-12-22","lab":"アズールレーン","tags":["アズールレーン","アドミラル・ヒッパー(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%"}];
-const GOODS = [{"slug":"set-b","name":"新刊套組 B","eyebrow":"2026 新刊","price":600,"was":800,"meta":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","list_title":"內容","items":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"note":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","works":["147595537","142549210","148313240"],"dims":[1215,810]},{"slug":"set-a","name":"新刊套組 A","eyebrow":"2026 新刊","price":100,"meta":"fanart book ＋ 明信片組 ＋ 紙袋","list_title":"內容","items":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"works":[],"dims":[1215,810]},{"slug":"anosoyo","name":"あのそよ套組","eyebrow":"BanG Dream!","price":400,"was":500,"meta":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","list_title":"內容","items":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"works":["148068024"],"dims":[1305,870]},{"slug":"stand","name":"「起点‧終点」壓克力飯友套組","eyebrow":"星街すいせい","price":500,"was":600,"meta":"高 6 cm・厚 8 mm・炫彩雙面印刷","size":"高 6 cm、厚 8 mm","spec":"炫彩、雙面印刷","works":["140064972"],"dims":[1396,930]},{"slug":"playmat","name":"「Chatter Chatter」桌遊滑鼠墊","eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":"比舊款長 10 cm。","works":["146954644"],"dims":[1290,860]},{"slug":"acrylic-board","name":"壓克力畫板","eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":"款","meta":"15 × 10 cm・3 款","size":"15 × 10 cm","list_title":"款式","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1350,900]},{"slug":"sign-board","name":"彩印簽繪板","eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":"款","meta":"21 × 15 cm・4 款","size":"21 × 15 cm","list_title":"款式","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":"購買新刊套組 B，可再折 NT$50。","works":["146954644","147595537","142549210","148068024"],"dims":[1350,900]},{"slug":"keychain","name":"壓克力吊飾","eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":"款","meta":"6 cm・3 款","size":"6 cm","list_title":"款式","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1170,780]},{"slug":"kikan","name":"既刊大禮包","eyebrow":"既刊","price":700,"meta":"既刊、資料夾、明信片組、吊飾等","list_title":"內容","items":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"works":[],"dims":[1395,930]}];
+const GOODS = [{"slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1215,810]},{"slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1215,810]},{"slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1305,870]},{"slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1396,930]},{"slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1290,860]},{"slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1350,900]},{"slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1350,900]},{"slug":"keychain","name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1170,780]},{"slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1395,930]}];
 const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';
-const EVENT = 'Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44';
 const byId = Object.fromEntries(WORKS.map((w, i) => [w.id, i]));
 const bySlug = Object.fromEntries(GOODS.map((g, i) => [g.slug, i]));
 const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+/* ---------- languages: zh (Traditional Chinese), en, ja ---------- */
+const I18N = {"zh":{"nav.main":"主選單","lang.label":"語言","hero.cue":"往下看作品","works.sub":"2019 — 2026 · {n} 件作品 · 點選封面看完整作品","cover.pages":"{n} 張","cover.video":"▶ 過程影片","wk.posted":"{d} 發表","wk.pages":"{n} 張","wk.pixiv":"在 pixiv 查看 ↗","wk.tlJump":"▶ 製作過程影片","wk.imgAlt":"{t}（第 {n} 張，共 {m} 張）","wk.madeGoods":"這張插畫做成了周邊：","wk.goodsLink":"看周邊詳細介紹 →","wk.others":"其他作品","list.sep":"、","tl.h":"製作過程影片","tl.yt":"在 YouTube 觀看 ↗","tl.play":"在 YouTube 播放：{t}","goods.sub":"Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。","goods.shopName":"買動漫賣場「Mania Art」","goods.shopBtn":"前往賣場 ↗","item.buy":"到買動漫賣場購買 ↗","item.menu":"看 FF47 完整品書","item.used":"使用插畫","item.others":"其他周邊","item.imgAlt":"{t}實品示意圖","price.event":"場次價","price.per":"／款","spec.size":"尺寸","spec.spec":"規格","spec.contents":"內容","spec.designs":"款式","spec.offer":"優惠","spec.debut":"首賣","event":"Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44","game.coverAlt":"遊戲的戰場背景美術","game.kicker":"INDIE GAME・開發中","game.tag":"組牌決策 × 魔力場站位 × 回合資源管理","game.lead":"讓每一次部署，成為下一個攻擊回合的優勢。","game.h":"一個人做的卡牌策略遊戲","game.p1":"用 54 張牌組成你的隊伍，在格子戰場上安排角色站位，一邊守住防線、一邊找機會反擊，把對手的總血量打到歸零。","game.p2":"從企劃、程式到美術，全部由 mania8522191 一個人製作。","chip.strategy":"卡牌策略","chip.turn":"回合制","chip.dev":"開發中","shots.h":"遊戲畫面","shots.zoom":"放大看這張畫面","shots.note":"開發中畫面，正式版可能會調整。","shots.thumb":"第 {n} 張：{t}","shot1":"角色：依稀有度篩選、搜尋角色卡","shot2":"牌組：依卡牌類型挑選，組成 54 張牌組","shot3":"召喚：選擇要部署上場的角色","shot4":"卡牌詳情：數值、技能與效果說明","shot5":"角色資訊：屬性與各項加成來源","shot6":"事件牌：從一般事件中挑選放進牌組","shot7":"攻擊階段：傷害數字直接顯示在戰場上","shot8":"戰鬥紀錄：雙方傷害統計與每一步的行動紀錄","feat.h":"玩法特色","f1.h":"自由組牌","f1.p":"角色、裝備、事件、天使與惡魔，用 54 張牌組出屬於你的戰術。","f2.h":"站位決定勝負","f2.p":"同一個角色，站的位置、帶的裝備不同，發揮也完全不一樣。","f3.h":"每回合都是取捨","f3.p":"行動點數、活力和魔力要怎麼分配，決定你下一回合的攻勢。","f4.h":"生死之門","f4.p":"10 回合內還沒分出勝負？雙方剩下的牌庫會被摧毀，打到有一方倒下為止。","chars.h":"角色一覽","chars.sub":"共 18 位角色，立繪陸續公開中。點角色可以看完整立繪。","chars.tbd":"char{n} 的立繪尚未公開","chars.view":"看 char{n} 的完整立繪","chars.full":"char{n} 的完整立繪","follow.h":"追蹤最新消息","follow.p":"遊戲還在開發中，上市時間和售價都還沒決定。想第一時間知道消息，可以追蹤這些地方。","about.alt":"mania8522191 的頭像：星街すいせい布偶","about.p1":"mania8522191，以 hololive 的星街すいせい為主要題材的插畫創作者。2019 年開始在 pixiv 發表作品，內容包括紀念插畫、和其他 VTuber 的聯動圖，以及 BanG Dream!、アズールレーン 的同人創作。","about.p2":"也製作周邊，曾以攤位 J44 參加台灣 Fancy Frontier 47。","about.p3":"目前正一個人開發卡牌策略遊戲。","about.gameLink":"看遊戲介紹 →","facts.works":"件作品","facts.pages":"張圖","facts.since":"開始在 pixiv 發表","contact.sub":"在以下平台都找得到我。作品相關的聯絡，請直接私訊。","grp.social":"社群","grp.works":"作品","grp.shop":"周邊","h.fbPage":"mania8522191・粉絲專頁","h.fbPersonal":"mania8522191p2・個人帳號","h.discord":"加入伺服器","h.shop":"賣場 217467","ch.baha":"巴哈姆特","ch.myacg":"買動漫","foot.nav":"社群與作品平台","foot.fbPage":"Facebook（粉專）","foot.fbPersonal":"Facebook（個人）","foot.baha":"巴哈姆特","foot.myacg":"買動漫","foot.copy":"© 2019–2026 mania8522191 · 作品版權所有","zv.label":"圖片檢視","zv.zoom":"放大","zv.unzoom":"縮小","zv.prev":"上一張","zv.next":"下一張","zv.hint":"點圖片放大，再點一下縮回","zv.load":"載入高解析度⋯","zv.workAlt":"{t}（第 {n} 張）"},"en":{"nav.main":"Main menu","lang.label":"Language","hero.cue":"Scroll down to the works","works.sub":"2019 — 2026 · {n} works · Click a cover to see the full piece","cover.pages":"{n} images","cover.video":"▶ Timelapse","wk.posted":"Posted {d}","wk.pages":"{n} images","wk.pixiv":"View on pixiv ↗","wk.tlJump":"▶ Process timelapse","wk.imgAlt":"{t} (image {n} of {m})","wk.madeGoods":"Made into goods: ","wk.goodsLink":"See the goods →","wk.others":"Other works","list.sep":", ","tl.h":"Process timelapse","tl.yt":"Watch on YouTube ↗","tl.play":"Play on YouTube: {t}","goods.sub":"Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.","goods.shopName":"MyACG shop “Mania Art”","goods.shopBtn":"Visit the shop ↗","item.buy":"Buy at the MyACG shop ↗","item.menu":"Full FF47 catalog","item.used":"Artwork used","item.others":"Other goods","item.imgAlt":"{t} product shot","price.event":"event price","price.per":" / design","spec.size":"Size","spec.spec":"Specs","spec.contents":"Contents","spec.designs":"Designs","spec.offer":"Offer","spec.debut":"Debut","event":"Fancy Frontier 47 · Aug 21–22, 2026 · Taipei Expo Dome, booth J44","game.coverAlt":"Battlefield background art from the game","game.kicker":"INDIE GAME · IN DEVELOPMENT","game.tag":"Deckbuilding × Mana-field positioning × Turn resource management","game.lead":"Make every deployment your edge in the next attack turn.","game.h":"A card strategy game made by one person","game.p1":"Build your team from a 54-card deck and position your characters on a grid battlefield. Hold the line, look for the moment to strike back, and bring your opponent's total HP down to zero.","game.p2":"Planning, programming and art: everything is made by mania8522191 alone.","chip.strategy":"Card strategy","chip.turn":"Turn-based","chip.dev":"In development","shots.h":"Screenshots","shots.zoom":"View this screenshot larger","shots.note":"In-development footage; the final game may differ.","shots.thumb":"Screenshot {n}: {t}","shot1":"Characters: filter and search character cards by rarity","shot2":"Deck: pick cards by type to build a 54-card deck","shot3":"Summon: choose which characters to deploy","shot4":"Card details: stats, skills and effects","shot5":"Character info: attributes and where each bonus comes from","shot6":"Event cards: choose general events for your deck","shot7":"Attack phase: damage numbers appear right on the battlefield","shot8":"Battle log: damage totals for both sides and a step-by-step record","feat.h":"Features","f1.h":"Build your deck","f1.p":"Characters, equipment, events, angels and demons: build your own tactics from 54 cards.","f2.h":"Position wins battles","f2.p":"The same character plays completely differently depending on where it stands and what it carries.","f3.h":"Every turn is a trade-off","f3.p":"How you spend action points, energy and mana decides the strength of your next attack.","f4.h":"Gate of Life and Death","f4.p":"No winner after 10 turns? Both remaining decks are destroyed, and the fight goes on until one side falls.","chars.h":"Characters","chars.sub":"18 characters, with more art revealed over time. Click a character to see the full art.","chars.tbd":"Art for char{n} is not revealed yet","chars.view":"View the full art of char{n}","chars.full":"Full art of char{n}","follow.h":"Follow the development","follow.p":"The game is still in development, and the release date and price are not decided yet. Follow along here to hear the news first.","about.alt":"mania8522191's avatar: a Hoshimachi Suisei plush","about.p1":"mania8522191 is an illustrator who mainly draws hololive's Hoshimachi Suisei. Posting on pixiv since 2019, with commemorative illustrations, collaborations with other VTubers, and fan art of BanG Dream! and Azur Lane.","about.p2":"Also makes goods, and exhibited at Fancy Frontier 47 in Taiwan (booth J44).","about.p3":"Currently developing a card strategy game solo. ","about.gameLink":"See the game →","facts.works":"works","facts.pages":"images","facts.since":"first pixiv post","contact.sub":"You can find me on all of these platforms. For anything about my work, please send a direct message.","grp.social":"Social","grp.works":"Portfolio","grp.shop":"Goods","h.fbPage":"mania8522191 · Page","h.fbPersonal":"mania8522191p2 · Personal","h.discord":"Join the server","h.shop":"Shop 217467","ch.baha":"Bahamut","ch.myacg":"MyACG","foot.nav":"Social and portfolio links","foot.fbPage":"Facebook (Page)","foot.fbPersonal":"Facebook (Personal)","foot.baha":"Bahamut","foot.myacg":"MyACG","foot.copy":"© 2019–2026 mania8522191 · All rights reserved","zv.label":"Image viewer","zv.zoom":"Zoom in","zv.unzoom":"Zoom out","zv.prev":"Previous","zv.next":"Next","zv.hint":"Click the picture to zoom in, click again to zoom out","zv.load":"Loading full resolution…","zv.workAlt":"{t} (image {n})"},"ja":{"nav.main":"メインメニュー","lang.label":"言語","hero.cue":"作品一覧へスクロール","works.sub":"2019 — 2026 · 全{n}作品 · 表紙をクリックすると作品ページを開きます","cover.pages":"{n}枚","cover.video":"▶ メイキング","wk.posted":"{d} 投稿","wk.pages":"{n}枚","wk.pixiv":"pixivで見る ↗","wk.tlJump":"▶ メイキング動画","wk.imgAlt":"{t}（{m}枚中{n}枚目）","wk.madeGoods":"グッズ化：","wk.goodsLink":"グッズ紹介を見る →","wk.others":"ほかの作品","list.sep":"、","tl.h":"メイキング動画","tl.yt":"YouTubeで見る ↗","tl.play":"YouTubeで再生：{t}","goods.sub":"Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。","goods.shopName":"買動漫（MyACG）ショップ「Mania Art」","goods.shopBtn":"ショップへ ↗","item.buy":"買動漫ショップで購入 ↗","item.menu":"FF47 お品書きを見る","item.used":"使用イラスト","item.others":"ほかのグッズ","item.imgAlt":"{t}の商品イメージ","price.event":"イベント価格","price.per":"／1種","spec.size":"サイズ","spec.spec":"仕様","spec.contents":"内容","spec.designs":"種類","spec.offer":"特典","spec.debut":"初頒布","event":"Fancy Frontier 47・2026.08.21–22・花博争艶館 J44","game.coverAlt":"ゲームの戦場背景アート","game.kicker":"INDIE GAME・開発中","game.tag":"デッキ構築 × 魔力場の位置取り × ターンごとの資源管理","game.lead":"ひとつひとつの配置を、次の攻撃ターンの優位に。","game.h":"ひとりで作るカードストラテジーゲーム","game.p1":"54枚のデッキでチームを編成し、マス目の戦場にキャラクターを配置。防衛ラインを守りながら反撃のチャンスをうかがい、相手の総HPをゼロにしましょう。","game.p2":"企画・プログラム・イラストまで、すべて mania8522191 がひとりで制作しています。","chip.strategy":"カードストラテジー","chip.turn":"ターン制","chip.dev":"開発中","shots.h":"ゲーム画面","shots.zoom":"この画面を拡大して見る","shots.note":"開発中の画面です。製品版では変更される場合があります。","shots.thumb":"{n}枚目：{t}","shot1":"キャラクター：レアリティで絞り込み・キャラカードを検索","shot2":"デッキ：カードの種類ごとに選んで54枚のデッキを構築","shot3":"召喚：戦場に配置するキャラクターを選択","shot4":"カード詳細：ステータス・スキル・効果の説明","shot5":"キャラクター情報：属性と各ボーナスの内訳","shot6":"イベントカード：一般イベントから選んでデッキに追加","shot7":"攻撃フェーズ：ダメージがそのまま戦場に表示","shot8":"バトルログ：両陣営のダメージ集計と行動の記録","feat.h":"ゲームの特徴","f1.h":"自由なデッキ構築","f1.p":"キャラクター、装備、イベント、天使と悪魔。54枚で自分だけの戦術を組み立てよう。","f2.h":"位置取りが勝負を決める","f2.p":"同じキャラクターでも、立つ位置や装備によって活躍がまったく変わります。","f3.h":"毎ターンが取捨選択","f3.p":"行動ポイント、活力、魔力をどう配分するかが、次のターンの攻勢を左右します。","f4.h":"生死の門","f4.p":"10ターンで決着がつかなければ、双方の残りの山札が破壊され、どちらかが倒れるまで戦いは続きます。","chars.h":"キャラクター","chars.sub":"全18キャラクター。立ち絵は順次公開中です。キャラクターをクリックすると立ち絵全体を表示します。","chars.tbd":"char{n} の立ち絵は未公開です","chars.view":"char{n} の立ち絵を見る","chars.full":"char{n} の立ち絵","follow.h":"最新情報をチェック","follow.p":"ゲームは開発中で、発売時期・価格は未定です。最新情報をいち早く知りたい方は、こちらをフォローしてください。","about.alt":"mania8522191 のアイコン：星街すいせいのぬいぐるみ","about.p1":"hololive の星街すいせいを中心に描いているイラストレーターです。2019年から pixiv に作品を投稿しており、記念イラストや他の VTuber とのコラボイラスト、BanG Dream!・アズールレーンのファンアートなどを描いています。","about.p2":"グッズ制作も行っており、台湾の Fancy Frontier 47 にサークル参加しました（スペース J44）。","about.p3":"現在、カードストラテジーゲームを個人で開発中です。","about.gameLink":"ゲーム紹介へ →","facts.works":"作品","facts.pages":"枚のイラスト","facts.since":"pixiv 投稿開始","contact.sub":"以下のプラットフォームで活動しています。作品に関するご連絡は、各SNSのDMまでお願いします。","grp.social":"SNS","grp.works":"作品","grp.shop":"グッズ","h.fbPage":"mania8522191・ページ","h.fbPersonal":"mania8522191p2・個人アカウント","h.discord":"サーバーに参加","h.shop":"ショップ 217467","ch.baha":"巴哈姆特（バハムート）","ch.myacg":"買動漫（MyACG）","foot.nav":"SNS・作品リンク","foot.fbPage":"Facebook（ページ）","foot.fbPersonal":"Facebook（個人）","foot.baha":"巴哈姆特","foot.myacg":"買動漫","foot.copy":"© 2019–2026 mania8522191 · 無断転載禁止","zv.label":"画像ビューア","zv.zoom":"拡大","zv.unzoom":"縮小","zv.prev":"前へ","zv.next":"次へ","zv.hint":"画像をクリックで拡大、もう一度クリックで元に戻ります","zv.load":"高解像度を読み込み中…","zv.workAlt":"{t}（{n}枚目）"}};
+const HTML_LANG = { zh: 'zh-Hant', en: 'en', ja: 'ja' };
+let LANG = I18N[window.__LANG] ? window.__LANG : 'zh';
+function tr(key, vars) {
+  let str = (I18N[LANG] && I18N[LANG][key]) ?? I18N.zh[key] ?? key;
+  if (vars) str = str.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+  return str;
+}
+const L = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? (v[LANG] ?? v.zh) : v);   // pick a translated data field
+const pagesText = (n) => (LANG === 'en' && n === 1 ? '1 image' : tr('wk.pages', { n }));
 const VIEWS = { home: $('#v-home'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), game: $('#v-game'), about: $('#v-about'), contact: $('#v-contact') };
 
 /* ---------- game page: character roster, char1–char18; slots without art show char0 ---------- */
@@ -718,14 +753,14 @@ for (let n = 1; n <= 18; n++) {
   img.src = `img/char${has ? n : 0}.webp`;
   img.width = 500; img.height = 1364;
   img.loading = 'lazy'; img.decoding = 'async';
-  img.alt = has ? '' : `char${n} 的立繪尚未公開`;
+  img.alt = has ? '' : tr('chars.tbd', { n });
   box.appendChild(img);
   let top = box;
   if (has) {
     top = el('button', 'char-btn');
     top.type = 'button';
     top.dataset.n = n;
-    top.setAttribute('aria-label', `看 char${n} 的完整立繪`);
+    top.setAttribute('aria-label', tr('chars.view', { n }));
     top.appendChild(box);
     artChars.push(n);
   }
@@ -733,31 +768,22 @@ for (let n = 1; n <= 18; n++) {
   charList.appendChild(li);
 }
 /* ---------- game page: in-development screenshots (main view + thumbnails) ---------- */
-const SHOTS = [
-  '角色：依稀有度篩選、搜尋角色卡',
-  '牌組：依卡牌類型挑選，組成 54 張牌組',
-  '召喚：選擇要部署上場的角色',
-  '卡牌詳情：數值、技能與效果說明',
-  '角色資訊：屬性與各項加成來源',
-  '事件牌：從一般事件中挑選放進牌組',
-  '攻擊階段：傷害數字直接顯示在戰場上',
-  '戰鬥紀錄：雙方傷害統計與每一步的行動紀錄',
-];
+const SHOTS = ['shot1', 'shot2', 'shot3', 'shot4', 'shot5', 'shot6', 'shot7', 'shot8'];   // captions live in I18N
 const shotImg = $('#shot-img'), shotThumbs = $('#shot-thumbs');
 let shotAt = 0;
 function showShot(i, animate = true) {
   shotAt = (i + SHOTS.length) % SHOTS.length;
   shotImg.src = `img/shot${shotAt + 1}.webp`;
-  shotImg.alt = SHOTS[shotAt];
+  shotImg.alt = tr(SHOTS[shotAt]);
   $('#shot-no').textContent = `${no2(shotAt + 1)} / ${no2(SHOTS.length)}`;
-  $('#shot-cap').textContent = SHOTS[shotAt];
+  $('#shot-cap').textContent = tr(SHOTS[shotAt]);
   shotThumbs.querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', String(k === shotAt)));
   if (animate) { shotImg.classList.remove('swap'); void shotImg.offsetWidth; shotImg.classList.add('swap'); }
 }
 SHOTS.forEach((cap, i) => {
   const b = el('button');
   b.type = 'button';
-  b.setAttribute('aria-label', `第 ${i + 1} 張：${cap}`);
+  b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(cap) }));
   const im = el('img');
   im.src = `img/shot${i + 1}-t.webp`; im.width = 400; im.height = 225; im.alt = ''; im.loading = 'lazy';
   b.appendChild(im);
@@ -774,11 +800,11 @@ const ZV_SETS = {
       src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
       w: W, h: H, zw: ZW || W,
       no: `${n + 1} / ${w.dims.length}`, cap: w.t,
-      alt: w.dims.length > 1 ? `${w.t}（第 ${n + 1} 張）` : w.t,
+      alt: w.dims.length > 1 ? tr('zv.workAlt', { t: w.t, n: n + 1 }) : w.t,
     }));
   },
-  shots: () => SHOTS.map((s, i) => ({ src: `img/shot${i + 1}.webp`, w: 1600, h: 900, zw: 1600, no: `${no2(i + 1)} / ${no2(SHOTS.length)}`, cap: s, alt: s })),
-  chars: () => artChars.map((n) => ({ src: `img/char${n}.webp`, w: 500, h: 1364, zw: 500, no: `No.${no2(n)}`, cap: `char${n}`, alt: `char${n} 的完整立繪` })),
+  shots: () => SHOTS.map((s, i) => ({ src: `img/shot${i + 1}.webp`, w: 1600, h: 900, zw: 1600, no: `${no2(i + 1)} / ${no2(SHOTS.length)}`, cap: tr(s), alt: tr(s) })),
+  chars: () => artChars.map((n) => ({ src: `img/char${n}.webp`, w: 500, h: 1364, zw: 500, no: `No.${no2(n)}`, cap: `char${n}`, alt: tr('chars.full', { n }) })),
 };
 let zvKind = '', zvSet = [], zvAt = 0, zvFrom = null, zoomed = false, zvToken = 0;
 
@@ -814,7 +840,7 @@ function zvZoom(on, cx, cy) {
   const fx = Math.min(1, Math.max(0, (px - a.left) / a.width)), fy = Math.min(1, Math.max(0, (py - a.top) / a.height));
   zoomed = on;
   zv.classList.toggle('zoomed', on);
-  zvZoomBtn.textContent = on ? '縮小' : '放大';
+  zvZoomBtn.textContent = on ? tr('zv.unzoom') : tr('zv.zoom');
   zvZoomBtn.setAttribute('aria-pressed', String(on));
   zvImg.style.transition = 'none';
   zvImg.style.transform = '';
@@ -839,7 +865,7 @@ function zvShow(i) {
   $('#zv-load').hidden = true;
   zoomed = false;
   zv.classList.remove('zoomed');
-  zvZoomBtn.textContent = '放大';
+  zvZoomBtn.textContent = tr('zv.zoom');
   zvZoomBtn.setAttribute('aria-pressed', 'false');
   zvImg.style.transition = 'none';
   zvImg.style.transform = '';
@@ -933,8 +959,8 @@ function price(g, label) {
   const p = el('span', 'price');
   if (g.was) p.appendChild(el('s', '', `NT$${g.was}`));
   p.appendChild(document.createTextNode(`NT$${g.price}`));
-  if (g.unit) p.appendChild(el('small', '', `／${g.unit}`));
-  if (label) p.appendChild(el('small', '', '場次價'));
+  if (g.unit) p.appendChild(el('small', '', tr('price.per')));
+  if (label) p.appendChild(el('small', '', tr('price.event')));
   return p;
 }
 
@@ -951,26 +977,32 @@ GOODS.forEach((g, i) => {
   img.src = `img/goods-${g.slug}.webp`; img.width = g.dims[0]; img.height = g.dims[1];
   img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
   box.appendChild(img);
-  a.append(box, el('span', 'g-name', g.name), el('span', 'g-meta', g.meta), price(g, false));
+  a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
+  fillGoodsCard(a, g);
   ggrid.appendChild(a);
 });
+function fillGoodsCard(a, g) {
+  a.querySelector('.g-name').textContent = L(g.name);
+  a.querySelector('.g-meta').textContent = L(g.meta);
+  a.querySelector('.price').replaceWith(price(g, false));
+}
 
 /* ---------- goods item page ---------- */
 function renderItem(i) {
   const g = GOODS[i];
-  $('#it-lab').textContent = g.eyebrow;
-  $('#it-title').textContent = g.name;
+  $('#it-lab').textContent = L(g.eyebrow);
+  $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
   const img = $('#it-img');
   img.src = `img/goods-${g.slug}.webp`; img.width = g.dims[0]; img.height = g.dims[1];
-  img.alt = `${g.name}實品示意圖`;
+  img.alt = tr('item.imgAlt', { t: L(g.name) });
 
   const rows = [];
-  if (g.size) rows.push(['尺寸', g.size]);
-  if (g.spec) rows.push(['規格', g.spec]);
-  if (g.items) rows.push([g.list_title, g.items]);
-  if (g.note) rows.push(['優惠', g.note]);
-  rows.push(['首賣', EVENT]);
+  if (g.size) rows.push([tr('spec.size'), L(g.size)]);
+  if (g.spec) rows.push([tr('spec.spec'), L(g.spec)]);
+  if (g.items) rows.push([tr('spec.' + g.list_title), L(g.items)]);
+  if (g.note) rows.push([tr('spec.offer'), L(g.note)]);
+  rows.push([tr('spec.debut'), tr('event')]);
   $('#it-spec').replaceChildren(...rows.map(([k, v], n) => {
     const d = el('div');
     d.dataset.rv = 'up';
@@ -994,8 +1026,8 @@ function renderItem(i) {
 
   const p = GOODS[(i - 1 + GOODS.length) % GOODS.length];
   const nx = GOODS[(i + 1) % GOODS.length];
-  $('#it-prev').href = '#g-' + p.slug; $('#it-prev-t').textContent = p.name;
-  $('#it-next').href = '#g-' + nx.slug; $('#it-next-t').textContent = nx.name;
+  $('#it-prev').href = '#g-' + p.slug; $('#it-prev-t').textContent = L(p.name);
+  $('#it-next').href = '#g-' + nx.slug; $('#it-next-t').textContent = L(nx.name);
 }
 
 /* ---------- cover wall: masonry; wide works span two columns so every cover shows its art at a similar
@@ -1004,7 +1036,6 @@ const wall = $('#wall');
 WORKS.forEach((w, i) => {
   const [W, H] = w.dims[0];
   const r = W / H;
-  const meta = `${w.d.slice(0, 4)}${w.dims.length > 1 ? ' · ' + w.dims.length + ' 張' : ''}${w.yt ? ' · ▶ 過程影片' : ''}`;
 
   const a = document.createElement('a');
   a.className = 'cover';
@@ -1016,13 +1047,17 @@ WORKS.forEach((w, i) => {
   a.dataset.date = w.d;
   a.style.cssText = `--ar:${r.toFixed(4)};--pos:${w.pos}`;
   a.innerHTML = `<span class="frame mask"><img src="${src(w.id, 0)}" width="${W}" height="${H}" alt="" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async"><span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
-  a.setAttribute('aria-label', `${w.t}（${dot(w.d)}）`);
   a.querySelector('.ov-t').textContent = w.t;
   a.querySelector('.cap-t').textContent = w.t;
-  a.querySelector('.ov-m').textContent = meta;
-  a.querySelector('.cap-m').textContent = meta;
+  fillCover(a, w);
   wall.appendChild(a);
 });
+function fillCover(a, w) {
+  const meta = `${w.d.slice(0, 4)}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
+  a.setAttribute('aria-label', `${w.t} (${dot(w.d)})`);
+  a.querySelector('.ov-m').textContent = meta;
+  a.querySelector('.cap-m').textContent = meta;
+}
 /* Collage layout on a tight skeleton. Two lanes on wide screens (one on narrow ones), each two columns
    wide: a wide work fills a lane; single-column works go side by side in pairs of similar shape (the
    nearest such partner in time), so every cover keeps its whole picture, detail reads at one scale and
@@ -1137,8 +1172,6 @@ function renderWork(i) {
   $('#wk-title').textContent = w.t;
   $('#wk-ym').textContent = w.ym;
   $('#wk-ym').hidden = !w.ym;
-  $('#wk-date').textContent = `${dot(w.d)} 發表`;
-  $('#wk-pages').textContent = `${w.dims.length} 張`;
   $('#wk-link').href = 'https://www.pixiv.net/artworks/' + w.id;
 
   const tags = $('#wk-tags');
@@ -1150,7 +1183,6 @@ function renderWork(i) {
     const r = W / H;
     img.src = src(w.id, n);
     img.width = W; img.height = H;
-    img.alt = w.dims.length > 1 ? `${w.t}（第 ${n + 1} 張，共 ${w.dims.length} 張）` : w.t;
     img.loading = n < 2 ? 'eager' : 'lazy';
     img.decoding = 'async';
     if (n) img.dataset.rv = 'up';
@@ -1164,21 +1196,6 @@ function renderWork(i) {
     return img;
   }));
 
-  /* cross-link: goods made from this piece, or the goods page for the catalog itself */
-  const gl = $('#wk-goods');
-  const made = GOODS.filter((g) => g.works.includes(w.id));
-  gl.replaceChildren();
-  if (w.id === '148499079') {
-    const a = el('a', '', '看周邊詳細介紹 →'); a.href = '#goods'; gl.append(a);
-  } else if (made.length) {
-    gl.append(document.createTextNode('這張插畫做成了周邊：'));
-    made.forEach((g, k) => {
-      if (k) gl.append(document.createTextNode('、'));
-      const a = el('a', '', g.name); a.href = '#g-' + g.slug; gl.append(a);
-    });
-  }
-  gl.hidden = !gl.childNodes.length;
-
   /* process timelapse: a thumbnail card that opens YouTube (artifact pages cannot embed players);
      the self-hosted copy swaps in the YouTube player on click */
   $('#wk-tl').hidden = $('#wk-tl-li').hidden = !w.yt;
@@ -1186,7 +1203,6 @@ function renderWork(i) {
     const url = `https://www.youtube.com/watch?v=${w.yt.id}`;
     const card = el('a', 'tl-card');
     card.href = url; card.target = '_blank'; card.rel = 'noopener';
-    card.setAttribute('aria-label', `在 YouTube 播放：${w.yt.t}`);
     const im = el('img');
     im.src = `img/yt/${w.yt.id}.webp`; im.width = 1280; im.height = 720; im.alt = ''; im.loading = 'lazy';
     card.append(im, el('span', 'tl-play'), el('span', 'tl-dur', w.yt.dur));
@@ -1212,6 +1228,33 @@ function renderWork(i) {
   const nx = WORKS[(i + 1) % WORKS.length];
   $('#wk-prev').href = '#w-' + p.id; $('#wk-prev-t').textContent = p.t;
   $('#wk-next').href = '#w-' + nx.id; $('#wk-next-t').textContent = nx.t;
+  workText(i);
+}
+/* the words on a work page; also run on a language switch so the images and the video player stay put */
+function workText(i) {
+  const w = WORKS[i];
+  $('#wk-date').textContent = tr('wk.posted', { d: dot(w.d) });
+  $('#wk-pages').textContent = pagesText(w.dims.length);
+  $('#wk-imgs').querySelectorAll('img').forEach((img, n) => {
+    img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t: w.t, n: n + 1, m: w.dims.length }) : w.t;
+  });
+  /* cross-link: goods made from this piece, or the goods page for the catalog itself */
+  const gl = $('#wk-goods');
+  const made = GOODS.filter((g) => g.works.includes(w.id));
+  gl.replaceChildren();
+  if (w.id === '148499079') {
+    const a = el('a', '', tr('wk.goodsLink')); a.href = '#goods'; gl.append(a);
+  } else if (made.length) {
+    gl.append(document.createTextNode(tr('wk.madeGoods')));
+    made.forEach((g, k) => {
+      if (k) gl.append(document.createTextNode(tr('list.sep')));
+      const a = el('a', '', L(g.name)); a.href = '#g-' + g.slug; gl.append(a);
+    });
+  }
+  gl.hidden = !gl.childNodes.length;
+
+  const card = $('#wk-tl-box .tl-card');
+  if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }
 
 /* ---------- motion ---------- */
@@ -1366,6 +1409,38 @@ function route() {
     document.querySelectorAll('.rv-now').forEach((n) => n.classList.remove('rv-now'));
   });
 }
+/* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
+function applyStatic() {
+  document.querySelectorAll('[data-i18n]').forEach((e) => { e.textContent = tr(e.dataset.i18n, { n: WORKS.length }); });
+  document.querySelectorAll('[data-i18n-aria]').forEach((e) => e.setAttribute('aria-label', tr(e.dataset.i18nAria)));
+  document.querySelectorAll('[data-i18n-alt]').forEach((e) => { e.alt = tr(e.dataset.i18nAlt); });
+  document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
+}
+function setLang(l) {
+  if (!I18N[l] || l === LANG) return;
+  LANG = l;
+  try { localStorage.setItem('lang', l); } catch (e) { /* private mode: still switches for this visit */ }
+  document.documentElement.lang = HTML_LANG[l];
+  if (/[?&]lang=/.test(location.search)) {
+    try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
+  }
+  zvClose();
+  applyStatic();
+  wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
+  ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
+  charList.querySelectorAll('.char').forEach((li, k) => {
+    const n = k + 1, btn = li.querySelector('.char-btn');
+    if (btn) btn.setAttribute('aria-label', tr('chars.view', { n }));
+    else li.querySelector('img').alt = tr('chars.tbd', { n });
+  });
+  shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
+  showShot(shotAt, false);
+  if (view === 'work') workText(byId[lastWork]);
+  if (view === 'item') renderItem(bySlug[lastItem]);
+  layoutWall();
+}
+document.addEventListener('click', (e) => { const b = e.target.closest('.lang button'); if (b) setLang(b.dataset.lang); });
+applyStatic();
 setTimeout(() => document.documentElement.classList.remove('intro'), 3400);
 addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
