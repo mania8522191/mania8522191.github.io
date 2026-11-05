@@ -63,19 +63,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .curtain[hidden]{display:none}
 .curtain .c2{position:absolute;inset:0;background:var(--bg-2);clip-path:inset(100% 0 0 0)}
 .curtain .ln{position:absolute;left:0;right:0;top:100%;height:2px;background:var(--g-gold);opacity:0}
-.curtain.in .c2{clip-path:inset(0 0 0 0);transition:clip-path .42s cubic-bezier(.76,0,.24,1)}
-.curtain.in .ln-a{top:0;opacity:1;transition:top .42s cubic-bezier(.76,0,.24,1),opacity .08s}
-.curtain.out .c2{clip-path:inset(0 0 100% 0);transition:clip-path .56s cubic-bezier(.76,0,.24,1)}
-.curtain.out .ln-a{opacity:0;transition:opacity .18s}
-.curtain.out .ln-b{top:0;opacity:1;transition:top .56s cubic-bezier(.76,0,.24,1),opacity .08s}
+.curtain.cur-in .c2{clip-path:inset(0 0 0 0);transition:clip-path .42s cubic-bezier(.76,0,.24,1)}
+.curtain.cur-in .ln-a{top:0;opacity:1;transition:top .42s cubic-bezier(.76,0,.24,1),opacity .08s}
+.curtain.cur-out .c2{clip-path:inset(0 0 100% 0);transition:clip-path .56s cubic-bezier(.76,0,.24,1)}
+.curtain.cur-out .ln-a{opacity:0;transition:opacity .18s}
+.curtain.cur-out .ln-b{top:0;opacity:1;transition:top .56s cubic-bezier(.76,0,.24,1),opacity .08s}
 .curtain-label{position:absolute;inset:0;z-index:1;display:grid;place-content:center;justify-items:center;gap:12px;padding:0 16px;text-align:center}
 .curtain-t{display:flex;overflow:hidden;font-family:var(--f-display);font-size:clamp(38px,8vw,116px);line-height:1.15;letter-spacing:.14em;padding-left:.14em}
 .curtain-t span{display:inline-block;transform:translateY(108%);transition:transform .5s var(--ease-out) calc(var(--i) * 26ms + .1s)}
-.curtain.in .curtain-t span{transform:none}
-.curtain.out .curtain-t span{transform:translateY(-108%);transition:transform .42s cubic-bezier(.76,0,.24,1) calc(var(--i) * 18ms)}
+.curtain.cur-in .curtain-t span{transform:none}
+.curtain.cur-out .curtain-t span{transform:translateY(-108%);transition:transform .42s cubic-bezier(.76,0,.24,1) calc(var(--i) * 18ms)}
 .curtain-s{font-size:12.5px;letter-spacing:.3em;color:var(--mute);opacity:0;transform:translateY(8px);transition:opacity .4s .3s,transform .5s var(--ease-out) .3s}
-.curtain.in .curtain-s{opacity:1;transform:none}
-.curtain.out .curtain-s{opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .3s}
+.curtain.cur-in .curtain-s{opacity:1;transform:none}
+.curtain.cur-out .curtain-s{opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .3s}
 
 /* views */
 .view{animation:enter .55s ease both}
@@ -1747,17 +1747,17 @@ function curtainTo(r) {
   const key = r.h === 'timeline' ? 'timeline' : r.next;
   $('#curtain-t').replaceChildren(...[...CUR_NAME[key]].map((ch, i) => { const sp = el('span', '', ch); sp.style.setProperty('--i', i); return sp; }));
   $('#curtain-s').textContent = tr('cur.' + key);
-  curtainEl.classList.remove('in', 'out');
+  curtainEl.classList.remove('cur-in', 'cur-out');
   curtainEl.hidden = false;
   void curtainEl.offsetWidth;
-  curtainEl.classList.add('in');
+  curtainEl.classList.add('cur-in');   // not 'in': that name is the page's 1400px content container
   setTimeout(() => {
     apply(r);
     setTimeout(() => {
-      curtainEl.classList.add('out');
+      curtainEl.classList.add('cur-out');
       setTimeout(() => {
         curtainEl.hidden = true;
-        curtainEl.classList.remove('in', 'out');
+        curtainEl.classList.remove('cur-in', 'cur-out');
         curtainBusy = false;
         if (location.hash !== shown) route();   // another tab was chosen while the curtain was up
       }, 620);
