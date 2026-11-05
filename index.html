@@ -425,6 +425,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 [data-rv="x"].rv-pre:not(.rv-in){opacity:0;transform:translateX(-32px)}
 [data-rv="track"]{transition:opacity 1.1s var(--ease-out) var(--d,0s),letter-spacing 1.6s var(--ease-out) var(--d,0s)}
 [data-rv="track"].rv-pre:not(.rv-in){opacity:0;letter-spacing:.5em}
+/* work covers fly in from a random direction (set per cover: --fx --fy --fr), spinning into their tilt */
+[data-rv="fly"]{transition:transform 1.25s var(--ease-out) var(--d,0s),opacity .7s var(--ease-out) var(--d,0s)}
+[data-rv="fly"].rv-pre:not(.rv-in){opacity:0;transform:translate(var(--fx,0px),var(--fy,60px)) rotate(var(--fr,0deg)) scale(.9)}
+.works{overflow-x:clip}
 [data-rv="clip"]{transition:transform 1.3s var(--ease-out) var(--d,0s)}
 [data-rv="clip"] .mask{display:block;clip-path:inset(0 0 0 0);transition:clip-path 1.3s var(--ease-out) var(--d,0s)}
 [data-rv="clip"] .mask img{transition:transform 1.6s var(--ease-out) var(--d,0s)}
@@ -1277,11 +1281,17 @@ WORKS.forEach((w, i) => {
   a.className = 'cover';
   a.id = 'c-' + w.id;
   a.href = '#w-' + w.id;
-  a.dataset.rv = 'clip';
-  a.dataset.d = `${(i % 4) * 0.07}s`;
+  a.dataset.rv = 'fly';
+  a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
   a.dataset.r = r.toFixed(4);
   a.dataset.date = w.d;
   a.style.cssText = `--ar:${r.toFixed(4)};--pos:${w.pos}`;
+  {   // a different direction for every cover, and every visit
+    const ang = Math.random() * Math.PI * 2, dist = (150 + Math.random() * 150) * (innerWidth < 700 ? 0.55 : 1);
+    a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
+    a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
+    a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
+  }
   a.innerHTML = `<span class="frame mask"><img src="${src(w.id, 0)}" width="${W}" height="${H}" alt="" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async"><span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
   a.querySelector('.ov-t').textContent = w.t;
   a.querySelector('.cap-t').textContent = w.t;
