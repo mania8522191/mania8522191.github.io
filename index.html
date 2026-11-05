@@ -432,17 +432,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .channels a:hover{padding-left:16px;color:var(--mute)}
 .ch{font-family:var(--f-display);font-size:clamp(20px,2.6vw,30px);letter-spacing:.08em}
 .hd{font-size:14px;color:var(--mute);overflow-wrap:anywhere}
-/* sub-accounts listed under their main channel */
-.ch-sub{list-style:none;margin:0;padding:0}
-.channels .ch-sub a,.ch-off{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:baseline;gap:14px;padding:13px 4px 13px 34px;border-bottom:1px solid var(--line);font-size:14px}
-.channels .ch-sub a::before,.ch-off::before{content:"";position:absolute;left:12px;top:0;width:12px;height:calc(50% + 1px);border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
-.channels .ch-sub a:hover{padding-left:46px}
-.channels .ch-sub .hd,.channels .ch-sub .ar{grid-column:auto;grid-row:auto;align-self:baseline}
-.sub-k{font-size:12px;letter-spacing:.1em;color:var(--fg-2)}
-.ch-sub .ar{font-size:14px}
-.ch-off{color:var(--mute)}
-.ch-off .sub-k,.ch-off .hd{opacity:.6;text-decoration:line-through;text-decoration-thickness:1px}
-.off-tag{justify-self:end;padding:2px 9px;border:1px solid var(--line);border-radius:999px;font-size:11px;letter-spacing:.1em;color:var(--mute)}
+/* a channel with several accounts: one big name, the main handle on its row, the others stacked
+   under it in smaller type; every arrow lines up in the same column */
+.channels .ch-multi{border-bottom:1px solid var(--line)}
+.channels .ch-multi>a{border-bottom:0;padding-bottom:6px}
+.ch-subs{list-style:none;margin:0;padding:0 4px 16px;display:grid;justify-items:end}
+.channels .ch-subs a{display:inline-grid;grid-template-columns:none;grid-auto-flow:column;align-items:baseline;gap:12px;padding:5px 0;border:0;font-size:13px;color:var(--mute);transition:color .25s}
+.channels .ch-subs a:hover{padding-left:0;color:var(--fg)}
+.channels .ch-subs .ar{grid-row:auto;align-self:baseline;font-size:13px}
+.sub-k{font-size:11px;letter-spacing:.14em;color:var(--mute);opacity:.75}
+.ch-subs a.is-off .sub-h{opacity:.75}
+.ch-subs a:hover .sub-h,.ch-subs a:hover .sub-k{opacity:1}
+.off-tag{align-self:center;padding:1px 8px;border:1px solid var(--line);border-radius:999px;font-size:10.5px;line-height:1.6;letter-spacing:.1em;color:var(--mute)}
 .ar{font-size:16px}
 
 /* footer */
@@ -544,6 +545,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .proj-nav .next{text-align:left;justify-items:start}
   .channels a{grid-template-columns:minmax(0,1fr) auto;row-gap:2px;padding-block:16px}
   .channels .hd{grid-column:1;grid-row:2}
+  .ch-subs{justify-items:stretch;padding-bottom:12px}
+  .channels .ch-subs a{display:grid;grid-auto-flow:row;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px}
+  .channels .ch-subs .off-tag{grid-column:3}
+  .channels .ch-subs .ar{grid-column:4}
   .channels .ar{grid-row:1 / span 2;align-self:center}
 }
 @media (max-width:420px){
@@ -819,10 +824,10 @@ addEventListener('hashchange', function () {
         <ul class="channels">
           <li><a href="https://x.com/mania8522191" target="_blank" rel="noopener"><span class="ch">X</span><span class="hd">@mania8522191</span><span class="ar">↗</span></a></li>
           <li><a href="https://www.instagram.com/mania8522191/" target="_blank" rel="noopener"><span class="ch">Instagram</span><span class="hd">@mania8522191</span><span class="ar">↗</span></a></li>
-          <li><a href="https://www.facebook.com/mania8522191" target="_blank" rel="noopener"><span class="ch">Facebook</span><span class="hd" data-i18n="h.fbPage">mania8522191・粉絲專頁</span><span class="ar">↗</span></a>
-            <ul class="ch-sub">
-              <li><a href="https://www.facebook.com/mania8522191p2/" target="_blank" rel="noopener"><span class="sub-k" data-i18n="h.personal">個人帳號</span><span class="hd">mania8522191p2</span><span class="ar">↗</span></a></li>
-              <li><span class="ch-off"><span class="sub-k" data-i18n="h.personal">個人帳號</span><span class="hd">mania8522191p1</span><span class="off-tag" data-i18n="h.deactivated">已停用</span></span></li>
+          <li class="ch-multi"><a href="https://www.facebook.com/mania8522191" target="_blank" rel="noopener"><span class="ch">Facebook</span><span class="hd" data-i18n="h.fbPage">mania8522191・粉絲專頁</span><span class="ar">↗</span></a>
+            <ul class="ch-subs">
+              <li><a href="https://www.facebook.com/mania8522191p2/" target="_blank" rel="noopener"><span class="sub-k" data-i18n="h.personal">個人帳號</span><span class="sub-h">mania8522191p2</span><span class="ar">↗</span></a></li>
+              <li><a class="is-off" href="https://www.facebook.com/mania8522191p1" target="_blank" rel="noopener"><span class="sub-k" data-i18n="h.personal">個人帳號</span><span class="sub-h">mania8522191p1</span><span class="off-tag" data-i18n="h.deactivated">已停用</span><span class="ar">↗</span></a></li>
             </ul>
           </li>
           <li><a href="https://www.plurk.com/mncrew" target="_blank" rel="noopener"><span class="ch">Plurk</span><span class="hd">mncrew</span><span class="ar">↗</span></a></li>
