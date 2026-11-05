@@ -64,9 +64,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .curtain .ink{position:absolute;inset:0;width:100%;height:100%;display:none}
 .curtain.gl .ink{display:block}
 .curtain.gl .liq{display:none}
-.curtain.gl .curtain-t span{transition-delay:calc(var(--i) * 20ms + .42s)}
-.curtain.gl .curtain-s{transition-delay:.58s}
-.curtain.gl.cur-out .curtain-t span{transition-delay:calc(var(--i) * 14ms)}
+.curtain.gl .curtain-t span{transition-duration:.32s;transition-delay:calc(var(--i) * 16ms + .2s)}
+.curtain.gl .curtain-s{transition-delay:.3s}
+.curtain.gl.cur-out .curtain-t span{transition-duration:.22s;transition-delay:calc(var(--i) * 10ms)}
 .curtain.gl.cur-out .curtain-s{transition-delay:0s}
 .liq{position:absolute;left:-12%;right:-12%;top:0;height:125%;transform:translateY(80%) rotate(-4deg);will-change:transform}
 .liq-rim,.liq-body{position:absolute;inset:0;-webkit-mask:var(--wave) 0 0 / 100% 100% no-repeat;mask:var(--wave) 0 0 / 100% 100% no-repeat}
@@ -82,7 +82,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .curtain.cur-out .liq{transform:translateY(80%) rotate(3deg);transition:transform .62s cubic-bezier(.6,0,.3,1) .06s}
 .curtain-label{position:absolute;inset:0;z-index:1;display:grid;place-content:center;justify-items:center;gap:12px;padding:0 16px;text-align:center}
 .curtain-t{display:flex;overflow:hidden;font-family:var(--f-display);font-size:clamp(38px,8vw,116px);line-height:1.15;letter-spacing:.14em;padding-left:.14em}
-.curtain-t span{display:inline-block;transform:translateY(108%);transition:transform .4s var(--ease-out) calc(var(--i) * 20ms + .3s);background:linear-gradient(180deg,#fff 0%,#e9e9e9 38%,#8d8d8d 52%,#cfcfcf 70%,#fff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.curtain-t span{display:inline-block;transform:translateY(108%);transition:transform .4s var(--ease-out) calc(var(--i) * 20ms + .3s);color:var(--fg)}
 .curtain.cur-in .curtain-t span{transform:none}
 .curtain.cur-out .curtain-t span{transform:translateY(-108%);transition:transform .3s cubic-bezier(.76,0,.24,1) calc(var(--i) * 14ms)}
 .curtain-s{font-size:12.5px;letter-spacing:.3em;color:#bdbdbd;opacity:0;transform:translateY(8px);transition:opacity .4s .45s,transform .5s var(--ease-out) .45s}
@@ -1759,9 +1759,8 @@ precision mediump float;
 #endif
 uniform vec2 u_res;   // canvas size in pixels
 uniform float u_t;    // seconds
-uniform vec2 u_o;     // where the ink starts (canvas pixels, origin bottom-left)
-uniform float u_r;    // how far it has spread (canvas pixels)
-uniform float u_dis;  // dissolve threshold, < -0.5 = not dissolving
+uniform float u_front; // the stream's front edge, canvas pixels from the left
+uniform float u_tail;  // the stream's tail edge, canvas pixels from the left
 uniform float u_s;    // canvas pixels per CSS pixel
 
 // 2D simplex noise - Ian McEwan, Ashima Arts (MIT licence)
@@ -1793,61 +1792,46 @@ float fbm3(vec2 p) {
   for (int i = 0; i < 3; i++) { s += a * snoise(p); p = p * 2.03 + vec2(1.7, 9.2); a *= 0.5; }
   return s;
 }
-// the liquid: smooth noise folded into itself, so it forms big swirling folds that keep flowing
+// the liquid flows left to right: every layer slides right, the deeper ones slower, so the folds reshape as they go
 float height(vec2 p, float t) {
-  vec2 q = vec2(fbm2(p * 0.85 + vec2(0.0, t * 0.55)), fbm2(p * 0.85 + vec2(5.2, 1.3) - vec2(t * 0.45, 0.0)));
-  return fbm2(p + 1.9 * q + vec2(t * 0.22, -t * 0.18));
+  vec2 q = vec2(fbm2(p * 0.85 - vec2(t * 0.09, 0.0)), fbm2(p * 0.85 + vec2(5.2, 1.3) - vec2(t * 0.07, 0.0)));
+  return fbm2(p + 1.9 * q - vec2(t * 0.14, 0.0));
 }
 
 void main() {
   vec2 fc = gl_FragCoord.xy;
   vec2 uv = fc / u_res.y;
-  float t = u_t * 0.5;
-  // long ribbons running on a diagonal, like the reference: stretch the field along a tilted axis
-  const float ca = 0.94, sa = -0.34;
+  float t = u_t;
+  // long strands along the flow, tilted slightly
+  const float ca = 0.985, sa = -0.17;
   vec2 rp = vec2(ca * uv.x - sa * uv.y, sa * uv.x + ca * uv.y);
-  vec2 p = rp * vec2(0.34, 0.78);
+  vec2 p = rp * vec2(0.13, 0.62);
   float h = height(p, t);
-  // surface slope from neighbouring heights, then lit like polished black chrome:
-  // flat areas stay black, only the crests of the folds catch the light
   const float ex = 0.01;
   vec2 g = vec2(height(p + vec2(ex, 0.0), t) - h, height(p + vec2(0.0, ex), t) - h) / ex;
-  vec3 n = normalize(vec3(-g * 0.3, 1.0));
-  vec3 V = vec3(0.0, 0.0, 1.0);
-  vec3 H1 = normalize(normalize(vec3(-0.55, 0.75, 0.6)) + V);
-  vec3 H2 = normalize(normalize(vec3(0.6, -0.35, 0.7)) + V);
-  float s1 = pow(max(dot(n, H1), 0.0), 34.0);
-  float s2 = pow(max(dot(n, H2), 0.0), 60.0);
-  vec3 R = reflect(-V, n);
-  float env = smoothstep(0.25, 0.55, R.y) * (1.0 - smoothstep(0.55, 0.9, R.y));
-  // grey ribbons tracing a few levels of the surface: thin where it is steep, wide where it flattens,
-  // which is what gives the reference its long flowing veins
-  float slope = length(g);
-  float rib = exp(-pow((h - 0.16) / 0.036, 2.0)) + 0.85 * exp(-pow((h + 0.22) / 0.03, 2.0));
-  rib *= 0.55 + 0.45 * smoothstep(0.0, 2.5, slope);
-  vec3 col = vec3(0.006) + vec3(0.62) * s1 + vec3(0.36) * s2 + vec3(0.08) * env + vec3(0.56) * rib * (0.75 + 0.5 * s1);
+  // one screen pixel measured in height units, so every edge is cut sharp but not jagged
+  float aa = max(length(g) * 0.42 / u_res.y, 0.0004);
+  // flat grey on black: two thin strands, and pools where the liquid rises highest, with a darker core
+  float l1 = 1.0 - smoothstep(0.013 - aa, 0.013 + aa, abs(h - 0.18));
+  float l2 = 1.0 - smoothstep(0.009 - aa, 0.009 + aa, abs(h + 0.26));
+  float pool = smoothstep(0.42 - aa, 0.42 + aa, h);
+  float core = smoothstep(0.58 - aa, 0.58 + aa, h);
+  float grey = max(max(l1, l2 * 0.9), pool * (1.0 - 0.72 * core));
+  vec3 col = vec3(0.012) + vec3(0.42) * grey;
   // a quieter middle so the name stays readable
   vec2 c = (fc - 0.5 * u_res) / u_res.y;
-  col *= mix(0.36, 1.0, smoothstep(0.04, 0.5, length(c * vec2(0.8, 1.25))));
+  col *= mix(0.45, 1.0, smoothstep(0.04, 0.5, length(c * vec2(0.8, 1.25))));
 
-  // spreading from the clicked tab: the edge follows the liquid's folds, so it blooms in tendrils
-  float d = length(fc - u_o);
-  float e = d + h * 0.3 * u_r + snoise(fc / (110.0 * u_s) + u_t * 0.8) * 16.0 * u_s - u_r;
-  float spread = 1.0 - smoothstep(-4.0 * u_s, 0.0, e);
-  float rimA = (1.0 - smoothstep(0.0, 4.0 * u_s, abs(e + 3.0 * u_s))) * spread;
-
-  // dissolving away: holes open in a slow noise field, the top clearing first (only worked out while dissolving)
-  float keep = 1.0, rimB = 0.0;
-  if (u_dis > -0.5) {
-    float f = fbm3(uv * 1.15 + vec2(7.3, 2.1) + u_t * 0.18) * 0.5 + 0.5;
-    f = mix(f, 1.0 - fc.y / u_res.y, 0.45);
-    keep = smoothstep(u_dis - 0.02, u_dis + 0.02, f);
-    rimB = (1.0 - smoothstep(0.0, 0.012, abs(f - u_dis - 0.022))) * keep;
-  }
-
-  col += vec3(0.7) * max(rimA * 0.8, rimB * 0.75);
-  float a = spread * keep;
-  gl_FragColor = vec4(min(col, vec3(1.0)) * a, a);
+  // the stream crosses the screen left to right: its front, then its tail, both edges following the folds and cut sharp
+  float wob = h * 0.18 * u_res.y + snoise(vec2(fc.y / (90.0 * u_s), u_t * 1.3)) * 14.0 * u_s;
+  float xf = fc.x + wob;
+  float eF = xf - u_front;   // < 0: the front has passed here
+  float eT = xf - u_tail;    // > 0: the tail has not passed here yet
+  float cov = (1.0 - smoothstep(-1.2 * u_s, 0.0, eF)) * smoothstep(0.0, 1.2 * u_s, eT);
+  float rimF = 1.0 - smoothstep(1.0 * u_s, 2.0 * u_s, abs(eF + 4.0 * u_s));
+  float rimT = 1.0 - smoothstep(1.0 * u_s, 2.0 * u_s, abs(eT - 4.0 * u_s));
+  col = mix(col, vec3(0.46), max(rimF, rimT));
+  gl_FragColor = vec4(min(col, vec3(1.0)) * cov, cov);
 }
 `;
 function inkReady() {
@@ -1868,7 +1852,7 @@ function inkReady() {
     const loc = gl.getAttribLocation(prog, 'a');
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    for (const n of ['u_res', 'u_t', 'u_o', 'u_r', 'u_dis', 'u_s']) INK.u[n] = gl.getUniformLocation(prog, n);
+    for (const n of ['u_res', 'u_t', 'u_front', 'u_tail', 'u_s']) INK.u[n] = gl.getUniformLocation(prog, n);
     gl.clearColor(0, 0, 0, 0);
     INK.gl = gl;
     INK.ok = true;
@@ -1883,26 +1867,25 @@ function inkSize() {
   inkCanvas.width = Math.max(2, Math.round(INK.w * INK.s));
   inkCanvas.height = Math.max(2, Math.round(INK.h * INK.s));
 }
-function inkDraw(t, r, dis, o) {
+function inkDraw(t, front, tail) {   // front / tail: CSS pixels from the left edge
   const gl = INK.gl;
   gl.viewport(0, 0, inkCanvas.width, inkCanvas.height);
   gl.uniform2f(INK.u.u_res, inkCanvas.width, inkCanvas.height);
   gl.uniform1f(INK.u.u_t, t);
-  gl.uniform2f(INK.u.u_o, o.x * INK.s, o.y * INK.s);
-  gl.uniform1f(INK.u.u_r, r * INK.s);
-  gl.uniform1f(INK.u.u_dis, dis);
+  gl.uniform1f(INK.u.u_front, front * INK.s);
+  gl.uniform1f(INK.u.u_tail, tail * INK.s);
   gl.uniform1f(INK.u.u_s, INK.s);
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
-/* one run: spread (0.65 s) -> page swapped underneath -> hold -> dissolve; timed by the clock, so a slow device
-   just shows fewer frames and the page is only swapped once the ink has covered everything */
-const INK_IN = 650, INK_HOLD = 400, INK_OUT = 760;
-function inkRun(originCss, cb) {
+/* one run: the stream's front crosses left to right, the page is swapped underneath once it is fully covered,
+   a short hold for the name, then the tail crosses. Timed by the clock, so a slow device just shows fewer frames. */
+const INK_IN = 440, INK_HOLD = 220, INK_OUT = 460;
+const inkEase = (p) => (1 - Math.cos(Math.PI * p)) / 2;
+function inkMargin() { return INK.h * 0.2 + 40; }   // beyond the deepest wave of the stream's edges
+function inkRun(cb) {
   inkSize();
-  const o = { x: originCss.x, y: INK.h - originCss.y };   // to the canvas's bottom-left origin
-  const far = Math.max(Math.hypot(o.x, o.y), Math.hypot(INK.w - o.x, o.y), Math.hypot(o.x, INK.h - o.y), Math.hypot(INK.w - o.x, INK.h - o.y));
-  const rMax = (far + 80) / 0.7;
+  const m = inkMargin(), span = INK.w + 2 * m;
   const seed = Math.random() * 40, t0 = performance.now();
   let covered = false, out = false, last = t0, slow = 0, frames = 0;
   const step = (now) => {
@@ -1910,29 +1893,14 @@ function inkRun(originCss, cb) {
     last = now; frames++;
     if (frames > 3 && dt > 40 && ++slow > 3 && INK.q > 0.35) { INK.q *= 0.7; inkSize(); slow = 0; }   // too slow: draw smaller
     const pin = Math.min(1, el / INK_IN);
-    const r = rMax * (1 - Math.pow(1 - pin, 2.4));
     const po = Math.min(1, Math.max(0, (el - INK_IN - INK_HOLD) / INK_OUT));
-    const eo = po < 0.5 ? 2 * po * po : 1 - Math.pow(-2 * po + 2, 2) / 2;
-    inkDraw(seed + el / 1000, r, el < INK_IN + INK_HOLD ? -1 : -0.25 + 1.5 * eo, o);
+    inkDraw(seed + el / 1000, -m + span * inkEase(pin), -m + span * inkEase(po));
     if (!covered && pin >= 1) { covered = true; cb.covered(); }
     if (!out && el >= INK_IN + INK_HOLD) { out = true; cb.out(); }
     if (el >= INK_IN + INK_HOLD + INK_OUT) { cb.done(); return; }
     requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
-}
-/* the ink starts from the tab that was clicked (or the top middle for back / forward) */
-let lastNavPoint = null;
-document.addEventListener('click', (e) => {
-  const a = e.target.closest('a[href^="#"]');
-  if (!a) return;
-  const rc = a.getBoundingClientRect();
-  lastNavPoint = { x: rc.left + rc.width / 2, y: rc.top + rc.height / 2, at: performance.now() };
-}, true);
-function inkOrigin() {
-  const top = curtainEl.getBoundingClientRect().top;
-  const p = lastNavPoint && performance.now() - lastNavPoint.at < 900 ? lastNavPoint : { x: innerWidth / 2, y: top - 30 };
-  return { x: p.x, y: p.y - top };
 }
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
@@ -1950,10 +1918,9 @@ function curtainTo(r) {
   curtainEl.hidden = false;
   if (inkReady()) {
     curtainEl.classList.add('gl');
-    const origin = inkOrigin();
     void curtainEl.offsetWidth;
     curtainEl.classList.add('cur-in');
-    inkRun(origin, {
+    inkRun({
       covered: () => apply(r),
       out: () => curtainEl.classList.add('cur-out'),
       done: () => {
