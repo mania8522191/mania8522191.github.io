@@ -1336,7 +1336,7 @@ const ZV_SETS = {
     const b = BOOKS[byBook[lastBook]], blur = b.blur || [];
     const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => n > 0 && !blur.includes(n));   // the cover has its own 3D viewer
     return pages.map(([[W, H, ZW], n], k) => ({
-      src: `img/ab/${b.slug}_p${n}.webp`, zsrc: ZW ? `img/ab/z/${b.slug}_p${n}.webp` : null,
+      src: `img/ab/${b.slug}_p${n}.webp`, zsrc: ZW ? `img/ab/x/${b.slug}_p${n}.webp` : null, eager: true,   // x: the full-size spread
       w: W, h: H, zw: ZW || W,
       no: `${k + 1} / ${pages.length}`, cap: `${b.ev} · ART BOOK`,
       alt: tr('bk.pageAlt', { t: b.ev, n }),
@@ -1421,6 +1421,7 @@ function zvShow(i) {
     zvTags.classList.remove('swap'); void zvTags.offsetWidth; zvTags.classList.add('swap');
   }
   zvSize();
+  if (it.eager && zvFit(it) * (devicePixelRatio || 1) > it.w) zvHiRes();   // shown bigger than the page image: get the full size now, not only on zoom
   zvStage.scrollTo(0, 0);
   zvImg.classList.remove('swap'); void zvImg.offsetWidth; zvImg.classList.add('swap');
   $('#zv-prev').hidden = $('#zv-next').hidden = zvSet.length < 2;
