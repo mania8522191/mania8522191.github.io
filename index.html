@@ -112,7 +112,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* NSFW: three blurred previews (blur baked into the files), a note, and the way to the cloud album */
 .nsfw{display:grid;justify-items:center;gap:clamp(22px,3vw,34px);margin-top:clamp(40px,5vw,64px);text-align:center}
 .nsfw-pics{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(14px,2.4vw,30px)}
-.nsfw-pic{position:relative;display:block;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.55);text-decoration:none}
+.nsfw-pic{position:relative;display:block;overflow:hidden;background:var(--bg-2);box-shadow:0 14px 36px rgba(0,0,0,.55);text-decoration:none}
 .nsfw-pic img{display:block;width:auto;height:clamp(150px,24vw,320px);transform:rotate(var(--tilt,0deg)) scale(1.02);transition:transform 1.2s var(--ease-out),filter .6s}
 .nsfw-pic:nth-child(1){--tilt:-.6deg}.nsfw-pic:nth-child(3){--tilt:.6deg}
 .nsfw-pic:hover img{transform:scale(1.06);filter:brightness(1.12)}
@@ -706,9 +706,9 @@ addEventListener('hashchange', function () {
       <!-- NSFW: blurred previews only (the blur is baked into the files); the full pieces are in the cloud album -->
       <div class="nsfw" id="nsfw" hidden>
         <div class="nsfw-pics">
-          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up"><img src="img/nsfw/nsfw1.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="lazy" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
-          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".1s"><img src="img/nsfw/nsfw2.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="lazy" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
-          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".2s"><img src="img/nsfw/nsfw3.webp" width="600" height="429" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="lazy" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
+          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up"><img src="img/nsfw/nsfw1.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="eager" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
+          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".1s"><img src="img/nsfw/nsfw2.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="eager" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
+          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".2s"><img src="img/nsfw/nsfw3.webp" width="600" height="429" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="eager" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
         </div>
         <p class="nsfw-note" data-i18n="nsfw.note" data-rv="up" data-d=".25s">成人向作品不直接放在網站上。點圖片或下方按鈕，到 Google 雲端相簿看完整作品。</p>
         <a class="nsfw-go" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".35s"><span data-i18n="nsfw.go">前往 Google 雲端相簿</span><span aria-hidden="true">↗</span></a>
