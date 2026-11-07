@@ -165,7 +165,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .b3-head,.b3-tail{left:calc(var(--t) / -2);right:0;top:calc(50% - var(--t) / 2);height:var(--t);border-radius:calc(var(--t) / 2) 0 0 calc(var(--t) / 2)}
 .b3-head::after,.b3-tail::after{border-radius:inherit}
 /* the bound edge is rounded: a half-cylinder of seven strips round the spine, each showing its slice of the middle of the spread */
-.b3-sp{top:0;bottom:0;left:calc(50% - var(--t) * .1125);width:calc(var(--t) * .225 + .6px);background-size:200cqw 100%;background-position:calc(-100cqw - var(--t) * var(--bx)) 0;transform:translateX(var(--sx)) rotateY(var(--a)) translateZ(calc(var(--t) * .4875))}
+.b3-sp{top:0;bottom:0;left:calc(50% - var(--t) * .1125);width:calc(var(--t) * .225 + .6px * var(--q,1));background-size:200cqw 100%;background-position:calc(-100cqw - var(--t) * var(--bx)) 0;transform:translateX(var(--sx)) rotateY(var(--a)) translateZ(calc(var(--t) * .4875))}
 .b3-fore{--s:var(--s-fore);transform:rotateY(90deg) translateZ(50cqw)}
 .b3-head{--s:var(--s-head);transform:rotateX(90deg) translateZ(50cqh)}
 .b3-tail{--s:var(--s-tail);transform:rotateX(-90deg) translateZ(50cqh)}
@@ -174,31 +174,31 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .b3.rtl .b3-head,.b3.rtl .b3-tail{left:0;right:calc(var(--t) / -2);border-radius:0 calc(var(--t) / 2) calc(var(--t) / 2) 0}
 .b3.rtl .b3-fore{transform:rotateY(-90deg) translateZ(50cqw)}
 .b3-fore,.b3-head,.b3-tail{background:var(--paper,#ebe5d8)}
-.b3-fore{background-image:repeating-linear-gradient(90deg,rgba(90,70,40,.13) 0 1px,rgba(0,0,0,0) 1px 3px);box-shadow:inset 1px 0 rgba(0,0,0,.45),inset -1px 0 rgba(0,0,0,.45)}
-.b3-head,.b3-tail{background-image:repeating-linear-gradient(0deg,rgba(90,70,40,.13) 0 1px,rgba(0,0,0,0) 1px 3px);box-shadow:inset 0 1px rgba(0,0,0,.45),inset 0 -1px rgba(0,0,0,.45)}
+.b3-fore{background-image:repeating-linear-gradient(90deg,rgba(90,70,40,.13) 0 calc(1px * var(--q,1)),rgba(0,0,0,0) calc(1px * var(--q,1)) calc(3px * var(--q,1)));box-shadow:inset 1px 0 rgba(0,0,0,.45),inset -1px 0 rgba(0,0,0,.45)}
+.b3-head,.b3-tail{background-image:repeating-linear-gradient(0deg,rgba(90,70,40,.13) 0 calc(1px * var(--q,1)),rgba(0,0,0,0) calc(1px * var(--q,1)) calc(3px * var(--q,1)));box-shadow:inset 0 1px rgba(0,0,0,.45),inset 0 -1px rgba(0,0,0,.45)}
 .b3-shadow{position:absolute;left:3%;right:3%;bottom:-9%;height:15%;background:radial-gradient(closest-side,rgba(0,0,0,.72),rgba(0,0,0,0));opacity:var(--so,1);transform:scaleX(var(--sw,.92));pointer-events:none}
 /* cover materials, from the print specs. A laminated cover mirrors a lamp standing left of the book: gloss film as a crisp
    glare that slides across as the book turns, matte film as a broad soft sheen over a faint haze. Uncoated ivory paper never
    shines: it is warm and mottled, its blacks print as charcoal and its colours come out softer. FF43's blue foil glints.
    The colour filter sits on .b3-fx, round the book but not its shadow. */
 .b3-fx{position:absolute;inset:0}
-.m-gloss .b3-fx{filter:saturate(1.12) contrast(1.05)}
-.m-matte .b3-fx{filter:saturate(.9)}
-.m-ivory .b3-fx{filter:saturate(.8)}
+.m-gloss .b3-fx{filter:saturate(1.07) contrast(1.03)}
+.m-matte .b3-fx{filter:saturate(.94)}
+.m-ivory .b3-fx{filter:saturate(.87)}
 .m-ivory{--paper:#ede3cc}
 .m-gloss,.m-matte{--paper:#efede8}
 .b3-tex{position:absolute;inset:0;pointer-events:none}
-.m-gloss .b3-front::before,.m-gloss .b3-back::before{z-index:1;opacity:var(--hi,0);background:radial-gradient(9.5cqmax 16cqmax at var(--hx) var(--hy),rgba(255,255,255,.86),rgba(255,255,255,.8) 62%,rgba(255,255,255,.16) 80%,rgba(255,255,255,0) 92%),radial-gradient(34cqmax 46cqmax at var(--hx) var(--hy),rgba(255,255,255,.22),rgba(255,255,255,.07) 55%,rgba(255,255,255,0))}
-.m-gloss .b3-tex{background:#fff;opacity:calc(var(--fr,0) * .6)}
-.m-matte .b3-front::before,.m-matte .b3-back::before{z-index:1;opacity:var(--hi,0);background:radial-gradient(60cqmax 70cqmax at var(--hx) var(--hy),rgba(255,255,255,.4),rgba(255,255,255,.2) 40%,rgba(255,255,255,.06) 70%,rgba(255,255,255,0))}
-.m-matte .b3-tex{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E %3Cfilter id='h' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='2' stitchTiles='stitch'/%3E %3CfeColorMatrix values='.12 0 0 0 .01 .12 0 0 0 .01 .12 0 0 0 .012 0 0 0 0 1'/%3E %3C/filter%3E %3Crect width='100%25' height='100%25' filter='url(%23h)'/%3E%3C/svg%3E");mix-blend-mode:screen;opacity:calc(.8 + var(--fr,0))}
+.m-gloss .b3-front::before,.m-gloss .b3-back::before{z-index:1;opacity:var(--hi,0);background:radial-gradient(13cqmax 20cqmax at var(--hx) var(--hy),rgba(255,255,255,.58),rgba(255,255,255,.44) 22%,rgba(255,255,255,.22) 50%,rgba(255,255,255,.07) 76%,rgba(255,255,255,0)),radial-gradient(36cqmax 48cqmax at var(--hx) var(--hy),rgba(255,255,255,.13),rgba(255,255,255,.04) 55%,rgba(255,255,255,0))}
+.m-gloss .b3-tex{background:#fff;opacity:calc(var(--fr,0) * .4)}
+.m-matte .b3-front::before,.m-matte .b3-back::before{z-index:1;opacity:var(--hi,0);background:radial-gradient(60cqmax 70cqmax at var(--hx) var(--hy),rgba(255,255,255,.28),rgba(255,255,255,.14) 40%,rgba(255,255,255,.04) 70%,rgba(255,255,255,0))}
+.m-matte .b3-tex{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E %3Cfilter id='h' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='2' stitchTiles='stitch'/%3E %3CfeColorMatrix values='.12 0 0 0 .01 .12 0 0 0 .01 .12 0 0 0 .012 0 0 0 0 1'/%3E %3C/filter%3E %3Crect width='200' height='200' filter='url(%23h)'/%3E%3C/svg%3E") 0 0 / calc(200px * var(--q,1));mix-blend-mode:screen;opacity:calc(.55 + var(--fr,0))}
 .m-gloss .b3-sp::before,.m-matte .b3-sp::before{z-index:1;background:#fff;opacity:var(--g,0)}
-.m-ivory .b3-front::before,.m-ivory .b3-back::before,.m-ivory .b3-sp::before{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E %3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.8 .5' numOctaves='2' seed='4' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1' result='a'/%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.04' numOctaves='3' seed='9' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E %3CfeComposite in='a' operator='arithmetic' k2='.75' k3='.25'/%3E %3CfeColorMatrix values='0.22 0 0 0 0.04 0.22 0 0 0 0.025 0.22 0 0 0 0.005 0 0 0 0 1'/%3E %3C/filter%3E %3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");mix-blend-mode:screen}
-.m-ivory .b3-tex{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E %3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.8 .5' numOctaves='2' seed='4' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1' result='a'/%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.04' numOctaves='3' seed='9' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E %3CfeComposite in='a' operator='arithmetic' k2='.75' k3='.25'/%3E %3CfeColorMatrix values='0.2 0 0 0 0.85 0.2 0 0 0 0.81 0.2 0 0 0 0.73 0 0 0 0 1'/%3E %3C/filter%3E %3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");mix-blend-mode:multiply}
-.b3-foil{position:absolute;inset:0;z-index:1;pointer-events:none;-webkit-mask:var(--foil) 0 0 / 100% 100% no-repeat;mask:var(--foil) 0 0 / 100% 100% no-repeat;background:linear-gradient(115deg,rgba(255,255,255,0) 43%,rgba(255,255,255,.45) 50%,rgba(255,255,255,0) 57%) var(--fx2,50%) 0 / 300% 100% no-repeat,linear-gradient(115deg,#0a215f 0%,#1f4fc4 16%,#7fb0ff 28%,#2a5fd6 38%,#0e2c80 54%,#3a74ea 68%,#d4e5ff 78%,#2253c8 88%,#0a215f 100%) var(--fx,50%) 0 / 280% 100%}
+.m-ivory .b3-front::before,.m-ivory .b3-back::before,.m-ivory .b3-sp::before{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E %3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.95 .7' numOctaves='2' seed='4' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1' result='a'/%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.04' numOctaves='3' seed='9' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E %3CfeComposite in='a' operator='arithmetic' k2='.9' k3='.1'/%3E %3CfeColorMatrix values='0.12 0 0 0 0.05 0.12 0 0 0 0.04 0.12 0 0 0 0.025 0 0 0 0 1'/%3E %3C/filter%3E %3Crect width='300' height='300' filter='url(%23p)'/%3E%3C/svg%3E") 0 0 / calc(300px * var(--q,1));mix-blend-mode:screen}
+.m-ivory .b3-tex{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E %3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.95 .7' numOctaves='2' seed='4' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1' result='a'/%3E %3CfeTurbulence type='fractalNoise' baseFrequency='.04' numOctaves='3' seed='9' stitchTiles='stitch'/%3E %3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1'/%3E %3CfeComposite in='a' operator='arithmetic' k2='.9' k3='.1'/%3E %3CfeColorMatrix values='0.12 0 0 0 0.905 0.12 0 0 0 0.875 0.12 0 0 0 0.81 0 0 0 0 1'/%3E %3C/filter%3E %3Crect width='300' height='300' filter='url(%23p)'/%3E%3C/svg%3E") 0 0 / calc(300px * var(--q,1));mix-blend-mode:multiply}
+.b3-foil{position:absolute;inset:0;z-index:1;pointer-events:none;-webkit-mask:var(--foil) 0 0 / 100% 100% no-repeat;mask:var(--foil) 0 0 / 100% 100% no-repeat;background:linear-gradient(115deg,rgba(255,255,255,0) 43%,rgba(255,255,255,.35) 50%,rgba(255,255,255,0) 57%) var(--fx2,50%) 0 / 300% 100% no-repeat,linear-gradient(115deg,#0a215f 0%,#1f4fc4 16%,#7fb0ff 28%,#2a5fd6 38%,#0e2c80 54%,#3a74ea 68%,#d4e5ff 78%,#2253c8 88%,#0a215f 100%) var(--fx,50%) 0 / 280% 100%}
 .b3-foil::before,.b3-foil::after{content:"";position:absolute;inset:0}
 .b3-foil::before{background:#000;opacity:calc(var(--s-front,0) * .8)}
-.b3-foil::after{background:radial-gradient(40cqmax 48cqmax at var(--hx) var(--hy),rgba(238,246,255,.95),rgba(140,190,255,.6) 32%,rgba(80,135,255,.2) 62%,rgba(80,135,255,0));opacity:var(--hi,0)}
+.b3-foil::after{background:radial-gradient(40cqmax 48cqmax at var(--hx) var(--hy),rgba(238,246,255,.82),rgba(140,190,255,.5) 32%,rgba(80,135,255,.16) 62%,rgba(80,135,255,0));opacity:var(--hi,0)}
 /* book page: the cover stands at the top as a 3D book; a click opens the viewer */
 .bk-cover{display:grid;justify-items:center;gap:clamp(8px,1.4vw,16px);margin:calc(-1 * clamp(16px,3vw,40px)) 0 clamp(44px,6vw,92px)}
 .bk-stage{position:relative;display:grid;place-items:center;width:100%;padding:clamp(26px,4.5vw,60px) 0 clamp(44px,6vw,80px);border:0;background:radial-gradient(40% 48% at 50% 48%,rgba(255,255,255,.07),rgba(255,255,255,0) 72%);color:inherit;font:inherit;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
@@ -212,9 +212,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .b3v-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(36% 44% at 50% 50%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);pointer-events:none}
 .b3v-stage.drag{cursor:grabbing}
 .b3v-fly,.b3v-zoom{position:absolute;inset:0;display:grid;place-items:center}
-.b3v-zoom{transform:scale(var(--z,1));transition:transform .4s var(--ease-out)}
+.b3v-zoom{transform:scale(calc(var(--z,1) / var(--q,1)));transition:transform .4s var(--ease-out)}
+.b3v-zoom.settle{transition:none}
 .b3v-stage.pinch .b3v-zoom{transition:none}
-.b3v-stage .b3{width:min(60cqw,calc(62cqh * var(--arn)))}
+/* a 3D book scaled up is drawn soft, so the book is laid out --q times its base size (the zoom it settled at, and in Chrome
+   the screen's pixel density too) and the zoom layer scales it to what is shown */
+.b3v-stage .b3{--bw:calc(min(60cqw,62cqh * var(--arn)) * var(--q,1));position:absolute;left:50%;top:50%;width:var(--bw);margin:calc(var(--bw) / var(--arn) / -2) 0 0 calc(var(--bw) / -2)}
 
 /* cover wall (template 1 browsing) */
 .works{padding-block:clamp(64px,9vw,128px) clamp(88px,10vw,150px)}
@@ -2125,7 +2128,7 @@ const B3_SP = 7;   // the rounded spine is drawn as this many narrow strips, fro
 const B3_SPN = Array.from({ length: B3_SP }, (_, i) => { const a = -(i + 0.5) * Math.PI / B3_SP; return [Math.sin(a), 0, Math.cos(a)]; });
 const B3_EYE = 4.2;   // the camera's distance in lengths of the cover's long side, as in .b3-cam's perspective()
 const B3_LAMP = [-1.02, 0.18, 0.84];   // the lamp a laminated cover mirrors: left of the book, close, about level with it
-const B3_SPEC = { gloss: [0.8, 24], matte: [0.25, 5] };   // how the round spine catches that lamp: how bright, how tight
+const B3_SPEC = { gloss: [0.55, 24], matte: [0.18, 5] };   // how the round spine catches that lamp: how bright, how tight
 const b3Unit = (v) => { const l = Math.hypot(...v) || 1; return v.map((x) => x / l); };
 const B3_LIGHT = [0, -0.35, 0.94].map((v, _, a) => v / Math.hypot(...a));   // above and in front of the book
 const B3_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 12a8.4 8.4 0 0 1 14.5-5.8M20.4 12a8.4 8.4 0 0 1-14.5 5.8"/><path d="M18.4 2.9v3.5h-3.5M5.6 21.1v-3.5h3.5"/></svg>';
@@ -2283,18 +2286,35 @@ const b3v = $('#b3v'), b3vStage = $('#b3v-stage'), b3vFly = $('#b3v-fly'), b3vZo
 const b3Ptr = new Map();
 let b3vBox = null, b3vFrom = null, b3vZ = 1, b3Drag = null, b3Pinch = null, b3Spin = 0, b3Tap = 0;
 if (matchMedia('(hover: none)').matches) $('#b3v-hint').dataset.i18n = 'b3.hintTouch';
-function b3vZoomTo(z) {
+let b3vQ = 1, b3vSettle = 0;
+const b3vDensity = () => (navigator.userAgentData ? Math.min(2, devicePixelRatio || 1) : 1);   // Chromium draws a big 3D face at no more than 1 px per CSS px
+function b3vZoomTo(z, now) {
   b3vZ = Math.min(2.4, Math.max(0.6, z));
   b3vZoomEl.style.setProperty('--z', b3vZ.toFixed(3));
+  clearTimeout(b3vSettle);
+  if (now) b3vSharpen();
+  else b3vSettle = setTimeout(() => { if (!b3Pinch) b3vSharpen(); }, 450);   // once the zoom has eased in
+}
+/* lay the book out at the size it is shown, so it is drawn sharp; the zoom layer's scale changes with it, without easing */
+function b3vSharpen() {
+  clearTimeout(b3vSettle);
+  const q = b3vZ * b3vDensity();
+  if (Math.abs(q - b3vQ) < 0.005) return;
+  b3vQ = q;
+  b3vZoomEl.classList.add('settle');
+  b3vZoomEl.style.setProperty('--q', q.toFixed(3));
+  void b3vZoomEl.offsetWidth;
+  b3vZoomEl.classList.remove('settle');
 }
 function b3vOpen(b, from) {
   const a = from.getBoundingClientRect();
   b3vFrom = from;
   b3vBox = b3Make(b, true);
+  b3vBox._src = `img/ab/x/${b.slug}_p0.webp`;   // full size: the viewer zooms in; the page's copy shows until it is ready
   b3vBox.style.setProperty('--img', from.style.getPropertyValue('--img'));
   b3Load(b3vBox);
   b3vZoomEl.replaceChildren(b3vBox);
-  b3vZoomTo(1);
+  b3vZoomTo(1, true);
   $('#b3v-cap').replaceChildren(el('span', '', 'COVER'), document.createTextNode(`${b.ev} · ART BOOK`));
   b3v.hidden = false;
   document.documentElement.classList.add('zv-open');
@@ -2385,7 +2405,7 @@ b3vStage.addEventListener('pointermove', (e) => {
 function b3vUp(e) {
   if (!b3Ptr.delete(e.pointerId)) return;
   if (b3Pinch) {
-    if (!b3Ptr.size) { b3Pinch = null; b3vStage.classList.remove('pinch'); }
+    if (!b3Ptr.size) { b3Pinch = null; b3vStage.classList.remove('pinch'); b3vSharpen(); }
     return;
   }
   const d = b3Drag;
