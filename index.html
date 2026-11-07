@@ -1810,16 +1810,43 @@ function yearsUpdate() {
   yearsProg.style.transform = `scaleX(${Math.min(1, Math.max(0, (line - wr.top) / wr.height)).toFixed(4)})`;
 }
 addEventListener('scroll', () => { if (!yearsRaf) yearsRaf = requestAnimationFrame(yearsUpdate); }, { passive: true });
-/* units in strict date order: a wide work alone, a single-column work beside the very next one when that
-   is single-column too and from the same year; otherwise it stands alone */
+/* units in date order: a wide work alone; a single-column work beside the next single-column one of the same year.
+   When that one is far taller or shorter, the closest in height among the next few takes its place, so a long work
+   is not left beside a short one; if even that is far shorter, the works after it stack under the short one */
 function buildUnits() {
   const items = wallOrder.map((el) => ({ el, r: +el.dataset.r, y: el.dataset.date.slice(0, 4) }));
-  const units = [];
+  const units = [], used = new Set();
+  const fits = (c, y) => c.y === y && c.r < 1.4;   // single-column, same year
   for (let k = 0; k < items.length; k++) {
-    const a = items[k], b = items[k + 1];
-    if (a.r >= 1.4) units.push({ a });
-    else if (b && b.r < 1.4 && b.y === a.y) { units.push({ a, b, pair: true }); k++; }
-    else units.push({ a, b: null, pair: true });
+    if (used.has(k)) continue;
+    const a = items[k];
+    if (a.r >= 1.4) { units.push({ a }); continue; }
+    let pick = -1, pickQ = Infinity;
+    for (let j = k + 1, n = 0; j < items.length && n < 3; j++) {
+      if (used.has(j)) continue;
+      if (!fits(items[j], a.y)) break;   // never past a wide work or into the next year
+      n++;
+      const q = Math.max(a.r, items[j].r) / Math.min(a.r, items[j].r);   // how much taller one is than the other
+      if (pick < 0 || q < pickQ - 0.25) { pick = j; pickQ = q; }
+      if (pickQ < 1.5) break;   // close enough: keep the date order
+    }
+    if (pick < 0) { units.push({ a, b: null, pair: true }); continue; }
+    used.add(pick);
+    const u = { a, b: items[pick], pair: true };
+    if (pickQ > 1.8) {   // still a long one beside a short one: fill the short side's column with the next works
+      let room = Math.abs(1 / a.r - 1 / u.b.r);   // the height left beside the long one, in column widths
+      const more = [];
+      for (let j = Math.max(k, pick) + 1; j < items.length && room > 0.6; j++) {
+        if (used.has(j)) continue;
+        const c = items[j];
+        if (!fits(c, a.y) || 1 / c.r > room + 0.3) break;
+        used.add(j);
+        more.push(c);
+        room -= 1 / c.r + 0.1;
+      }
+      if (more.length) u[a.r < u.b.r ? 'sb' : 'sa'] = more;   // under whichever of the two is shorter
+    }
+    units.push(u);
   }
   return units;
 }
@@ -1841,8 +1868,11 @@ function layoutWall() {
   const plan = wallUnits.map((u) => {
     const p = { u, wa: u.pair ? colW * (0.9 + rand() * 0.1) : laneW * (0.86 + rand() * 0.14) };
     if (u.b) p.wb = colW * (0.9 + rand() * 0.1);
+    p.ex = u.sa || u.sb || [];
+    p.we = p.ex.map(() => colW * (0.9 + rand() * 0.1));
     u.a.el.style.width = `${Math.round(p.wa)}px`;
     if (u.b) u.b.el.style.width = `${Math.round(p.wb)}px`;
+    p.ex.forEach((c, i) => { c.el.style.width = `${Math.round(p.we[i])}px`; });
     return p;
   });
   const h = new Map(wallOrder.map((el) => [el, el.offsetHeight]));   // one layout pass for every cover
@@ -1877,12 +1907,23 @@ function layoutWall() {
       const ya = y0 + rand() * 24;
       const xa = u.b ? x0 + (colW - p.wa) * rand() : x0 + (laneW - p.wa) / 2 + (rand() - 0.5) * gap;   // a lone one sits mid-lane
       placeCover(u.a.el, xa, ya, tilt());
-      bottom = ya + h.get(u.a.el);
+      let botA = ya + h.get(u.a.el), botB = botA;
       if (u.b) {
         const yb = y0 + rand() * 24, xb = x0 + colW + gap + (colW - p.wb) * rand();
         placeCover(u.b.el, xb, yb, tilt());
-        bottom = Math.max(bottom, yb + h.get(u.b.el));
+        botB = yb + h.get(u.b.el);
       }
+      if (p.ex.length) {   // the works stacked under the short one, beside the long one
+        const cx = u.sa ? x0 : x0 + colW + gap;
+        let yy = u.sa ? botA : botB;
+        p.ex.forEach((c, i) => {
+          const y = yy + gap * (0.6 + rand() * 0.6);
+          placeCover(c.el, cx + (colW - p.we[i]) * rand(), y, tilt());
+          yy = y + h.get(c.el);
+        });
+        if (u.sa) botA = yy; else botB = yy;
+      }
+      bottom = Math.max(botA, botB);
     } else {
       const spill = !touch && lanes === 2 && !lone && rand() < 0.18 ? (L === 0 ? 1 : -1) * (6 + rand() * 16) : 0;
       const xa = Math.min(W - p.wa, Math.max(0, x0 + (laneW - p.wa) * rand() + spill));
@@ -1891,6 +1932,7 @@ function layoutWall() {
     }
     u.a.el.style.zIndex = String(++z);
     if (u.b) u.b.el.style.zIndex = String(++z);
+    p.ex.forEach((c) => { c.el.style.zIndex = String(++z); });
     laneH[L] = bottom;
     fresh[L] = false;
   });
