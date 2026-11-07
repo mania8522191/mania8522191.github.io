@@ -123,7 +123,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nsfw-go{display:inline-flex;align-items:center;gap:10px;padding:13px 28px;border:1px solid rgba(208,166,90,.65);color:var(--fg);text-decoration:none;font-size:14px;letter-spacing:.12em;transition:background .35s,border-color .35s,color .35s}
 .nsfw-go:hover{background:var(--g-gold);border-color:var(--g-gold);color:#111}
 .nsfw-go:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
-/* art books: a timeline like the works wall; each year opens with its outlined number, then its books' cover spreads */
+/* art books: a timeline like the works wall; each year opens with its outlined number, then its books, each shown as a 3D book */
 .artbook{padding-block:clamp(64px,9vw,128px) clamp(88px,10vw,150px)}
 .ab-list{display:grid;gap:clamp(56px,7vw,104px);margin-top:clamp(36px,5vw,64px)}
 .ab-year{display:grid;gap:clamp(22px,3vw,36px)}
@@ -131,10 +131,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(22px,3.4vw,52px);align-items:start}
 .ab-card{display:grid;gap:14px;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 90px)}
 .ab-card:only-child{grid-column:1 / -1;justify-self:center;width:min(100%,calc(50% - clamp(11px,1.7vw,26px)))}
-.ab-frame{position:relative;display:block;overflow:hidden;background:var(--bg-2);box-shadow:0 14px 36px rgba(0,0,0,.55)}
-.ab-frame img{display:block;width:100%;height:auto;transition:transform 1.4s var(--ease-out)}
-.ab-frame::after{content:"";position:absolute;inset:0;left:50%;width:1px;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.35),rgba(0,0,0,0));pointer-events:none}   /* the spine */
-.ab-card:hover .ab-frame img{transform:scale(1.04)}
+.ab-stage{position:relative;display:grid;place-items:center;aspect-ratio:4 / 3;container-type:size}   /* JS sets the ratio per book format */
+.ab-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(44% 46% at 50% 52%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);opacity:.7;transition:opacity .7s;pointer-events:none}
+.ab-card:hover .ab-stage::before,.ab-card:focus-visible .ab-stage::before{opacity:1}
+.ab-stage .b3{width:min(66cqw,calc(72cqh * var(--arn)));transition:translate .9s var(--ease-out)}
+.ab-card:hover .ab-stage .b3,.ab-card:focus-visible .ab-stage .b3{translate:0 -8px}
 .ab-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .ab-cap{display:flex;align-items:baseline;gap:14px;padding-inline:2px}
 .ab-ev{font-family:var(--f-display);font-size:clamp(19px,2vw,26px);letter-spacing:.1em;transition:color .3s}
@@ -148,6 +149,50 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .bk-blur{position:relative;display:block;width:min(100%,1400px);text-decoration:none}
 .bk-blur img{width:100%;cursor:pointer}
 .bk-blur .nsfw-tag{font-size:clamp(26px,4vw,48px)}
+/* a closed book in CSS 3D. The cover spread wraps it: right half front, left half back, a sliver of the middle the spine (left-bound).
+   The page block shows on the other three edges. JS sets the angle (--rx, --ry) and how dark each face is for a light above and in front. */
+.b3{position:relative;display:block;aspect-ratio:var(--ar);container-type:size}
+.b3-cam,.b3-book{position:absolute;inset:0;transform-style:preserve-3d}
+.b3-cam{--t:calc(max(100cqw,100cqh) * .032);transform:perspective(calc(max(100cqw,100cqh) * 4.2)) rotateX(var(--rx,-9deg))}
+.b3-book{transform:rotateY(var(--ry,24deg))}
+.b3-f{position:absolute;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:var(--bg-2) var(--img,none) no-repeat}
+.b3-f::after{content:"";position:absolute;inset:0;background:#000;opacity:var(--s,0);pointer-events:none}
+.b3-front,.b3-back{inset:0;background-size:200% 100%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.b3-front{--s:var(--s-front);background-position:100% 0;transform:translateZ(calc(var(--t) / 2))}
+.b3-back{--s:var(--s-back);background-position:0 0;transform:rotateY(180deg) translateZ(calc(var(--t) / 2))}
+.b3-front::before,.b3-back::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(112deg,rgba(255,255,255,0) 36%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 64%) no-repeat;background-size:300% 100%;pointer-events:none}
+.b3-front::before{opacity:var(--g-front,0);background-position:var(--gx-front,50%) 0}
+.b3-back::before{opacity:var(--g-back,0);background-position:var(--gx-back,50%) 0}
+.b3-spine,.b3-fore{top:0;bottom:0;left:calc(50% - var(--t) / 2);width:var(--t)}
+.b3-head,.b3-tail{left:0;right:0;top:calc(50% - var(--t) / 2);height:var(--t)}
+.b3-spine{--s:var(--s-spine);background-size:200cqw 100%;background-position:50% 0;transform:rotateY(-90deg) translateZ(50cqw)}
+.b3-fore{--s:var(--s-fore);transform:rotateY(90deg) translateZ(50cqw)}
+.b3-head{--s:var(--s-head);transform:rotateX(90deg) translateZ(50cqh)}
+.b3-tail{--s:var(--s-tail);transform:rotateX(-90deg) translateZ(50cqh)}
+.b3.rtl .b3-front{background-position:0 0}   /* a right-bound book: front cover on the left half, spine on the right */
+.b3.rtl .b3-back{background-position:100% 0}
+.b3.rtl .b3-spine{transform:rotateY(90deg) translateZ(50cqw)}
+.b3.rtl .b3-fore{transform:rotateY(-90deg) translateZ(50cqw)}
+.b3-fore,.b3-head,.b3-tail{background:#e9e3d6}
+.b3-fore{background-image:repeating-linear-gradient(90deg,rgba(90,70,40,.13) 0 1px,rgba(0,0,0,0) 1px 3px);box-shadow:inset 1px 0 rgba(0,0,0,.45),inset -1px 0 rgba(0,0,0,.45)}
+.b3-head,.b3-tail{background-image:repeating-linear-gradient(0deg,rgba(90,70,40,.13) 0 1px,rgba(0,0,0,0) 1px 3px);box-shadow:inset 0 1px rgba(0,0,0,.45),inset 0 -1px rgba(0,0,0,.45)}
+.b3-shadow{position:absolute;left:3%;right:3%;bottom:-9%;height:15%;background:radial-gradient(closest-side,rgba(0,0,0,.72),rgba(0,0,0,0));opacity:var(--so,1);transform:scaleX(var(--sw,.92));pointer-events:none}
+/* book page: the cover stands at the top as a 3D book; a click opens the viewer */
+.bk-cover{display:grid;justify-items:center;gap:clamp(8px,1.4vw,16px);margin:calc(-1 * clamp(16px,3vw,40px)) 0 clamp(44px,6vw,92px)}
+.bk-stage{position:relative;display:grid;place-items:center;width:100%;padding:clamp(26px,4.5vw,60px) 0 clamp(44px,6vw,80px);border:0;background:radial-gradient(40% 48% at 50% 48%,rgba(255,255,255,.07),rgba(255,255,255,0) 72%);color:inherit;font:inherit;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
+.bk-stage .b3{width:min(84vw,700px,calc(56vh * var(--arn)))}
+.bk-stage:focus-visible{outline:1px solid var(--fg);outline-offset:-1px}
+.bk-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}
+.bk-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+/* the 3D viewer: drag to turn the book, wheel or pinch to zoom */
+.zv.b3v{background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
+.b3v-stage{position:relative;overflow:hidden;container-type:size;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.b3v-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(36% 44% at 50% 50%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);pointer-events:none}
+.b3v-stage.drag{cursor:grabbing}
+.b3v-fly,.b3v-zoom{position:absolute;inset:0;display:grid;place-items:center}
+.b3v-zoom{transform:scale(var(--z,1));transition:transform .4s var(--ease-out)}
+.b3v-stage.pinch .b3v-zoom{transition:none}
+.b3v-stage .b3{width:min(60cqw,calc(62cqh * var(--arn)))}
 
 /* cover wall (template 1 browsing) */
 .works{padding-block:clamp(64px,9vw,128px) clamp(88px,10vw,150px)}
@@ -799,7 +844,7 @@ addEventListener('hashchange', function () {
     <div class="ab-list" id="ab-list"></div>
   </section>
 
-  <!-- single art book: cover spread first, then the inside pages -->
+  <!-- single art book: the cover as a 3D book, then the inside pages -->
   <article class="view in" id="v-book" hidden>
     <div class="proj">
       <header class="proj-head">
@@ -812,6 +857,7 @@ addEventListener('hashchange', function () {
         </ul>
         <p class="proj-goods" id="bk-r18" hidden><span data-i18n="bk.r18">這本是成人向作品，內頁已模糊處理。</span> <a href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener"><span data-i18n="nsfw.go">前往 Google 雲端相簿</span> ↗</a></p>
       </header>
+      <div class="bk-cover" id="bk-cover"></div>
       <div class="proj-imgs" id="bk-imgs"></div>
       <nav class="proj-nav" aria-label="其他畫冊" data-i18n-aria="bk.others">
         <a id="bk-prev"><span class="lbl">← Previous Book</span><span class="nm" id="bk-prev-t"></span></a>
@@ -1028,11 +1074,21 @@ addEventListener('hashchange', function () {
   <p class="zv-load" id="zv-load" hidden data-i18n="zv.load">載入高解析度⋯</p>
 </div>
 
+<div class="zv b3v" id="b3v" role="dialog" aria-modal="true" aria-label="畫冊 3D 檢視" data-i18n-aria="b3.label" hidden>
+  <div class="zv-bar">
+    <p class="zv-cap" id="b3v-cap"></p>
+    <button type="button" id="b3v-reset" data-i18n="b3.reset">還原角度</button>
+    <button type="button" id="b3v-close">CLOSE</button>
+  </div>
+  <div class="b3v-stage" id="b3v-stage"><div class="b3v-fly" id="b3v-fly"><div class="b3v-zoom" id="b3v-zoom"></div></div></div>
+  <p class="zv-hint" id="b3v-hint" data-i18n="b3.hint">按住拖曳旋轉 · 滾輪縮放 · 點兩下還原</p>
+</div>
+
 <script>
 window.SELF_HOSTED = true;
 const WORKS = [{"id":"151727539","t":"星街すいせい「旗袍」","ym":"2023.02","d":"2026-11-06","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","proc":[["151727539.webp",1000,2000]],"cat":"fan"},{"id":"151727489","t":"星街すいせい「着物」","ym":"2023.02","d":"2026-11-06","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","proc":[["151727489.webp",1000,2000]],"cat":"fan"},{"id":"151727425","t":"星街すいせい「Bomber Jacket」","ym":"2023.02","d":"2026-11-06","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","proc":[["151727425.webp",1000,2000]],"cat":"fan"},{"id":"151727321","t":"星街すいせい「poncho」","ym":"2023.02","d":"2026-11-06","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","proc":[["151727321.webp",1000,2000]],"cat":"fan"},{"id":"151696428","t":"星街すいせい「全衣装」","ym":"2023.02","d":"2026-11-05","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,1200,2560,2560],[1500,1500,2560,2560]],"pos":"50% 35%","proc":[["151696428.webp",1000,1000],["151696428_p1.webp",1000,1000]],"cat":"fan"},{"id":"151695370","t":"星街すいせい「SHOUT IN CRISIS」","ym":"2023.02","d":"2026-11-05","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[858,1200,1829,2560]],"pos":"50% 35%","proc":[["151695370.webp",1000,1400]],"cat":"fan"},{"id":"148923743","t":"星街すいせい×AZKi-「AZKiと未来へ」","ym":"2026.08","d":"2026-08-27","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","AZKi"],"dims":[[900,2728,1500,4547]],"pos":"50% 31%","yt":{"id":"4jt6jOjVMuA","dur":"22:20","t":"星街すいせい×AZKi-「AZKiと未来へ」PROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"148499079","t":"台湾FF47お品書き","ym":"","d":"2026-08-16","lab":"Fancy Frontier 47","tags":["バーチャルYouTuber","星街すいせい","さくらみこ","宝鐘マリン","一伊那尓栖","仲町あられ"],"dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]],"pos":"50% 35%","cat":"fan"},{"id":"148494165","t":"星街すいせい×花譜-KAF-「DEADPOOL」","ym":"2026.08","d":"2026-08-16","lab":"hololive × 神椿スタジオ","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","神椿スタジオ"],"dims":[[900,2728,1500,4547]],"pos":"50% 29%","yt":{"id":"CqvN1sByvPU","dur":"21:41","t":"星街すいせい×花譜-KAF-「DEADPOOL」PROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"148313240","t":"チビキーホルダー","ym":"2026.08","d":"2026-08-12","lab":"hololive","tags":["バーチャルYouTuber","hololive","星街すいせい","ほしまちぎゃらりー","HololiveEN","一伊那尓栖"],"dims":[[1000,1001],[1000,1001],[1000,1001],[1000,1001]],"pos":"50% 50%","yt":{"id":"T3Oaep-xdDw","dur":"12:42","t":"チビキーホルダーPROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"148068024","t":"あのそよ「ブレンドの香る窓辺で」","ym":"2026.08","d":"2026-08-06","lab":"BanG Dream!","tags":["バンドリ","BanG_Dream!","千早愛音","長崎そよ","あのそよ"],"dims":[[1200,800,2560,1707],[1500,12000]],"pos":"50% 35%","yt":{"id":"JLrV-DkgcAM","dur":"57:59","t":"あのそよ「ブレンドの香る窓辺で」PROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"147595537","t":"miComet「シュガーラッシュ」「Lollipop」","ym":"","d":"2026-07-25","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","miComet","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,2560,1707],[1500,12000]],"pos":"50% 35%","yt":{"id":"5IpNSzgaoDE","dur":"25:03","t":"miComet「シュガーラッシュ」「Lollipop」PROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"146954644","t":"星街すいせい×宝鐘マリン「Chatter Chatter」","ym":"","d":"2026-07-08","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","ほしまちぎゃらりー","宝鐘マリン","マリンのお宝"],"dims":[[1200,675,2560,1440],[1200,8100]],"pos":"50% 35%","yt":{"id":"3D9UhNnYtnw","dur":"49:12","t":"星街すいせい×宝鐘マリン「Chatter Chatter」PROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"146544263","t":"星街すいせい「SheenderellaDay」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","ほしまちぎゃらりー","アイドルマスターシンデレラガールズ","高垣楓"],"dims":[[1200,608,1500,760],[1500,4560]],"pos":"50% 35%","cat":"fan"},{"id":"146544204","t":"星街すいせい「SheenderellaDay」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,608,1500,760],[1500,4560]],"pos":"50% 35%","cat":"fan"},{"id":"146543533","t":"星街すいせい「ジュビリー」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,608,1500,760],[1500,6080]],"pos":"50% 35%","cat":"fan"},{"id":"146541232","t":"星街すいせい「ジュビリー」","ym":"2024.08","d":"2026-06-28","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー","アイドルマスターシンデレラガールズ","高垣楓"],"dims":[[1200,608,1500,760],[750,4560]],"pos":"50% 35%","cat":"fan"},{"id":"142549210","t":"星街すいせい「ビビデバ」","ym":"2026.08","d":"2026-03-21","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000],[750,4000]],"pos":"50% 35%","yt":{"id":"yWAYSn_4VsA","dur":"16:45","t":"星街すいせい「ビビデバ」PROCESS TIMELAPSE- 202608"},"cat":"fan"},{"id":"140064972","t":"星街すいせい「起点‧終点」","ym":"2026.02","d":"2026-01-18","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,675,1920,1080],[1000,1000],[1000,1000],[1000,1000],[1000,1000],[1000,1000],[1000,1000]],"pos":"50% 35%","yt":{"id":"rb2b--E93Do","dur":"32:58","t":"星街すいせい「起点‧終点」PROCESS TIMELAPSE- 202602"},"cat":"fan"},{"id":"140064141","t":"miComet「シュガーラッシュ」","ym":"2024.08","d":"2026-01-18","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","miComet","星街すいせい","さくらみこ","ほしまちぎゃらりー"],"dims":[[1000,1000],[1000,6000]],"pos":"50% 35%","cat":"fan"},{"id":"139165109","t":"星街すいせい「じつげん」","ym":"2026.02","d":"2025-12-28","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,675,1778,1000],[889,6000]],"pos":"50% 35%","yt":{"id":"AI6gq6-lBoY","dur":"40:22","t":"星街すいせい「じつげん」PROCESS TIMELAPSE- 202602"},"cat":"fan"},{"id":"137386797","t":"星街すいせい「武道館」","ym":"2025.12","d":"2025-11-12","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000],[750,6000]],"pos":"50% 35%","yt":{"id":"VyM0Wds8Zbw","dur":"30:01","t":"星街すいせい「武道館」PROCESS TIMELAPSE- 202512"},"cat":"fan"},{"id":"137332578","t":"miComet「Lollipop」","ym":"2025.12","d":"2025-11-11","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","miComet","星街すいせい","さくらみこ","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000],[750,6000]],"pos":"50% 35%","yt":{"id":"PgKiIjXDjgo","dur":"30:01","t":"miComet「Lollipop」PROCESS TIMELAPSE- 202512"},"cat":"fan"},{"id":"137310133","t":"星街すいせい","ym":"2025.05","d":"2025-11-10","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1000,1000]],"pos":"50% 35%","yt":{"id":"5FlWXc-elA4","dur":"20:13","t":"星街すいせい「新星目録」PROCESS TIMELAPSE- 202508"},"cat":"fan"},{"id":"137309925","t":"星街すいせい「Super Nova」","ym":"2025.05","d":"2025-11-10","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[800,1200,1000,1500]],"pos":"50% 30%","cat":"fan"},{"id":"137308455","t":"星街すいせい「7th Anniversary」","ym":"2025.05","d":"2025-11-10","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,800,1500,1000]],"pos":"50% 35%","yt":{"id":"ZePHgBmgToQ","dur":"21:57","t":"星街すいせい「7th Anniversary」PROCESS TIMELAPSE- 202508"},"cat":"fan"},{"id":"137296812","t":"ガールズバンド","ym":"2024.12","d":"2025-11-10","lab":"MyGO!!!!! / ガールズバンドクライ","tags":["MyGO!!!!!","ガールズバンドクライ"],"dims":[[1200,1200,1500,1500],[1200,600,2560,1280],[1200,600,2560,1280],[1200,900,2000,1500],[1200,600,2560,1280]],"pos":"50% 35%","cat":"fan"},{"id":"137293278","t":"星街すいせい","ym":"2024.08","d":"2025-11-09","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい"],"dims":[[1200,600,2560,1280],[1200,600,2560,1280],[1200,600,2560,1280]],"pos":"50% 35%","cat":"fan"},{"id":"137292428","t":"ブルアカ ネグリジェ series","ym":"2024.02","d":"2025-11-09","lab":"ブルーアーカイブ","tags":["ブルーアーカイブ","ブルアカ","BlueArchive","仲正イチカ","天童アリス","聖園ミカ"],"dims":[[1200,1200,1500,1500],[1500,1500],[1500,1500],[1500,1500],[1500,1500]],"pos":"50% 35%","cat":"fan"},{"id":"110349085","t":"みちづれ","ym":"","d":"2023-07-29","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[1200,600,2560,1280]],"pos":"50% 35%","cat":"fan"},{"id":"110144237","t":"灼熱にて純情(wii-wii-woo)","ym":"","d":"2023-07-22","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[1200,600,2560,1280]],"pos":"50% 35%","cat":"fan"},{"id":"104573608","t":"❤","ym":"","d":"2023-01-16","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[800,1200,1200,1800]],"pos":"50% 35%","proc":[["104573608.webp",1000,1500]],"cat":"fan"},{"id":"99304739","t":"❤","ym":"","d":"2022-06-26","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい"],"dims":[[1200,600,1600,800]],"pos":"50% 35%","cat":"fan"},{"id":"95387282","t":"❤","ym":"","d":"2022-01-08","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","星街すいせい","VTuber"],"dims":[[681,1200,908,1600]],"pos":"50% 42%","cat":"fan"},{"id":"94713402","t":"「KING」","ym":"","d":"2021-12-11","lab":"hololive","tags":["バーチャルYouTuber","星街すいせい","ホロライブ"],"dims":[[1200,681,1600,908]],"pos":"50% 35%","cat":"fan"},{"id":"94112477","t":"「Honeycomb Summer」","ym":"","d":"2021-11-13","lab":"hololive × にじさんじ","tags":["バーチャルYouTuber","星街すいせい","戌亥とこ","とこまち","ホロライブ","にじさんじ"],"dims":[[1200,681,1600,908]],"pos":"50% 35%","cat":"fan"},{"id":"93787913","t":"「今宵月の館にて」","ym":"","d":"2021-10-30","lab":"hololive × にじさんじ","tags":["バーチャルYouTuber","星街すいせい","戌亥とこ","とこまち","ホロライブ","にじさんじ"],"dims":[[1200,681,1600,908]],"pos":"50% 35%","cat":"fan"},{"id":"92332684","t":"夏","ym":"","d":"2021-08-28","lab":"hololive","tags":["バーチャルYouTuber","猫又おかゆ","戌神ころね","水着","ホロライブ","おかころ"],"dims":[[1200,750,1600,1000]],"pos":"50% 35%","cat":"fan"},{"id":"91801023","t":"夏","ym":"","d":"2021-08-08","lab":"hololive English","tags":["バーチャルYouTuber","一伊那尓栖","小鳥遊キアラ","森カリオペ","ワトソン・アメリア","がうる・ぐら"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},{"id":"91312872","t":"夏","ym":"","d":"2021-07-17","lab":"hololive","tags":["バーチャルYouTuber","天音かなた","桐生ココ","星街すいせい","水着"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},{"id":"78848192","t":"プリンツ・オイゲン","ym":"","d":"2020-01-12","lab":"アズールレーン","tags":["アズールレーン","プリンツ・オイゲン(アズールレーン)","私服"],"dims":[[900,1200],[900,1200]],"pos":"50% 35%","cat":"fan"},{"id":"78715432","t":"ドイッチュラント","ym":"","d":"2020-01-05","lab":"アズールレーン","tags":["アズールレーン","ドイッチュラント(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%","cat":"fan"},{"id":"78553188","t":"アドミラル・グラーフ・シュペー","ym":"","d":"2019-12-29","lab":"アズールレーン","tags":["アズールレーン","アドミラル・グラーフ・シュペー(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%","cat":"fan"},{"id":"78409231","t":"アドミラル・ヒッパー","ym":"","d":"2019-12-22","lab":"アズールレーン","tags":["アズールレーン","アドミラル・ヒッパー(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%","cat":"fan"},{"id":"o-3-3","t":"Original21","ym":"","d":"2024-03-31","lab":"Original Art","tags":[],"dims":[[800,1200,1707,2560]],"pos":"50% 35%","cat":"original","proc":[["o-3-3.webp",1000,1500]]},{"id":"o-3-2","t":"Original20","ym":"","d":"2024-03-29","lab":"Original Art","tags":[],"dims":[[800,1200,1707,2560]],"pos":"50% 35%","cat":"original","proc":[["o-3-2.webp",1000,1500]]},{"id":"o-3-1","t":"Original19","ym":"","d":"2024-03-22","lab":"Original Art","tags":[],"dims":[[800,1200,1707,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-1","t":"Original18","ym":"","d":"2024-03-12","lab":"Original Art","tags":[],"dims":[[1200,600,2560,1280]],"pos":"50% 35%","cat":"original","proc":[["o-1.webp",2000,1000]]},{"id":"o-8","t":"Original17","ym":"","d":"2024-03-01","lab":"Original Art","tags":[],"dims":[[856,1200,1826,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-58","t":"Original16","ym":"","d":"2023-11-15","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-56","t":"Original15","ym":"","d":"2023-11-15","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original","proc":[["o-56.webp",1000,1600]]},{"id":"o-54","t":"Original14","ym":"","d":"2023-10-30","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original","proc":[["o-54.webp",1000,1600]]},{"id":"o-51","t":"Original13","ym":"","d":"2023-10-25","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-48","t":"Original12","ym":"","d":"2023-10-25","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-53","t":"Original11","ym":"","d":"2023-10-23","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-50","t":"Original10","ym":"","d":"2023-10-23","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-21","t":"Original09","ym":"","d":"2023-08-06","lab":"Original Art","tags":[],"dims":[[772,1200,1646,2560]],"pos":"50% 35%","cat":"original","proc":[["o-21.webp",1000,1555]]},{"id":"o-20","t":"Original08","ym":"","d":"2023-07-23","lab":"Original Art","tags":[],"dims":[[772,1200,1646,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-9-4","t":"Original07","ym":"","d":"2023-01-31","lab":"Original Art","tags":[],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-9-3","t":"Original06","ym":"","d":"2023-01-31","lab":"Original Art","tags":[],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-9-2","t":"Original05","ym":"","d":"2023-01-31","lab":"Original Art","tags":[],"dims":[[600,1200,1280,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-p3-2","t":"Original04","ym":"","d":"2022-09-26","lab":"Original Art","tags":[],"dims":[[1200,1000,2560,2133]],"pos":"50% 35%","cat":"original"},{"id":"o-p2","t":"Original03","ym":"","d":"2022-08-31","lab":"Original Art","tags":[],"dims":[[857,1200,1829,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-65","t":"Original02","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[750,1200,1600,2560]],"pos":"50% 35%","cat":"original"},{"id":"o-64","t":"Original01","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[1200,750,2560,1600]],"pos":"50% 35%","cat":"original"}];
 const GOODS = [{"slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1215,810]},{"slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1215,810]},{"slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1305,870]},{"slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1396,930]},{"slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1290,860]},{"slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1350,900]},{"slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1350,900]},{"slug":"keychain","name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1170,780]},{"slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1395,930]}];
-const BOOKS = [{"slug":"ff47","ev":"FF47","ym":"2026.08","card":[900,317],"pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},{"slug":"ff46","ev":"FF46","ym":"2026.02","card":[900,317],"pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},{"slug":"ff45","ev":"FF45","ym":"2025.08","card":[900,450],"pages":[[1400,700,2560,1280],[1400,700],[1400,700]],"blur":[1,2]},{"slug":"ff44","ev":"FF44","ym":"2025.02","card":[900,450],"pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff43","ev":"FF43","ym":"2024.08","card":[900,450],"pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff42","ev":"FF42","ym":"2024.02","card":[900,450],"pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff41","ev":"FF41","ym":"2023.08","card":[900,450],"pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff40","ev":"FF40","ym":"2023.02","card":[900,450],"pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff38","ev":"FF38","ym":"2022.02","card":[900,635],"pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]},{"slug":"ff37","ev":"FF37","ym":"2021.08","card":[900,635],"pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]}];   // art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred
+const BOOKS = [{"slug":"ff47","ev":"FF47","ym":"2026.08","pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},{"slug":"ff46","ev":"FF46","ym":"2026.02","pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},{"slug":"ff45","rtl":true,"ev":"FF45","ym":"2025.08","pages":[[1400,700,2560,1280],[1400,700],[1400,700]],"blur":[1,2]},{"slug":"ff44","ev":"FF44","ym":"2025.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff43","ev":"FF43","ym":"2024.08","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff42","ev":"FF42","ym":"2024.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff41","ev":"FF41","ym":"2023.08","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff40","ev":"FF40","ym":"2023.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},{"slug":"ff38","ev":"FF38","ym":"2022.02","pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]},{"slug":"ff37","ev":"FF37","ym":"2021.08","pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]}];   // art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred
 const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';
 const byId = Object.fromEntries(WORKS.map((w, i) => [w.id, i]));
 const CAT_LIST = { fan: WORKS.filter((w) => w.cat === 'fan'), original: WORKS.filter((w) => w.cat === 'original') };   // Fan Art (pixiv fan works) / Original Art, newest first
@@ -1043,7 +1099,7 @@ const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 /* ---------- languages: zh (Traditional Chinese), en, ja ---------- */
-const I18N = {"zh":{"nav.main":"主選單","lang.label":"語言","hero.cue":"往下看作品","works.sub":"{a} — {b} · {n} 件作品 · 點選封面看完整作品","cover.pages":"{n} 張","cover.video":"▶ 過程影片","wk.posted":"{d} 發表","wk.pages":"{n} 張","wk.pixiv":"在 pixiv 查看 ↗","wk.tlJump":"▶ 製作過程影片","wk.imgAlt":"{t}（第 {n} 張，共 {m} 張）","wk.madeGoods":"這張插畫做成了周邊：","wk.goodsLink":"看周邊詳細介紹 →","wk.others":"其他作品","list.sep":"、","tl.h":"製作過程影片","tl.yt":"在 YouTube 觀看 ↗","tl.play":"在 YouTube 播放：{t}","goods.sub":"Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。","goods.shopName":"買動漫賣場「Mania Art」","goods.shopBtn":"前往賣場 ↗","item.buy":"到買動漫賣場購買 ↗","item.menu":"看 FF47 完整品書","item.used":"使用插畫","item.others":"其他周邊","item.imgAlt":"{t}實品示意圖","price.event":"場次價","price.per":"／款","spec.size":"尺寸","spec.spec":"規格","spec.contents":"內容","spec.designs":"款式","spec.offer":"優惠","spec.debut":"首賣","event":"Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44","game.coverAlt":"遊戲的戰場背景美術","game.kicker":"INDIE GAME・開發中","game.tag":"組牌決策 × 魔力場站位 × 回合資源管理","game.lead":"讓每一次部署，成為下一個攻擊回合的優勢。","game.h":"一個人做的卡牌策略遊戲","game.p1":"用 54 張牌組成你的隊伍，在格子戰場上安排角色站位，一邊守住防線、一邊找機會反擊，把對手的總血量打到歸零。","game.p2":"從企劃、程式到美術，全部由 mania8522191 一個人製作。","chip.strategy":"卡牌策略","chip.turn":"回合制","chip.dev":"開發中","shots.h":"遊戲畫面","shots.zoom":"放大看這張畫面","shots.note":"開發中畫面，正式版可能會調整。","shots.thumb":"第 {n} 張：{t}","shot1":"角色：依稀有度篩選、搜尋角色卡","shot2":"牌組：依卡牌類型挑選，組成 54 張牌組","shot3":"召喚：選擇要部署上場的角色","shot4":"卡牌詳情：數值、技能與效果說明","shot5":"角色資訊：屬性與各項加成來源","shot6":"事件牌：從一般事件中挑選放進牌組","shot7":"攻擊階段：傷害數字直接顯示在戰場上","shot8":"戰鬥紀錄：雙方傷害統計與每一步的行動紀錄","feat.h":"玩法特色","f1.h":"自由組牌","f1.p":"角色、裝備、事件、天使與惡魔，用 54 張牌組出屬於你的戰術。","f2.h":"站位決定勝負","f2.p":"同一個角色，站的位置、帶的裝備不同，發揮也完全不一樣。","f3.h":"每回合都是取捨","f3.p":"行動點數、活力和魔力要怎麼分配，決定你下一回合的攻勢。","f4.h":"生死之門","f4.p":"10 回合內還沒分出勝負？雙方剩下的牌庫會被摧毀，打到有一方倒下為止。","chars.h":"角色一覽","chars.sub":"共 18 位角色，立繪陸續公開中。點角色可以看完整立繪；標有 CARD 的角色，滑鼠移上去會顯示卡牌。","chars.tbd":"char{n} 的立繪尚未公開","chars.view":"看 char{n} 的完整立繪","chars.full":"char{n} 的完整立繪","follow.h":"追蹤最新消息","follow.p":"遊戲還在開發中，上市時間和售價都還沒決定。想第一時間知道消息，可以追蹤這些地方。","about.alt":"mania8522191 的頭像：星街すいせい布偶","about.photoAlt":"mania8522191 本人，拿著一杯飲料的自拍","about.toPlush":"換成布偶頭像","about.toPhoto":"換回本人照片","about.p1":"mania8522191，以 hololive 的星街すいせい為主要題材的插畫創作者。2019 年開始在 pixiv 發表作品，內容包括紀念插畫、和其他 VTuber 的聯動圖，以及 BanG Dream!、アズールレーン 的同人創作。","about.p2":"也製作周邊，曾以攤位 J44 參加台灣 Fancy Frontier 47。","about.p3":"目前正一個人開發卡牌策略遊戲。","about.gameLink":"看遊戲介紹 →","facts.works":"件作品","facts.pages":"張圖","facts.since":"開始在 pixiv 發表","contact.sub":"在以下平台都找得到我。作品相關的聯絡，請直接私訊。","grp.social":"社群","grp.works":"作品","grp.shop":"周邊","h.fbPage":"mania8522191・粉絲專頁","h.fbPersonal":"mania8522191p2・個人帳號","h.discord":"加入伺服器","h.shop":"賣場 217467","ch.baha":"巴哈姆特","ch.myacg":"買動漫","foot.nav":"社群與作品平台","foot.fbPage":"Facebook（粉專）","foot.fbPersonal":"Facebook（個人）","foot.baha":"巴哈姆特","foot.myacg":"買動漫","foot.copy":"© 2019–2026 mania8522191 · 作品版權所有","zv.label":"圖片檢視","zv.zoom":"放大","zv.unzoom":"縮小","zv.prev":"上一張","zv.next":"下一張","zv.hint":"點圖片放大，再點一下縮回","zv.load":"載入高解析度⋯","zv.workAlt":"{t}（第 {n} 張）","proc.h":"製作過程","proc.alt":"{t} 的製作過程","cards.h":"卡牌一覽","cards.sub":"左右滑動看更多卡牌，點卡牌可以放大。","cards.prev":"上一組卡牌","cards.next":"下一組卡牌","cards.alt":"{c}卡「{name}」","cards.view":"放大看卡牌「{name}」（{c}，第 {n} 張，共 {m} 張）","cat.equip":"一般裝備","cat.event":"一般事件","cat.angel":"天使","cat.demon":"惡魔","cat.oracle":"神諭","cat.summon":"召喚","chars.viewPair":"看 char{n} 的立繪和卡牌","chars.pairAlt":"char{n} 的完整立繪（左）和卡牌（右）","deck.equip":"一般裝備","deck.event":"一般事件","deck.contract":"天使‧惡魔","deck.oracle":"神諭‧召喚","pair.art":"立繪","pair.card":"卡牌","line.h":"作品時間軸","line.sub":"往下捲動，從 2019 年一路走到現在。","line.jump":"依時間軸瀏覽 ↓","line.item":"{t}（{d}）","h.personal":"個人帳號","h.deactivated":"已停用","cur.home":"插畫作品","cur.goods":"周邊商品","cur.game":"獨立遊戲","cur.about":"關於我","cur.contact":"聯絡方式","cur.timeline":"2019 — 現在","years.nav":"依年份瀏覽","years.go":"跳到 {y} 年","wall.count":"{n} 件","works.cats":"作品分類","wk.made":"{d} 完成","works.sort":"排序","sort.new":"由新到舊","sort.old":"由舊到新","sort.label":"排序：{v}","nsfw.sub":"18 歲以上 · 預覽已模糊處理 · 完整作品放在雲端相簿","nsfw.note":"成人向作品不直接放在網站上。點圖片或下方按鈕，到 Google 雲端相簿看完整作品。","nsfw.go":"前往 Google 雲端相簿","nsfw.alt":"模糊處理的成人向作品預覽","cur.artbook":"畫冊","ab.sub":"{a} — {b} · {n} 本畫冊 · 點選封面看內頁","ab.count":"{n} 本","ab.card":"{t} 畫冊（{d}）","bk.date":"{d} 發行","bk.coverAlt":"{t} 封面與封底","bk.pageAlt":"{t} 內頁（第 {n} 張）","bk.blurAlt":"{t} 內頁（成人向，已模糊處理）","bk.others":"其他畫冊","bk.r18":"這本是成人向作品，內頁已模糊處理。"},"en":{"nav.main":"Main menu","lang.label":"Language","hero.cue":"Scroll down to the works","works.sub":"{a} — {b} · {n} works · Click a cover to see the full piece","cover.pages":"{n} images","cover.video":"▶ Timelapse","wk.posted":"Posted {d}","wk.pages":"{n} images","wk.pixiv":"View on pixiv ↗","wk.tlJump":"▶ Process timelapse","wk.imgAlt":"{t} (image {n} of {m})","wk.madeGoods":"Made into goods: ","wk.goodsLink":"See the goods →","wk.others":"Other works","list.sep":", ","tl.h":"Process timelapse","tl.yt":"Watch on YouTube ↗","tl.play":"Play on YouTube: {t}","goods.sub":"Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.","goods.shopName":"MyACG shop “Mania Art”","goods.shopBtn":"Visit the shop ↗","item.buy":"Buy at the MyACG shop ↗","item.menu":"Full FF47 catalog","item.used":"Artwork used","item.others":"Other goods","item.imgAlt":"{t} product shot","price.event":"event price","price.per":" / design","spec.size":"Size","spec.spec":"Specs","spec.contents":"Contents","spec.designs":"Designs","spec.offer":"Offer","spec.debut":"Debut","event":"Fancy Frontier 47 · Aug 21–22, 2026 · Taipei Expo Dome, booth J44","game.coverAlt":"Battlefield background art from the game","game.kicker":"INDIE GAME · IN DEVELOPMENT","game.tag":"Deckbuilding × Mana-field positioning × Turn resource management","game.lead":"Make every deployment your edge in the next attack turn.","game.h":"A card strategy game made by one person","game.p1":"Build your team from a 54-card deck and position your characters on a grid battlefield. Hold the line, look for the moment to strike back, and bring your opponent's total HP down to zero.","game.p2":"Planning, programming and art: everything is made by mania8522191 alone.","chip.strategy":"Card strategy","chip.turn":"Turn-based","chip.dev":"In development","shots.h":"Screenshots","shots.zoom":"View this screenshot larger","shots.note":"In-development footage; the final game may differ.","shots.thumb":"Screenshot {n}: {t}","shot1":"Characters: filter and search character cards by rarity","shot2":"Deck: pick cards by type to build a 54-card deck","shot3":"Summon: choose which characters to deploy","shot4":"Card details: stats, skills and effects","shot5":"Character info: attributes and where each bonus comes from","shot6":"Event cards: choose general events for your deck","shot7":"Attack phase: damage numbers appear right on the battlefield","shot8":"Battle log: damage totals for both sides and a step-by-step record","feat.h":"Features","f1.h":"Build your deck","f1.p":"Characters, equipment, events, angels and demons: build your own tactics from 54 cards.","f2.h":"Position wins battles","f2.p":"The same character plays completely differently depending on where it stands and what it carries.","f3.h":"Every turn is a trade-off","f3.p":"How you spend action points, energy and mana decides the strength of your next attack.","f4.h":"Gate of Life and Death","f4.p":"No winner after 10 turns? Both remaining decks are destroyed, and the fight goes on until one side falls.","chars.h":"Characters","chars.sub":"18 characters, with more art revealed over time. Click a character to see the full art; hover over those marked CARD to see their card.","chars.tbd":"Art for char{n} is not revealed yet","chars.view":"View the full art of char{n}","chars.full":"Full art of char{n}","follow.h":"Follow the development","follow.p":"The game is still in development, and the release date and price are not decided yet. Follow along here to hear the news first.","about.alt":"mania8522191's avatar: a Hoshimachi Suisei plush","about.photoAlt":"mania8522191, a selfie holding a drink","about.toPlush":"Show the plush avatar","about.toPhoto":"Show my photo","about.p1":"mania8522191 is an illustrator who mainly draws hololive's Hoshimachi Suisei. Posting on pixiv since 2019, with commemorative illustrations, collaborations with other VTubers, and fan art of BanG Dream! and Azur Lane.","about.p2":"Also makes goods, and exhibited at Fancy Frontier 47 in Taiwan (booth J44).","about.p3":"Currently developing a card strategy game solo. ","about.gameLink":"See the game →","facts.works":"works","facts.pages":"images","facts.since":"first pixiv post","contact.sub":"You can find me on all of these platforms. For anything about my work, please send a direct message.","grp.social":"Social","grp.works":"Portfolio","grp.shop":"Goods","h.fbPage":"mania8522191 · Page","h.fbPersonal":"mania8522191p2 · Personal","h.discord":"Join the server","h.shop":"Shop 217467","ch.baha":"Bahamut","ch.myacg":"MyACG","foot.nav":"Social and portfolio links","foot.fbPage":"Facebook (Page)","foot.fbPersonal":"Facebook (Personal)","foot.baha":"Bahamut","foot.myacg":"MyACG","foot.copy":"© 2019–2026 mania8522191 · All rights reserved","zv.label":"Image viewer","zv.zoom":"Zoom in","zv.unzoom":"Zoom out","zv.prev":"Previous","zv.next":"Next","zv.hint":"Click the picture to zoom in, click again to zoom out","zv.load":"Loading full resolution…","zv.workAlt":"{t} (image {n})","proc.h":"Process","proc.alt":"{t}: work in progress","cards.h":"Cards","cards.sub":"Swipe sideways to see more cards; click a card to enlarge it.","cards.prev":"Previous cards","cards.next":"Next cards","cards.alt":"{c} card “{name}”","cards.view":"Enlarge “{name}” ({c}, card {n} of {m})","cat.equip":"Equipment","cat.event":"Event","cat.angel":"Angel","cat.demon":"Demon","cat.oracle":"Oracle","cat.summon":"Summon","chars.viewPair":"View char{n}: full art and card","chars.pairAlt":"char{n}: full art (left) and card (right)","deck.equip":"Equipment","deck.event":"Events","deck.contract":"Angel · Demon","deck.oracle":"Oracle · Summon","pair.art":"Artwork","pair.card":"Card","line.h":"Timeline","line.sub":"Keep scrolling to travel from 2019 to today.","line.jump":"Browse as a timeline ↓","line.item":"{t} ({d})","h.personal":"Personal account","h.deactivated":"Deactivated","cur.home":"Illustrations","cur.goods":"Merchandise","cur.game":"Indie card game","cur.about":"About the artist","cur.contact":"Get in touch","cur.timeline":"2019 — now","years.nav":"Browse by year","years.go":"Jump to {y}","wall.count":"{n} works","works.cats":"Work categories","wk.made":"Completed {d}","works.sort":"Sort order","sort.new":"Newest first","sort.old":"Oldest first","sort.label":"Sort order: {v}","nsfw.sub":"18+ only · Previews are blurred · The full works are in the cloud album","nsfw.note":"Adult works are not shown on this site. Open the Google Drive album to see them in full.","nsfw.go":"Open the Google Drive album","nsfw.alt":"Blurred preview of an adult work","cur.artbook":"Art books","ab.sub":"{a} — {b} · {n} art books · Click a cover to look inside","ab.count":"{n} books","ab.card":"{t} art book ({d})","bk.date":"Released {d}","bk.coverAlt":"{t}: front and back cover","bk.pageAlt":"{t}: inside pages ({n})","bk.blurAlt":"{t}: inside pages (adult content, blurred)","bk.others":"Other art books","bk.r18":"This book is adult content; its inside pages are blurred."},"ja":{"nav.main":"メインメニュー","lang.label":"言語","hero.cue":"作品一覧へスクロール","works.sub":"{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます","cover.pages":"{n}枚","cover.video":"▶ メイキング","wk.posted":"{d} 投稿","wk.pages":"{n}枚","wk.pixiv":"pixivで見る ↗","wk.tlJump":"▶ メイキング動画","wk.imgAlt":"{t}（{m}枚中{n}枚目）","wk.madeGoods":"グッズ化：","wk.goodsLink":"グッズ紹介を見る →","wk.others":"ほかの作品","list.sep":"、","tl.h":"メイキング動画","tl.yt":"YouTubeで見る ↗","tl.play":"YouTubeで再生：{t}","goods.sub":"Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。","goods.shopName":"買動漫（MyACG）ショップ「Mania Art」","goods.shopBtn":"ショップへ ↗","item.buy":"買動漫ショップで購入 ↗","item.menu":"FF47 お品書きを見る","item.used":"使用イラスト","item.others":"ほかのグッズ","item.imgAlt":"{t}の商品イメージ","price.event":"イベント価格","price.per":"／1種","spec.size":"サイズ","spec.spec":"仕様","spec.contents":"内容","spec.designs":"種類","spec.offer":"特典","spec.debut":"初頒布","event":"Fancy Frontier 47・2026.08.21–22・花博争艶館 J44","game.coverAlt":"ゲームの戦場背景アート","game.kicker":"INDIE GAME・開発中","game.tag":"デッキ構築 × 魔力場の位置取り × ターンごとの資源管理","game.lead":"ひとつひとつの配置を、次の攻撃ターンの優位に。","game.h":"ひとりで作るカードストラテジーゲーム","game.p1":"54枚のデッキでチームを編成し、マス目の戦場にキャラクターを配置。防衛ラインを守りながら反撃のチャンスをうかがい、相手の総HPをゼロにしましょう。","game.p2":"企画・プログラム・イラストまで、すべて mania8522191 がひとりで制作しています。","chip.strategy":"カードストラテジー","chip.turn":"ターン制","chip.dev":"開発中","shots.h":"ゲーム画面","shots.zoom":"この画面を拡大して見る","shots.note":"開発中の画面です。製品版では変更される場合があります。","shots.thumb":"{n}枚目：{t}","shot1":"キャラクター：レアリティで絞り込み・キャラカードを検索","shot2":"デッキ：カードの種類ごとに選んで54枚のデッキを構築","shot3":"召喚：戦場に配置するキャラクターを選択","shot4":"カード詳細：ステータス・スキル・効果の説明","shot5":"キャラクター情報：属性と各ボーナスの内訳","shot6":"イベントカード：一般イベントから選んでデッキに追加","shot7":"攻撃フェーズ：ダメージがそのまま戦場に表示","shot8":"バトルログ：両陣営のダメージ集計と行動の記録","feat.h":"ゲームの特徴","f1.h":"自由なデッキ構築","f1.p":"キャラクター、装備、イベント、天使と悪魔。54枚で自分だけの戦術を組み立てよう。","f2.h":"位置取りが勝負を決める","f2.p":"同じキャラクターでも、立つ位置や装備によって活躍がまったく変わります。","f3.h":"毎ターンが取捨選択","f3.p":"行動ポイント、活力、魔力をどう配分するかが、次のターンの攻勢を左右します。","f4.h":"生死の門","f4.p":"10ターンで決着がつかなければ、双方の残りの山札が破壊され、どちらかが倒れるまで戦いは続きます。","chars.h":"キャラクター","chars.sub":"全18キャラクター。立ち絵は順次公開中です。クリックで立ち絵全体を表示、CARD の付いたキャラクターはマウスを乗せるとカードが見られます。","chars.tbd":"char{n} の立ち絵は未公開です","chars.view":"char{n} の立ち絵を見る","chars.full":"char{n} の立ち絵","follow.h":"最新情報をチェック","follow.p":"ゲームは開発中で、発売時期・価格は未定です。最新情報をいち早く知りたい方は、こちらをフォローしてください。","about.alt":"mania8522191 のアイコン：星街すいせいのぬいぐるみ","about.photoAlt":"mania8522191 本人、ドリンクを手にした自撮り","about.toPlush":"ぬいぐるみのアイコンに切り替え","about.toPhoto":"本人の写真に切り替え","about.p1":"hololive の星街すいせいを中心に描いているイラストレーターです。2019年から pixiv に作品を投稿しており、記念イラストや他の VTuber とのコラボイラスト、BanG Dream!・アズールレーンのファンアートなどを描いています。","about.p2":"グッズ制作も行っており、台湾の Fancy Frontier 47 にサークル参加しました（スペース J44）。","about.p3":"現在、カードストラテジーゲームを個人で開発中です。","about.gameLink":"ゲーム紹介へ →","facts.works":"作品","facts.pages":"枚のイラスト","facts.since":"pixiv 投稿開始","contact.sub":"以下のプラットフォームで活動しています。作品に関するご連絡は、各SNSのDMまでお願いします。","grp.social":"SNS","grp.works":"作品","grp.shop":"グッズ","h.fbPage":"mania8522191・ページ","h.fbPersonal":"mania8522191p2・個人アカウント","h.discord":"サーバーに参加","h.shop":"ショップ 217467","ch.baha":"巴哈姆特（バハムート）","ch.myacg":"買動漫（MyACG）","foot.nav":"SNS・作品リンク","foot.fbPage":"Facebook（ページ）","foot.fbPersonal":"Facebook（個人）","foot.baha":"巴哈姆特","foot.myacg":"買動漫","foot.copy":"© 2019–2026 mania8522191 · 無断転載禁止","zv.label":"画像ビューア","zv.zoom":"拡大","zv.unzoom":"縮小","zv.prev":"前へ","zv.next":"次へ","zv.hint":"画像をクリックで拡大、もう一度クリックで元に戻ります","zv.load":"高解像度を読み込み中…","zv.workAlt":"{t}（{n}枚目）","proc.h":"制作過程","proc.alt":"{t} の制作過程","cards.h":"カード一覧","cards.sub":"左右にスワイプしてカードを見られます。カードをクリックすると拡大します。","cards.prev":"前のカード","cards.next":"次のカード","cards.alt":"{c}カード「{name}」","cards.view":"カード「{name}」を拡大（{c}・{m}枚中{n}枚目）","cat.equip":"一般装備","cat.event":"一般イベント","cat.angel":"天使","cat.demon":"悪魔","cat.oracle":"神託","cat.summon":"召喚","chars.viewPair":"char{n} の立ち絵とカードを見る","chars.pairAlt":"char{n} の立ち絵（左）とカード（右）","deck.equip":"一般装備","deck.event":"一般イベント","deck.contract":"天使・悪魔","deck.oracle":"神託・召喚","pair.art":"立ち絵","pair.card":"カード","line.h":"作品タイムライン","line.sub":"スクロールすると、2019年から現在までたどれます。","line.jump":"タイムラインで見る ↓","line.item":"{t}（{d}）","h.personal":"個人アカウント","h.deactivated":"利用停止中","cur.home":"イラスト作品","cur.goods":"グッズ","cur.game":"インディーゲーム","cur.about":"プロフィール","cur.contact":"コンタクト","cur.timeline":"2019 — 現在","years.nav":"年ごとに見る","years.go":"{y}年へ移動","wall.count":"{n}作品","works.cats":"作品カテゴリー","wk.made":"{d} 完成","works.sort":"並び順","sort.new":"新しい順","sort.old":"古い順","sort.label":"並び順：{v}","nsfw.sub":"18歳以上向け · プレビューはぼかし加工済み · 作品はクラウドアルバムで公開中","nsfw.note":"成人向け作品はこのサイトには掲載していません。画像か下のボタンから Google ドライブのアルバムでご覧ください。","nsfw.go":"Google ドライブで見る","nsfw.alt":"ぼかし加工した成人向け作品のプレビュー","cur.artbook":"画集","ab.sub":"{a} — {b} · 全{n}冊 · 表紙をクリックすると中を見られます","ab.count":"{n}冊","ab.card":"{t} 画集（{d}）","bk.date":"{d} 発行","bk.coverAlt":"{t} 表紙と裏表紙","bk.pageAlt":"{t} 本文（{n}枚目）","bk.blurAlt":"{t} 本文（成人向け・ぼかし加工）","bk.others":"ほかの画集","bk.r18":"成人向けの本のため、本文はぼかしています。"}};
+const I18N = {"zh":{"nav.main":"主選單","lang.label":"語言","hero.cue":"往下看作品","works.sub":"{a} — {b} · {n} 件作品 · 點選封面看完整作品","cover.pages":"{n} 張","cover.video":"▶ 過程影片","wk.posted":"{d} 發表","wk.pages":"{n} 張","wk.pixiv":"在 pixiv 查看 ↗","wk.tlJump":"▶ 製作過程影片","wk.imgAlt":"{t}（第 {n} 張，共 {m} 張）","wk.madeGoods":"這張插畫做成了周邊：","wk.goodsLink":"看周邊詳細介紹 →","wk.others":"其他作品","list.sep":"、","tl.h":"製作過程影片","tl.yt":"在 YouTube 觀看 ↗","tl.play":"在 YouTube 播放：{t}","goods.sub":"Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。","goods.shopName":"買動漫賣場「Mania Art」","goods.shopBtn":"前往賣場 ↗","item.buy":"到買動漫賣場購買 ↗","item.menu":"看 FF47 完整品書","item.used":"使用插畫","item.others":"其他周邊","item.imgAlt":"{t}實品示意圖","price.event":"場次價","price.per":"／款","spec.size":"尺寸","spec.spec":"規格","spec.contents":"內容","spec.designs":"款式","spec.offer":"優惠","spec.debut":"首賣","event":"Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44","game.coverAlt":"遊戲的戰場背景美術","game.kicker":"INDIE GAME・開發中","game.tag":"組牌決策 × 魔力場站位 × 回合資源管理","game.lead":"讓每一次部署，成為下一個攻擊回合的優勢。","game.h":"一個人做的卡牌策略遊戲","game.p1":"用 54 張牌組成你的隊伍，在格子戰場上安排角色站位，一邊守住防線、一邊找機會反擊，把對手的總血量打到歸零。","game.p2":"從企劃、程式到美術，全部由 mania8522191 一個人製作。","chip.strategy":"卡牌策略","chip.turn":"回合制","chip.dev":"開發中","shots.h":"遊戲畫面","shots.zoom":"放大看這張畫面","shots.note":"開發中畫面，正式版可能會調整。","shots.thumb":"第 {n} 張：{t}","shot1":"角色：依稀有度篩選、搜尋角色卡","shot2":"牌組：依卡牌類型挑選，組成 54 張牌組","shot3":"召喚：選擇要部署上場的角色","shot4":"卡牌詳情：數值、技能與效果說明","shot5":"角色資訊：屬性與各項加成來源","shot6":"事件牌：從一般事件中挑選放進牌組","shot7":"攻擊階段：傷害數字直接顯示在戰場上","shot8":"戰鬥紀錄：雙方傷害統計與每一步的行動紀錄","feat.h":"玩法特色","f1.h":"自由組牌","f1.p":"角色、裝備、事件、天使與惡魔，用 54 張牌組出屬於你的戰術。","f2.h":"站位決定勝負","f2.p":"同一個角色，站的位置、帶的裝備不同，發揮也完全不一樣。","f3.h":"每回合都是取捨","f3.p":"行動點數、活力和魔力要怎麼分配，決定你下一回合的攻勢。","f4.h":"生死之門","f4.p":"10 回合內還沒分出勝負？雙方剩下的牌庫會被摧毀，打到有一方倒下為止。","chars.h":"角色一覽","chars.sub":"共 18 位角色，立繪陸續公開中。點角色可以看完整立繪；標有 CARD 的角色，滑鼠移上去會顯示卡牌。","chars.tbd":"char{n} 的立繪尚未公開","chars.view":"看 char{n} 的完整立繪","chars.full":"char{n} 的完整立繪","follow.h":"追蹤最新消息","follow.p":"遊戲還在開發中，上市時間和售價都還沒決定。想第一時間知道消息，可以追蹤這些地方。","about.alt":"mania8522191 的頭像：星街すいせい布偶","about.photoAlt":"mania8522191 本人，拿著一杯飲料的自拍","about.toPlush":"換成布偶頭像","about.toPhoto":"換回本人照片","about.p1":"mania8522191，以 hololive 的星街すいせい為主要題材的插畫創作者。2019 年開始在 pixiv 發表作品，內容包括紀念插畫、和其他 VTuber 的聯動圖，以及 BanG Dream!、アズールレーン 的同人創作。","about.p2":"也製作周邊，曾以攤位 J44 參加台灣 Fancy Frontier 47。","about.p3":"目前正一個人開發卡牌策略遊戲。","about.gameLink":"看遊戲介紹 →","facts.works":"件作品","facts.pages":"張圖","facts.since":"開始在 pixiv 發表","contact.sub":"在以下平台都找得到我。作品相關的聯絡，請直接私訊。","grp.social":"社群","grp.works":"作品","grp.shop":"周邊","h.fbPage":"mania8522191・粉絲專頁","h.fbPersonal":"mania8522191p2・個人帳號","h.discord":"加入伺服器","h.shop":"賣場 217467","ch.baha":"巴哈姆特","ch.myacg":"買動漫","foot.nav":"社群與作品平台","foot.fbPage":"Facebook（粉專）","foot.fbPersonal":"Facebook（個人）","foot.baha":"巴哈姆特","foot.myacg":"買動漫","foot.copy":"© 2019–2026 mania8522191 · 作品版權所有","zv.label":"圖片檢視","zv.zoom":"放大","zv.unzoom":"縮小","zv.prev":"上一張","zv.next":"下一張","zv.hint":"點圖片放大，再點一下縮回","zv.load":"載入高解析度⋯","zv.workAlt":"{t}（第 {n} 張）","proc.h":"製作過程","proc.alt":"{t} 的製作過程","cards.h":"卡牌一覽","cards.sub":"左右滑動看更多卡牌，點卡牌可以放大。","cards.prev":"上一組卡牌","cards.next":"下一組卡牌","cards.alt":"{c}卡「{name}」","cards.view":"放大看卡牌「{name}」（{c}，第 {n} 張，共 {m} 張）","cat.equip":"一般裝備","cat.event":"一般事件","cat.angel":"天使","cat.demon":"惡魔","cat.oracle":"神諭","cat.summon":"召喚","chars.viewPair":"看 char{n} 的立繪和卡牌","chars.pairAlt":"char{n} 的完整立繪（左）和卡牌（右）","deck.equip":"一般裝備","deck.event":"一般事件","deck.contract":"天使‧惡魔","deck.oracle":"神諭‧召喚","pair.art":"立繪","pair.card":"卡牌","line.h":"作品時間軸","line.sub":"往下捲動，從 2019 年一路走到現在。","line.jump":"依時間軸瀏覽 ↓","line.item":"{t}（{d}）","h.personal":"個人帳號","h.deactivated":"已停用","cur.home":"插畫作品","cur.goods":"周邊商品","cur.game":"獨立遊戲","cur.about":"關於我","cur.contact":"聯絡方式","cur.timeline":"2019 — 現在","years.nav":"依年份瀏覽","years.go":"跳到 {y} 年","wall.count":"{n} 件","works.cats":"作品分類","wk.made":"{d} 完成","works.sort":"排序","sort.new":"由新到舊","sort.old":"由舊到新","sort.label":"排序：{v}","nsfw.sub":"18 歲以上 · 預覽已模糊處理 · 完整作品放在雲端相簿","nsfw.note":"成人向作品不直接放在網站上。點圖片或下方按鈕，到 Google 雲端相簿看完整作品。","nsfw.go":"前往 Google 雲端相簿","nsfw.alt":"模糊處理的成人向作品預覽","cur.artbook":"畫冊","ab.sub":"{a} — {b} · {n} 本畫冊 · 點選封面看內頁","ab.count":"{n} 本","ab.card":"{t} 畫冊（{d}）","bk.date":"{d} 發行","bk.coverAlt":"{t} 封面與封底","bk.pageAlt":"{t} 內頁（第 {n} 張）","bk.blurAlt":"{t} 內頁（成人向，已模糊處理）","bk.others":"其他畫冊","bk.r18":"這本是成人向作品，內頁已模糊處理。","b3.open":"點擊放大，可 360° 旋轉","b3.book":"{t} 封面與封底：點擊放大，可 360° 旋轉","b3.label":"畫冊 3D 檢視","b3.reset":"還原角度","b3.hint":"按住拖曳旋轉 · 滾輪縮放 · 點兩下還原","b3.hintTouch":"拖曳旋轉 · 兩指縮放 · 點兩下還原"},"en":{"nav.main":"Main menu","lang.label":"Language","hero.cue":"Scroll down to the works","works.sub":"{a} — {b} · {n} works · Click a cover to see the full piece","cover.pages":"{n} images","cover.video":"▶ Timelapse","wk.posted":"Posted {d}","wk.pages":"{n} images","wk.pixiv":"View on pixiv ↗","wk.tlJump":"▶ Process timelapse","wk.imgAlt":"{t} (image {n} of {m})","wk.madeGoods":"Made into goods: ","wk.goodsLink":"See the goods →","wk.others":"Other works","list.sep":", ","tl.h":"Process timelapse","tl.yt":"Watch on YouTube ↗","tl.play":"Play on YouTube: {t}","goods.sub":"Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.","goods.shopName":"MyACG shop “Mania Art”","goods.shopBtn":"Visit the shop ↗","item.buy":"Buy at the MyACG shop ↗","item.menu":"Full FF47 catalog","item.used":"Artwork used","item.others":"Other goods","item.imgAlt":"{t} product shot","price.event":"event price","price.per":" / design","spec.size":"Size","spec.spec":"Specs","spec.contents":"Contents","spec.designs":"Designs","spec.offer":"Offer","spec.debut":"Debut","event":"Fancy Frontier 47 · Aug 21–22, 2026 · Taipei Expo Dome, booth J44","game.coverAlt":"Battlefield background art from the game","game.kicker":"INDIE GAME · IN DEVELOPMENT","game.tag":"Deckbuilding × Mana-field positioning × Turn resource management","game.lead":"Make every deployment your edge in the next attack turn.","game.h":"A card strategy game made by one person","game.p1":"Build your team from a 54-card deck and position your characters on a grid battlefield. Hold the line, look for the moment to strike back, and bring your opponent's total HP down to zero.","game.p2":"Planning, programming and art: everything is made by mania8522191 alone.","chip.strategy":"Card strategy","chip.turn":"Turn-based","chip.dev":"In development","shots.h":"Screenshots","shots.zoom":"View this screenshot larger","shots.note":"In-development footage; the final game may differ.","shots.thumb":"Screenshot {n}: {t}","shot1":"Characters: filter and search character cards by rarity","shot2":"Deck: pick cards by type to build a 54-card deck","shot3":"Summon: choose which characters to deploy","shot4":"Card details: stats, skills and effects","shot5":"Character info: attributes and where each bonus comes from","shot6":"Event cards: choose general events for your deck","shot7":"Attack phase: damage numbers appear right on the battlefield","shot8":"Battle log: damage totals for both sides and a step-by-step record","feat.h":"Features","f1.h":"Build your deck","f1.p":"Characters, equipment, events, angels and demons: build your own tactics from 54 cards.","f2.h":"Position wins battles","f2.p":"The same character plays completely differently depending on where it stands and what it carries.","f3.h":"Every turn is a trade-off","f3.p":"How you spend action points, energy and mana decides the strength of your next attack.","f4.h":"Gate of Life and Death","f4.p":"No winner after 10 turns? Both remaining decks are destroyed, and the fight goes on until one side falls.","chars.h":"Characters","chars.sub":"18 characters, with more art revealed over time. Click a character to see the full art; hover over those marked CARD to see their card.","chars.tbd":"Art for char{n} is not revealed yet","chars.view":"View the full art of char{n}","chars.full":"Full art of char{n}","follow.h":"Follow the development","follow.p":"The game is still in development, and the release date and price are not decided yet. Follow along here to hear the news first.","about.alt":"mania8522191's avatar: a Hoshimachi Suisei plush","about.photoAlt":"mania8522191, a selfie holding a drink","about.toPlush":"Show the plush avatar","about.toPhoto":"Show my photo","about.p1":"mania8522191 is an illustrator who mainly draws hololive's Hoshimachi Suisei. Posting on pixiv since 2019, with commemorative illustrations, collaborations with other VTubers, and fan art of BanG Dream! and Azur Lane.","about.p2":"Also makes goods, and exhibited at Fancy Frontier 47 in Taiwan (booth J44).","about.p3":"Currently developing a card strategy game solo. ","about.gameLink":"See the game →","facts.works":"works","facts.pages":"images","facts.since":"first pixiv post","contact.sub":"You can find me on all of these platforms. For anything about my work, please send a direct message.","grp.social":"Social","grp.works":"Portfolio","grp.shop":"Goods","h.fbPage":"mania8522191 · Page","h.fbPersonal":"mania8522191p2 · Personal","h.discord":"Join the server","h.shop":"Shop 217467","ch.baha":"Bahamut","ch.myacg":"MyACG","foot.nav":"Social and portfolio links","foot.fbPage":"Facebook (Page)","foot.fbPersonal":"Facebook (Personal)","foot.baha":"Bahamut","foot.myacg":"MyACG","foot.copy":"© 2019–2026 mania8522191 · All rights reserved","zv.label":"Image viewer","zv.zoom":"Zoom in","zv.unzoom":"Zoom out","zv.prev":"Previous","zv.next":"Next","zv.hint":"Click the picture to zoom in, click again to zoom out","zv.load":"Loading full resolution…","zv.workAlt":"{t} (image {n})","proc.h":"Process","proc.alt":"{t}: work in progress","cards.h":"Cards","cards.sub":"Swipe sideways to see more cards; click a card to enlarge it.","cards.prev":"Previous cards","cards.next":"Next cards","cards.alt":"{c} card “{name}”","cards.view":"Enlarge “{name}” ({c}, card {n} of {m})","cat.equip":"Equipment","cat.event":"Event","cat.angel":"Angel","cat.demon":"Demon","cat.oracle":"Oracle","cat.summon":"Summon","chars.viewPair":"View char{n}: full art and card","chars.pairAlt":"char{n}: full art (left) and card (right)","deck.equip":"Equipment","deck.event":"Events","deck.contract":"Angel · Demon","deck.oracle":"Oracle · Summon","pair.art":"Artwork","pair.card":"Card","line.h":"Timeline","line.sub":"Keep scrolling to travel from 2019 to today.","line.jump":"Browse as a timeline ↓","line.item":"{t} ({d})","h.personal":"Personal account","h.deactivated":"Deactivated","cur.home":"Illustrations","cur.goods":"Merchandise","cur.game":"Indie card game","cur.about":"About the artist","cur.contact":"Get in touch","cur.timeline":"2019 — now","years.nav":"Browse by year","years.go":"Jump to {y}","wall.count":"{n} works","works.cats":"Work categories","wk.made":"Completed {d}","works.sort":"Sort order","sort.new":"Newest first","sort.old":"Oldest first","sort.label":"Sort order: {v}","nsfw.sub":"18+ only · Previews are blurred · The full works are in the cloud album","nsfw.note":"Adult works are not shown on this site. Open the Google Drive album to see them in full.","nsfw.go":"Open the Google Drive album","nsfw.alt":"Blurred preview of an adult work","cur.artbook":"Art books","ab.sub":"{a} — {b} · {n} art books · Click a cover to look inside","ab.count":"{n} books","ab.card":"{t} art book ({d})","bk.date":"Released {d}","bk.coverAlt":"{t}: front and back cover","bk.pageAlt":"{t}: inside pages ({n})","bk.blurAlt":"{t}: inside pages (adult content, blurred)","bk.others":"Other art books","bk.r18":"This book is adult content; its inside pages are blurred.","b3.open":"Click to enlarge and turn it 360°","b3.book":"{t}: front and back cover. Click to enlarge and turn it 360°","b3.label":"Art book 3D view","b3.reset":"Reset view","b3.hint":"Drag to rotate · Scroll to zoom · Double-click to reset","b3.hintTouch":"Drag to rotate · Pinch to zoom · Double-tap to reset"},"ja":{"nav.main":"メインメニュー","lang.label":"言語","hero.cue":"作品一覧へスクロール","works.sub":"{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます","cover.pages":"{n}枚","cover.video":"▶ メイキング","wk.posted":"{d} 投稿","wk.pages":"{n}枚","wk.pixiv":"pixivで見る ↗","wk.tlJump":"▶ メイキング動画","wk.imgAlt":"{t}（{m}枚中{n}枚目）","wk.madeGoods":"グッズ化：","wk.goodsLink":"グッズ紹介を見る →","wk.others":"ほかの作品","list.sep":"、","tl.h":"メイキング動画","tl.yt":"YouTubeで見る ↗","tl.play":"YouTubeで再生：{t}","goods.sub":"Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。","goods.shopName":"買動漫（MyACG）ショップ「Mania Art」","goods.shopBtn":"ショップへ ↗","item.buy":"買動漫ショップで購入 ↗","item.menu":"FF47 お品書きを見る","item.used":"使用イラスト","item.others":"ほかのグッズ","item.imgAlt":"{t}の商品イメージ","price.event":"イベント価格","price.per":"／1種","spec.size":"サイズ","spec.spec":"仕様","spec.contents":"内容","spec.designs":"種類","spec.offer":"特典","spec.debut":"初頒布","event":"Fancy Frontier 47・2026.08.21–22・花博争艶館 J44","game.coverAlt":"ゲームの戦場背景アート","game.kicker":"INDIE GAME・開発中","game.tag":"デッキ構築 × 魔力場の位置取り × ターンごとの資源管理","game.lead":"ひとつひとつの配置を、次の攻撃ターンの優位に。","game.h":"ひとりで作るカードストラテジーゲーム","game.p1":"54枚のデッキでチームを編成し、マス目の戦場にキャラクターを配置。防衛ラインを守りながら反撃のチャンスをうかがい、相手の総HPをゼロにしましょう。","game.p2":"企画・プログラム・イラストまで、すべて mania8522191 がひとりで制作しています。","chip.strategy":"カードストラテジー","chip.turn":"ターン制","chip.dev":"開発中","shots.h":"ゲーム画面","shots.zoom":"この画面を拡大して見る","shots.note":"開発中の画面です。製品版では変更される場合があります。","shots.thumb":"{n}枚目：{t}","shot1":"キャラクター：レアリティで絞り込み・キャラカードを検索","shot2":"デッキ：カードの種類ごとに選んで54枚のデッキを構築","shot3":"召喚：戦場に配置するキャラクターを選択","shot4":"カード詳細：ステータス・スキル・効果の説明","shot5":"キャラクター情報：属性と各ボーナスの内訳","shot6":"イベントカード：一般イベントから選んでデッキに追加","shot7":"攻撃フェーズ：ダメージがそのまま戦場に表示","shot8":"バトルログ：両陣営のダメージ集計と行動の記録","feat.h":"ゲームの特徴","f1.h":"自由なデッキ構築","f1.p":"キャラクター、装備、イベント、天使と悪魔。54枚で自分だけの戦術を組み立てよう。","f2.h":"位置取りが勝負を決める","f2.p":"同じキャラクターでも、立つ位置や装備によって活躍がまったく変わります。","f3.h":"毎ターンが取捨選択","f3.p":"行動ポイント、活力、魔力をどう配分するかが、次のターンの攻勢を左右します。","f4.h":"生死の門","f4.p":"10ターンで決着がつかなければ、双方の残りの山札が破壊され、どちらかが倒れるまで戦いは続きます。","chars.h":"キャラクター","chars.sub":"全18キャラクター。立ち絵は順次公開中です。クリックで立ち絵全体を表示、CARD の付いたキャラクターはマウスを乗せるとカードが見られます。","chars.tbd":"char{n} の立ち絵は未公開です","chars.view":"char{n} の立ち絵を見る","chars.full":"char{n} の立ち絵","follow.h":"最新情報をチェック","follow.p":"ゲームは開発中で、発売時期・価格は未定です。最新情報をいち早く知りたい方は、こちらをフォローしてください。","about.alt":"mania8522191 のアイコン：星街すいせいのぬいぐるみ","about.photoAlt":"mania8522191 本人、ドリンクを手にした自撮り","about.toPlush":"ぬいぐるみのアイコンに切り替え","about.toPhoto":"本人の写真に切り替え","about.p1":"hololive の星街すいせいを中心に描いているイラストレーターです。2019年から pixiv に作品を投稿しており、記念イラストや他の VTuber とのコラボイラスト、BanG Dream!・アズールレーンのファンアートなどを描いています。","about.p2":"グッズ制作も行っており、台湾の Fancy Frontier 47 にサークル参加しました（スペース J44）。","about.p3":"現在、カードストラテジーゲームを個人で開発中です。","about.gameLink":"ゲーム紹介へ →","facts.works":"作品","facts.pages":"枚のイラスト","facts.since":"pixiv 投稿開始","contact.sub":"以下のプラットフォームで活動しています。作品に関するご連絡は、各SNSのDMまでお願いします。","grp.social":"SNS","grp.works":"作品","grp.shop":"グッズ","h.fbPage":"mania8522191・ページ","h.fbPersonal":"mania8522191p2・個人アカウント","h.discord":"サーバーに参加","h.shop":"ショップ 217467","ch.baha":"巴哈姆特（バハムート）","ch.myacg":"買動漫（MyACG）","foot.nav":"SNS・作品リンク","foot.fbPage":"Facebook（ページ）","foot.fbPersonal":"Facebook（個人）","foot.baha":"巴哈姆特","foot.myacg":"買動漫","foot.copy":"© 2019–2026 mania8522191 · 無断転載禁止","zv.label":"画像ビューア","zv.zoom":"拡大","zv.unzoom":"縮小","zv.prev":"前へ","zv.next":"次へ","zv.hint":"画像をクリックで拡大、もう一度クリックで元に戻ります","zv.load":"高解像度を読み込み中…","zv.workAlt":"{t}（{n}枚目）","proc.h":"制作過程","proc.alt":"{t} の制作過程","cards.h":"カード一覧","cards.sub":"左右にスワイプしてカードを見られます。カードをクリックすると拡大します。","cards.prev":"前のカード","cards.next":"次のカード","cards.alt":"{c}カード「{name}」","cards.view":"カード「{name}」を拡大（{c}・{m}枚中{n}枚目）","cat.equip":"一般装備","cat.event":"一般イベント","cat.angel":"天使","cat.demon":"悪魔","cat.oracle":"神託","cat.summon":"召喚","chars.viewPair":"char{n} の立ち絵とカードを見る","chars.pairAlt":"char{n} の立ち絵（左）とカード（右）","deck.equip":"一般装備","deck.event":"一般イベント","deck.contract":"天使・悪魔","deck.oracle":"神託・召喚","pair.art":"立ち絵","pair.card":"カード","line.h":"作品タイムライン","line.sub":"スクロールすると、2019年から現在までたどれます。","line.jump":"タイムラインで見る ↓","line.item":"{t}（{d}）","h.personal":"個人アカウント","h.deactivated":"利用停止中","cur.home":"イラスト作品","cur.goods":"グッズ","cur.game":"インディーゲーム","cur.about":"プロフィール","cur.contact":"コンタクト","cur.timeline":"2019 — 現在","years.nav":"年ごとに見る","years.go":"{y}年へ移動","wall.count":"{n}作品","works.cats":"作品カテゴリー","wk.made":"{d} 完成","works.sort":"並び順","sort.new":"新しい順","sort.old":"古い順","sort.label":"並び順：{v}","nsfw.sub":"18歳以上向け · プレビューはぼかし加工済み · 作品はクラウドアルバムで公開中","nsfw.note":"成人向け作品はこのサイトには掲載していません。画像か下のボタンから Google ドライブのアルバムでご覧ください。","nsfw.go":"Google ドライブで見る","nsfw.alt":"ぼかし加工した成人向け作品のプレビュー","cur.artbook":"画集","ab.sub":"{a} — {b} · 全{n}冊 · 表紙をクリックすると中を見られます","ab.count":"{n}冊","ab.card":"{t} 画集（{d}）","bk.date":"{d} 発行","bk.coverAlt":"{t} 表紙と裏表紙","bk.pageAlt":"{t} 本文（{n}枚目）","bk.blurAlt":"{t} 本文（成人向け・ぼかし加工）","bk.others":"ほかの画集","bk.r18":"成人向けの本のため、本文はぼかしています。","b3.open":"クリックで拡大・360°回転できます","b3.book":"{t} 表紙と裏表紙：クリックで拡大・360°回転","b3.label":"画集の3Dビュー","b3.reset":"元に戻す","b3.hint":"ドラッグで回転 · ホイールで拡大縮小 · ダブルクリックで元に戻す","b3.hintTouch":"ドラッグで回転 · ピンチで拡大縮小 · ダブルタップで元に戻す"}};
 const HTML_LANG = { zh: 'zh-Hant', en: 'en', ja: 'ja' };
 let LANG = I18N[window.__LANG] ? window.__LANG : 'zh';
 function tr(key, vars) {
@@ -1253,12 +1309,12 @@ const ZV_SETS = {
     : { src: `img/char${n}.webp`, w: 500, h: 1364, zw: 500, no: `No.${no2(n)}`, cap: `char${n}`, alt: tr('chars.full', { n }) })),
   book: () => {
     const b = BOOKS[byBook[lastBook]], blur = b.blur || [];
-    const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => !blur.includes(n));
+    const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => n > 0 && !blur.includes(n));   // the cover has its own 3D viewer
     return pages.map(([[W, H, ZW], n], k) => ({
       src: `img/ab/${b.slug}_p${n}.webp`, zsrc: ZW ? `img/ab/z/${b.slug}_p${n}.webp` : null,
       w: W, h: H, zw: ZW || W,
       no: `${k + 1} / ${pages.length}`, cap: `${b.ev} · ART BOOK`,
-      alt: n === 0 ? tr('bk.coverAlt', { t: b.ev }) : tr('bk.pageAlt', { t: b.ev, n }),
+      alt: tr('bk.pageAlt', { t: b.ev, n }),
     }));
   },
   cards: () => DECK.map((f, i) => {
@@ -1933,9 +1989,10 @@ function renderBooks() {
     const grid = el('div', 'ab-grid');
     list.filter((b) => b.ym.startsWith(y)).forEach((b, k) => {
       const a = el('a', 'ab-card'); a.id = 'abc-' + b.slug; a.href = '#ab-' + b.slug; a.dataset.rv = 'up'; a.dataset.d = `${(k * 0.12).toFixed(2)}s`;
-      const fr = el('span', 'ab-frame'), im = el('img');
-      im.src = `img/ab/${b.slug}-card.webp`; im.width = b.card[0]; im.height = b.card[1]; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async';
-      fr.append(im);
+      const fr = el('span', 'ab-stage'), box = b3Lazy(b3Make(b, false));
+      fr.style.aspectRatio = b3StageRatio(b);
+      fr.append(box);
+      b3Hover(a, box, b);
       const cap = el('span', 'ab-cap');
       cap.append(el('span', 'ab-ev', b.ev));
       if (b.blur) cap.append(el('span', 'ab-r18', '18+'));
@@ -1998,17 +2055,18 @@ function abYearsUpdate() {
 }
 addEventListener('scroll', () => { if (!abRaf) abRaf = requestAnimationFrame(abYearsUpdate); }, { passive: true });
 
-/* ---------- single art book: the cover spread, then the inside pages; blurred pages lead to the album ---------- */
+/* ---------- single art book: the cover as a 3D book, then the inside pages; blurred pages lead to the album ---------- */
 function renderBook(i) {
   const b = BOOKS[i], blur = b.blur || [];
   $('#bk-title').textContent = b.ev;
   $('#bk-r18').hidden = !blur.length;
-  $('#bk-imgs').replaceChildren(...b.pages.map(([W, H], n) => {
+  $('#bk-cover').replaceChildren(...b3Hero(b));
+  $('#bk-imgs').replaceChildren(...b.pages.map(([W, H], n) => [W, H, n]).slice(1).map(([W, H, n]) => {
     const img = el('img');
-    img.src = `img/ab/${b.slug}_p${n}.webp`; img.width = W; img.height = H;
+    img.src = `img/ab/${b.slug}_p${n}.webp`; img.width = W; img.height = H; img.dataset.n = n;
     img.loading = n < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
     img.style.aspectRatio = `${W} / ${H}`;
-    if (!blur.includes(n)) { if (n) img.dataset.rv = 'up'; return img; }
+    if (!blur.includes(n)) { img.dataset.rv = 'up'; return img; }
     const a = el('a', 'bk-blur'); a.href = NSFW_URL; a.target = '_blank'; a.rel = 'noopener'; a.dataset.rv = 'up';
     const tag = el('span', 'nsfw-tag', '18+'); tag.setAttribute('aria-hidden', 'true');
     a.append(img, tag);
@@ -2025,15 +2083,262 @@ function bookText(i) {
   $('#bk-date').textContent = tr('bk.date', { d: b.ym });
   $('#bk-ev').textContent = `Fancy Frontier ${b.ev.slice(2)}`;
   $('#bk-pages').textContent = pagesText(b.pages.length);
-  $('#bk-imgs').querySelectorAll('img').forEach((img, n) => {
-    img.alt = n === 0 ? tr('bk.coverAlt', { t: b.ev }) : tr(blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: b.ev, n });
+  $('#bk-imgs').querySelectorAll('img').forEach((img) => {
+    const n = +img.dataset.n;
+    img.alt = tr(blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: b.ev, n });
   });
+  const hero = $('#bk-cover .bk-stage');
+  if (hero) { hero.setAttribute('aria-label', tr('b3.book', { t: b.ev })); $('#bk-cover .bk-hint span').textContent = tr('b3.open'); }
 }
 $('#bk-imgs').addEventListener('click', (e) => {
   const im = e.target.closest('img');
   if (!im || im.closest('.bk-blur')) return;   // a blurred page is a link to the album
   zvOpen('book', [...$('#bk-imgs').querySelectorAll(':scope > img')].indexOf(im), im);
 });
+
+/* ---------- the cover as a physical book: the spread folds round a CSS 3D block; enlarged, it turns as you drag ---------- */
+const B3_REST = { rx: -12, ry: -28 }, B3_HOVER = { rx: -8, ry: -12 }, B3_VIEW = { rx: -12, ry: -34 };   // turned to show the page edges
+const B3_FACES = { front: [0, 0, 1], back: [0, 0, -1], spine: [-1, 0, 0], fore: [1, 0, 0], head: [0, -1, 0], tail: [0, 1, 0] };
+const B3_LIGHT = [0, -0.35, 0.94].map((v, _, a) => v / Math.hypot(...a));   // above and in front of the book
+const B3_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.6 12a8.4 8.4 0 0 1 14.5-5.8M20.4 12a8.4 8.4 0 0 1-14.5 5.8"/><path d="M18.4 2.9v3.5h-3.5M5.6 21.1v-3.5h3.5"/></svg>';
+const b3Src = (b, big) => `img/ab/${big ? 'z/' : ''}${b.slug}_p0.webp`;
+const b3At = (box, p) => ({ rx: p.rx, ry: box._rtl ? -p.ry : p.ry });   // a right-bound book turns the other way to show its spine
+const b3Tilt = (v) => Math.min(70, Math.max(-70, v));
+const b3StageRatio = (b) => ((b.pages[0][0] / 2 / b.pages[0][1]) * 0.62 + 0.7).toFixed(3);   // wide books get a wide stage
+function b3Make(b, big) {
+  const [W, H] = b.pages[0], box = el('span', b.rtl ? 'b3 rtl' : 'b3');
+  box._rtl = !!b.rtl;
+  box.style.setProperty('--ar', `${W / 2} / ${H}`);
+  box.style.setProperty('--arn', (W / 2 / H).toFixed(4));
+  box.setAttribute('aria-hidden', 'true');
+  const cam = el('span', 'b3-cam'), book = el('span', 'b3-book');
+  book.append(...Object.keys(B3_FACES).map((f) => el('span', 'b3-f b3-' + f)));
+  cam.append(book);
+  box.append(el('span', 'b3-shadow'), cam);
+  box._src = b3Src(b, big);
+  const p = b3At(box, B3_REST);
+  b3Pose(box, p.rx, p.ry);
+  return box;
+}
+/* the cover goes on once it has loaded; a book on the list waits until it is near the screen */
+function b3Load(box) {
+  if (!box._ready) {
+    const im = new Image();
+    im.src = box._src;
+    box._ready = im.decode().catch(() => {}).then(() => box.style.setProperty('--img', `url("${box._src}")`));
+  }
+  return box._ready;
+}
+const b3io = 'IntersectionObserver' in window
+  ? new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { b3io.unobserve(e.target); b3Load(e.target); } }), { rootMargin: '400px 0px' })
+  : null;
+const b3Lazy = (box) => { if (b3io) b3io.observe(box); else b3Load(box); return box; };
+/* turn the book: rotateX tips it toward you, rotateY spins it; each face is shaded for a light above and in front, and a glossy
+   cover catches a sheen that slides across as it turns, brightest when it mirrors the light at you */
+function b3Pose(box, rx, ry) {
+  box._pose = { rx, ry };
+  const m = box._rtl ? -1 : 1;   // a right-bound book is lit as the mirror image of a left-bound one
+  const st = box.style, a = m * ry * Math.PI / 180, c = rx * Math.PI / 180, [lx, ly, lz] = B3_LIGHT;
+  st.setProperty('--rx', `${rx.toFixed(2)}deg`);
+  st.setProperty('--ry', `${ry.toFixed(2)}deg`);
+  for (const [k, [x, y, z]] of Object.entries(B3_FACES)) {
+    const x1 = x * Math.cos(a) + z * Math.sin(a), z1 = z * Math.cos(a) - x * Math.sin(a);
+    const y2 = y * Math.cos(c) - z1 * Math.sin(c), z2 = y * Math.sin(c) + z1 * Math.cos(c);
+    const d = Math.max(0, x1 * lx + y2 * ly + z2 * lz);
+    st.setProperty(`--s-${k}`, ((k === 'front' || k === 'back' ? 0.42 : 0.6) * (1 - d)).toFixed(3));   // covers stay bright, edges fall into shade
+    if (k === 'front' || k === 'back') {
+      const rz = d > 0 ? 2 * d * z2 - lz : 0;
+      st.setProperty(`--g-${k}`, (0.06 + 0.5 * Math.pow(Math.max(0, rz), 16)).toFixed(3));
+      st.setProperty(`--gx-${k}`, `${(50 - m * x1 * 70).toFixed(1)}%`);
+    }
+  }
+  st.setProperty('--sw', (Math.abs(Math.cos(a)) * 0.92 + 0.08).toFixed(3));   // the shadow narrows as the book turns edge-on
+  st.setProperty('--so', Math.max(0, 1 - Math.abs(rx) / 110).toFixed(3));
+}
+function b3Tween(box, to, ms = 650) {
+  cancelAnimationFrame(box._tw);
+  if (CALM) { b3Pose(box, to.rx, to.ry); return; }
+  const from = box._pose, t0 = performance.now();
+  const step = (now) => {
+    const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+    b3Pose(box, from.rx + (to.rx - from.rx) * e, from.ry + (to.ry - from.ry) * e);
+    if (k < 1) box._tw = requestAnimationFrame(step);
+  };
+  box._tw = requestAnimationFrame(step);
+}
+const b3Warmed = new Set();
+const b3Warm = (b) => { if (!b3Warmed.has(b.slug)) { b3Warmed.add(b.slug); new Image().src = b3Src(b, true); } };   // the book page shows the sharp cover
+/* on the list, a book turns toward you while the pointer is on it */
+function b3Hover(card, box, b) {
+  const on = () => { b3Warm(b); b3Tween(box, b3At(box, B3_HOVER), 700); }, off = () => b3Tween(box, b3At(box, B3_REST), 900);
+  card.addEventListener('pointerenter', on);
+  card.addEventListener('pointerleave', off);
+  card.addEventListener('focus', on);
+  card.addEventListener('blur', off);
+}
+/* the book page: the list's copy of the cover shows at once, the sharp one replaces it; the book leans toward the mouse */
+function b3Hero(b) {
+  const stage = el('button', 'bk-stage'), box = b3Make(b, true), small = b3Src(b, false);
+  stage.type = 'button';
+  box.style.setProperty('--img', `url("${small}")`);
+  const pre = new Image();
+  pre.src = small;
+  const sharp = b3Load(box);
+  box._ready = Promise.race([pre.decode().catch(() => {}), sharp]);
+  stage.append(box);
+  stage.addEventListener('click', () => b3vOpen(b, box));
+  stage.addEventListener('pointermove', (e) => {
+    if (CALM || e.pointerType !== 'mouse') return;
+    const r = stage.getBoundingClientRect(), p = b3At(box, B3_REST);
+    b3Tween(box, { rx: p.rx - ((e.clientY - r.top) / r.height - 0.5) * 12, ry: p.ry + ((e.clientX - r.left) / r.width - 0.5) * 22 }, 420);
+  });
+  stage.addEventListener('pointerleave', () => b3Tween(box, b3At(box, B3_REST), 900));
+  const hint = el('p', 'bk-hint');
+  hint.innerHTML = B3_ICON;
+  hint.append(el('span', '', tr('b3.open')));
+  return [stage, hint];
+}
+
+/* the 3D viewer: hold and drag to turn the book (it keeps spinning a little when flung), wheel or pinch to zoom,
+   double-click or double-tap the book to put it back, click beside it to close */
+const b3v = $('#b3v'), b3vStage = $('#b3v-stage'), b3vFly = $('#b3v-fly'), b3vZoomEl = $('#b3v-zoom');
+const b3Ptr = new Map();
+let b3vBox = null, b3vFrom = null, b3vZ = 1, b3Drag = null, b3Pinch = null, b3Spin = 0, b3Tap = 0;
+if (matchMedia('(hover: none)').matches) $('#b3v-hint').dataset.i18n = 'b3.hintTouch';
+function b3vZoomTo(z) {
+  b3vZ = Math.min(2.4, Math.max(0.6, z));
+  b3vZoomEl.style.setProperty('--z', b3vZ.toFixed(3));
+}
+function b3vOpen(b, from) {
+  const a = from.getBoundingClientRect();
+  b3vFrom = from;
+  b3vBox = b3Make(b, true);
+  b3vBox.style.setProperty('--img', from.style.getPropertyValue('--img'));
+  b3Load(b3vBox);
+  b3vZoomEl.replaceChildren(b3vBox);
+  b3vZoomTo(1);
+  $('#b3v-cap').replaceChildren(el('span', '', 'COVER'), document.createTextNode(`${b.ev} · ART BOOK`));
+  b3v.hidden = false;
+  document.documentElement.classList.add('zv-open');
+  const hint = $('#b3v-hint');
+  hint.style.animation = 'none'; void hint.offsetWidth; hint.style.animation = '';
+  b3Pose(b3vBox, from._pose.rx, from._pose.ry);
+  if (!CALM && b3vFly.animate) {   // the book rises from where it sat on the page
+    const c = b3vBox.getBoundingClientRect();
+    b3vFly.animate([
+      { transform: `translate(${(a.left + a.width / 2 - c.left - c.width / 2).toFixed(1)}px,${(a.top + a.height / 2 - c.top - c.height / 2).toFixed(1)}px) scale(${(a.width / c.width).toFixed(4)})` },
+      { transform: 'none' },
+    ], { duration: 720, easing: EASE_OUT });
+  }
+  b3Tween(b3vBox, b3At(b3vBox, B3_VIEW), 1000);
+  $('#b3v-close').focus({ preventScroll: true });
+}
+function b3vClose() {
+  if (b3v.hidden) return;
+  b3v.hidden = true;
+  cancelAnimationFrame(b3Spin);
+  if (b3vBox) cancelAnimationFrame(b3vBox._tw);
+  b3Ptr.clear();
+  b3Drag = b3Pinch = null;
+  b3vStage.classList.remove('drag', 'pinch');
+  document.documentElement.classList.remove('zv-open');
+  const s = b3vFrom && b3vFrom.closest('button');
+  if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
+}
+function b3vReset() {
+  const p = b3vBox._pose, v = b3At(b3vBox, B3_VIEW);   // come back the short way round
+  b3Pose(b3vBox, p.rx, v.ry + ((((p.ry - v.ry) % 360) + 540) % 360 - 180));
+  b3Tween(b3vBox, v, 800);
+  b3vZoomTo(1);
+}
+function b3Fling(vx, vy) {
+  vx = Math.max(-2.2, Math.min(2.2, vx));
+  vy = Math.max(-1.2, Math.min(1.2, vy));
+  let last = performance.now();
+  const step = (now) => {
+    const dt = Math.min(40, now - last), p = b3vBox._pose;
+    last = now;
+    b3Pose(b3vBox, b3Tilt(p.rx - vy * dt * 0.35), p.ry + vx * dt * 0.45);
+    vx *= Math.pow(0.93, dt / 16.7);
+    vy *= Math.pow(0.84, dt / 16.7);
+    if (Math.abs(vx) + Math.abs(vy) > 0.015) b3Spin = requestAnimationFrame(step);
+  };
+  b3Spin = requestAnimationFrame(step);
+}
+b3vStage.addEventListener('pointerdown', (e) => {
+  if (!b3vBox || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  b3Ptr.set(e.pointerId, [e.clientX, e.clientY]);
+  try { b3vStage.setPointerCapture(e.pointerId); } catch (_) { /* keep turning without capture */ }
+  cancelAnimationFrame(b3Spin);
+  cancelAnimationFrame(b3vBox._tw);
+  if (b3Ptr.size === 2) {   // a second finger: pinch to zoom
+    const [[x1, y1], [x2, y2]] = b3Ptr.values();
+    b3Pinch = { d: Math.hypot(x2 - x1, y2 - y1) || 1, z: b3vZ };
+    b3Drag = null;
+    b3vStage.classList.add('pinch');
+  } else if (b3Ptr.size === 1) {
+    const p = b3vBox._pose;
+    b3Drag = { x: e.clientX, y: e.clientY, rx: p.rx, ry: p.ry, moved: false, lx: e.clientX, ly: e.clientY, lt: e.timeStamp, vx: 0, vy: 0 };
+  }
+});
+b3vStage.addEventListener('pointermove', (e) => {
+  if (!b3Ptr.has(e.pointerId)) return;
+  b3Ptr.set(e.pointerId, [e.clientX, e.clientY]);
+  if (b3Pinch) {
+    if (b3Ptr.size < 2) return;
+    const [[x1, y1], [x2, y2]] = b3Ptr.values();
+    b3vZoomTo(b3Pinch.z * Math.hypot(x2 - x1, y2 - y1) / b3Pinch.d);
+    return;
+  }
+  const d = b3Drag;
+  if (!d) return;
+  const dx = e.clientX - d.x, dy = e.clientY - d.y;
+  if (!d.moved) {
+    if (Math.abs(dx) + Math.abs(dy) < 5) return;
+    d.moved = true;
+    b3vStage.classList.add('drag');
+  }
+  const dt = Math.max(8, e.timeStamp - d.lt);
+  d.vx = 0.7 * (e.clientX - d.lx) / dt + 0.3 * d.vx;
+  d.vy = 0.7 * (e.clientY - d.ly) / dt + 0.3 * d.vy;
+  d.lx = e.clientX; d.ly = e.clientY; d.lt = e.timeStamp;
+  b3Pose(b3vBox, b3Tilt(d.rx - dy * 0.35), d.ry + dx * 0.45);
+});
+function b3vUp(e) {
+  if (!b3Ptr.delete(e.pointerId)) return;
+  if (b3Pinch) {
+    if (!b3Ptr.size) { b3Pinch = null; b3vStage.classList.remove('pinch'); }
+    return;
+  }
+  const d = b3Drag;
+  b3Drag = null;
+  b3vStage.classList.remove('drag');
+  if (!d || e.type === 'pointercancel') return;
+  if (d.moved) { if (!CALM && e.timeStamp - d.lt < 90) b3Fling(d.vx, d.vy); return; }
+  const r = b3vBox.getBoundingClientRect(), pad = 40;
+  if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) { b3vClose(); return; }
+  if (b3Tap && e.timeStamp - b3Tap < 350) { b3Tap = 0; b3vReset(); } else b3Tap = e.timeStamp;
+}
+b3vStage.addEventListener('pointerup', b3vUp);
+b3vStage.addEventListener('pointercancel', b3vUp);
+b3vStage.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  b3vZoomTo(b3vZ * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015)));
+}, { passive: false });
+$('#b3v-close').addEventListener('click', b3vClose);
+$('#b3v-reset').addEventListener('click', b3vReset);
+addEventListener('keydown', (e) => {
+  if (b3v.hidden || !b3vBox || e.altKey || e.metaKey || e.ctrlKey) return;
+  const p = b3vBox._pose, turn = { ArrowLeft: [0, -30], ArrowRight: [0, 30], ArrowUp: [15, 0], ArrowDown: [-15, 0] }[e.key];
+  if (e.key === 'Escape') b3vClose();
+  else if (turn) { cancelAnimationFrame(b3Spin); b3Tween(b3vBox, { rx: b3Tilt(p.rx + turn[0]), ry: p.ry + turn[1] }, 450); }
+  else if (e.key === '+' || e.key === '=') b3vZoomTo(b3vZ * 1.25);
+  else if (e.key === '-') b3vZoomTo(b3vZ / 1.25);
+  else if (e.key === '0' || e.key === 'Home') b3vReset();
+  else return;
+  e.preventDefault();
+});
+addEventListener('hashchange', b3vClose);
 
 /* ---------- motion ---------- */
 const CALM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2230,8 +2535,8 @@ function route() {
     if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
     if (from === 'work' && r.next === 'home') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
     if (from === 'item' && r.next === 'goods') return fwd ? $('#it-img') : lastItem && document.querySelector(`#gc-${lastItem} img`);
-    if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} img`) : document.querySelector('#bk-imgs img');
-    if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-imgs img') : lastBook && document.querySelector(`#abc-${lastBook} img`);
+    if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
+    if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
     return null;
   };
   const named = [];
@@ -2244,7 +2549,7 @@ function route() {
     const b = pick(false);
     if (onScreen(b)) {
       b.style.viewTransitionName = 'shared'; named.push(b); showNow(b);
-      try { await Promise.race([b.decode(), sleep(450)]); } catch (_) { /* show it as is */ }
+      try { await Promise.race([b.decode ? b.decode() : b3Load(b), sleep(450)]); } catch (_) { /* show it as is */ }
     }
   });
   t.ready.catch(() => {});   // a newer page change can cut this one short; that is fine
@@ -2401,6 +2706,7 @@ function swapLang(l) {
     try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
   zvClose();
+  b3vClose();
   applyStatic();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
@@ -2426,7 +2732,7 @@ document.addEventListener('click', (e) => {
   if (a && a.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
 });
 addEventListener('keydown', (e) => {
-  if (!zv.hidden || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
+  if (!zv.hidden || !b3v.hidden || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
   const k = view === 'work' ? 'wk' : view === 'book' ? 'bk' : 'it';
   if (e.key === 'ArrowRight') location.hash = $(`#${k}-next`).getAttribute('href');
   if (e.key === 'ArrowLeft') location.hash = $(`#${k}-prev`).getAttribute('href');
