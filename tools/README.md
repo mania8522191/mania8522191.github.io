@@ -49,6 +49,11 @@
 - **改了 `css/` 或 `js/` 裡的檔案，要跑 `python tools/build.py`**，重新合併出 `site.css`、`site.js`，
   並更新 `index.html` 裡的版本戳記（`?v=`），回訪的人才會拿到新檔案。沒跑的話，網頁上看不到修改。
   會寫資料的工具（加了 `--save` 時）會自動跑。
+- **直接改原本那條，不要在後面另外加一條蓋過去。** 樣式、程式、文字都一樣：照上面的說明找到它在哪個檔案，就在那裡改。
+- **拿掉或換掉一個功能時，它的文字（`js/i18n.js` 三種語言）、樣式和圖片要一起刪。**
+- **上線前跑 `python tools/build.py --check`，看到 `no leftovers` 才上線。**
+  `build.py` 每次合併完都會檢查殘留：沒在用的程式、樣式、文字、資料欄位和圖片，還有一定會被蓋掉、不會生效的樣式，
+  有的話會一條條列出來，先刪乾淨。如果它列的東西其實有在用（工具看不懂的寫法），就改進 `tools/check_code.py`，不要放著不管。
 
 ## 加一件作品
 
@@ -65,7 +70,7 @@
 3. 有過程動畫的話（階段圖照順序；或一個 GIF）：
    `python tools/process_anim.py <id> <階段圖1> <階段圖2> ... --save <id>`
    同一件作品第二頁的動畫，名稱用 `<id>_p1`。
-4. `python tools/check_images.py`：確認沒有缺圖。
+4. 工具最後會印出檢查結果，看到 `no leftovers` 就沒問題（缺圖也會列在這裡）。
 5. 本機預覽，再上線（見下方）。
 
 ## 加一本畫冊
@@ -84,7 +89,8 @@
 4. 有燙箔的話，從封面 PSD 的燙箔圖層做遮罩，再在那本書加上 `"foil": "blue"`：
    `python tools/foil_mask.py <slug> <Cover.psd> 燙藍`
 5. 新的尺寸或材質名稱要在 `js/i18n.js` 三種語言都加文字（`bk.size.*`、`bk.mat.*`）。
-6. `python tools/check_images.py`，本機預覽，再上線。
+6. 手動改過 `js/data.js` 或 `js/i18n.js` 的話（例如加上 `foil`），再跑一次 `python tools/build.py`。
+   看到 `no leftovers` 後，本機預覽，再上線。
 
 ## 改文字
 
@@ -110,6 +116,7 @@ git push
 python tools/check_deploy.py
 ```
 
+`build.py --check` 確認兩件事：`site.css`、`site.js` 是最新的，而且沒有殘留。沒通過就先處理，再上線。
 `check_deploy.py` 會等 GitHub Pages 部署完，再比對線上的 `index.html`、`site.css`、`site.js` 等檔案跟本機是否一樣。
 GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --allow-empty -m "Redeploy"`，再 `git push`。
 
@@ -122,8 +129,9 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `book_images.py` | 畫冊圖：跨頁（寬 1400）、3D 書封面（2560）、原尺寸、R18 模糊頁 |
 | `foil_mask.py` | 燙箔遮罩，從封面 PSD 的圖層做 |
 | `nsfw_preview.py` | NSFW 區的模糊預覽 |
-| `build.py` | 把 `css/`、`js/` 合併成 `site.css`、`site.js`，更新版本戳記 |
-| `check_images.py` | 列出沒用到的圖和缺少的圖 |
+| `build.py` | 把 `css/`、`js/` 合併成 `site.css`、`site.js`，更新版本戳記，再檢查殘留 |
+| `check_code.py` | 列出沒在用的程式、樣式、文字、資料欄位，和不會生效的樣式（`build.py` 每次都會跑） |
+| `check_images.py` | 列出沒用到的圖和缺少的圖（`build.py` 每次都會跑） |
 | `check_deploy.py` | 等部署完成，比對線上檔案 |
 | `common.py` | 共用的設定和函式（尺寸、品質、讀寫 `js/data.js`） |
 

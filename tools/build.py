@@ -8,6 +8,8 @@ Loaded as separate files, those could run between two files, before the page has
     python tools/build.py           build site.css and site.js, then update their version stamps in index.html
     python tools/build.py --check   only check that both are up to date (exit code 1 if not)
 
+Both then list leftovers: code, styles, texts, data fields and pictures that nothing uses, and styles that never
+apply (tools/check_code.py and tools/check_images.py). With --check, leftovers also give exit code 1.
 Run it after changing anything in css/ or js/; the tools that write js/data.js (with --save) run it themselves.
 Never edit site.css or site.js by hand: they are rebuilt from the sources. The version stamp (?v=) makes a returning
 visitor's browser fetch the new copy instead of a cached old one.
@@ -18,6 +20,7 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # for check_code and check_images, also under python -I
 
 # the order matters: later CSS rules win over earlier ones; scripts use what the earlier ones define
 CSS = ['base', 'home', 'artbook', 'works', 'goods', 'nav', 'game', 'lightbox', 'about', 'motion', 'responsive']
@@ -62,10 +65,26 @@ def build(check=False):
     return stale
 
 
+def report():
+    """List the leftovers: code nothing uses (check_code.py) and pictures (check_images.py). Returns how many."""
+    import check_code
+    import check_images
+    found = check_code.findings() + check_images.findings()
+    if not found:
+        print('no leftovers: every function, style, text, data field and picture is in use')
+        return 0
+    print(f'leftovers ({len(found)}): clean them up before going live (if one is in fact used, improve tools/check_code.py)')
+    for f in found:
+        print('  ' + f)
+    return len(found)
+
+
 if __name__ == '__main__':
     check = '--check' in sys.argv
     stale = build(check)
     if check:
         print('out of date: ' + ', '.join(stale) + ' (run python tools/build.py)' if stale else 'site.css, site.js and stamps are up to date')
-        sys.exit(1 if stale else 0)
-    print('built: ' + ', '.join(stale) if stale else 'nothing to build: already up to date')
+    else:
+        print('built: ' + ', '.join(stale) if stale else 'nothing to build: already up to date')
+    left = report()
+    sys.exit(1 if check and (stale or left) else 0)

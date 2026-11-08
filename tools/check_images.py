@@ -3,8 +3,8 @@
 usage: python tools/check_images.py
 
 It works out every picture the pages can ask for: the paths written in index.html and js/, plus the ones the
-scripts build from the data (works, process animations, art books, goods, the game page). Run it after adding or
-removing works or books. It only reports; delete files yourself (they stay in the git history).
+scripts build from the data (works, process animations, art books, goods, the game page). tools/build.py runs it
+every time it builds. It only reports; delete files yourself (they stay in the git history).
 """
 import json
 import os
@@ -68,12 +68,23 @@ def referenced():
     return refs
 
 
-def main():
-    refs = referenced()
-    files = set()
+def in_img():
+    """Every file under img/, as img/... paths."""
+    out = set()
     for d, _, fs in os.walk(os.path.join(C.ROOT, 'img')):
         for f in fs:
-            files.add(os.path.relpath(os.path.join(d, f), C.ROOT).replace(os.sep, '/'))
+            out.add(os.path.relpath(os.path.join(d, f), C.ROOT).replace(os.sep, '/'))
+    return out
+
+
+def findings():
+    """One line per problem, for tools/build.py: pictures nothing uses, and pictures the pages ask for that are missing."""
+    refs, files = referenced(), in_img()
+    return [f'{f}: not used by any page' for f in sorted(files - refs)] + [f'{f}: missing' for f in sorted(refs - files)]
+
+
+def main():
+    refs, files = referenced(), in_img()
     unused, missing = sorted(files - refs), sorted(refs - files)
     size = sum(os.path.getsize(os.path.join(C.ROOT, f)) for f in unused)
     print(f'{len(files)} files in img/, {len(refs)} referenced')

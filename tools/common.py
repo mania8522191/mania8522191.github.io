@@ -38,13 +38,14 @@ def load(name):
 
 
 def save(name, items):
-    """Write one list back to js/data.js, one item per line, then rebuild site.js (tools/build.py)."""
+    """Write one list back to js/data.js, one item per line, then rebuild site.js and list any leftovers (tools/build.py)."""
     s = open(DATA, encoding='utf-8').read()
     _, a, b = _locate(s, name)
     body = '[\n' + ',\n'.join('  ' + json.dumps(x, ensure_ascii=False, separators=(',', ':')) for x in items) + '\n]'
     open(DATA, 'w', encoding='utf-8', newline='').write(s[:a] + body + s[b:])
     import build
     build.build()
+    build.report()
 
 
 def find(items, key, value):
