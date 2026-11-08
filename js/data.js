@@ -73,13 +73,14 @@ const WORKS = [
 ];
 
 /* the home page carousel: these works, in a new random order on every visit;
-   pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike */
+   pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike;
+   keep (optional) = a part that must always show in full, as [left, top, right, bottom] in % of the picture */
 const HOME_SLIDES = [
   {"id":"139165109","pos":"80% 40%"},
   {"id":"137308455","pos":"34% 15%"},
   {"id":"146954644","pos":"36% 30%"},
   {"id":"147595537","pos":"80% 20%"},
-  {"id":"148494165","pos":"50% 22%"}
+  {"id":"148494165","pos":"50% 22%","keep":[5,16.5,76,35.5]}
 ];
 
 const GOODS = [

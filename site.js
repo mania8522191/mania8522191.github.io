@@ -76,13 +76,14 @@ const WORKS = [
 ];
 
 /* the home page carousel: these works, in a new random order on every visit;
-   pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike */
+   pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike;
+   keep (optional) = a part that must always show in full, as [left, top, right, bottom] in % of the picture */
 const HOME_SLIDES = [
   {"id":"139165109","pos":"80% 40%"},
   {"id":"137308455","pos":"34% 15%"},
   {"id":"146954644","pos":"36% 30%"},
   {"id":"147595537","pos":"80% 20%"},
-  {"id":"148494165","pos":"50% 22%"}
+  {"id":"148494165","pos":"50% 22%","keep":[5,16.5,76,35.5]}
 ];
 
 const GOODS = [
@@ -2231,7 +2232,7 @@ if (!CALM) addEventListener('scroll', () => { if (!rafId) rafId = requestAnimati
    It moves on by itself, except while the visitor is on its controls or prefers less motion. */
 const heroSlides = $('#hero-slides'), heroDots = $('#hero-dots'), heroCap = $('#hero-cap');
 const HERO_MS = 6500;   // how long each work stays before the next one fades in
-const SLIDES = HOME_SLIDES.filter((s) => s.id in byId).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos }));
+const SLIDES = HOME_SLIDES.filter((s) => s.id in byId).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, keep: s.keep }));
 for (let i = SLIDES.length - 1; i > 0; i--) {   // a new order on every visit
   const j = Math.floor(Math.random() * (i + 1));
   [SLIDES[i], SLIDES[j]] = [SLIDES[j], SLIDES[i]];
@@ -2244,6 +2245,14 @@ SLIDES.forEach((s, i) => {
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
   s.img.style.objectPosition = s.pos || s.w.pos || '';
+  if (s.keep) {   // sized and placed by heroFit, over a blurred copy that fills whatever it leaves uncovered
+    s.bg = el('img', 'hero-bg');
+    s.bg.alt = '';
+    s.bg.decoding = 'async';
+    s.bg.style.objectPosition = s.img.style.objectPosition;
+    s.box.append(s.bg);
+    s.img.classList.add('hero-fit');
+  }
   s.box.append(s.img);
   s.dot = el('button', 'hero-dot');
   s.dot.type = 'button';
@@ -2253,16 +2262,51 @@ SLIDES.forEach((s, i) => {
   heroDots.append(s.dot);
 });
 
-/* a picture is fetched only when its slide is next: the page copy, or the full-size one on big screens */
+/* a picture is fetched only when its slide is next: the page copy, or the full-size one when it shows wider than
+   that (sizes, from heroFit) on the screen's pixels */
 function heroLoad(s) {
   if (s.img.src) return;
   const [w, h, zw] = s.w.dims[0], page = src(s.w.id, 0);
   s.img.width = w;
   s.img.height = h;
-  s.img.sizes = '100vw';
+  s.img.sizes = '100vw';   // until heroFit knows how wide it shows
+  heroFit(s);
   s.img.srcset = zw ? `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w` : `${page} ${w}w`;
   s.img.src = page;
+  if (s.bg) s.bg.src = page;
 }
+
+/* sizes: how wide the picture shows, so the browser picks a copy sharp enough for the screen's pixel density.
+   A slide with keep (HOME_SLIDES: left, top, right, bottom in %) is also scaled and placed here so that part of
+   the picture stays in view, above the title and the dots at the foot. On a screen too wide for that part, the
+   picture is shown a little smaller than the screen and the blurred copy behind it fills the sides. */
+function heroFit(s) {
+  const W = heroSlides.clientWidth, H = heroSlides.clientHeight;
+  if (!s || !W || !H) return;
+  const d = s.w.dims[0], w = d[2] || d[0], h = d[3] || d[1];   // its shape (both copies have the same)
+  if (!s.keep) { s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`; return; }   // cover: wider than the screen when the picture is wider
+  const [x1, y1, x2, y2] = s.keep.map((v) => v / 100);
+  const room = Math.min(H, heroCap.offsetTop - 12);   // where the kept part has to end: above the title
+  const k = Math.min(Math.max(W / w, H / h), W / ((x2 - x1) * w), room / ((y2 - y1) * h));   // cover, unless the part would not fit
+  const dw = w * k, dh = h * k;
+  const [px, py] = (s.pos || '50% 50%').split(' ').map((v) => parseFloat(v) / 100);
+  /* one axis: keep [a, b] of the picture between 0 and end; if the picture is as long as the screen, leave no gap */
+  const along = (size, len, a, b, end, want) => {
+    let lo = -a * len, hi = end - b * len;
+    if (len < size) return Math.min(hi, Math.max(lo, (end - len) / 2));
+    if (Math.max(lo, size - len) <= Math.min(hi, 0)) { lo = Math.max(lo, size - len); hi = Math.min(hi, 0); }
+    return Math.min(hi, Math.max(lo, (size - len) * want));
+  };
+  const st = s.img.style;
+  s.img.sizes = `${Math.ceil(dw)}px`;
+  st.width = `${dw.toFixed(1)}px`;
+  st.height = `${dh.toFixed(1)}px`;
+  st.left = `${along(W, dw, x1, x2, W, px).toFixed(1)}px`;
+  st.top = `${along(H, dh, y1, y2, room, py).toFixed(1)}px`;
+}
+const heroRefit = () => SLIDES.forEach((s) => { if (s.img.src) heroFit(s); });
+if ('ResizeObserver' in window) new ResizeObserver(heroRefit).observe(heroSlides);   // also when the home page is shown again
+else addEventListener('resize', heroRefit);
 
 function heroShow(i) {
   const s = SLIDES[i];
@@ -2283,6 +2327,7 @@ const heroStep = (d) => { heroShow((heroAt + d + SLIDES.length) % SLIDES.length)
 /* the timer runs only while the home page is shown in a visible tab */
 function heroPlay() {
   clearTimeout(heroTimer);
+  if (view === 'home') heroRefit();   // the home page may have been hidden (unmeasurable) until now
   if (CALM || heroHover || heroFocus || document.hidden || view !== 'home' || SLIDES.length < 2) return;
   heroTimer = setTimeout(() => heroStep(1), HERO_MS);
 }

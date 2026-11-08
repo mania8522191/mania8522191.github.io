@@ -1,11 +1,14 @@
 /* Home: the carousel of featured works; then, for the wall: section titles, the Fan Art / Original Art switch, NSFW previews */
 /* hero: the home page, a carousel of featured works under the name (js/home.js), filling the screen below the header */
-.hero{position:relative;isolation:isolate;overflow:hidden;height:calc(100vh - var(--head));height:calc(100svh - var(--head));min-height:420px;display:grid;place-items:center;text-align:center;touch-action:pan-y}
+.hero{position:relative;isolation:isolate;overflow:hidden;height:calc(100vh - var(--head));height:calc(100svh - var(--head));min-height:300px;display:grid;place-items:center;text-align:center;touch-action:pan-y}
 .hero-media{position:absolute;inset:0;z-index:-2;overflow:hidden;will-change:transform}
 /* a slide fades in while it settles from a slight zoom; one on its way out keeps its size until it has faded */
-.hero-slide{position:absolute;inset:0;opacity:0;transform:scale(1.06);transition:opacity 1.4s var(--ease-io),transform 0s 1.4s}
+.hero-slide{position:absolute;inset:0;overflow:hidden;opacity:0;transform:scale(1.06);transition:opacity 1.4s var(--ease-io),transform 0s 1.4s}
 .hero-slide.on{opacity:1;transform:none;transition:opacity 1.4s var(--ease-io),transform 7s var(--ease-out)}
 .hero-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
+/* a slide with keep in HOME_SLIDES: js/home.js sizes and places the picture; a blurred copy fills what it leaves uncovered */
+.hero-media img.hero-fit{position:absolute;object-fit:fill}
+.hero-bg{filter:blur(32px) brightness(.8);transform:scale(1.15)}
 .hero-txt{will-change:transform,opacity}
 .hero-name .hl{display:inline-block}
 /* at the foot of the carousel: the title of the work shown (a link to it), and a dot for each work */
