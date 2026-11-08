@@ -10,7 +10,7 @@ change instead of piling up. It reports:
   - CSS declarations that a later rule with the same selector, in the same @media, always overrides
   - custom properties (--name) set but never read, or read but never set; @keyframes nothing plays
   - texts in js/i18n.js missing in a language, written twice, never used, or asked for but not there
-  - fields in js/data.js (WORKS, GOODS, BOOKS) that no script reads
+  - fields in js/data.js (WORKS, GOODS, BOOKS) that no script reads, and HOME_SLIDES entries that are not works
 A name put together while the page runs, such as 'bk.size.' + b.size or `b3-${face}`, counts as used when its
 prefix is put together that way somewhere. The tool only reports. If it lists something that is in fact used
 (a way of using it that the tool does not know), teach the tool instead of leaving the warning.
@@ -131,7 +131,7 @@ def findings():
             for x in re.findall(r'([.#])(-?[A-Za-z_][\w-]*)', bare):
                 names.setdefault(''.join(x), where)
             sel = re.sub(r'\s*([,>+~])\s*', r'\1', ' '.join(sel.split()))
-            for prop, important in declarations(body):
+            for prop, important in dict(declarations(body)).items():   # twice in one rule = a fallback, e.g. vh then svh
                 key = (ctx, sel, prop)
                 if key in last:
                     was, was_important = last[key]
@@ -206,19 +206,27 @@ def findings():
         asked |= set(re.findall(r'data-i18n(?:-\w+)?="([^"]+)"', html))
         out += [f'"{k}" is asked for, but js/i18n.js does not have it' for k in sorted(asked - set(order))]
 
-    # data fields
+    # data fields, and the home carousel's works
     data = read('js/data.js')
     code = '\n'.join(v for n, v in js.items() if n != 'data') + '\n' + html
-    for name in ('WORKS', 'GOODS', 'BOOKS'):
+
+    def listed(name):
         head = f'const {name} = '
-        if head not in data:
+        return json.JSONDecoder().raw_decode(data[data.index(head) + len(head):])[0] if head in data else None
+
+    for name in ('WORKS', 'GOODS', 'BOOKS'):
+        items = listed(name)
+        if items is None:
             out.append(f'js/data.js: {name} not found: update tools/check_code.py')
             continue
-        items = json.JSONDecoder().raw_decode(data[data.index(head) + len(head):])[0]
         for k in dict.fromkeys(k for it in items for k in it):
             e = re.escape(k)
             if not re.search(rf'\.{e}(?![\w$])|[\'"`]{e}[\'"`]|[{{,]\s*{e}\s*[,}}=]', code):
                 out.append(f'js/data.js: the {name} field "{k}" is never read')
+    works = {w['id'] for w in listed('WORKS') or []}
+    for s in listed('HOME_SLIDES') or []:
+        if s.get('id') not in works:
+            out.append(f'js/data.js: HOME_SLIDES has "{s.get("id")}", which is not a work in WORKS')
     return out
 
 

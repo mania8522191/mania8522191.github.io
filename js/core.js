@@ -7,7 +7,7 @@ const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), about: $('#v-about'), contact: $('#v-contact') };
 
 /* a url() for a CSS custom property, made absolute so it points at the same file whichever stylesheet uses it */
 const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;

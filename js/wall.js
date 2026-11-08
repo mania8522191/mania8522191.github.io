@@ -199,7 +199,7 @@ yearsIn.addEventListener('click', (e) => {
 let yearsRaf = 0, yearNow = '';
 function yearsUpdate() {
   yearsRaf = 0;
-  if (VIEWS.home.hidden || wall.hidden) return;
+  if (VIEWS.works.hidden || wall.hidden) return;
   const line = yearsBar.getBoundingClientRect().bottom + 48;
   let cur = YEARS[0];
   for (const y of YEARS) { if (yearHead.get(y).getBoundingClientRect().top <= line) cur = y; else break; }
@@ -261,7 +261,7 @@ function placeCover(el, x, y, tilt) {
   el.style.setProperty('--tilt', `${tilt ? tilt.toFixed(2) : 0}deg`);
 }
 function layoutWall() {
-  if (VIEWS.home.hidden || !wall.clientWidth) return;
+  if (VIEWS.works.hidden || !wall.clientWidth) return;
   const rand = seeded(WALL_SEED);
   wallUnits = wallUnits || buildUnits();
   const W = wall.clientWidth;

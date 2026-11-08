@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=b18c7c27">
+<link rel="stylesheet" href="site.css?v=083eb8ee">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -38,7 +38,7 @@ addEventListener('hashchange', function () {
   window.__LANG = lang;
   document.documentElement.lang = { zh: 'zh-Hant', en: 'en', ja: 'ja' }[lang];
   var h = location.hash.slice(1);
-  var home = h === '' || h === 'home' || h === 'work' || h === 'fanart' || h === 'original' || h === 'nsfw';
+  var home = h === '' || h === 'home';   /* the home page (the carousel), not the wall */
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (home && !calm) document.documentElement.classList.add('intro');
   if (document.startViewTransition && !calm) document.documentElement.classList.add('vt');
@@ -49,7 +49,8 @@ addEventListener('hashchange', function () {
   <div class="in">
     <a class="logo" href="#home">MANIA8522191</a>
     <nav class="nav" aria-label="主選單" data-i18n-aria="nav.main">
-      <a href="#work" data-v="home work">Work</a>
+      <a href="#home" data-v="home">Home</a>
+      <a href="#work" data-v="works work">Work</a>
       <a href="#artbook" data-v="artbook book">Art Book</a>
       <a href="#goods" data-v="goods item">Goods</a>
       <a href="#game" data-v="game">Game</a>
@@ -61,7 +62,8 @@ addEventListener('hashchange', function () {
   </div>
 </header>
 <nav class="m-nav" id="m-nav" aria-label="主選單" data-i18n-aria="nav.main">
-  <a href="#work" data-v="home work">Work</a>
+  <a href="#home" data-v="home">Home</a>
+  <a href="#work" data-v="works work">Work</a>
   <a href="#artbook" data-v="artbook book">Art Book</a>
   <a href="#goods" data-v="goods item">Goods</a>
   <a href="#game" data-v="game">Game</a>
@@ -71,16 +73,21 @@ addEventListener('hashchange', function () {
 </nav>
 
 <main>
-  <!-- home: hero + cover wall -->
+  <!-- home: a carousel of featured works under the name (js/home.js; which works: HOME_SLIDES in js/data.js) -->
   <div class="view" id="v-home">
-    <section class="hero">
-      <div class="hero-media"><img src="img/hero.webp" width="2000" height="1333" alt="" fetchpriority="high"></div>
+    <section class="hero" aria-roledescription="carousel" aria-label="精選作品" data-i18n-aria="home.featured">
+      <div class="hero-media" id="hero-slides"></div>
       <div class="hero-txt">
         <p class="hero-by">Illustrations by</p>
         <h1 class="hero-name" aria-label="MANIA8522191"><span class="hl" aria-hidden="true" style="--i:0">M</span><span class="hl" aria-hidden="true" style="--i:1">A</span><span class="hl" aria-hidden="true" style="--i:2">N</span><span class="hl" aria-hidden="true" style="--i:3">I</span><span class="hl" aria-hidden="true" style="--i:4">A</span><span class="hl" aria-hidden="true" style="--i:5">8</span><span class="hl" aria-hidden="true" style="--i:6">5</span><span class="hl" aria-hidden="true" style="--i:7">2</span><span class="hl" aria-hidden="true" style="--i:8">2</span><span class="hl" aria-hidden="true" style="--i:9">1</span><span class="hl" aria-hidden="true" style="--i:10">9</span><span class="hl" aria-hidden="true" style="--i:11">1</span></h1>
       </div>
-      <a class="hero-cue" href="#work" aria-label="往下看作品" data-i18n-aria="hero.cue"><span></span></a>
+      <a class="hero-cap" id="hero-cap" href="#work"><span class="hero-cap-t"></span><span class="hero-cap-ar" aria-hidden="true">→</span></a>
+      <div class="hero-dots" id="hero-dots" role="group" aria-label="切換作品" data-i18n-aria="home.dots"></div>
     </section>
+  </div>
+
+  <!-- work: the cover wall (Fan Art / Original Art / NSFW) -->
+  <div class="view" id="v-works" hidden>
     <section class="works in" aria-labelledby="works">
       <h2 class="sec-title" id="works">WORKS</h2>
       <nav class="cats" id="cats" aria-label="作品分類" data-i18n-aria="works.cats"><a href="#fanart" data-cat="fan">Fan Art<span class="cats-n"></span></a><a href="#original" data-cat="original">Original Art<span class="cats-n"></span></a><a href="#nsfw" data-cat="nsfw">NSFW<span class="cats-n">18+</span></a></nav>
@@ -408,6 +415,6 @@ addEventListener('hashchange', function () {
   <p class="zv-hint" id="b3v-hint" data-i18n="b3.hint">左鍵拖曳移動 · 右鍵拖曳旋轉 · 滾輪縮放 · 點兩下還原</p>
 </div>
 
-<script src="site.js?v=2629166a"></script>
+<script src="site.js?v=19254ab1"></script>
 </body>
 </html>

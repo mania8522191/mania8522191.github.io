@@ -1,4 +1,4 @@
-/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, wall, work, artbook, book3d, motion, router, about, lang-switch, main. Edit those files, not this one. */
+/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, wall, work, artbook, book3d, motion, home, router, about, lang-switch, main. Edit those files, not this one. */
 
 /* ==================== js/data.js ==================== */
 /* Site data. One item per line; the scripts in tools/ read and write this file (keep each list valid JSON).
@@ -75,6 +75,16 @@ const WORKS = [
   {"id":"o-64","t":"Original01","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[1200,750,4000,2500]],"pos":"50% 35%","cat":"original"}
 ];
 
+/* the home page carousel: these works, in a new random order on every visit;
+   pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike */
+const HOME_SLIDES = [
+  {"id":"139165109","pos":"80% 40%"},
+  {"id":"137308455","pos":"34% 15%"},
+  {"id":"146954644","pos":"36% 30%"},
+  {"id":"147595537","pos":"80% 20%"},
+  {"id":"148494165","pos":"50% 22%"}
+];
+
 const GOODS = [
   {"slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1215,810]},
   {"slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1215,810]},
@@ -113,7 +123,7 @@ const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), about: $('#v-about'), contact: $('#v-contact') };
 
 /* a url() for a CSS custom property, made absolute so it points at the same file whichever stylesheet uses it */
 const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
@@ -124,7 +134,9 @@ const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
 const I18N = {
   "zh": {
     "nav.main": "主選單",
-    "hero.cue": "往下看作品",
+    "home.featured": "精選作品",
+    "home.dots": "切換作品",
+    "home.dot": "第 {n} 張：{t}",
     "works.sub": "{a} — {b} · {n} 件作品 · 點選封面看完整作品",
     "cover.pages": "{n} 張",
     "cover.video": "▶ 過程影片",
@@ -253,7 +265,8 @@ const I18N = {
     "pair.card": "卡牌",
     "h.personal": "個人帳號",
     "h.deactivated": "已停用",
-    "cur.home": "插畫作品",
+    "cur.home": "精選作品",
+    "cur.works": "插畫作品",
     "cur.goods": "周邊商品",
     "cur.game": "獨立遊戲",
     "cur.about": "關於我",
@@ -304,7 +317,9 @@ const I18N = {
   },
   "en": {
     "nav.main": "Main menu",
-    "hero.cue": "Scroll down to the works",
+    "home.featured": "Featured works",
+    "home.dots": "Choose a work",
+    "home.dot": "Slide {n}: {t}",
     "works.sub": "{a} — {b} · {n} works · Click a cover to see the full piece",
     "cover.pages": "{n} images",
     "cover.video": "▶ Timelapse",
@@ -433,7 +448,8 @@ const I18N = {
     "pair.card": "Card",
     "h.personal": "Personal account",
     "h.deactivated": "Deactivated",
-    "cur.home": "Illustrations",
+    "cur.home": "Featured works",
+    "cur.works": "Illustrations",
     "cur.goods": "Merchandise",
     "cur.game": "Indie card game",
     "cur.about": "About the artist",
@@ -484,7 +500,9 @@ const I18N = {
   },
   "ja": {
     "nav.main": "メインメニュー",
-    "hero.cue": "作品一覧へスクロール",
+    "home.featured": "ピックアップ作品",
+    "home.dots": "作品を切り替える",
+    "home.dot": "{n}枚目：{t}",
     "works.sub": "{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます",
     "cover.pages": "{n}枚",
     "cover.video": "▶ メイキング",
@@ -613,7 +631,8 @@ const I18N = {
     "pair.card": "カード",
     "h.personal": "個人アカウント",
     "h.deactivated": "利用停止中",
-    "cur.home": "イラスト作品",
+    "cur.home": "ピックアップ作品",
+    "cur.works": "イラスト作品",
     "cur.goods": "グッズ",
     "cur.game": "インディーゲーム",
     "cur.about": "プロフィール",
@@ -1059,7 +1078,7 @@ function setMenu(open) {
 menuBtn.addEventListener('click', () => setMenu(!document.documentElement.classList.contains('menu-open')));
 $('#m-nav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
-matchMedia('(min-width: 641px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+matchMedia('(min-width: 821px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
 
 /* ==================== js/goods.js ==================== */
 /* Goods: prices, the goods list, goods item pages */
@@ -1341,7 +1360,7 @@ yearsIn.addEventListener('click', (e) => {
 let yearsRaf = 0, yearNow = '';
 function yearsUpdate() {
   yearsRaf = 0;
-  if (VIEWS.home.hidden || wall.hidden) return;
+  if (VIEWS.works.hidden || wall.hidden) return;
   const line = yearsBar.getBoundingClientRect().bottom + 48;
   let cur = YEARS[0];
   for (const y of YEARS) { if (yearHead.get(y).getBoundingClientRect().top <= line) cur = y; else break; }
@@ -1403,7 +1422,7 @@ function placeCover(el, x, y, tilt) {
   el.style.setProperty('--tilt', `${tilt ? tilt.toFixed(2) : 0}deg`);
 }
 function layoutWall() {
-  if (VIEWS.home.hidden || !wall.clientWidth) return;
+  if (VIEWS.works.hidden || !wall.clientWidth) return;
   const rand = seeded(WALL_SEED);
   wallUnits = wallUnits || buildUnits();
   const W = wall.clientWidth;
@@ -2206,15 +2225,107 @@ function parallax() {
 }
 if (!CALM) addEventListener('scroll', () => { if (!rafId) rafId = requestAnimationFrame(parallax); }, { passive: true });
 
+/* ==================== js/home.js ==================== */
+/* Home: a carousel of featured works under the name. The works are HOME_SLIDES in data.js, shown in a new random
+   order on every visit. A dot for each work picks it; a swipe or the arrow keys go to the next or previous one.
+   It moves on by itself, except while the visitor is on its controls or prefers less motion. */
+const heroSlides = $('#hero-slides'), heroDots = $('#hero-dots'), heroCap = $('#hero-cap');
+const HERO_MS = 6500;   // how long each work stays before the next one fades in
+const SLIDES = HOME_SLIDES.filter((s) => s.id in byId).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos }));
+for (let i = SLIDES.length - 1; i > 0; i--) {   // a new order on every visit
+  const j = Math.floor(Math.random() * (i + 1));
+  [SLIDES[i], SLIDES[j]] = [SLIDES[j], SLIDES[i]];
+}
+let heroAt = -1, heroTimer = 0, heroHover = false, heroFocus = false, heroX = null;
+
+SLIDES.forEach((s, i) => {
+  s.box = el('div', 'hero-slide');
+  s.img = el('img');
+  s.img.alt = '';   // the title is in the link under the carousel
+  s.img.decoding = 'async';
+  s.img.style.objectPosition = s.pos || s.w.pos || '';
+  s.box.append(s.img);
+  s.dot = el('button', 'hero-dot');
+  s.dot.type = 'button';
+  s.dot.append(el('i'));
+  s.dot.addEventListener('click', () => { heroShow(i); heroPlay(); });
+  heroSlides.append(s.box);
+  heroDots.append(s.dot);
+});
+
+/* a picture is fetched only when its slide is next: the page copy, or the full-size one on big screens */
+function heroLoad(s) {
+  if (s.img.src) return;
+  const [w, h, zw] = s.w.dims[0], page = src(s.w.id, 0);
+  s.img.width = w;
+  s.img.height = h;
+  s.img.sizes = '100vw';
+  s.img.srcset = zw ? `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w` : `${page} ${w}w`;
+  s.img.src = page;
+}
+
+function heroShow(i) {
+  const s = SLIDES[i];
+  if (!s || i === heroAt) return;
+  const first = heroAt < 0;
+  if (!first) SLIDES[heroAt].box.classList.remove('on');
+  heroAt = i;
+  heroLoad(s);
+  heroLoad(SLIDES[(i + 1) % SLIDES.length]);   // the next one, in the background
+  s.box.classList.add('on');
+  SLIDES.forEach((x, k) => x.dot.setAttribute('aria-current', String(k === i)));
+  heroCap.href = '#w-' + s.w.id;
+  heroCap.querySelector('.hero-cap-t').textContent = s.w.t;
+  if (!first && !CALM) heroCap.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
+}
+const heroStep = (d) => { heroShow((heroAt + d + SLIDES.length) % SLIDES.length); heroPlay(); };
+
+/* the timer runs only while the home page is shown in a visible tab */
+function heroPlay() {
+  clearTimeout(heroTimer);
+  if (CALM || heroHover || heroFocus || document.hidden || view !== 'home' || SLIDES.length < 2) return;
+  heroTimer = setTimeout(() => heroStep(1), HERO_MS);
+}
+document.addEventListener('visibilitychange', heroPlay);
+for (const c of [heroDots, heroCap]) {   // hold still while the visitor is on the dots or the title
+  c.addEventListener('pointerenter', () => { heroHover = true; heroPlay(); });
+  c.addEventListener('pointerleave', () => { heroHover = false; heroPlay(); });
+  c.addEventListener('focusin', (e) => { heroFocus = e.target.matches(':focus-visible'); heroPlay(); });
+  c.addEventListener('focusout', () => { heroFocus = false; heroPlay(); });
+}
+hero.addEventListener('pointerdown', (e) => { heroX = e.pointerType === 'mouse' ? null : e.clientX; });
+hero.addEventListener('pointercancel', () => { heroX = null; });
+hero.addEventListener('pointerup', (e) => {
+  if (heroX === null) return;
+  const dx = e.clientX - heroX;
+  heroX = null;
+  if (Math.abs(dx) > 50 && SLIDES.length > 1) heroStep(dx < 0 ? 1 : -1);
+});
+addEventListener('keydown', (e) => {
+  if (view !== 'home' || SLIDES.length < 2 || e.altKey || e.metaKey || e.ctrlKey || document.documentElement.classList.contains('menu-open')) return;
+  if (e.key === 'ArrowRight') heroStep(1);
+  if (e.key === 'ArrowLeft') heroStep(-1);
+});
+
+/* the dots' names, again after a language change */
+function heroText() {
+  SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: s.w.t })));
+}
+heroText();
+if (SLIDES.length) {
+  SLIDES[0].img.fetchPriority = 'high';
+  heroShow(0);
+}
+
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home #work #fanart #original #nsfw #artbook #ab-<book> #goods #about #contact #w-<work id> #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #about #contact #w-<work id> #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastItem = null;
 function parse() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game') return { h, next: h, idx: -1 };
-  if (h === 'timeline') return { h, next: 'home', idx: -1 };
-  if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'home', idx: -1, cat: h === 'fanart' ? 'fan' : h };
+  if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
+  if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-') && h.slice(2) in byId) return { h, next: 'work', idx: byId[h.slice(2)] };
   if (h.startsWith('g-') && h.slice(2) in bySlug) return { h, next: 'item', idx: bySlug[h.slice(2)] };
   if (h === 'artbook') return { h, next: 'artbook', idx: -1 };
@@ -2240,15 +2351,14 @@ function apply({ h, next, idx, cat }) {
     renderWork(idx); lastWork = WORKS[idx].id; scrollTo(0, 0); els = prime(root);
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
-  } else if (next === 'home') {
+  } else if (next === 'works') {
     /* #fanart / #original pick the category; back from a work page shows that work's category */
     const switched = setCat(cat || (from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
     layoutWall();
-    const cover = from === 'work' && lastWork && h !== 'home' && document.getElementById('c-' + lastWork);
+    const cover = from === 'work' && lastWork && document.getElementById('c-' + lastWork);
     if (cover && !cover.hidden) { cover.scrollIntoView({ block: 'center' }); els = pending(root); }
     else {
-      if (h === 'work' || h === 'timeline' || h === 'fanart' || h === 'original' || h === 'nsfw') $('#works').scrollIntoView({ behavior });   // #timeline: the wall is the timeline now
-      else if (from) scrollTo({ top: 0, behavior });
+      scrollTo({ top: 0, behavior });
       els = !same ? prime(root) : switched ? [...pending(root), ...prime(wall), ...prime(nsfwBox)] : pending(root);   // a new category flies in
     }
   } else if (next === 'book') {
@@ -2269,14 +2379,15 @@ function apply({ h, next, idx, cat }) {
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
+  heroPlay();   // the carousel moves on only while the home page is shown
   watch(els);
   parallax();
 }
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
-const TOP_VIEWS = new Set(['home', 'artbook', 'goods', 'game', 'about', 'contact']);
+const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
+const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'game', 'about', 'contact']);
 let curtainBusy = false;
 function curtainTo(r) {
   curtainBusy = true;
@@ -2322,12 +2433,12 @@ function route() {
   if (curtainBusy) return;
   const r = parse();
   const from = view;
-  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'home') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
+  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   if (from === null || from === r.next || !VT) { apply(r); return; }
   const pick = (fwd) => {
-    if (from === 'home' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
+    if (from === 'works' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
     if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
-    if (from === 'work' && r.next === 'home') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
+    if (from === 'work' && r.next === 'works') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
     if (from === 'item' && r.next === 'goods') return fwd ? $('#it-img') : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
@@ -2506,6 +2617,7 @@ function swapLang(l) {
   zvClose();
   b3vClose();
   applyStatic();
+  heroText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
   charList.querySelectorAll('.char').forEach((li, k) => {

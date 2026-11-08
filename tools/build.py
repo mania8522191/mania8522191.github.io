@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # for check_cod
 # the order matters: later CSS rules win over earlier ones; scripts use what the earlier ones define
 CSS = ['base', 'home', 'artbook', 'works', 'goods', 'nav', 'game', 'lightbox', 'about', 'motion', 'responsive']
 JS = ['data', 'core', 'i18n', 'game', 'lightbox', 'menu', 'goods', 'wall', 'work', 'artbook', 'book3d', 'motion',
-      'router', 'about', 'lang-switch', 'main']
+      'home', 'router', 'about', 'lang-switch', 'main']
 REF = re.compile(r'((?:href|src)=")(site\.(?:css|js))(?:\?v=\w*)?(")')
 
 

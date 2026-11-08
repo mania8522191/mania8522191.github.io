@@ -1,14 +1,27 @@
-/* Home: hero, section titles, the Fan Art / Original Art switch, NSFW previews */
-/* hero */
-.hero{position:relative;isolation:isolate;overflow:hidden;height:clamp(400px,74vh,800px);display:grid;place-items:center;text-align:center}
+/* Home: the carousel of featured works; then, for the wall: section titles, the Fan Art / Original Art switch, NSFW previews */
+/* hero: the home page, a carousel of featured works under the name (js/home.js), filling the screen below the header */
+.hero{position:relative;isolation:isolate;overflow:hidden;height:calc(100vh - var(--head));height:calc(100svh - var(--head));min-height:420px;display:grid;place-items:center;text-align:center;touch-action:pan-y}
 .hero-media{position:absolute;inset:0;z-index:-2;overflow:hidden;will-change:transform}
-.hero-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:50% 34%}
+/* a slide fades in while it settles from a slight zoom; one on its way out keeps its size until it has faded */
+.hero-slide{position:absolute;inset:0;opacity:0;transform:scale(1.06);transition:opacity 1.4s var(--ease-io),transform 0s 1.4s}
+.hero-slide.on{opacity:1;transform:none;transition:opacity 1.4s var(--ease-io),transform 7s var(--ease-out)}
+.hero-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
 .hero-txt{will-change:transform,opacity}
 .hero-name .hl{display:inline-block}
-.hero-cue{position:absolute;left:50%;bottom:0;width:44px;height:84px;margin-left:-22px;display:block}
-.hero-cue::before{content:"";position:absolute;left:50%;top:10px;bottom:18px;width:1px;background:rgba(242,239,233,.28)}
-.hero-cue span{position:absolute;left:50%;top:10px;width:1px;height:22px;background:var(--fg);animation:cue 2.4s var(--ease-io) infinite}
-@keyframes cue{0%{transform:translateY(-22px);opacity:0}30%{opacity:1}100%{transform:translateY(56px);opacity:0}}
+/* at the foot of the carousel: the title of the work shown (a link to it), and a dot for each work */
+.hero-cap{position:absolute;left:0;right:0;bottom:calc(clamp(14px,3vh,32px) + 40px);width:fit-content;max-width:calc(100% - var(--pad-l) - var(--pad-r));margin-inline:auto;display:flex;align-items:baseline;gap:.7em;font-size:13px;letter-spacing:.06em;color:var(--fg-2);text-decoration:none;text-shadow:0 1px 14px rgba(0,0,0,.8);transition:color .3s}
+.hero-cap-t{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.hero-cap-ar{transition:transform .5s var(--ease-out)}
+.hero-cap:hover{color:var(--fg)}
+.hero-cap:hover .hero-cap-ar{transform:translateX(5px)}
+.hero-cap:focus-visible{outline:1px solid var(--fg);outline-offset:5px}
+.hero-dots{position:absolute;left:0;right:0;bottom:clamp(14px,3vh,32px);display:flex;justify-content:center;gap:2px}
+.hero-dot{display:grid;place-items:center;width:32px;height:32px;padding:0;border:0;background:none;cursor:pointer}
+.hero-dot i{display:block;width:8px;height:8px;border-radius:50%;border:1px solid rgba(242,239,233,.75);transition:background-color .45s,border-color .45s,transform .45s var(--ease-out)}
+.hero-dot:hover i{border-color:var(--fg);transform:scale(1.25)}
+.hero-dot[aria-current="true"] i{background:var(--g-gold);border-color:var(--g-gold)}
+.hero-dot:focus-visible{outline:none}
+.hero-dot:focus-visible i{outline:1px solid var(--fg);outline-offset:4px}
 .hero::after{content:"";position:absolute;inset:0;background:var(--veil);z-index:-1}
 .hero-txt{padding-left:var(--pad-l);padding-right:var(--pad-r)}
 .hero-by{margin:0 0 4px;font-size:clamp(15px,1.5vw,19px);letter-spacing:.03em}

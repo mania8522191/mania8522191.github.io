@@ -10,19 +10,19 @@
 | `css/` | 樣式的原始檔，一個區塊一個檔案 |
 | `js/` | 程式的原始檔，一個功能一個檔案 |
 | `site.css`、`site.js` | 網頁實際載入的檔案：`tools/build.py` 把 `css/`、`js/` 照順序合併而成，不要直接改 |
-| `js/data.js` | 網站資料：`WORKS` 作品、`GOODS` 周邊、`BOOKS` 畫冊，一件一行 |
+| `js/data.js` | 網站資料：`WORKS` 作品、`HOME_SLIDES` 首頁輪播、`GOODS` 周邊、`BOOKS` 畫冊，一件一行 |
 | `img/` | 圖片（見下方） |
 | `tools/` | 這裡的工具 |
 
 **樣式**（`css/`）照這個順序合併，順序會影響哪一條規則優先，不要隨意調換：
-`base` 基本設定、頁首、選單 → `home` 首頁大圖、分類切換、NSFW → `artbook` 畫冊、3D 書、材質、3D 檢視 →
+`base` 基本設定、頁首、選單 → `home` 首頁輪播，以及作品牆的標題、分類切換、NSFW → `artbook` 畫冊、3D 書、材質、3D 檢視 →
 `works` 作品牆、作品頁 → `goods` 按鈕、價格、周邊 → `nav` 語言切換、手機選單 → `game` 遊戲頁 →
 `lightbox` 放大檢視 → `about` 關於、聯絡、頁尾 → `motion` 動畫 → `responsive` 窄螢幕、減少動態。
 
 **程式**（`js/`）照這個順序合併成一個 `site.js`，前面檔案定義的東西後面的檔案可以直接用：
 `data` 資料 → `core` 共用小工具 → `i18n` 三種語言的文字 → `game` 遊戲頁 → `lightbox` 放大檢視 →
 `menu` 手機選單 → `goods` 周邊 → `wall` 作品牆 → `work` 作品頁 → `artbook` 畫冊列表、畫冊頁 →
-`book3d` 3D 書和 3D 檢視 → `motion` 捲動動畫 → `router` 換頁 → `about` 關於頁 →
+`book3d` 3D 書和 3D 檢視 → `motion` 捲動動畫 → `home` 首頁輪播 → `router` 換頁 → `about` 關於頁 →
 `lang-switch` 切換語言 → `main` 啟動（最後一個）。
 順序寫在 `tools/build.py` 裡；新增檔案的話也要加進那裡。
 合成一個檔案載入，是為了讓開頁時的執行順序跟拆檔前完全一樣（分開載入的話，有些等字型載入完才做的動作會在檔案之間提早執行）。
@@ -91,6 +91,15 @@
 5. 新的尺寸或材質名稱要在 `js/i18n.js` 三種語言都加文字（`bk.size.*`、`bk.mat.*`）。
 6. 手動改過 `js/data.js` 或 `js/i18n.js` 的話（例如加上 `foil`），再跑一次 `python tools/build.py`。
    看到 `no leftovers` 後，本機預覽，再上線。
+
+## 首頁輪播
+
+首頁（`#home`）輪播的作品寫在 `js/data.js` 的 `HOME_SLIDES`，一張一行：
+- `id`：作品編號，要是 `WORKS` 裡有的作品
+- `pos`：裁切時保留在畫面裡的位置，電腦和手機共用。例如 `"50% 22%"` 是左右置中、上下在 22% 的地方
+
+每次重新整理，順序都會重新隨機。改完跑 `python tools/build.py`。
+作品牆在 `#work`；舊的 `#fanart`、`#original`、`#nsfw`、`#timeline` 網址也會到這裡。
 
 ## 改文字
 

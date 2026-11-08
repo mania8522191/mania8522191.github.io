@@ -1,11 +1,11 @@
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home #work #fanart #original #nsfw #artbook #ab-<book> #goods #about #contact #w-<work id> #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #about #contact #w-<work id> #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastItem = null;
 function parse() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game') return { h, next: h, idx: -1 };
-  if (h === 'timeline') return { h, next: 'home', idx: -1 };
-  if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'home', idx: -1, cat: h === 'fanart' ? 'fan' : h };
+  if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
+  if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-') && h.slice(2) in byId) return { h, next: 'work', idx: byId[h.slice(2)] };
   if (h.startsWith('g-') && h.slice(2) in bySlug) return { h, next: 'item', idx: bySlug[h.slice(2)] };
   if (h === 'artbook') return { h, next: 'artbook', idx: -1 };
@@ -31,15 +31,14 @@ function apply({ h, next, idx, cat }) {
     renderWork(idx); lastWork = WORKS[idx].id; scrollTo(0, 0); els = prime(root);
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
-  } else if (next === 'home') {
+  } else if (next === 'works') {
     /* #fanart / #original pick the category; back from a work page shows that work's category */
     const switched = setCat(cat || (from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
     layoutWall();
-    const cover = from === 'work' && lastWork && h !== 'home' && document.getElementById('c-' + lastWork);
+    const cover = from === 'work' && lastWork && document.getElementById('c-' + lastWork);
     if (cover && !cover.hidden) { cover.scrollIntoView({ block: 'center' }); els = pending(root); }
     else {
-      if (h === 'work' || h === 'timeline' || h === 'fanart' || h === 'original' || h === 'nsfw') $('#works').scrollIntoView({ behavior });   // #timeline: the wall is the timeline now
-      else if (from) scrollTo({ top: 0, behavior });
+      scrollTo({ top: 0, behavior });
       els = !same ? prime(root) : switched ? [...pending(root), ...prime(wall), ...prime(nsfwBox)] : pending(root);   // a new category flies in
     }
   } else if (next === 'book') {
@@ -60,14 +59,15 @@ function apply({ h, next, idx, cat }) {
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
+  heroPlay();   // the carousel moves on only while the home page is shown
   watch(els);
   parallax();
 }
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
-const TOP_VIEWS = new Set(['home', 'artbook', 'goods', 'game', 'about', 'contact']);
+const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
+const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'game', 'about', 'contact']);
 let curtainBusy = false;
 function curtainTo(r) {
   curtainBusy = true;
@@ -113,12 +113,12 @@ function route() {
   if (curtainBusy) return;
   const r = parse();
   const from = view;
-  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'home') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
+  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   if (from === null || from === r.next || !VT) { apply(r); return; }
   const pick = (fwd) => {
-    if (from === 'home' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
+    if (from === 'works' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
     if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
-    if (from === 'work' && r.next === 'home') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
+    if (from === 'work' && r.next === 'works') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
     if (from === 'item' && r.next === 'goods') return fwd ? $('#it-img') : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);

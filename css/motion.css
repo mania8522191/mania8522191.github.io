@@ -9,7 +9,7 @@
 @keyframes rise{from{opacity:0;transform:translateY(20px)}}
 .intro .hero-name .hl{animation:char-in 1.2s var(--ease-out) both;animation-delay:calc(.62s + var(--i) * .05s)}
 @keyframes char-in{from{opacity:0;transform:translateY(.5em) rotate(6deg);filter:blur(12px)}}
-.intro .hero-cue{animation:rise 1s var(--ease-out) 1.6s both}
+.intro .hero-cap,.intro .hero-dots{animation:rise 1s var(--ease-out) 1.6s both}
 
 /* with the View Transitions API the page change is animated there instead */
 .vt .view{animation:none}
