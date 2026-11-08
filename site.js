@@ -124,7 +124,6 @@ const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
 const I18N = {
   "zh": {
     "nav.main": "主選單",
-    "lang.label": "語言",
     "hero.cue": "往下看作品",
     "works.sub": "{a} — {b} · {n} 件作品 · 點選封面看完整作品",
     "cover.pages": "{n} 張",
@@ -212,7 +211,6 @@ const I18N = {
     "grp.works": "作品",
     "grp.shop": "周邊",
     "h.fbPage": "mania8522191・粉絲專頁",
-    "h.fbPersonal": "mania8522191p2・個人帳號",
     "h.discord": "加入伺服器",
     "h.shop": "賣場 217467",
     "ch.baha": "巴哈姆特",
@@ -253,10 +251,6 @@ const I18N = {
     "deck.oracle": "神諭‧召喚",
     "pair.art": "立繪",
     "pair.card": "卡牌",
-    "line.h": "作品時間軸",
-    "line.sub": "往下捲動，從 2019 年一路走到現在。",
-    "line.jump": "依時間軸瀏覽 ↓",
-    "line.item": "{t}（{d}）",
     "h.personal": "個人帳號",
     "h.deactivated": "已停用",
     "cur.home": "插畫作品",
@@ -264,7 +258,6 @@ const I18N = {
     "cur.game": "獨立遊戲",
     "cur.about": "關於我",
     "cur.contact": "聯絡方式",
-    "cur.timeline": "2019 — 現在",
     "years.nav": "依年份瀏覽",
     "years.go": "跳到 {y} 年",
     "wall.count": "{n} 件",
@@ -283,7 +276,6 @@ const I18N = {
     "ab.count": "{n} 本",
     "ab.card": "{t} 畫冊（{d}）",
     "bk.date": "{d} 發行",
-    "bk.coverAlt": "{t} 封面與封底",
     "bk.pageAlt": "{t} 內頁（第 {n} 張）",
     "bk.blurAlt": "{t} 內頁（成人向，已模糊處理）",
     "bk.others": "其他畫冊",
@@ -312,7 +304,6 @@ const I18N = {
   },
   "en": {
     "nav.main": "Main menu",
-    "lang.label": "Language",
     "hero.cue": "Scroll down to the works",
     "works.sub": "{a} — {b} · {n} works · Click a cover to see the full piece",
     "cover.pages": "{n} images",
@@ -400,7 +391,6 @@ const I18N = {
     "grp.works": "Portfolio",
     "grp.shop": "Goods",
     "h.fbPage": "mania8522191 · Page",
-    "h.fbPersonal": "mania8522191p2 · Personal",
     "h.discord": "Join the server",
     "h.shop": "Shop 217467",
     "ch.baha": "Bahamut",
@@ -441,10 +431,6 @@ const I18N = {
     "deck.oracle": "Oracle · Summon",
     "pair.art": "Artwork",
     "pair.card": "Card",
-    "line.h": "Timeline",
-    "line.sub": "Keep scrolling to travel from 2019 to today.",
-    "line.jump": "Browse as a timeline ↓",
-    "line.item": "{t} ({d})",
     "h.personal": "Personal account",
     "h.deactivated": "Deactivated",
     "cur.home": "Illustrations",
@@ -452,7 +438,6 @@ const I18N = {
     "cur.game": "Indie card game",
     "cur.about": "About the artist",
     "cur.contact": "Get in touch",
-    "cur.timeline": "2019 — now",
     "years.nav": "Browse by year",
     "years.go": "Jump to {y}",
     "wall.count": "{n} works",
@@ -471,7 +456,6 @@ const I18N = {
     "ab.count": "{n} books",
     "ab.card": "{t} art book ({d})",
     "bk.date": "Released {d}",
-    "bk.coverAlt": "{t}: front and back cover",
     "bk.pageAlt": "{t}: inside pages ({n})",
     "bk.blurAlt": "{t}: inside pages (adult content, blurred)",
     "bk.others": "Other art books",
@@ -500,7 +484,6 @@ const I18N = {
   },
   "ja": {
     "nav.main": "メインメニュー",
-    "lang.label": "言語",
     "hero.cue": "作品一覧へスクロール",
     "works.sub": "{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます",
     "cover.pages": "{n}枚",
@@ -588,7 +571,6 @@ const I18N = {
     "grp.works": "作品",
     "grp.shop": "グッズ",
     "h.fbPage": "mania8522191・ページ",
-    "h.fbPersonal": "mania8522191p2・個人アカウント",
     "h.discord": "サーバーに参加",
     "h.shop": "ショップ 217467",
     "ch.baha": "巴哈姆特（バハムート）",
@@ -629,10 +611,6 @@ const I18N = {
     "deck.oracle": "神託・召喚",
     "pair.art": "立ち絵",
     "pair.card": "カード",
-    "line.h": "作品タイムライン",
-    "line.sub": "スクロールすると、2019年から現在までたどれます。",
-    "line.jump": "タイムラインで見る ↓",
-    "line.item": "{t}（{d}）",
     "h.personal": "個人アカウント",
     "h.deactivated": "利用停止中",
     "cur.home": "イラスト作品",
@@ -640,7 +618,6 @@ const I18N = {
     "cur.game": "インディーゲーム",
     "cur.about": "プロフィール",
     "cur.contact": "コンタクト",
-    "cur.timeline": "2019 — 現在",
     "years.nav": "年ごとに見る",
     "years.go": "{y}年へ移動",
     "wall.count": "{n}作品",
@@ -659,7 +636,6 @@ const I18N = {
     "ab.count": "{n}冊",
     "ab.card": "{t} 画集（{d}）",
     "bk.date": "{d} 発行",
-    "bk.coverAlt": "{t} 表紙と裏表紙",
     "bk.pageAlt": "{t} 本文（{n}枚目）",
     "bk.blurAlt": "{t} 本文（成人向け・ぼかし加工）",
     "bk.others": "ほかの画集",
@@ -2299,7 +2275,7 @@ function apply({ h, next, idx, cat }) {
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT', timeline: 'TIMELINE' };
+const CUR_NAME = { home: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
 const TOP_VIEWS = new Set(['home', 'artbook', 'goods', 'game', 'about', 'contact']);
 let curtainBusy = false;
 function curtainTo(r) {

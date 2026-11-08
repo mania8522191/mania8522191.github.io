@@ -66,7 +66,7 @@ function apply({ h, next, idx, cat }) {
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT', timeline: 'TIMELINE' };
+const CUR_NAME = { home: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
 const TOP_VIEWS = new Set(['home', 'artbook', 'goods', 'game', 'about', 'contact']);
 let curtainBusy = false;
 function curtainTo(r) {
