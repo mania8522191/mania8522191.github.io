@@ -9,6 +9,9 @@
 /* a slide with keep in HOME_SLIDES: js/home.js sizes and places the picture; a blurred copy fills what it leaves uncovered */
 .hero-media img.hero-fit{position:absolute;object-fit:fill}
 .hero-bg{filter:blur(32px) brightness(.8);transform:scale(1.15)}
+/* a slide with turn in HOME_SLIDES: the picture lies on its side, in a box as tall as the screen is wide */
+.hero-slide.turned{container-type:size}
+.hero-turn{position:absolute;left:50%;top:50%;width:100cqh;height:100cqw;transform:translate(-50%,-50%) rotate(var(--turn))}
 .hero-txt{will-change:transform,opacity}
 .hero-name .hl{display:inline-block}
 /* at the foot of the carousel: the title of the work shown (a link to it), and a dot for each work */

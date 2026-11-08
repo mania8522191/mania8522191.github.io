@@ -1,12 +1,19 @@
-/* Home: a carousel of featured works under the name. The works are HOME_SLIDES in data.js, shown in a new random
-   order on every visit. A dot for each work picks it; a swipe or the arrow keys go to the next or previous one.
+/* Home: a carousel of featured works under the name. Every visit shows HERO_N of the works in HOME_SLIDES (data.js),
+   picked and ordered at random. A dot for each work picks it; a swipe or the arrow keys go to the next or previous one.
    It moves on by itself, except while the visitor is on its controls or prefers less motion. */
 const heroSlides = $('#hero-slides'), heroDots = $('#hero-dots'), heroCap = $('#hero-cap');
+const HERO_N = 5;       // how many works a visit shows
 const HERO_MS = 6500;   // how long each work stays before the next one fades in
-const SLIDES = HOME_SLIDES.filter((s) => s.id in byId).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, keep: s.keep }));
-for (let i = SLIDES.length - 1; i > 0; i--) {   // a new order on every visit
+const heroPool = HOME_SLIDES.filter((s) => s.id in byId);
+for (let i = heroPool.length - 1; i > 0; i--) {   // a new pick and order on every visit
   const j = Math.floor(Math.random() * (i + 1));
-  [SLIDES[i], SLIDES[j]] = [SLIDES[j], SLIDES[i]];
+  [heroPool[i], heroPool[j]] = [heroPool[j], heroPool[i]];
+}
+const SLIDES = heroPool.slice(0, HERO_N).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, keep: s.keep, turn: s.turn }));
+/* pos says where the crop centres on the screen; a turned picture needs it in its own, unturned terms */
+function turnPos(pos, turn) {
+  const [x, y] = pos.split(' ').map(parseFloat);
+  return turn === 90 ? `${y}% ${100 - x}%` : turn === -90 ? `${100 - y}% ${x}%` : pos;
 }
 let heroAt = -1, heroTimer = 0, heroHover = false, heroFocus = false, heroX = null;
 
@@ -15,8 +22,8 @@ SLIDES.forEach((s, i) => {
   s.img = el('img');
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
-  s.img.style.objectPosition = s.pos || s.w.pos || '';
-  if (s.keep) {   // sized and placed by heroFit, over a blurred copy that fills whatever it leaves uncovered
+  s.img.style.objectPosition = s.turn ? turnPos(s.pos || '50% 50%', s.turn) : s.pos || s.w.pos || '';
+  if (s.keep && !s.turn) {   // sized and placed by heroFit, over a blurred copy that fills whatever it leaves uncovered
     s.bg = el('img', 'hero-bg');
     s.bg.alt = '';
     s.bg.decoding = 'async';
@@ -24,7 +31,13 @@ SLIDES.forEach((s, i) => {
     s.box.append(s.bg);
     s.img.classList.add('hero-fit');
   }
-  s.box.append(s.img);
+  if (s.turn) {   // shown on its side: a box as tall as the screen is wide, turned around its centre
+    const t = el('div', 'hero-turn');
+    t.style.setProperty('--turn', `${s.turn}deg`);
+    t.append(s.img);
+    s.box.classList.add('turned');
+    s.box.append(t);
+  } else s.box.append(s.img);
   s.dot = el('button', 'hero-dot');
   s.dot.type = 'button';
   s.dot.append(el('i'));
@@ -52,10 +65,11 @@ function heroLoad(s) {
    the picture stays in view, above the title and the dots at the foot. On a screen too wide for that part, the
    picture is shown a little smaller than the screen and the blurred copy behind it fills the sides. */
 function heroFit(s) {
-  const W = heroSlides.clientWidth, H = heroSlides.clientHeight;
+  let W = heroSlides.clientWidth, H = heroSlides.clientHeight;
   if (!s || !W || !H) return;
   const d = s.w.dims[0], w = d[2] || d[0], h = d[3] || d[1];   // its shape (both copies have the same)
-  if (!s.keep) { s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`; return; }   // cover: wider than the screen when the picture is wider
+  if (s.turn) [W, H] = [H, W];   // a turned picture covers the screen on its side
+  if (!s.keep || s.turn) { s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`; return; }   // cover: wider than the screen when the picture is wider
   const [x1, y1, x2, y2] = s.keep.map((v) => v / 100);
   const room = Math.min(H, heroCap.offsetTop - 12);   // where the kept part has to end: above the title
   const k = Math.min(Math.max(W / w, H / h), W / ((x2 - x1) * w), room / ((y2 - y1) * h));   // cover, unless the part would not fit

@@ -75,15 +75,21 @@ const WORKS = [
   {"id":"o-64","t":"Original01","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[1200,750,4000,2500]],"pos":"50% 35%","cat":"original"}
 ];
 
-/* the home page carousel: these works, in a new random order on every visit;
+/* the home page carousel: every visit shows five of these works (HERO_N in home.js), picked and ordered at random;
    pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike;
+   turn (optional) = show the picture turned 90 (clockwise) or -90 degrees; pos is then where it shows turned;
    keep (optional) = a part that must always show in full, as [left, top, right, bottom] in % of the picture */
 const HOME_SLIDES = [
   {"id":"139165109","pos":"80% 40%"},
   {"id":"137308455","pos":"34% 15%"},
   {"id":"146954644","pos":"36% 30%"},
   {"id":"147595537","pos":"80% 20%"},
-  {"id":"148494165","pos":"50% 22%","keep":[5,16.5,76,35.5]}
+  {"id":"137386797","pos":"42% 15%"},
+  {"id":"137332578","pos":"15% 50%"},
+  {"id":"142549210","pos":"35% 0%"},
+  {"id":"146541232","pos":"33% 30%"},
+  {"id":"137309925","pos":"10% 50%","turn":90},
+  {"id":"148068024","pos":"40% 30%"}
 ];
 
 const GOODS = [
@@ -2227,15 +2233,22 @@ function parallax() {
 if (!CALM) addEventListener('scroll', () => { if (!rafId) rafId = requestAnimationFrame(parallax); }, { passive: true });
 
 /* ==================== js/home.js ==================== */
-/* Home: a carousel of featured works under the name. The works are HOME_SLIDES in data.js, shown in a new random
-   order on every visit. A dot for each work picks it; a swipe or the arrow keys go to the next or previous one.
+/* Home: a carousel of featured works under the name. Every visit shows HERO_N of the works in HOME_SLIDES (data.js),
+   picked and ordered at random. A dot for each work picks it; a swipe or the arrow keys go to the next or previous one.
    It moves on by itself, except while the visitor is on its controls or prefers less motion. */
 const heroSlides = $('#hero-slides'), heroDots = $('#hero-dots'), heroCap = $('#hero-cap');
+const HERO_N = 5;       // how many works a visit shows
 const HERO_MS = 6500;   // how long each work stays before the next one fades in
-const SLIDES = HOME_SLIDES.filter((s) => s.id in byId).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, keep: s.keep }));
-for (let i = SLIDES.length - 1; i > 0; i--) {   // a new order on every visit
+const heroPool = HOME_SLIDES.filter((s) => s.id in byId);
+for (let i = heroPool.length - 1; i > 0; i--) {   // a new pick and order on every visit
   const j = Math.floor(Math.random() * (i + 1));
-  [SLIDES[i], SLIDES[j]] = [SLIDES[j], SLIDES[i]];
+  [heroPool[i], heroPool[j]] = [heroPool[j], heroPool[i]];
+}
+const SLIDES = heroPool.slice(0, HERO_N).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, keep: s.keep, turn: s.turn }));
+/* pos says where the crop centres on the screen; a turned picture needs it in its own, unturned terms */
+function turnPos(pos, turn) {
+  const [x, y] = pos.split(' ').map(parseFloat);
+  return turn === 90 ? `${y}% ${100 - x}%` : turn === -90 ? `${100 - y}% ${x}%` : pos;
 }
 let heroAt = -1, heroTimer = 0, heroHover = false, heroFocus = false, heroX = null;
 
@@ -2244,8 +2257,8 @@ SLIDES.forEach((s, i) => {
   s.img = el('img');
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
-  s.img.style.objectPosition = s.pos || s.w.pos || '';
-  if (s.keep) {   // sized and placed by heroFit, over a blurred copy that fills whatever it leaves uncovered
+  s.img.style.objectPosition = s.turn ? turnPos(s.pos || '50% 50%', s.turn) : s.pos || s.w.pos || '';
+  if (s.keep && !s.turn) {   // sized and placed by heroFit, over a blurred copy that fills whatever it leaves uncovered
     s.bg = el('img', 'hero-bg');
     s.bg.alt = '';
     s.bg.decoding = 'async';
@@ -2253,7 +2266,13 @@ SLIDES.forEach((s, i) => {
     s.box.append(s.bg);
     s.img.classList.add('hero-fit');
   }
-  s.box.append(s.img);
+  if (s.turn) {   // shown on its side: a box as tall as the screen is wide, turned around its centre
+    const t = el('div', 'hero-turn');
+    t.style.setProperty('--turn', `${s.turn}deg`);
+    t.append(s.img);
+    s.box.classList.add('turned');
+    s.box.append(t);
+  } else s.box.append(s.img);
   s.dot = el('button', 'hero-dot');
   s.dot.type = 'button';
   s.dot.append(el('i'));
@@ -2281,10 +2300,11 @@ function heroLoad(s) {
    the picture stays in view, above the title and the dots at the foot. On a screen too wide for that part, the
    picture is shown a little smaller than the screen and the blurred copy behind it fills the sides. */
 function heroFit(s) {
-  const W = heroSlides.clientWidth, H = heroSlides.clientHeight;
+  let W = heroSlides.clientWidth, H = heroSlides.clientHeight;
   if (!s || !W || !H) return;
   const d = s.w.dims[0], w = d[2] || d[0], h = d[3] || d[1];   // its shape (both copies have the same)
-  if (!s.keep) { s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`; return; }   // cover: wider than the screen when the picture is wider
+  if (s.turn) [W, H] = [H, W];   // a turned picture covers the screen on its side
+  if (!s.keep || s.turn) { s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`; return; }   // cover: wider than the screen when the picture is wider
   const [x1, y1, x2, y2] = s.keep.map((v) => v / 100);
   const room = Math.min(H, heroCap.offsetTop - 12);   // where the kept part has to end: above the title
   const k = Math.min(Math.max(W / w, H / h), W / ((x2 - x1) * w), room / ((y2 - y1) * h));   // cover, unless the part would not fit
