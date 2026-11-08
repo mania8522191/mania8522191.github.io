@@ -59,6 +59,7 @@ function apply({ h, next, idx, cat }) {
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
+  if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
   heroPlay();   // the carousel moves on only while the home page is shown
   watch(els);
   parallax();

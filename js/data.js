@@ -72,7 +72,8 @@ const WORKS = [
   {"id":"o-64","t":"Original01","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[1200,750,4000,2500]],"pos":"50% 35%","cat":"original"}
 ];
 
-/* the home page carousel: every visit shows five of these works (HERO_N in home.js), picked and ordered at random;
+/* the home page carousel: every visit, and every press of Home, shows five of these works (HERO_N in home.js),
+   picked and ordered at random;
    pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike;
    turn (optional) = show the picture turned 90 (clockwise) or -90 degrees; pos is then where it shows turned */
 const HOME_SLIDES = [

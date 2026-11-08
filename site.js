@@ -75,7 +75,8 @@ const WORKS = [
   {"id":"o-64","t":"Original01","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[1200,750,4000,2500]],"pos":"50% 35%","cat":"original"}
 ];
 
-/* the home page carousel: every visit shows five of these works (HERO_N in home.js), picked and ordered at random;
+/* the home page carousel: every visit, and every press of Home, shows five of these works (HERO_N in home.js),
+   picked and ordered at random;
    pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike;
    turn (optional) = show the picture turned 90 (clockwise) or -90 degrees; pos is then where it shows turned */
 const HOME_SLIDES = [
@@ -2235,32 +2236,30 @@ function parallax() {
 if (!CALM) addEventListener('scroll', () => { if (!rafId) rafId = requestAnimationFrame(parallax); }, { passive: true });
 
 /* ==================== js/home.js ==================== */
-/* Home: a carousel of featured works under the name. Every visit shows HERO_N of the works in HOME_SLIDES (data.js),
-   picked and ordered at random. A dot for each work picks it; a swipe or the arrow keys go to the next or previous one.
-   It moves on by itself, except while the visitor is on its controls or prefers less motion. */
+/* Home: a carousel of featured works under the name. On every visit, and every time Home is pressed, it shows HERO_N
+   of the works in HOME_SLIDES (data.js), picked and ordered at random. A dot for each work picks it; a swipe or the
+   arrow keys go to the next or previous one. It moves on by itself, except while the visitor is on its controls or
+   prefers less motion. */
 const heroSlides = $('#hero-slides'), heroDots = $('#hero-dots'), heroCap = $('#hero-cap');
-const HERO_N = 5;       // how many works a visit shows
+const HERO_N = 5;       // how many works a pick shows
 const HERO_MS = 6500;   // how long each work stays before the next one fades in
-const heroPool = HOME_SLIDES.filter((s) => s.id in byId);
-for (let i = heroPool.length - 1; i > 0; i--) {   // a new pick and order on every visit
-  const j = Math.floor(Math.random() * (i + 1));
-  [heroPool[i], heroPool[j]] = [heroPool[j], heroPool[i]];
-}
-const SLIDES = heroPool.slice(0, HERO_N).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, turn: s.turn }));
+let SLIDES = [], heroCur = null, heroAt = -1, heroPicks = 0, heroTimer = 0, heroHover = false, heroFocus = false, heroX = null;
+
 /* pos says where the crop centres on the screen; a turned picture needs it in its own, unturned terms */
 function turnPos(pos, turn) {
   const [x, y] = pos.split(' ').map(parseFloat);
   return turn === 90 ? `${y}% ${100 - x}%` : turn === -90 ? `${100 - y}% ${x}%` : pos;
 }
-let heroAt = -1, heroTimer = 0, heroHover = false, heroFocus = false, heroX = null;
 
-SLIDES.forEach((s, i) => {
+/* one slide: the picture in its box (on its side if turn says so), and its dot */
+function heroMake(item, i) {
+  const s = { w: WORKS[byId[item.id]], pos: item.pos, turn: item.turn };
   s.box = el('div', 'hero-slide');
   s.img = el('img');
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
   s.img.style.objectPosition = s.turn ? turnPos(s.pos || '50% 50%', s.turn) : s.pos || s.w.pos || '';
-  if (s.turn) {   // shown on its side: a box as tall as the screen is wide, turned around its centre
+  if (s.turn) {   // a box as tall as the screen is wide, turned around its centre
     const t = el('div', 'hero-turn');
     t.style.setProperty('--turn', `${s.turn}deg`);
     t.append(s.img);
@@ -2271,9 +2270,39 @@ SLIDES.forEach((s, i) => {
   s.dot.type = 'button';
   s.dot.append(el('i'));
   s.dot.addEventListener('click', () => { heroShow(i); heroPlay(); });
-  heroSlides.append(s.box);
-  heroDots.append(s.dot);
-});
+  return s;
+}
+
+/* a new pick of works in a new order. The work on screen, if any, stays until the new first picture is ready and
+   then fades out under it; the new first work is never the one that was showing. */
+function heroPick() {
+  const pick = ++heroPicks, was = heroCur, old = SLIDES;
+  const pool = HOME_SLIDES.filter((s) => s.id in byId);
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  if (was && pool.length > 1 && pool[0].id === was.w.id) pool.push(pool.shift());
+  SLIDES = pool.slice(0, HERO_N).map(heroMake);
+  old.forEach((s) => { if (s !== was) s.box.remove(); });
+  heroSlides.append(...SLIDES.map((s) => s.box));
+  heroDots.replaceChildren(...SLIDES.map((s) => s.dot));
+  heroAt = -1;
+  heroText();
+  if (!SLIDES.length) return;
+  if (!was) {
+    SLIDES[0].img.fetchPriority = 'high';
+    heroShow(0);
+    return;
+  }
+  heroLoad(SLIDES[0]);
+  Promise.race([SLIDES[0].img.decode(), sleep(900)]).catch(() => {}).then(() => {
+    if (pick !== heroPicks) return;   // a newer pick has taken over
+    if (heroCur === was) heroShow(0);   // unless the visitor has already chosen one with a dot
+    setTimeout(() => was.box.remove(), 1500);   // once it has faded
+    heroPlay();
+  });
+}
 
 /* a picture is fetched only when its slide is next: the page copy, or the full-size one when it shows wider than
    that (sizes, from heroSizes) on the screen's pixels */
@@ -2303,9 +2332,10 @@ else addEventListener('resize', heroRefit);
 
 function heroShow(i) {
   const s = SLIDES[i];
-  if (!s || i === heroAt) return;
-  const first = heroAt < 0;
-  if (!first) SLIDES[heroAt].box.classList.remove('on');
+  if (!s || s === heroCur) return;
+  const first = !heroCur;
+  if (heroCur) heroCur.box.classList.remove('on');
+  heroCur = s;
   heroAt = i;
   heroLoad(s);
   heroLoad(SLIDES[(i + 1) % SLIDES.length]);   // the next one, in the background
@@ -2349,11 +2379,7 @@ addEventListener('keydown', (e) => {
 function heroText() {
   SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: s.w.t })));
 }
-heroText();
-if (SLIDES.length) {
-  SLIDES[0].img.fetchPriority = 'high';
-  heroShow(0);
-}
+heroPick();
 
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
@@ -2417,6 +2443,7 @@ function apply({ h, next, idx, cat }) {
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
+  if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
   heroPlay();   // the carousel moves on only while the home page is shown
   watch(els);
   parallax();
@@ -2674,11 +2701,13 @@ function swapLang(l) {
 }
 
 /* ==================== js/sound.js ==================== */
-/* Sound: background music, switched on and off by the button beside the languages, and a soft click on every button
-   and link. The music starts off (a browser only lets a page make sound once the visitor has touched it); the click
-   plays whether the music is on or off. Volumes are set here: the music file is loud, so it plays well under it. */
+/* Sound: background music, switched on and off by the button beside the languages; a soft click on every button and
+   link; and, as the mouse comes over a button or text link, the same click lower and softer. The music starts off (a
+   browser only lets a page make sound once the visitor has touched it); the click and the hover sound play whether the
+   music is on or off. Volumes are set here: the music file is loud, so it plays well under it. */
 const BGM_SRC = 'audio/bgm.mp3', CLICK_SRC = 'audio/click.mp3';
-const BGM_VOL = 0.35, CLICK_VOL = 0.5;
+const BGM_VOL = 0.35, CLICK_VOL = 0.7;
+const HOVER_VOL = 0.3, HOVER_RATE = 0.72;   // the hover sound: the click played slower, so lower, and softer
 const sndBtns = document.querySelectorAll('.snd');
 let actx = null, clickBuf = null, bgm = null, bgmGain = null, bgmOn = false, bgmHeld = false, bgmRest = 0;
 
@@ -2712,12 +2741,13 @@ function sndTrim(buf) {
   return { buf, at: Math.max(0, a / buf.sampleRate - 0.004), len: (b - a) / buf.sampleRate + 0.03 };
 }
 
-function sndClick() {
-  const c = sndWake();
+/* the click sound at a volume and a speed (below 1: slower and lower) */
+function sndPlay(c, vol, rate) {
   if (!c || !clickBuf) return;
   const s = c.createBufferSource(), g = c.createGain();
-  g.gain.value = CLICK_VOL;
+  g.gain.value = vol;
   s.buffer = clickBuf.buf;
+  s.playbackRate.value = rate;
   s.connect(g).connect(c.destination);
   s.start(0, clickBuf.at, clickBuf.len);
 }
@@ -2759,11 +2789,27 @@ function sndText() {
 sndText();
 
 sndBtns.forEach((b) => b.addEventListener('click', () => bgmSet(!bgmOn)));
+const SND_ON = 'a[href], button, [role="button"]';   // what sounds when clicked, or (not a picture) hovered
+
+/* the mouse coming over a button or a text link: once per element, not for links made of a picture (the covers on
+   the wall), at most every 60 ms. It sounds only after the visitor's first click or key press: before that the
+   browser keeps the page silent, and the page does not ask. */
+let hoverOn = null, hoverAt = 0;
+document.addEventListener('pointerover', (e) => {
+  if (e.pointerType !== 'mouse' || !(e.target instanceof Element)) return;
+  const b = e.target.closest(SND_ON);
+  if (!b || b === hoverOn) return;
+  hoverOn = b;
+  if (b.querySelector('img, .b3') || !actx || actx.state !== 'running' || performance.now() - hoverAt < 60) return;
+  hoverAt = performance.now();
+  sndPlay(actx, HOVER_VOL, HOVER_RATE);
+});
+document.addEventListener('pointerout', (e) => { if (hoverOn && !hoverOn.contains(e.relatedTarget)) hoverOn = null; });
 addEventListener('pointerdown', sndWake, { capture: true, passive: true });
 addEventListener('keydown', sndWake, true);
 document.addEventListener('click', (e) => {
   if (!(e.target instanceof Element)) return;
-  if (e.target.closest('a[href], button, [role="button"]')) sndClick();
+  if (e.target.closest(SND_ON)) sndPlay(sndWake(), CLICK_VOL, 1);
   if (window.SELF_HOSTED && e.target.closest('.tl-card')) { bgmHeld = true; if (bgmOn) bgmPlay(false); }   // the video has its own sound
 }, true);
 addEventListener('hashchange', () => { if (bgmHeld) { bgmHeld = false; if (bgmOn) bgmPlay(!document.hidden); } });
