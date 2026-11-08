@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <style>
-body{margin:0}[hidden]{display:none!important}img{max-width:100%}
+body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-drag:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 /* Layout: black gallery frame with a serif wordmark (template 2 look). Home = full-bleed hero + two-column staggered cover wall; each cover opens a project page of stacked full pages with previous / next (template 1 browsing). Single dark look by choice. */
 :root{
   --bg:#0b0b0b;
@@ -2980,6 +2980,15 @@ addEventListener('hashchange', route);
 document.addEventListener('click', (e) => {
   const a = e.target.closest('a[href^="#"]');
   if (a && a.getAttribute('href') === location.hash) { e.preventDefault(); route(); }
+});
+/* the artwork can't be saved from the right-click (or long-press) menu, or dragged out of the page;
+   a picture under an overlay counts too: the titles on the wall, the NSFW labels, the play buttons, the lightbox, the 3D books */
+const ART = 'img, .frame, .nsfw-pic, .tl-card, .zv-stage, .b3';
+const onArt = (t) => t instanceof Element && !!t.closest(ART);
+document.addEventListener('contextmenu', (e) => { if (onArt(e.target)) e.preventDefault(); });
+document.addEventListener('dragstart', (e) => {
+  const t = e.target;
+  if (onArt(t) || (t instanceof Element && t.querySelector('img'))) e.preventDefault();   // a link around a picture
 });
 addEventListener('keydown', (e) => {
   if (!zv.hidden || !b3v.hidden || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
