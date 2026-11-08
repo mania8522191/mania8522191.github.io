@@ -1,0 +1,23 @@
+/* Language switcher and the phone menu */
+/* language: Japanese pages use Japanese glyph shapes; English pages show Japanese titles the same way */
+:root:lang(ja),:root:lang(en){--f-body:"Figtree","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif}
+.site-head .in{justify-content:flex-start}
+.nav{margin-left:auto}
+.lang{display:flex;align-items:center;gap:2px;margin-left:clamp(10px,1.8vw,26px);padding-left:clamp(8px,1.6vw,22px);border-left:1px solid var(--line)}
+.lang button{padding:6px 7px;border:0;background:none;color:var(--mute);font:inherit;font-size:12px;letter-spacing:.06em;cursor:pointer;transition:color .3s}
+.lang button:hover,.lang button[aria-pressed="true"]{color:var(--fg)}
+.lang button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
+.lang button:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
+.m-nav .lang{margin:clamp(14px,3vh,26px) 0 0;padding:0;border:0}
+.m-nav .lang button{font-family:var(--f-body);font-size:15px;padding:8px 12px;opacity:1;transform:none}
+
+/* mobile menu */
+.menu-btn{display:none;margin-left:auto;align-items:center;gap:10px;padding:8px 0;border:0;background:none;color:var(--fg);font:inherit;font-size:12px;letter-spacing:.2em;cursor:pointer}
+.menu-btn:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
+.menu-ic{position:relative;width:22px;height:9px}
+.menu-ic::before,.menu-ic::after{content:"";position:absolute;left:0;right:0;height:1px;background:currentColor;transition:transform .5s var(--ease-out),top .5s var(--ease-out)}
+.menu-ic::before{top:0}
+.menu-ic::after{top:8px}
+.menu-open .menu-ic::before{top:4px;transform:rotate(45deg)}
+.menu-open .menu-ic::after{top:4px;transform:rotate(-45deg)}
+.m-nav{display:none}

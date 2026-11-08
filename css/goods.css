@@ -1,0 +1,51 @@
+/* Buttons and prices (used across the site), the goods list, goods item pages */
+/* buttons */
+.btn{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 24px;border:1px solid var(--fg);text-decoration:none;font-size:14px;letter-spacing:.06em;transition:color .45s var(--ease-out),border-color .3s}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--fg);transform:scaleX(0);transform-origin:right center;transition:transform .6s var(--ease-out)}
+.btn:hover{color:var(--bg)}
+.btn:hover::before{transform:scaleX(1);transform-origin:left center}
+.btn.ghost{border-color:var(--line)}
+.btn.ghost::before{background:var(--bg-2)}
+.btn.ghost:hover{color:var(--fg);border-color:var(--fg)}
+.price{font-variant-numeric:tabular-nums;letter-spacing:.03em}
+.price s{color:var(--mute);margin-right:10px;font-size:.86em}
+.price small{color:var(--mute);font-size:.72em;margin-left:6px;letter-spacing:.08em}
+
+/* goods list (template 2 "selected work" captions) */
+.goods{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
+.g-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(44px,5vw,72px) clamp(20px,3vw,40px);margin-top:clamp(48px,6vw,88px)}
+.g-card{display:grid;align-content:start;justify-items:center;gap:6px;text-align:center;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 24px)}
+/* cards in one row share their rows, so names, descriptions and prices line up even when one name wraps */
+@supports (grid-template-rows:subgrid){.g-grid{row-gap:0;margin-bottom:calc(-1 * clamp(44px,5vw,72px))}.g-card{grid-row:span 4;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.g-card .g-name{align-self:end}.g-card .g-meta,.g-card .price{align-self:start}}
+.g-img{display:block;width:100%;aspect-ratio:3 / 2;overflow:hidden;background:var(--bg-2);margin-bottom:14px}
+.g-img img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.g-card:hover .g-img img{transform:scale(1.035)}
+.g-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
+.g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
+.g-meta{font-size:13px;color:var(--mute);line-height:1.6}
+.g-card .price{font-size:15px;margin-top:2px}
+.g-shop{max-width:860px;margin:clamp(72px,9vw,128px) auto 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px 32px;padding-block:28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.g-shop p{margin:0}
+.g-shop-k{font-size:12px;letter-spacing:.3em;color:var(--mute)}
+.g-shop-n{font-family:var(--f-display);font-size:clamp(20px,2.4vw,28px);letter-spacing:.04em;line-height:1.5}
+
+/* goods item */
+.gd{max-width:1200px;margin:0 auto;padding-block:clamp(56px,8vw,112px) clamp(64px,8vw,110px)}
+.gd-price{margin:2px 0 0;font-size:clamp(19px,2vw,24px)}
+.gd-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,60px);align-items:start}
+.gd-fig{margin:0}
+.gd-fig img{display:block;width:100%;height:auto;background:var(--bg-2)}
+.gd-spec{margin:0;border-top:1px solid var(--line)}
+.gd-spec > div{display:grid;grid-template-columns:4.6em minmax(0,1fr);gap:16px;padding-block:15px;border-bottom:1px solid var(--line)}
+.gd-spec dt{font-size:13px;letter-spacing:.12em;color:var(--mute);padding-top:2px}
+.gd-spec dd{margin:0;font-size:15px;line-height:1.75;overflow-wrap:anywhere}
+.gd-spec ol{margin:0;padding-left:1.25em;display:grid;gap:4px}
+.gd-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.gd-works{margin-top:clamp(56px,7vw,100px)}
+.gd-h{margin:0 0 20px;font-size:12px;font-weight:400;letter-spacing:.3em;color:var(--mute)}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+@media (max-width:560px){.mini{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+.mini a{display:grid;gap:10px;align-content:start;text-decoration:none;min-width:0}
+.mini img{display:block;width:100%;aspect-ratio:4 / 3;object-fit:contain;background:var(--bg-2);transition:opacity .25s}
+.mini a:hover img{opacity:.8}
+.mini span{font-family:var(--f-display);font-size:14px;letter-spacing:.03em;line-height:1.5;overflow-wrap:anywhere}
