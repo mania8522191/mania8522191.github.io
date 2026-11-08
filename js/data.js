@@ -74,8 +74,7 @@ const WORKS = [
 
 /* the home page carousel: every visit shows five of these works (HERO_N in home.js), picked and ordered at random;
    pos = the point the crop keeps in view (CSS object-position), on wide screens and phones alike;
-   turn (optional) = show the picture turned 90 (clockwise) or -90 degrees; pos is then where it shows turned;
-   keep (optional) = a part that must always show in full, as [left, top, right, bottom] in % of the picture */
+   turn (optional) = show the picture turned 90 (clockwise) or -90 degrees; pos is then where it shows turned */
 const HOME_SLIDES = [
   {"id":"139165109","pos":"80% 40%"},
   {"id":"137308455","pos":"34% 15%"},

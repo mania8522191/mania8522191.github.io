@@ -9,7 +9,7 @@ for (let i = heroPool.length - 1; i > 0; i--) {   // a new pick and order on eve
   const j = Math.floor(Math.random() * (i + 1));
   [heroPool[i], heroPool[j]] = [heroPool[j], heroPool[i]];
 }
-const SLIDES = heroPool.slice(0, HERO_N).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, keep: s.keep, turn: s.turn }));
+const SLIDES = heroPool.slice(0, HERO_N).map((s) => ({ w: WORKS[byId[s.id]], pos: s.pos, turn: s.turn }));
 /* pos says where the crop centres on the screen; a turned picture needs it in its own, unturned terms */
 function turnPos(pos, turn) {
   const [x, y] = pos.split(' ').map(parseFloat);
@@ -23,14 +23,6 @@ SLIDES.forEach((s, i) => {
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
   s.img.style.objectPosition = s.turn ? turnPos(s.pos || '50% 50%', s.turn) : s.pos || s.w.pos || '';
-  if (s.keep && !s.turn) {   // sized and placed by heroFit, over a blurred copy that fills whatever it leaves uncovered
-    s.bg = el('img', 'hero-bg');
-    s.bg.alt = '';
-    s.bg.decoding = 'async';
-    s.bg.style.objectPosition = s.img.style.objectPosition;
-    s.box.append(s.bg);
-    s.img.classList.add('hero-fit');
-  }
   if (s.turn) {   // shown on its side: a box as tall as the screen is wide, turned around its centre
     const t = el('div', 'hero-turn');
     t.style.setProperty('--turn', `${s.turn}deg`);
@@ -47,49 +39,28 @@ SLIDES.forEach((s, i) => {
 });
 
 /* a picture is fetched only when its slide is next: the page copy, or the full-size one when it shows wider than
-   that (sizes, from heroFit) on the screen's pixels */
+   that (sizes, from heroSizes) on the screen's pixels */
 function heroLoad(s) {
   if (s.img.src) return;
   const [w, h, zw] = s.w.dims[0], page = src(s.w.id, 0);
   s.img.width = w;
   s.img.height = h;
-  s.img.sizes = '100vw';   // until heroFit knows how wide it shows
-  heroFit(s);
+  s.img.sizes = '100vw';   // until heroSizes knows how wide it shows
+  heroSizes(s);
   s.img.srcset = zw ? `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w` : `${page} ${w}w`;
   s.img.src = page;
-  if (s.bg) s.bg.src = page;
 }
 
 /* sizes: how wide the picture shows, so the browser picks a copy sharp enough for the screen's pixel density.
-   A slide with keep (HOME_SLIDES: left, top, right, bottom in %) is also scaled and placed here so that part of
-   the picture stays in view, above the title and the dots at the foot. On a screen too wide for that part, the
-   picture is shown a little smaller than the screen and the blurred copy behind it fills the sides. */
-function heroFit(s) {
+   Covering the screen, a picture wider than the screen's shape shows wider than the screen. */
+function heroSizes(s) {
   let W = heroSlides.clientWidth, H = heroSlides.clientHeight;
   if (!s || !W || !H) return;
   const d = s.w.dims[0], w = d[2] || d[0], h = d[3] || d[1];   // its shape (both copies have the same)
   if (s.turn) [W, H] = [H, W];   // a turned picture covers the screen on its side
-  if (!s.keep || s.turn) { s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`; return; }   // cover: wider than the screen when the picture is wider
-  const [x1, y1, x2, y2] = s.keep.map((v) => v / 100);
-  const room = Math.min(H, heroCap.offsetTop - 12);   // where the kept part has to end: above the title
-  const k = Math.min(Math.max(W / w, H / h), W / ((x2 - x1) * w), room / ((y2 - y1) * h));   // cover, unless the part would not fit
-  const dw = w * k, dh = h * k;
-  const [px, py] = (s.pos || '50% 50%').split(' ').map((v) => parseFloat(v) / 100);
-  /* one axis: keep [a, b] of the picture between 0 and end; if the picture is as long as the screen, leave no gap */
-  const along = (size, len, a, b, end, want) => {
-    let lo = -a * len, hi = end - b * len;
-    if (len < size) return Math.min(hi, Math.max(lo, (end - len) / 2));
-    if (Math.max(lo, size - len) <= Math.min(hi, 0)) { lo = Math.max(lo, size - len); hi = Math.min(hi, 0); }
-    return Math.min(hi, Math.max(lo, (size - len) * want));
-  };
-  const st = s.img.style;
-  s.img.sizes = `${Math.ceil(dw)}px`;
-  st.width = `${dw.toFixed(1)}px`;
-  st.height = `${dh.toFixed(1)}px`;
-  st.left = `${along(W, dw, x1, x2, W, px).toFixed(1)}px`;
-  st.top = `${along(H, dh, y1, y2, room, py).toFixed(1)}px`;
+  s.img.sizes = `${Math.ceil(Math.max(W, H * w / h))}px`;
 }
-const heroRefit = () => SLIDES.forEach((s) => { if (s.img.src) heroFit(s); });
+const heroRefit = () => SLIDES.forEach((s) => { if (s.img.src) heroSizes(s); });
 if ('ResizeObserver' in window) new ResizeObserver(heroRefit).observe(heroSlides);   // also when the home page is shown again
 else addEventListener('resize', heroRefit);
 
