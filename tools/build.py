@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # for check_cod
 # the order matters: later CSS rules win over earlier ones; scripts use what the earlier ones define
 CSS = ['base', 'home', 'artbook', 'works', 'goods', 'nav', 'game', 'lightbox', 'about', 'motion', 'responsive']
 JS = ['data', 'core', 'i18n', 'game', 'lightbox', 'menu', 'goods', 'wall', 'work', 'artbook', 'book3d', 'motion',
-      'home', 'router', 'about', 'lang-switch', 'main']
+      'home', 'router', 'about', 'lang-switch', 'sound', 'main']
 REF = re.compile(r'((?:href|src)=")(site\.(?:css|js))(?:\?v=\w*)?(")')
 
 
@@ -66,12 +66,12 @@ def build(check=False):
 
 
 def report():
-    """List the leftovers: code nothing uses (check_code.py) and pictures (check_images.py). Returns how many."""
+    """List the leftovers: code nothing uses (check_code.py), pictures and sounds (check_images.py). Returns how many."""
     import check_code
     import check_images
     found = check_code.findings() + check_images.findings()
     if not found:
-        print('no leftovers: every function, style, text, data field and picture is in use')
+        print('no leftovers: every function, style, text, data field, picture and sound is in use')
         return 0
     print(f'leftovers ({len(found)}): clean them up before going live (if one is in fact used, improve tools/check_code.py)')
     for f in found:

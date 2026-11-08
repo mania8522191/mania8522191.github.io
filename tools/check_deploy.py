@@ -47,8 +47,8 @@ def main(argv):
     for _ in range(6):   # the CDN can lag a little behind the deploy
         bad = []
         for f in files:
-            local = hashlib.sha256(open(os.path.join(C.ROOT, f), 'rb').read().replace(b'\r\n', b'\n') if not f.startswith('img/')
-                                   else open(os.path.join(C.ROOT, f), 'rb').read()).hexdigest()
+            local = hashlib.sha256(open(os.path.join(C.ROOT, f), 'rb').read().replace(b'\r\n', b'\n') if not f.startswith(('img/', 'audio/'))
+                                   else open(os.path.join(C.ROOT, f), 'rb').read()).hexdigest()   # pictures and sounds as they are
             live = hashlib.sha256(get(f'{SITE}{f}?nocache={int(time.time())}')).hexdigest()
             if live != local:
                 bad.append(f)

@@ -8,7 +8,26 @@
 .lang button:hover,.lang button[aria-pressed="true"]{color:var(--fg)}
 .lang button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
 .lang button:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
-.m-nav .lang{margin:clamp(14px,3vh,26px) 0 0;padding:0;border:0}
+/* background music on / off, beside the languages (js/sound.js): four bars that dance while it plays;
+   while it is off they are low, grey and struck through */
+.snd{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;margin-left:clamp(2px,.6vw,8px);padding:0;border:0;background:none;color:var(--mute);cursor:pointer;transition:color .3s}
+.snd:hover,.snd[aria-pressed="true"]{color:var(--fg)}
+.snd:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
+.snd::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:1px;margin:-.5px 0 0 -9px;background:currentColor;transform:rotate(-45deg);transition:opacity .3s}
+.snd[aria-pressed="true"]::after{opacity:0}
+.snd-bars{display:flex;align-items:flex-end;gap:2px;height:12px}
+.snd-bars i{display:block;width:2px;height:4px;background:currentColor;transition:height .5s var(--ease-out)}
+.snd-bars i:nth-child(2){height:7px}
+.snd-bars i:nth-child(3){height:5px}
+.snd-bars i:nth-child(4){height:6px}
+.snd[aria-pressed="true"] .snd-bars i{animation:snd-bar .9s ease-in-out infinite alternate}
+.snd[aria-pressed="true"] .snd-bars i:nth-child(1){height:6px;animation-delay:-.3s}
+.snd[aria-pressed="true"] .snd-bars i:nth-child(2){height:12px;animation-delay:-.7s}
+.snd[aria-pressed="true"] .snd-bars i:nth-child(3){height:8px;animation-delay:-.1s}
+.snd[aria-pressed="true"] .snd-bars i:nth-child(4){height:10px;animation-delay:-.5s}
+@keyframes snd-bar{from{height:3px}to{height:12px}}
+.m-tools{display:flex;align-items:center;gap:6px;margin:clamp(14px,3vh,26px) 0 0}
+.m-nav .lang{margin:0;padding:0;border:0}
 .m-nav .lang button{font-family:var(--f-body);font-size:15px;padding:8px 12px;opacity:1;transform:none}
 
 /* mobile menu */
