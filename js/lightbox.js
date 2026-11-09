@@ -131,24 +131,35 @@ function zvRectOf(e) {
   const r = (e.tagName === 'IMG' ? e : e.querySelector('img') || e).getBoundingClientRect();
   return r.width && r.height && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth ? r : null;
 }
-/* opening, the picture flies from the one that was clicked to its place in the viewer; closing, back again. With
-   nothing on screen to fly from, it grows from a little smaller instead. Returns how long it takes (ms). */
+/* opening, the picture flies from the one that was clicked to its place in the viewer; closing, back again. A copy
+   flies, fixed to the window, while the picture itself waits hidden: moved inside the viewer's scrolling area, the
+   picture would make its scrollbars come and go, and jump. With nothing on screen to fly from, the copy grows from
+   a little smaller instead. Returns how long it takes (ms). */
+const zvGhostsOut = () => { zv.querySelectorAll('.zv-ghost').forEach((g) => g.remove()); zvImg.style.visibility = ''; };
 function zvFly(out) {
+  zvGhostsOut();
   if (CALM || !zvImg.animate) return 0;
-  const c = zvImg.getBoundingClientRect(), a = zvRectOf(zvFrom), to = a && c.width;
-  const away = to
+  const c = zvImg.getBoundingClientRect(), a = zvRectOf(zvFrom);
+  if (!c.width) return 0;
+  const ghost = zvImg.cloneNode(false);
+  ghost.removeAttribute('id');
+  ghost.className = 'zv-ghost';
+  ghost.style.cssText = `left:${c.left}px;top:${c.top}px;width:${c.width}px;height:${c.height}px`;
+  zv.append(ghost);
+  zvImg.style.visibility = 'hidden';
+  const away = a
     ? { transform: `translate(${(a.left - c.left).toFixed(1)}px,${(a.top - c.top).toFixed(1)}px) scale(${(a.width / c.width).toFixed(4)},${(a.height / c.height).toFixed(4)})`, opacity: 1 }
-    : { transform: 'scale(.92)', opacity: 0 };
+    : { transform: `translate(${(c.width * 0.04).toFixed(1)}px,${(c.height * 0.04).toFixed(1)}px) scale(.92)`, opacity: 0 };
   const here = { transform: 'none', opacity: 1 }, ms = out ? 380 : 520;
-  zvImg.style.transformOrigin = to ? '0 0' : '50% 50%';
-  zvImg.animate(out ? [here, away] : [away, here], { duration: ms, easing: out ? 'cubic-bezier(.4,0,.2,1)' : 'cubic-bezier(.16,1,.3,1)', fill: out ? 'forwards' : 'backwards' });
+  const fly = ghost.animate(out ? [here, away] : [away, here], { duration: ms, easing: out ? 'cubic-bezier(.4,0,.2,1)' : 'cubic-bezier(.16,1,.3,1)', fill: 'both' });
+  if (!out) fly.finished.then(zvGhostsOut, () => {});   // landed: the picture itself takes over
   return ms;
 }
 let zvShut = 0;   // the closing timer
 function zvOpen(kind, i, from) {
   clearTimeout(zvShut);   // opened again while closing
   zv.classList.remove('zv-out');
-  zvImg.getAnimations().forEach((x) => x.cancel());
+  zvGhostsOut();
   zvKind = kind;
   zvSet = ZV_SETS[kind]();
   zvFrom = from;
@@ -166,7 +177,7 @@ function zvClose() {
   const done = () => {
     zv.hidden = true;
     zv.classList.remove('zv-out');
-    zvImg.getAnimations().forEach((x) => x.cancel());
+    zvGhostsOut();
     document.documentElement.classList.remove('zv-open');
     if (zvFrom && zvFrom.isConnected) zvFrom.focus({ preventScroll: true });
   };
