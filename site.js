@@ -264,7 +264,8 @@ const I18N = {
     "zv.max": "最大化",
     "zv.unmax": "還原大小",
     "zv.close": "關閉",
-    "zv.hint": "點圖片放大，再點一下縮回",
+    "zv.hint": "滾輪縮放 · 拖曳移動 · 點一下放大或縮回",
+    "zv.hintTouch": "點圖片放大，再點一下縮回",
     "zv.load": "載入高解析度⋯",
     "zv.workAlt": "{t}（第 {n} 張）",
     "proc.h": "製作過程",
@@ -456,7 +457,8 @@ const I18N = {
     "zv.max": "Maximize",
     "zv.unmax": "Restore size",
     "zv.close": "Close",
-    "zv.hint": "Click the picture to zoom in, click again to zoom out",
+    "zv.hint": "Scroll to zoom · Drag to move · Click to zoom in or back",
+    "zv.hintTouch": "Tap the picture to zoom in, tap again to zoom out",
     "zv.load": "Loading full resolution…",
     "zv.workAlt": "{t} (image {n})",
     "proc.h": "Process",
@@ -648,7 +650,8 @@ const I18N = {
     "zv.max": "最大化",
     "zv.unmax": "元のサイズに戻す",
     "zv.close": "閉じる",
-    "zv.hint": "画像をクリックで拡大、もう一度クリックで元に戻ります",
+    "zv.hint": "ホイールで拡大・縮小 · ドラッグで移動 · クリックで拡大／元に戻す",
+    "zv.hintTouch": "画像をタップで拡大、もう一度タップで元に戻ります",
     "zv.load": "高解像度を読み込み中…",
     "zv.workAlt": "{t}（{n}枚目）",
     "proc.h": "制作過程",
@@ -927,10 +930,11 @@ showShot(0, false);
    corner to resize it; maximize fills the screen below the header (so does a double-click on the bar); minimize tucks
    it into the dock at the bottom left, and a click there brings it back as it was. Any number stay open side by side
    while you look round that part of the site; going to another part (another link in the header) closes them all.
-   On the game page a picture opens in a pop-up over the page instead, one at a time. In both: click to zoom into the
-   high-resolution copy, drag to pan. ---------- */
+   On the game page a picture opens in a pop-up over the page instead, one at a time. In both: the wheel zooms, a
+   click goes to the high-resolution copy at its actual size and back, a drag moves the picture. ---------- */
 const zwLayer = $('#zw-layer'), zvDock = $('#zv-dock');
 const ZV_MIN_W = 240, ZV_MIN_H = 180;   // the smallest a window can be made
+const ZV_TOP = 3;   // the wheel zooms up to this many times a picture's actual size
 const ZV_POP = new Set(['shots', 'chars', 'cards']);   // the game page's pictures: the pop-up
 const ZV_SETS = {   // what a window steps through; made again in another language
   proc: (id) => {   // a work's process animations; the full-size one, where there is one, on zoom
@@ -978,19 +982,19 @@ const zvFull = (w) => zvBox(w, 0, 0, zwLayer.clientWidth, zwLayer.clientHeight);
 const zvInWin = (e) => e.target instanceof Element && !!e.target.closest('.zw');   // a key or click in a window
 
 /* ---- a picture's size in its window ---- */
-function zvFit(w, it, live) {
-  /* from the window's size, not from the picture's area as it is now: that can be short of a scrollbar along the
-     bottom for a moment, brought by a picture still at its old size. While the window glides (live), as it is now. */
+function zvRoom(w, it, live) {   // the width and height a picture has in its window; while the window glides (live), as it is now
   const bd = w.pop ? 0 : 2, W = live ? w.el.clientWidth : w.box.w - bd, H = live ? w.el.clientHeight : w.box.h - bd;   // inside the border
   const side = w.set.length > 1 && W > 430 ? 112 : 24;   // the picture's side margins, with room for the arrows (css/lightbox.css)
-  const sw = W - (w.stage.offsetWidth - w.stage.clientWidth) - side, sh = H - w.bar.offsetHeight - 32 - (it.tags ? 40 : 0);
-  const r = it.h / it.w;
-  if (r > 2.9) return Math.max(40, Math.min(sw, it.zw, 1000));   // long process strips: fit the width, scroll down
+  return [W - side, H - w.bar.offsetHeight - 32 - (it.tags ? 40 : 0)];
+}
+function zvFit(w, it, live) {
+  const [sw, sh] = zvRoom(w, it, live), r = it.h / it.w;
+  if (r > 2.9) return Math.max(40, Math.min(sw, it.zw, 1000));   // long process strips: fit the width
   return Math.max(40, Math.min(sw, sh / r, it.zw));
 }
 function zvSize(w, live) {
   const it = w.set[w.at], fit = zvFit(w, it, live);
-  const px = w.zoomed ? it.zw : fit;   // zoomed: the picture at its actual size, 100%
+  const px = w.zoomed ? w.pw : fit;   // zoomed: the width it was zoomed to
   w.img.style.width = `${Math.round(px)}px`;
   w.img.style.height = `${Math.round(px * it.h / it.w)}px`;
   w.tags.style.width = `${Math.round(px)}px`;
@@ -1005,7 +1009,7 @@ function zvSize(w, live) {
 }
 function zvHiRes(w) {
   const it = w.set[w.at];
-  if (!it.zsrc || w.img.getAttribute('src') === it.zsrc) return;
+  if (!it.zsrc || w.img.getAttribute('src') === it.zsrc || !w.load.hidden) return;   // none, there already, or on its way
   const t = ++w.token, pre = new Image();
   pre.src = it.zsrc;
   w.load.hidden = false;
@@ -1014,21 +1018,22 @@ function zvHiRes(w) {
     .catch(() => {})
     .finally(() => { if (t === w.token) w.load.hidden = true; });
 }
-function zvZoom(w, on, cx, cy) {
-  if (on === w.zoomed || w.stage.classList.contains('nozoom')) return;
+/* show the picture at a width (px), or fitting its window (null) */
+function zvScale(w, px, cx, cy) {
   const { img, stage } = w;
   const a = img.getBoundingClientRect(), s = stage.getBoundingClientRect();
-  const px = cx ?? s.left + s.width / 2, py = cy ?? s.top + s.height / 2;   // this point stays put
-  const fx = Math.min(1, Math.max(0, (px - a.left) / a.width)), fy = Math.min(1, Math.max(0, (py - a.top) / a.height));
-  w.zoomed = on;
-  w.el.classList.toggle('zoomed', on);
-  w.zoomBtn.setAttribute('aria-pressed', String(on));
+  const ax = cx ?? s.left + s.width / 2, ay = cy ?? s.top + s.height / 2;   // this point stays put
+  const fx = Math.min(1, Math.max(0, (ax - a.left) / a.width)), fy = Math.min(1, Math.max(0, (ay - a.top) / a.height));
+  w.zoomed = px !== null;
+  w.pw = px;
+  w.el.classList.toggle('zoomed', w.zoomed);
+  w.zoomBtn.setAttribute('aria-pressed', String(w.zoomed));
   img.style.transition = 'none';
   img.style.transform = '';
   zvSize(w);
   const b = img.getBoundingClientRect();
-  stage.scrollLeft += b.left + fx * b.width - px;
-  stage.scrollTop += b.top + fy * b.height - py;
+  stage.scrollLeft += b.left + fx * b.width - ax;
+  stage.scrollTop += b.top + fy * b.height - ay;
   if (!CALM) {   // tween from the old box to the new one
     const c = img.getBoundingClientRect();
     img.style.transformOrigin = '0 0';
@@ -1037,7 +1042,21 @@ function zvZoom(w, on, cx, cy) {
     img.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)';
     img.style.transform = 'none';
   }
-  if (on) zvHiRes(w);
+  if (w.zoomed && px * (devicePixelRatio || 1) > w.set[w.at].w) zvHiRes(w);   // bigger than the page image: the full size
+}
+/* the click and the button: the actual size, or back to fitting the window */
+function zvZoom(w, on, cx, cy) {
+  if (on === w.zoomed || w.stage.classList.contains('nozoom')) return;
+  zvScale(w, on ? w.set[w.at].zw : null, cx, cy);
+}
+/* the wheel zooms toward the pointer: from the picture fitting its window (a long strip: all of it showing) up to
+   ZV_TOP times its actual size */
+function zvWheel(w, e) {
+  e.preventDefault();
+  const it = w.set[w.at], r = it.h / it.w, fit = zvFit(w, it), low = r > 2.9 ? Math.min(fit, Math.max(40, zvRoom(w, it)[1] / r)) : fit;
+  const now = w.zoomed ? w.pw : fit, px = Math.min(it.zw * ZV_TOP, Math.max(low, now * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015))));
+  if (Math.abs(px - now) < 0.5) return;
+  zvScale(w, low === fit && px < fit + 0.5 ? null : px, e.clientX, e.clientY);
 }
 /* the words for the picture a window shows, in the language chosen */
 function zvText(w) {
@@ -1077,9 +1096,9 @@ function zvRectOf(e) {
   return r.width && r.height && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth ? r : null;
 }
 /* opening, the picture flies from the one that was clicked to its place in the window; closing, back again. A copy
-   flies, fixed to the screen, while the picture itself waits hidden: moved inside the window's scrolling area, the
-   picture would make its scrollbars come and go. A picture bigger than its window (zoomed in, a long strip), or with
-   nothing on screen to fly to, just fades with the window. Returns how long it takes (ms). */
+   flies, fixed to the screen, while the picture itself waits hidden: inside the window's scrolling area it would be
+   cut off at the edge. A picture bigger than its window (zoomed in, a long strip), or with nothing on screen to fly
+   to, just fades with the window. Returns how long it takes (ms). */
 function zvGhostOut(w) {
   if (w.ghost) { w.ghost.remove(); w.ghost = null; }
   w.img.style.visibility = '';
@@ -1356,7 +1375,7 @@ function zvFrame(kind, from, pop) {
   el.addEventListener('pointerdown', () => zvFront(w), true);   // whatever is pressed, its window comes to the front
   el.addEventListener('focusin', () => zvFront(w));
   el.addEventListener('keydown', (e) => zvKey(w, e));
-  el.addEventListener('wheel', (e) => { if (!e.ctrlKey && !(w.scrolls && w.scrolls(e))) e.preventDefault(); }, { passive: false });   // the page behind does not scroll
+  el.addEventListener('wheel', (e) => { if (!e.ctrlKey) e.preventDefault(); }, { passive: false });   // the page behind does not scroll
   w.bar.addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) zvGrab(w, e, ''); });
   w.bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) zvMax(w); });
   el.querySelectorAll('.zv-rs').forEach((h) => h.addEventListener('pointerdown', (e) => zvGrab(w, e, h.dataset.d)));
@@ -1366,6 +1385,7 @@ function zvFrame(kind, from, pop) {
   return w;
 }
 /* a picture's window (the pop-up for the game page's), with the zoom button, the picture, the arrows */
+if (matchMedia('(hover: none)').matches) $('#zv-pic-tpl').content.querySelector('.zv-hint').dataset.i18n = 'zv.hintTouch';
 function zvMake(kind, key, set, from) {
   const w = zvFrame(kind, from, ZV_POP.has(kind)), parts = $('#zv-pic-tpl').content.cloneNode(true), q = (s) => w.el.querySelector(s);
   w.el.querySelector('.zv-min').before(parts.querySelector('.zv-zoom'));
@@ -1377,11 +1397,11 @@ function zvMake(kind, key, set, from) {
   q('.zv-prev').hidden = q('.zv-next').hidden = set.length < 2;
   Object.assign(w, {
     stage: q('.zv-stage'), img: q('.zv-img'), tags: q('.zv-tags'), zoomBtn: q('.zv-zoom'), zoomT: q('.zv-zoom .zv-t'), load: q('.zv-load'),
-    key, set, at: 0, at0: 0, zoomed: false, token: 0, ghost: null, pan: null,
+    key, set, at: 0, at0: 0, zoomed: false, pw: null, token: 0, ghost: null, pan: null,
     fit: (live) => { if (w.img.getAttribute('src')) zvSize(w, live); },
     want: (maxW, maxH, side) => {
       const it = w.set[w.at], r = it.h / it.w;
-      const fw = w.stage.offsetWidth - w.stage.clientWidth + 2 + (w.set.length > 1 ? 112 : 24), fh = w.bar.offsetHeight + 2 + 32 + (it.tags ? 40 : 0);   // scrollbar room, border, margins
+      const fw = 2 + (w.set.length > 1 ? 112 : 24), fh = w.bar.offsetHeight + 2 + 32 + (it.tags ? 40 : 0);   // border, margins
       const pw = Math.min(maxW - fw, it.zw, r > 2.9 ? 1000 : (maxH - fh) / r);
       return [Math.min(maxW, Math.max(side ? 0 : 480, pw + fw)), r > 2.9 ? maxH : Math.min(maxH, Math.max(320, pw * r + fh))];
     },
@@ -1392,10 +1412,6 @@ function zvMake(kind, key, set, from) {
       else return false;
       return true;
     },
-    scrolls: (e) => {   // a picture bigger than its window scrolls
-      const s = w.stage;
-      return s.contains(e.target) && (s.scrollHeight > s.clientHeight + 1 || s.scrollWidth > s.clientWidth + 1);
-    },
     leave: (out) => zvFly(w, out),
     land: () => zvGhostOut(w),
     end: () => { ++w.token; zvGhostOut(w); },
@@ -1405,10 +1421,12 @@ function zvMake(kind, key, set, from) {
   w.zoomBtn.addEventListener('click', () => zvZoom(w, !w.zoomed));
   q('.zv-prev').addEventListener('click', () => zvShow(w, w.at - 1));
   q('.zv-next').addEventListener('click', () => zvShow(w, w.at + 1));
-  /* a click toggles zoom at that point (in the pop-up, a click beside the picture closes it); a mouse drag pans */
+  /* the wheel zooms; a click toggles zoom at that point (in the pop-up, a click beside the picture closes it); a mouse
+     drag moves a picture bigger than its window */
   const st = w.stage;
+  st.addEventListener('wheel', (e) => zvWheel(w, e), { passive: false });
   st.addEventListener('pointerdown', (e) => {
-    if (!w.zoomed || e.pointerType !== 'mouse' || e.button !== 0) return;
+    if (e.pointerType !== 'mouse' || e.button !== 0 || (st.scrollWidth <= st.clientWidth + 1 && st.scrollHeight <= st.clientHeight + 1)) return;
     w.pan = { x: e.clientX, y: e.clientY, l: st.scrollLeft, t: st.scrollTop, moved: false };
     st.setPointerCapture(e.pointerId);
   });

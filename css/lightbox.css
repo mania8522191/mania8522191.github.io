@@ -63,8 +63,8 @@
 .zv-prev{left:12px}
 .zv-next{right:12px}
 
-/* the picture: fit to the window, click to zoom into the high-resolution copy, drag to pan */
-.zv-stage{position:relative;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable both-edges;cursor:zoom-in;scrollbar-color:var(--line) transparent}   /* a scrollbar coming does not move the picture */
+/* the picture: fit to the window; the wheel zooms, a click goes to the actual size and back, a drag moves it */
+.zv-stage{position:relative;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;cursor:zoom-in}   /* no scrollbars: one coming and going would shift the picture as it zooms */
 .zw.zoomed .zv-stage{cursor:grab}
 .zv-stage.drag{cursor:grabbing}
 .zv-stage.nozoom{cursor:default}   /* already shown at its actual size */
