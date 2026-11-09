@@ -50,6 +50,8 @@
 /* page-to-page morph (View Transitions API) */
 @media (prefers-reduced-motion:no-preference){
   .site-head{view-transition-name:site-head}
+  .zw-layer{view-transition-name:zw-layer}   /* the picture windows and the dock stay put while the page changes */
+  .zv-dock{view-transition-name:zv-dock}
   ::view-transition-old(root){animation:vt-out .4s var(--ease-io) both}
   ::view-transition-new(root){animation:vt-in .75s var(--ease-out) .08s both}
   ::view-transition-group(shared){animation-duration:.85s;animation-timing-function:var(--ease-out)}

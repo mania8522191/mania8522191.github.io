@@ -1,10 +1,15 @@
 /* Switching language: everything on screen is redrawn in place, with a short tween */
 /* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
 const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : { n: WORKS.length });
+/* the texts marked in the page, or in a part of it made later (a picture window: js/lightbox.js) */
+function textsIn(root) {
+  root.querySelectorAll('[data-i18n]').forEach((e) => { e.textContent = tr(e.dataset.i18n, subVars(e)); });
+  root.querySelectorAll('[data-i18n-aria]').forEach((e) => e.setAttribute('aria-label', tr(e.dataset.i18nAria)));
+  root.querySelectorAll('[data-i18n-alt]').forEach((e) => { e.alt = tr(e.dataset.i18nAlt); });
+  root.querySelectorAll('[data-i18n-title]').forEach((e) => { e.title = tr(e.dataset.i18nTitle); });
+}
 function applyStatic() {
-  document.querySelectorAll('[data-i18n]').forEach((e) => { e.textContent = tr(e.dataset.i18n, subVars(e)); });
-  document.querySelectorAll('[data-i18n-aria]').forEach((e) => e.setAttribute('aria-label', tr(e.dataset.i18nAria)));
-  document.querySelectorAll('[data-i18n-alt]').forEach((e) => { e.alt = tr(e.dataset.i18nAlt); });
+  textsIn(document);
   document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
   catText();
   sortText();
@@ -94,9 +99,9 @@ function swapLang(l) {
   if (/[?&]lang=/.test(location.search)) {
     try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
-  zvClose();
   b3vClose();
   applyStatic();
+  zvLang();
   heroText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));

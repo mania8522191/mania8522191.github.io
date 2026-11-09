@@ -2,7 +2,7 @@
 /* ---------- phone menu ---------- */
 const menuBtn = $('#menu-btn');
 function setMenu(open) {
-  if (open) { zvClose(); b3vClose(); }   // an open viewer would cover the menu's links
+  if (open) b3vClose();   // the 3D viewer would cover the menu's links; picture windows wait hidden behind it (css/lightbox.css)
   document.documentElement.classList.toggle('menu-open', open);
   menuBtn.setAttribute('aria-expanded', String(open));
   menuBtn.querySelector('.menu-lbl').textContent = open ? 'CLOSE' : 'MENU';

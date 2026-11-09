@@ -88,7 +88,6 @@
 .bk-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}
 .bk-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 /* the 3D viewer: drag to turn the book, wheel or pinch to zoom */
-.zv.b3v::before{background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
 .b3v .zv-hint{animation:none}   /* its hint stays */
 .b3v-stage{position:relative;overflow:hidden;container-type:size;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .b3v-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(36% 44% at 50% 50%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);pointer-events:none}
