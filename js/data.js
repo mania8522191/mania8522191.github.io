@@ -115,16 +115,16 @@ const GOODS = [
 
 /* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
 const BOOKS = [
-  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},
-  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},
-  {"slug":"ff45","mat":"ivory","tk":0.027,"rtl":true,"ev":"FF45","t":"mania8522191 Original R18 Manga Project ROUGH BOOK 01","size":"a4sq","pp":40,"print":"mono","ym":"2025.08","pages":[[1400,700,2560,1280],[1400,700],[1400,700]],"blur":[1,2]},
-  {"slug":"ff44","mat":"ivory","tk":0.027,"ev":"FF44","t":"MIRA93 vol.5","size":"a4sq","pp":36,"print":"color","ym":"2025.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff43","mat":"ivory","foil":"blue","ev":"FF43","t":"MIRA93 vol.3.5","size":"a4sq","pp":20,"print":"color","ym":"2024.08","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff42","mat":"ivory","ev":"FF42","t":"MIRA93 vol.3","size":"a4sq","pp":20,"print":"color","ym":"2024.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff41","mat":"ivory","ev":"FF41","t":"MIRA93 vol.2","size":"a4sq","pp":20,"print":"color","ym":"2023.08","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff40","mat":"ivory","ev":"FF40","t":"MIRA93 vol.1","size":"a4sq","pp":20,"print":"color","ym":"2023.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff38","mat":"matte","ev":"FF38","t":"Fimmel: Comet2","size":"b5","pp":28,"print":"color","ym":"2022.02","pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]},
-  {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]}
+  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","pages":[[1400,493,5787,2039],[1400,493,5787,2039],[1400,493,5787,2039]]},
+  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","pages":[[1400,493,5788,2039],[1400,493,5788,2039],[1400,493,5788,2039]]},
+  {"slug":"ff45","mat":"ivory","tk":0.027,"rtl":true,"ev":"FF45","t":"mania8522191 Original R18 Manga Project ROUGH BOOK 01","size":"a4sq","pp":40,"print":"mono","ym":"2025.08","pages":[[1400,700,5787,2894],[1400,700],[1400,700]],"blur":[1,2]},
+  {"slug":"ff44","mat":"ivory","tk":0.027,"ev":"FF44","t":"MIRA93 vol.5","size":"a4sq","pp":36,"print":"color","ym":"2025.02","pages":[[1400,700,5787,2894],[1400,700,5787,2893],[1400,700,5787,2893]]},
+  {"slug":"ff43","mat":"ivory","foil":"blue","ev":"FF43","t":"MIRA93 vol.3.5","size":"a4sq","pp":20,"print":"color","ym":"2024.08","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff42","mat":"ivory","ev":"FF42","t":"MIRA93 vol.3","size":"a4sq","pp":20,"print":"color","ym":"2024.02","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff41","mat":"ivory","ev":"FF41","t":"MIRA93 vol.2","size":"a4sq","pp":20,"print":"color","ym":"2023.08","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff40","mat":"ivory","ev":"FF40","t":"MIRA93 vol.1","size":"a4sq","pp":20,"print":"color","ym":"2023.02","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff38","mat":"matte","ev":"FF38","t":"Fimmel: Comet2","size":"b5","pp":28,"print":"color","ym":"2022.02","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]},
+  {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]}
 ];
 
 const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';

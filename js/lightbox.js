@@ -27,12 +27,12 @@ const ZV_SETS = {
     : { src: `img/char${n}.webp`, w: 500, h: 1364, zw: 500, no: `No.${no2(n)}`, cap: `char${n}`, alt: tr('chars.full', { n }) })),
   book: () => {
     const b = BOOKS[byBook[lastBook]], blur = b.blur || [];
-    const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => n > 0 && !blur.includes(n));   // the cover has its own 3D viewer
+    const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => !blur.includes(n));   // the cover spread, then the inside pages
     return pages.map(([[W, H, ZW], n], k) => ({
       src: `img/ab/${b.slug}_p${n}.webp`, zsrc: ZW ? `img/ab/x/${b.slug}_p${n}.webp` : null, eager: true,   // x: the full-size spread
       w: W, h: H, zw: ZW || W,
       no: `${k + 1} / ${pages.length}`, cap: bkName(b),
-      alt: tr('bk.pageAlt', { t: bkName(b), n }),
+      alt: tr(n ? 'bk.pageAlt' : 'bk.coverAlt', { t: bkName(b), n }),
     }));
   },
   cards: () => DECK.map((f, i) => {
@@ -51,10 +51,16 @@ function zvFit(it) {
 function zvSize() {
   const it = zvSet[zvAt];
   const fit = zvFit(it);
-  const w = zoomed ? Math.max(it.zw, fit * 1.6) : fit;
+  const w = zoomed ? it.zw : fit;   // zoomed: the picture at its actual size, 100%
   zvImg.style.width = `${Math.round(w)}px`;
   zvImg.style.height = `${Math.round(w * it.h / it.w)}px`;
   zvTags.style.width = `${Math.round(w)}px`;
+  /* the zoom button says what it does: show the actual size, or fit the window (at that share of the actual size).
+     A picture that already fits at its actual size has nothing to zoom. */
+  const can = zoomed || it.zw > fit + 1;
+  zvZoomBtn.hidden = !can;
+  zvStage.classList.toggle('nozoom', !can);
+  zvZoomBtn.textContent = zoomed ? tr('zv.unzoom', { p: Math.round((fit / it.zw) * 100) }) : tr('zv.zoom');
 }
 function zvHiRes() {
   const it = zvSet[zvAt];
@@ -69,13 +75,12 @@ function zvHiRes() {
     .finally(() => { if (t === zvToken) $('#zv-load').hidden = true; });
 }
 function zvZoom(on, cx, cy) {
-  if (on === zoomed) return;
+  if (on === zoomed || zvStage.classList.contains('nozoom')) return;
   const a = zvImg.getBoundingClientRect(), s = zvStage.getBoundingClientRect();
   const px = cx ?? s.left + s.width / 2, py = cy ?? s.top + s.height / 2;   // this point stays put
   const fx = Math.min(1, Math.max(0, (px - a.left) / a.width)), fy = Math.min(1, Math.max(0, (py - a.top) / a.height));
   zoomed = on;
   zv.classList.toggle('zoomed', on);
-  zvZoomBtn.textContent = on ? tr('zv.unzoom') : tr('zv.zoom');
   zvZoomBtn.setAttribute('aria-pressed', String(on));
   zvImg.style.transition = 'none';
   zvImg.style.transform = '';
@@ -93,14 +98,13 @@ function zvZoom(on, cx, cy) {
   }
   if (on) zvHiRes();
 }
-function zvShow(i) {
+function zvShow(i, opening) {
   zvAt = (i + zvSet.length) % zvSet.length;
   const it = zvSet[zvAt];
   ++zvToken;
   $('#zv-load').hidden = true;
   zoomed = false;
   zv.classList.remove('zoomed');
-  zvZoomBtn.textContent = tr('zv.zoom');
   zvZoomBtn.setAttribute('aria-pressed', 'false');
   zvImg.style.transition = 'none';
   zvImg.style.transform = '';
@@ -116,11 +120,35 @@ function zvShow(i) {
   zvSize();
   if (it.eager && zvFit(it) * (devicePixelRatio || 1) > it.w) zvHiRes();   // shown bigger than the page image: get the full size now, not only on zoom
   zvStage.scrollTo(0, 0);
-  zvImg.classList.remove('swap'); void zvImg.offsetWidth; zvImg.classList.add('swap');
+  zvImg.classList.remove('swap');
+  if (!opening) { void zvImg.offsetWidth; zvImg.classList.add('swap'); }   // the next one swaps in; the first one flies in (zvFly)
   $('#zv-prev').hidden = $('#zv-next').hidden = zvSet.length < 2;
   if (zvKind === 'shots') showShot(zvAt, false);
 }
+/* the picture that was clicked, where it is on the screen (null if it is not showing) */
+function zvRectOf(e) {
+  if (!e || !e.isConnected || e.closest('[hidden]')) return null;
+  const r = (e.tagName === 'IMG' ? e : e.querySelector('img') || e).getBoundingClientRect();
+  return r.width && r.height && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth ? r : null;
+}
+/* opening, the picture flies from the one that was clicked to its place in the viewer; closing, back again. With
+   nothing on screen to fly from, it grows from a little smaller instead. Returns how long it takes (ms). */
+function zvFly(out) {
+  if (CALM || !zvImg.animate) return 0;
+  const c = zvImg.getBoundingClientRect(), a = zvRectOf(zvFrom), to = a && c.width;
+  const away = to
+    ? { transform: `translate(${(a.left - c.left).toFixed(1)}px,${(a.top - c.top).toFixed(1)}px) scale(${(a.width / c.width).toFixed(4)},${(a.height / c.height).toFixed(4)})`, opacity: 1 }
+    : { transform: 'scale(.92)', opacity: 0 };
+  const here = { transform: 'none', opacity: 1 }, ms = out ? 380 : 520;
+  zvImg.style.transformOrigin = to ? '0 0' : '50% 50%';
+  zvImg.animate(out ? [here, away] : [away, here], { duration: ms, easing: out ? 'cubic-bezier(.4,0,.2,1)' : 'cubic-bezier(.16,1,.3,1)', fill: out ? 'forwards' : 'backwards' });
+  return ms;
+}
+let zvShut = 0;   // the closing timer
 function zvOpen(kind, i, from) {
+  clearTimeout(zvShut);   // opened again while closing
+  zv.classList.remove('zv-out');
+  zvImg.getAnimations().forEach((x) => x.cancel());
   zvKind = kind;
   zvSet = ZV_SETS[kind]();
   zvFrom = from;
@@ -128,15 +156,23 @@ function zvOpen(kind, i, from) {
   document.documentElement.classList.add('zv-open');
   const hint = $('#zv-hint');
   hint.style.animation = 'none'; void hint.offsetWidth; hint.style.animation = '';
-  zvShow(i);
+  zvShow(i, true);
+  zvFly(false);
   $('#zv-close').focus({ preventScroll: true });
 }
 function zvClose() {
-  if (zv.hidden) return;
-  zv.hidden = true;
+  if (zv.hidden || zv.classList.contains('zv-out')) return;
   ++zvToken;
-  document.documentElement.classList.remove('zv-open');
-  if (zvFrom) zvFrom.focus({ preventScroll: true });
+  const done = () => {
+    zv.hidden = true;
+    zv.classList.remove('zv-out');
+    zvImg.getAnimations().forEach((x) => x.cancel());
+    document.documentElement.classList.remove('zv-open');
+    if (zvFrom && zvFrom.isConnected) zvFrom.focus({ preventScroll: true });
+  };
+  if (CALM) { done(); return; }
+  zv.classList.add('zv-out');
+  zvShut = setTimeout(done, zvFly(true) || 380);
 }
 /* a click toggles zoom at that point (outside the picture it closes); a mouse drag pans instead */
 let drag = null;

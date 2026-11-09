@@ -19,7 +19,7 @@ ZOOM_Q = 88         # full-size copy for the zoom view (never shrunk)
 PROC_Q = 82         # process animations
 PROC_FRAME_MS = 1500
 BOOK_W = 1400       # art book spreads on the book page
-BOOK_Z = 2560       # the cover spread for the 3D book on the book page; also the zoom width given in BOOKS
+BOOK_Z = 2560       # the cover spread for the 3D book on the book page
 BOOK_Q, BOOK_BLUR_Q, BOOK_Z_Q, BOOK_X_Q = 85, 80, 84, 82
 
 
@@ -71,10 +71,6 @@ def fit_long(im, n):
 def fit_width(im, w):
     """Scaled to w px wide (art book spreads)."""
     return im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
-
-
-def size_at_width(size, w):
-    return [w, round(size[1] * w / size[0])]
 
 
 def heavy_blur(im, radius):

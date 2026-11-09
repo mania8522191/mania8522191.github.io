@@ -1,9 +1,16 @@
 /* Image viewer (lightbox) */
 /* image viewer: fit to screen, click to zoom into the high-resolution copy, drag to pan */
-.zv{position:fixed;inset:0;z-index:40;display:grid;grid-template-rows:auto minmax(0,1fr);background:rgba(8,8,8,.96);animation:lb-in .35s var(--ease-out) both}
+.zv{position:fixed;inset:0;z-index:40;isolation:isolate;display:grid;grid-template-rows:auto minmax(0,1fr)}
+/* it opens like a pop-up: the page shows through the backdrop, the backdrop and the controls fade in and the picture grows
+   out of the one that was clicked; closing (.zv-out) runs it backwards (js/lightbox.js) */
+.zv::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(8,8,8,.8)}
+.zv::before,.zv-bar,.zv-prev,.zv-next{animation:lb-in .35s var(--ease-out) both}
+.zv.zv-out{pointer-events:none}
+.zv.zv-out::before,.zv-out .zv-bar,.zv-out .zv-prev,.zv-out .zv-next,.zv-out .zv-hint,.zv-out .zv-load,.zv-out .zv-tags{animation:lb-out .38s var(--ease-io) both}
 .zv[hidden]{display:none}
 @keyframes lb-in{from{opacity:0}}
-.zv-bar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+@keyframes lb-out{to{opacity:0}}
+.zv-bar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);background:rgba(8,8,8,.6)}   /* darker than the backdrop, so the header behind does not show through the controls */
 .zv-cap{flex:1;min-width:0;margin:0;font-family:var(--f-display);font-size:14px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .zv-cap span{margin-right:10px;color:var(--g-gold);font-variant-numeric:tabular-nums}
 .zv button{flex:none;height:40px;min-width:40px;padding:0 14px;border:1px solid var(--line);background:rgba(11,11,11,.75);color:var(--fg);font:inherit;font-size:12px;letter-spacing:.14em;cursor:pointer;transition:border-color .3s}
@@ -12,6 +19,7 @@
 .zv-stage{position:relative;overflow:auto;overscroll-behavior:contain;cursor:zoom-in;scrollbar-color:var(--line) transparent}
 .zv.zoomed .zv-stage{cursor:grab}
 .zv-stage.drag{cursor:grabbing}
+.zv-stage.nozoom{cursor:default}   /* already shown at its actual size */
 .zv-canvas{display:flex;align-items:center;justify-content:center;width:max-content;height:max-content;min-width:100%;min-height:100%;padding:16px 64px calc(16px + env(safe-area-inset-bottom,0px))}
 .zv-canvas{flex-direction:column;gap:14px}
 .zv-tags{display:grid;font-size:12px;letter-spacing:.14em;color:var(--fg-2);text-align:center;white-space:nowrap}

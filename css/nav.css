@@ -8,14 +8,14 @@
 .lang button:hover,.lang button[aria-pressed="true"]{color:var(--fg)}
 .lang button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
 .lang button:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
-/* background music on / off, beside the languages (js/sound.js): four bars that dance while it plays;
-   while it is off they are low, grey and struck through */
-.snd{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;margin-left:clamp(2px,.6vw,8px);padding:0;border:0;background:none;color:var(--mute);cursor:pointer;transition:color .3s}
+/* background music on / off, beside the languages (js/sound.js), after a line like the one before them: four bars that
+   dance while it plays; while it is off they are low, grey and struck through */
+.snd{display:inline-flex;align-items:center;justify-content:center;height:32px;margin-left:clamp(10px,1.8vw,26px);padding:0 6px 0 clamp(10px,1.8vw,22px);border:0;border-left:1px solid var(--line);background:none;color:var(--mute);cursor:pointer;transition:color .3s}
 .snd:hover,.snd[aria-pressed="true"]{color:var(--fg)}
 .snd:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
-.snd::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:1px;margin:-.5px 0 0 -9px;background:currentColor;transform:rotate(-45deg);transition:opacity .3s}
-.snd[aria-pressed="true"]::after{opacity:0}
-.snd-bars{display:flex;align-items:flex-end;gap:2px;height:12px}
+.snd-bars::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:1px;margin:-.5px 0 0 -9px;background:currentColor;transform:rotate(-45deg);transition:opacity .3s}
+.snd[aria-pressed="true"] .snd-bars::after{opacity:0}
+.snd-bars{position:relative;display:flex;align-items:flex-end;gap:2px;height:12px}
 .snd-bars i{display:block;width:2px;height:4px;background:currentColor;transition:height .5s var(--ease-out)}
 .snd-bars i:nth-child(2){height:7px}
 .snd-bars i:nth-child(3){height:5px}

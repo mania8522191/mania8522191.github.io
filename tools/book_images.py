@@ -11,7 +11,7 @@ usage: python tools/book_images.py <slug> <cover spread> <spread> [<spread> ...]
   --save       write the sizes into the book's "pages" (and "blur") in js/data.js (the book must already be there)
   --out DIR    write under DIR instead of the site, to try it out
 
-Prints the book's "pages": [[W, H, ZW, ZH], ...] (ZW, ZH: the 2560 px size the zoom view opens at); blurred pages [W, H].
+Prints the book's "pages": [[W, H, XW, XH], ...] (XW, XH: the full size, which the zoom view shows at 100%); blurred pages [W, H].
 """
 import os
 import sys
@@ -44,7 +44,7 @@ def main(argv):
         if n == 0:
             C.save_webp(C.fit_width(im, C.BOOK_Z), os.path.join(ab, 'z', name), C.BOOK_Z_Q)
         mb = C.save_webp(im, os.path.join(ab, 'x', name), C.BOOK_X_Q) / 1e6
-        pages.append([page.width, page.height] + C.size_at_width(im.size, C.BOOK_Z))
+        pages.append([page.width, page.height, im.width, im.height])
         print(f'{name}: page {page.width}x{page.height} {kb} KB | full {im.width}x{im.height} {mb:.1f} MB')
     print('"pages":', pages)
     if save:

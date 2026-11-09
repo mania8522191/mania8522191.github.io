@@ -146,7 +146,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ab-card:hover .ab-stage .b3,.ab-card:focus-visible .ab-stage .b3{translate:0 -8px}
 .ab-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .ab-info{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding-inline:2px}
-.ab-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,23px);letter-spacing:.04em;line-height:1.35;white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name */
+.ab-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,23px);letter-spacing:.04em;line-height:calc(clamp(17px,1.7vw,23px) * 1.35);white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name; the line keeps its height, so the lines under the names stay level */
 .ab-card:hover .ab-t{color:var(--g-gold)}
 .ab-cap{display:flex;align-items:baseline;gap:14px}
 .ab-ev{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;color:var(--fg-2)}
@@ -155,6 +155,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ab-r18{font-size:11px;letter-spacing:.08em;color:#c4655a;border:1px solid rgba(196,101,90,.55);padding:1px 6px;align-self:center}
 @media (max-width:700px){.ab-grid{grid-template-columns:minmax(0,1fr)}.ab-card:only-child{width:100%}}
 /* single art book: spreads stacked full width; blurred adult pages carry 18+ and lead to the album */
+.bk-pv{margin:0 0 clamp(16px,2.2vw,28px);text-align:center}   /* "Preview", over the spreads */
 #bk-imgs img{width:min(100%,1400px)}
 .bk-blur{position:relative;display:block;width:min(100%,1400px);text-decoration:none}
 .bk-blur img{width:100%;cursor:pointer}
@@ -219,7 +220,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .bk-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}
 .bk-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 /* the 3D viewer: drag to turn the book, wheel or pinch to zoom */
-.zv.b3v{background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
+.zv.b3v::before{background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
+.b3v .zv-hint{animation:none}   /* its hint stays */
 .b3v-stage{position:relative;overflow:hidden;container-type:size;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .b3v-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(36% 44% at 50% 50%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);pointer-events:none}
 .b3v-stage.drag{cursor:grabbing}
@@ -427,14 +429,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lang button:hover,.lang button[aria-pressed="true"]{color:var(--fg)}
 .lang button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
 .lang button:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
-/* background music on / off, beside the languages (js/sound.js): four bars that dance while it plays;
-   while it is off they are low, grey and struck through */
-.snd{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;margin-left:clamp(2px,.6vw,8px);padding:0;border:0;background:none;color:var(--mute);cursor:pointer;transition:color .3s}
+/* background music on / off, beside the languages (js/sound.js), after a line like the one before them: four bars that
+   dance while it plays; while it is off they are low, grey and struck through */
+.snd{display:inline-flex;align-items:center;justify-content:center;height:32px;margin-left:clamp(10px,1.8vw,26px);padding:0 6px 0 clamp(10px,1.8vw,22px);border:0;border-left:1px solid var(--line);background:none;color:var(--mute);cursor:pointer;transition:color .3s}
 .snd:hover,.snd[aria-pressed="true"]{color:var(--fg)}
 .snd:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
-.snd::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:1px;margin:-.5px 0 0 -9px;background:currentColor;transform:rotate(-45deg);transition:opacity .3s}
-.snd[aria-pressed="true"]::after{opacity:0}
-.snd-bars{display:flex;align-items:flex-end;gap:2px;height:12px}
+.snd-bars::after{content:"";position:absolute;left:50%;top:50%;width:18px;height:1px;margin:-.5px 0 0 -9px;background:currentColor;transform:rotate(-45deg);transition:opacity .3s}
+.snd[aria-pressed="true"] .snd-bars::after{opacity:0}
+.snd-bars{position:relative;display:flex;align-items:flex-end;gap:2px;height:12px}
 .snd-bars i{display:block;width:2px;height:4px;background:currentColor;transition:height .5s var(--ease-out)}
 .snd-bars i:nth-child(2){height:7px}
 .snd-bars i:nth-child(3){height:5px}
@@ -567,10 +569,17 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* ==================== css/lightbox.css ==================== */
 /* Image viewer (lightbox) */
 /* image viewer: fit to screen, click to zoom into the high-resolution copy, drag to pan */
-.zv{position:fixed;inset:0;z-index:40;display:grid;grid-template-rows:auto minmax(0,1fr);background:rgba(8,8,8,.96);animation:lb-in .35s var(--ease-out) both}
+.zv{position:fixed;inset:0;z-index:40;isolation:isolate;display:grid;grid-template-rows:auto minmax(0,1fr)}
+/* it opens like a pop-up: the page shows through the backdrop, the backdrop and the controls fade in and the picture grows
+   out of the one that was clicked; closing (.zv-out) runs it backwards (js/lightbox.js) */
+.zv::before{content:"";position:absolute;inset:0;z-index:-1;background:rgba(8,8,8,.8)}
+.zv::before,.zv-bar,.zv-prev,.zv-next{animation:lb-in .35s var(--ease-out) both}
+.zv.zv-out{pointer-events:none}
+.zv.zv-out::before,.zv-out .zv-bar,.zv-out .zv-prev,.zv-out .zv-next,.zv-out .zv-hint,.zv-out .zv-load,.zv-out .zv-tags{animation:lb-out .38s var(--ease-io) both}
 .zv[hidden]{display:none}
 @keyframes lb-in{from{opacity:0}}
-.zv-bar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line)}
+@keyframes lb-out{to{opacity:0}}
+.zv-bar{display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));border-bottom:1px solid var(--line);background:rgba(8,8,8,.6)}   /* darker than the backdrop, so the header behind does not show through the controls */
 .zv-cap{flex:1;min-width:0;margin:0;font-family:var(--f-display);font-size:14px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .zv-cap span{margin-right:10px;color:var(--g-gold);font-variant-numeric:tabular-nums}
 .zv button{flex:none;height:40px;min-width:40px;padding:0 14px;border:1px solid var(--line);background:rgba(11,11,11,.75);color:var(--fg);font:inherit;font-size:12px;letter-spacing:.14em;cursor:pointer;transition:border-color .3s}
@@ -579,6 +588,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .zv-stage{position:relative;overflow:auto;overscroll-behavior:contain;cursor:zoom-in;scrollbar-color:var(--line) transparent}
 .zv.zoomed .zv-stage{cursor:grab}
 .zv-stage.drag{cursor:grabbing}
+.zv-stage.nozoom{cursor:default}   /* already shown at its actual size */
 .zv-canvas{display:flex;align-items:center;justify-content:center;width:max-content;height:max-content;min-width:100%;min-height:100%;padding:16px 64px calc(16px + env(safe-area-inset-bottom,0px))}
 .zv-canvas{flex-direction:column;gap:14px}
 .zv-tags{display:grid;font-size:12px;letter-spacing:.14em;color:var(--fg-2);text-align:center;white-space:nowrap}

@@ -164,6 +164,7 @@ function b3Hero(b) {
 /* the 3D viewer: hold and drag to turn the book (it keeps spinning a little when flung), wheel or pinch to zoom,
    double-click or double-tap the book to put it back, click beside it to close */
 const b3v = $('#b3v'), b3vStage = $('#b3v-stage'), b3vFly = $('#b3v-fly'), b3vZoomEl = $('#b3v-zoom');
+let b3vShut = 0;   // the closing timer
 const b3Ptr = new Map();
 let b3vBox = null, b3vFrom = null, b3vZ = 1, b3Drag = null, b3Pinch = null, b3Spin = 0, b3Tap = 0;
 if (matchMedia('(hover: none)').matches) $('#b3v-hint').dataset.i18n = 'b3.hintTouch';
@@ -201,6 +202,9 @@ function b3vSharpen() {
   b3vZoomEl.classList.remove('settle');
 }
 function b3vOpen(b, from) {
+  clearTimeout(b3vShut);   // opened again while closing
+  b3v.classList.remove('zv-out');
+  b3vFly.getAnimations().forEach((x) => x.cancel());
   const a = from.getBoundingClientRect();
   b3vFrom = from;
   b3vBox = b3Make(b, true);
@@ -212,8 +216,6 @@ function b3vOpen(b, from) {
   $('#b3v-cap').replaceChildren(el('span', '', 'COVER'), document.createTextNode(bkName(b)));
   b3v.hidden = false;
   document.documentElement.classList.add('zv-open');
-  const hint = $('#b3v-hint');
-  hint.style.animation = 'none'; void hint.offsetWidth; hint.style.animation = '';
   b3Pose(b3vBox, from._pose.rx, from._pose.ry);
   if (!CALM && b3vFly.animate) {   // the book rises from where it sat on the page
     const c = b3vBox.getBoundingClientRect();
@@ -225,17 +227,36 @@ function b3vOpen(b, from) {
   b3Tween(b3vBox, b3At(b3vBox, B3_VIEW), 1000);
   $('#b3v-close').focus({ preventScroll: true });
 }
+/* closing, the book flies back to its place on the page, turning back to how it sits there, as the viewer fades */
 function b3vClose() {
-  if (b3v.hidden) return;
-  b3v.hidden = true;
+  if (b3v.hidden || b3v.classList.contains('zv-out')) return;
   cancelAnimationFrame(b3Spin);
   if (b3vBox) cancelAnimationFrame(b3vBox._tw);
   b3Ptr.clear();
   b3Drag = b3Pinch = b3Pan = null;
   b3vStage.classList.remove('drag', 'pinch', 'pan');
-  document.documentElement.classList.remove('zv-open');
-  const s = b3vFrom && b3vFrom.closest('button');
-  if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
+  const done = () => {
+    b3v.hidden = true;
+    b3v.classList.remove('zv-out');
+    if (b3vBox) cancelAnimationFrame(b3vBox._tw);
+    b3vFly.getAnimations().forEach((x) => x.cancel());
+    document.documentElement.classList.remove('zv-open');
+    const s = b3vFrom && b3vFrom.closest('button');
+    if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
+  };
+  if (CALM) { done(); return; }
+  b3v.classList.add('zv-out');
+  const a = b3vFrom && b3vFrom.isConnected && !b3vFrom.closest('[hidden]') ? b3vFrom.getBoundingClientRect() : null;
+  if (a && a.width && b3vBox && b3vFly.animate) {
+    /* the fly layer scales about its centre, so aim the book's centre, wherever the visitor moved it, at its place */
+    const c = b3vBox.getBoundingClientRect(), f = b3vFly.getBoundingClientRect(), k = a.width / c.width;
+    const fx = f.left + f.width / 2, fy = f.top + f.height / 2;
+    const tx = a.left + a.width / 2 - fx - k * (c.left + c.width / 2 - fx), ty = a.top + a.height / 2 - fy - k * (c.top + c.height / 2 - fy);
+    b3vFly.animate([{ transform: 'none' }, { transform: `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})` }],
+      { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    if (b3vFrom._pose) b3Tween(b3vBox, b3vFrom._pose, 420);
+  }
+  b3vShut = setTimeout(done, 420);
 }
 function b3vReset() {
   const p = b3vBox._pose, v = b3At(b3vBox, B3_VIEW);   // come back the short way round

@@ -107,7 +107,7 @@ function abYearsUpdate() {
 }
 addEventListener('scroll', () => { if (!abRaf) abRaf = requestAnimationFrame(abYearsUpdate); }, { passive: true });
 
-/* ---------- single art book: the cover as a 3D book, then the inside pages; blurred pages lead to the album ---------- */
+/* ---------- single art book: the cover as a 3D book, then under "Preview" the cover spread and the inside pages; blurred pages lead to the album ---------- */
 fitWatch($('#bk-title'), 9); fitWatch($('#bk-prev-t'), 10); fitWatch($('#bk-next-t'), 10);
 function renderBook(i) {
   const b = BOOKS[i], blur = b.blur || [];
@@ -115,7 +115,7 @@ function renderBook(i) {
   fitLine($('#bk-title'));
   $('#bk-r18').hidden = !blur.length;
   $('#bk-cover').replaceChildren(...b3Hero(b));
-  $('#bk-imgs').replaceChildren(...b.pages.map(([W, H], n) => [W, H, n]).slice(1).map(([W, H, n]) => {
+  $('#bk-imgs').replaceChildren(...b.pages.map(([W, H], n) => {
     const img = el('img');
     img.src = `img/ab/${b.slug}_p${n}.webp`; img.width = W; img.height = H; img.dataset.n = n;
     img.loading = n < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
@@ -148,7 +148,7 @@ function bookText(i) {
   $('#bk-spec').setAttribute('aria-label', tr('bk.spec'));
   $('#bk-imgs').querySelectorAll('img').forEach((img) => {
     const n = +img.dataset.n;
-    img.alt = tr(blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: bkName(b), n });
+    img.alt = tr(n === 0 ? 'bk.coverAlt' : blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: bkName(b), n });
   });
   const hero = $('#bk-cover .bk-stage');
   if (hero) { hero.setAttribute('aria-label', tr('b3.book', { t: bkName(b) })); $('#bk-cover .bk-hint span').textContent = tr('b3.open'); }

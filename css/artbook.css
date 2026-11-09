@@ -14,7 +14,7 @@
 .ab-card:hover .ab-stage .b3,.ab-card:focus-visible .ab-stage .b3{translate:0 -8px}
 .ab-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .ab-info{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding-inline:2px}
-.ab-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,23px);letter-spacing:.04em;line-height:1.35;white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name */
+.ab-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,23px);letter-spacing:.04em;line-height:calc(clamp(17px,1.7vw,23px) * 1.35);white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name; the line keeps its height, so the lines under the names stay level */
 .ab-card:hover .ab-t{color:var(--g-gold)}
 .ab-cap{display:flex;align-items:baseline;gap:14px}
 .ab-ev{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;color:var(--fg-2)}
@@ -23,6 +23,7 @@
 .ab-r18{font-size:11px;letter-spacing:.08em;color:#c4655a;border:1px solid rgba(196,101,90,.55);padding:1px 6px;align-self:center}
 @media (max-width:700px){.ab-grid{grid-template-columns:minmax(0,1fr)}.ab-card:only-child{width:100%}}
 /* single art book: spreads stacked full width; blurred adult pages carry 18+ and lead to the album */
+.bk-pv{margin:0 0 clamp(16px,2.2vw,28px);text-align:center}   /* "Preview", over the spreads */
 #bk-imgs img{width:min(100%,1400px)}
 .bk-blur{position:relative;display:block;width:min(100%,1400px);text-decoration:none}
 .bk-blur img{width:100%;cursor:pointer}
@@ -87,7 +88,8 @@
 .bk-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}
 .bk-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 /* the 3D viewer: drag to turn the book, wheel or pinch to zoom */
-.zv.b3v{background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
+.zv.b3v::before{background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
+.b3v .zv-hint{animation:none}   /* its hint stays */
 .b3v-stage{position:relative;overflow:hidden;container-type:size;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .b3v-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(36% 44% at 50% 50%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);pointer-events:none}
 .b3v-stage.drag{cursor:grabbing}

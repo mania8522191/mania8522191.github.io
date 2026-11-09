@@ -118,16 +118,16 @@ const GOODS = [
 
 /* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
 const BOOKS = [
-  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},
-  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","pages":[[1400,493,2560,902],[1400,493,2560,902],[1400,493,2560,902]]},
-  {"slug":"ff45","mat":"ivory","tk":0.027,"rtl":true,"ev":"FF45","t":"mania8522191 Original R18 Manga Project ROUGH BOOK 01","size":"a4sq","pp":40,"print":"mono","ym":"2025.08","pages":[[1400,700,2560,1280],[1400,700],[1400,700]],"blur":[1,2]},
-  {"slug":"ff44","mat":"ivory","tk":0.027,"ev":"FF44","t":"MIRA93 vol.5","size":"a4sq","pp":36,"print":"color","ym":"2025.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff43","mat":"ivory","foil":"blue","ev":"FF43","t":"MIRA93 vol.3.5","size":"a4sq","pp":20,"print":"color","ym":"2024.08","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff42","mat":"ivory","ev":"FF42","t":"MIRA93 vol.3","size":"a4sq","pp":20,"print":"color","ym":"2024.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff41","mat":"ivory","ev":"FF41","t":"MIRA93 vol.2","size":"a4sq","pp":20,"print":"color","ym":"2023.08","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff40","mat":"ivory","ev":"FF40","t":"MIRA93 vol.1","size":"a4sq","pp":20,"print":"color","ym":"2023.02","pages":[[1400,700,2560,1280],[1400,700,2560,1280],[1400,700,2560,1280]]},
-  {"slug":"ff38","mat":"matte","ev":"FF38","t":"Fimmel: Comet2","size":"b5","pp":28,"print":"color","ym":"2022.02","pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]},
-  {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,2560,1806],[1400,988,2560,1807],[1400,988,2560,1807]]}
+  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","pages":[[1400,493,5787,2039],[1400,493,5787,2039],[1400,493,5787,2039]]},
+  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","pages":[[1400,493,5788,2039],[1400,493,5788,2039],[1400,493,5788,2039]]},
+  {"slug":"ff45","mat":"ivory","tk":0.027,"rtl":true,"ev":"FF45","t":"mania8522191 Original R18 Manga Project ROUGH BOOK 01","size":"a4sq","pp":40,"print":"mono","ym":"2025.08","pages":[[1400,700,5787,2894],[1400,700],[1400,700]],"blur":[1,2]},
+  {"slug":"ff44","mat":"ivory","tk":0.027,"ev":"FF44","t":"MIRA93 vol.5","size":"a4sq","pp":36,"print":"color","ym":"2025.02","pages":[[1400,700,5787,2894],[1400,700,5787,2893],[1400,700,5787,2893]]},
+  {"slug":"ff43","mat":"ivory","foil":"blue","ev":"FF43","t":"MIRA93 vol.3.5","size":"a4sq","pp":20,"print":"color","ym":"2024.08","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff42","mat":"ivory","ev":"FF42","t":"MIRA93 vol.3","size":"a4sq","pp":20,"print":"color","ym":"2024.02","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff41","mat":"ivory","ev":"FF41","t":"MIRA93 vol.2","size":"a4sq","pp":20,"print":"color","ym":"2023.08","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff40","mat":"ivory","ev":"FF40","t":"MIRA93 vol.1","size":"a4sq","pp":20,"print":"color","ym":"2023.02","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
+  {"slug":"ff38","mat":"matte","ev":"FF38","t":"Fimmel: Comet2","size":"b5","pp":28,"print":"color","ym":"2022.02","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]},
+  {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]}
 ];
 
 const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';
@@ -254,8 +254,8 @@ const I18N = {
     "foot.myacg": "買動漫",
     "foot.copy": "© 2019–2026 mania8522191 · 作品版權所有",
     "zv.label": "圖片檢視",
-    "zv.zoom": "放大",
-    "zv.unzoom": "縮小",
+    "zv.zoom": "顯示實際尺寸(100%)",
+    "zv.unzoom": "符合視窗({p}%)",
     "zv.prev": "上一張",
     "zv.next": "下一張",
     "zv.hint": "點圖片放大，再點一下縮回",
@@ -310,6 +310,7 @@ const I18N = {
     "ab.card": "{t} 畫冊（{d}）",
     "bk.date": "{d} 發行",
     "bk.pageAlt": "{t} 內頁（第 {n} 張）",
+    "bk.coverAlt": "{t} 封面與封底",
     "bk.blurAlt": "{t} 內頁（成人向，已模糊處理）",
     "bk.others": "其他畫冊",
     "bk.r18": "這本是成人向作品，內頁已模糊處理。",
@@ -438,8 +439,8 @@ const I18N = {
     "foot.myacg": "MyACG",
     "foot.copy": "© 2019–2026 mania8522191 · All rights reserved",
     "zv.label": "Image viewer",
-    "zv.zoom": "Zoom in",
-    "zv.unzoom": "Zoom out",
+    "zv.zoom": "Actual size (100%)",
+    "zv.unzoom": "Fit to window ({p}%)",
     "zv.prev": "Previous",
     "zv.next": "Next",
     "zv.hint": "Click the picture to zoom in, click again to zoom out",
@@ -494,6 +495,7 @@ const I18N = {
     "ab.card": "{t} art book ({d})",
     "bk.date": "Released {d}",
     "bk.pageAlt": "{t}: inside pages ({n})",
+    "bk.coverAlt": "{t}: front and back cover",
     "bk.blurAlt": "{t}: inside pages (adult content, blurred)",
     "bk.others": "Other art books",
     "bk.r18": "This book is adult content; its inside pages are blurred.",
@@ -622,8 +624,8 @@ const I18N = {
     "foot.myacg": "買動漫",
     "foot.copy": "© 2019–2026 mania8522191 · 無断転載禁止",
     "zv.label": "画像ビューア",
-    "zv.zoom": "拡大",
-    "zv.unzoom": "縮小",
+    "zv.zoom": "実寸表示(100%)",
+    "zv.unzoom": "ウィンドウに合わせる({p}%)",
     "zv.prev": "前へ",
     "zv.next": "次へ",
     "zv.hint": "画像をクリックで拡大、もう一度クリックで元に戻ります",
@@ -678,6 +680,7 @@ const I18N = {
     "ab.card": "{t} 画集（{d}）",
     "bk.date": "{d} 発行",
     "bk.pageAlt": "{t} 本文（{n}枚目）",
+    "bk.coverAlt": "{t} 表紙と裏表紙",
     "bk.blurAlt": "{t} 本文（成人向け・ぼかし加工）",
     "bk.others": "ほかの画集",
     "bk.r18": "成人向けの本のため、本文はぼかしています。",
@@ -926,12 +929,12 @@ const ZV_SETS = {
     : { src: `img/char${n}.webp`, w: 500, h: 1364, zw: 500, no: `No.${no2(n)}`, cap: `char${n}`, alt: tr('chars.full', { n }) })),
   book: () => {
     const b = BOOKS[byBook[lastBook]], blur = b.blur || [];
-    const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => n > 0 && !blur.includes(n));   // the cover has its own 3D viewer
+    const pages = b.pages.map((d, n) => [d, n]).filter(([, n]) => !blur.includes(n));   // the cover spread, then the inside pages
     return pages.map(([[W, H, ZW], n], k) => ({
       src: `img/ab/${b.slug}_p${n}.webp`, zsrc: ZW ? `img/ab/x/${b.slug}_p${n}.webp` : null, eager: true,   // x: the full-size spread
       w: W, h: H, zw: ZW || W,
       no: `${k + 1} / ${pages.length}`, cap: bkName(b),
-      alt: tr('bk.pageAlt', { t: bkName(b), n }),
+      alt: tr(n ? 'bk.pageAlt' : 'bk.coverAlt', { t: bkName(b), n }),
     }));
   },
   cards: () => DECK.map((f, i) => {
@@ -950,10 +953,16 @@ function zvFit(it) {
 function zvSize() {
   const it = zvSet[zvAt];
   const fit = zvFit(it);
-  const w = zoomed ? Math.max(it.zw, fit * 1.6) : fit;
+  const w = zoomed ? it.zw : fit;   // zoomed: the picture at its actual size, 100%
   zvImg.style.width = `${Math.round(w)}px`;
   zvImg.style.height = `${Math.round(w * it.h / it.w)}px`;
   zvTags.style.width = `${Math.round(w)}px`;
+  /* the zoom button says what it does: show the actual size, or fit the window (at that share of the actual size).
+     A picture that already fits at its actual size has nothing to zoom. */
+  const can = zoomed || it.zw > fit + 1;
+  zvZoomBtn.hidden = !can;
+  zvStage.classList.toggle('nozoom', !can);
+  zvZoomBtn.textContent = zoomed ? tr('zv.unzoom', { p: Math.round((fit / it.zw) * 100) }) : tr('zv.zoom');
 }
 function zvHiRes() {
   const it = zvSet[zvAt];
@@ -968,13 +977,12 @@ function zvHiRes() {
     .finally(() => { if (t === zvToken) $('#zv-load').hidden = true; });
 }
 function zvZoom(on, cx, cy) {
-  if (on === zoomed) return;
+  if (on === zoomed || zvStage.classList.contains('nozoom')) return;
   const a = zvImg.getBoundingClientRect(), s = zvStage.getBoundingClientRect();
   const px = cx ?? s.left + s.width / 2, py = cy ?? s.top + s.height / 2;   // this point stays put
   const fx = Math.min(1, Math.max(0, (px - a.left) / a.width)), fy = Math.min(1, Math.max(0, (py - a.top) / a.height));
   zoomed = on;
   zv.classList.toggle('zoomed', on);
-  zvZoomBtn.textContent = on ? tr('zv.unzoom') : tr('zv.zoom');
   zvZoomBtn.setAttribute('aria-pressed', String(on));
   zvImg.style.transition = 'none';
   zvImg.style.transform = '';
@@ -992,14 +1000,13 @@ function zvZoom(on, cx, cy) {
   }
   if (on) zvHiRes();
 }
-function zvShow(i) {
+function zvShow(i, opening) {
   zvAt = (i + zvSet.length) % zvSet.length;
   const it = zvSet[zvAt];
   ++zvToken;
   $('#zv-load').hidden = true;
   zoomed = false;
   zv.classList.remove('zoomed');
-  zvZoomBtn.textContent = tr('zv.zoom');
   zvZoomBtn.setAttribute('aria-pressed', 'false');
   zvImg.style.transition = 'none';
   zvImg.style.transform = '';
@@ -1015,11 +1022,35 @@ function zvShow(i) {
   zvSize();
   if (it.eager && zvFit(it) * (devicePixelRatio || 1) > it.w) zvHiRes();   // shown bigger than the page image: get the full size now, not only on zoom
   zvStage.scrollTo(0, 0);
-  zvImg.classList.remove('swap'); void zvImg.offsetWidth; zvImg.classList.add('swap');
+  zvImg.classList.remove('swap');
+  if (!opening) { void zvImg.offsetWidth; zvImg.classList.add('swap'); }   // the next one swaps in; the first one flies in (zvFly)
   $('#zv-prev').hidden = $('#zv-next').hidden = zvSet.length < 2;
   if (zvKind === 'shots') showShot(zvAt, false);
 }
+/* the picture that was clicked, where it is on the screen (null if it is not showing) */
+function zvRectOf(e) {
+  if (!e || !e.isConnected || e.closest('[hidden]')) return null;
+  const r = (e.tagName === 'IMG' ? e : e.querySelector('img') || e).getBoundingClientRect();
+  return r.width && r.height && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth ? r : null;
+}
+/* opening, the picture flies from the one that was clicked to its place in the viewer; closing, back again. With
+   nothing on screen to fly from, it grows from a little smaller instead. Returns how long it takes (ms). */
+function zvFly(out) {
+  if (CALM || !zvImg.animate) return 0;
+  const c = zvImg.getBoundingClientRect(), a = zvRectOf(zvFrom), to = a && c.width;
+  const away = to
+    ? { transform: `translate(${(a.left - c.left).toFixed(1)}px,${(a.top - c.top).toFixed(1)}px) scale(${(a.width / c.width).toFixed(4)},${(a.height / c.height).toFixed(4)})`, opacity: 1 }
+    : { transform: 'scale(.92)', opacity: 0 };
+  const here = { transform: 'none', opacity: 1 }, ms = out ? 380 : 520;
+  zvImg.style.transformOrigin = to ? '0 0' : '50% 50%';
+  zvImg.animate(out ? [here, away] : [away, here], { duration: ms, easing: out ? 'cubic-bezier(.4,0,.2,1)' : 'cubic-bezier(.16,1,.3,1)', fill: out ? 'forwards' : 'backwards' });
+  return ms;
+}
+let zvShut = 0;   // the closing timer
 function zvOpen(kind, i, from) {
+  clearTimeout(zvShut);   // opened again while closing
+  zv.classList.remove('zv-out');
+  zvImg.getAnimations().forEach((x) => x.cancel());
   zvKind = kind;
   zvSet = ZV_SETS[kind]();
   zvFrom = from;
@@ -1027,15 +1058,23 @@ function zvOpen(kind, i, from) {
   document.documentElement.classList.add('zv-open');
   const hint = $('#zv-hint');
   hint.style.animation = 'none'; void hint.offsetWidth; hint.style.animation = '';
-  zvShow(i);
+  zvShow(i, true);
+  zvFly(false);
   $('#zv-close').focus({ preventScroll: true });
 }
 function zvClose() {
-  if (zv.hidden) return;
-  zv.hidden = true;
+  if (zv.hidden || zv.classList.contains('zv-out')) return;
   ++zvToken;
-  document.documentElement.classList.remove('zv-open');
-  if (zvFrom) zvFrom.focus({ preventScroll: true });
+  const done = () => {
+    zv.hidden = true;
+    zv.classList.remove('zv-out');
+    zvImg.getAnimations().forEach((x) => x.cancel());
+    document.documentElement.classList.remove('zv-open');
+    if (zvFrom && zvFrom.isConnected) zvFrom.focus({ preventScroll: true });
+  };
+  if (CALM) { done(); return; }
+  zv.classList.add('zv-out');
+  zvShut = setTimeout(done, zvFly(true) || 380);
 }
 /* a click toggles zoom at that point (outside the picture it closes); a mouse drag pans instead */
 let drag = null;
@@ -1749,7 +1788,7 @@ function abYearsUpdate() {
 }
 addEventListener('scroll', () => { if (!abRaf) abRaf = requestAnimationFrame(abYearsUpdate); }, { passive: true });
 
-/* ---------- single art book: the cover as a 3D book, then the inside pages; blurred pages lead to the album ---------- */
+/* ---------- single art book: the cover as a 3D book, then under "Preview" the cover spread and the inside pages; blurred pages lead to the album ---------- */
 fitWatch($('#bk-title'), 9); fitWatch($('#bk-prev-t'), 10); fitWatch($('#bk-next-t'), 10);
 function renderBook(i) {
   const b = BOOKS[i], blur = b.blur || [];
@@ -1757,7 +1796,7 @@ function renderBook(i) {
   fitLine($('#bk-title'));
   $('#bk-r18').hidden = !blur.length;
   $('#bk-cover').replaceChildren(...b3Hero(b));
-  $('#bk-imgs').replaceChildren(...b.pages.map(([W, H], n) => [W, H, n]).slice(1).map(([W, H, n]) => {
+  $('#bk-imgs').replaceChildren(...b.pages.map(([W, H], n) => {
     const img = el('img');
     img.src = `img/ab/${b.slug}_p${n}.webp`; img.width = W; img.height = H; img.dataset.n = n;
     img.loading = n < 2 ? 'eager' : 'lazy'; img.decoding = 'async';
@@ -1790,7 +1829,7 @@ function bookText(i) {
   $('#bk-spec').setAttribute('aria-label', tr('bk.spec'));
   $('#bk-imgs').querySelectorAll('img').forEach((img) => {
     const n = +img.dataset.n;
-    img.alt = tr(blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: bkName(b), n });
+    img.alt = tr(n === 0 ? 'bk.coverAlt' : blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: bkName(b), n });
   });
   const hero = $('#bk-cover .bk-stage');
   if (hero) { hero.setAttribute('aria-label', tr('b3.book', { t: bkName(b) })); $('#bk-cover .bk-hint span').textContent = tr('b3.open'); }
@@ -1968,6 +2007,7 @@ function b3Hero(b) {
 /* the 3D viewer: hold and drag to turn the book (it keeps spinning a little when flung), wheel or pinch to zoom,
    double-click or double-tap the book to put it back, click beside it to close */
 const b3v = $('#b3v'), b3vStage = $('#b3v-stage'), b3vFly = $('#b3v-fly'), b3vZoomEl = $('#b3v-zoom');
+let b3vShut = 0;   // the closing timer
 const b3Ptr = new Map();
 let b3vBox = null, b3vFrom = null, b3vZ = 1, b3Drag = null, b3Pinch = null, b3Spin = 0, b3Tap = 0;
 if (matchMedia('(hover: none)').matches) $('#b3v-hint').dataset.i18n = 'b3.hintTouch';
@@ -2005,6 +2045,9 @@ function b3vSharpen() {
   b3vZoomEl.classList.remove('settle');
 }
 function b3vOpen(b, from) {
+  clearTimeout(b3vShut);   // opened again while closing
+  b3v.classList.remove('zv-out');
+  b3vFly.getAnimations().forEach((x) => x.cancel());
   const a = from.getBoundingClientRect();
   b3vFrom = from;
   b3vBox = b3Make(b, true);
@@ -2016,8 +2059,6 @@ function b3vOpen(b, from) {
   $('#b3v-cap').replaceChildren(el('span', '', 'COVER'), document.createTextNode(bkName(b)));
   b3v.hidden = false;
   document.documentElement.classList.add('zv-open');
-  const hint = $('#b3v-hint');
-  hint.style.animation = 'none'; void hint.offsetWidth; hint.style.animation = '';
   b3Pose(b3vBox, from._pose.rx, from._pose.ry);
   if (!CALM && b3vFly.animate) {   // the book rises from where it sat on the page
     const c = b3vBox.getBoundingClientRect();
@@ -2029,17 +2070,36 @@ function b3vOpen(b, from) {
   b3Tween(b3vBox, b3At(b3vBox, B3_VIEW), 1000);
   $('#b3v-close').focus({ preventScroll: true });
 }
+/* closing, the book flies back to its place on the page, turning back to how it sits there, as the viewer fades */
 function b3vClose() {
-  if (b3v.hidden) return;
-  b3v.hidden = true;
+  if (b3v.hidden || b3v.classList.contains('zv-out')) return;
   cancelAnimationFrame(b3Spin);
   if (b3vBox) cancelAnimationFrame(b3vBox._tw);
   b3Ptr.clear();
   b3Drag = b3Pinch = b3Pan = null;
   b3vStage.classList.remove('drag', 'pinch', 'pan');
-  document.documentElement.classList.remove('zv-open');
-  const s = b3vFrom && b3vFrom.closest('button');
-  if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
+  const done = () => {
+    b3v.hidden = true;
+    b3v.classList.remove('zv-out');
+    if (b3vBox) cancelAnimationFrame(b3vBox._tw);
+    b3vFly.getAnimations().forEach((x) => x.cancel());
+    document.documentElement.classList.remove('zv-open');
+    const s = b3vFrom && b3vFrom.closest('button');
+    if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
+  };
+  if (CALM) { done(); return; }
+  b3v.classList.add('zv-out');
+  const a = b3vFrom && b3vFrom.isConnected && !b3vFrom.closest('[hidden]') ? b3vFrom.getBoundingClientRect() : null;
+  if (a && a.width && b3vBox && b3vFly.animate) {
+    /* the fly layer scales about its centre, so aim the book's centre, wherever the visitor moved it, at its place */
+    const c = b3vBox.getBoundingClientRect(), f = b3vFly.getBoundingClientRect(), k = a.width / c.width;
+    const fx = f.left + f.width / 2, fy = f.top + f.height / 2;
+    const tx = a.left + a.width / 2 - fx - k * (c.left + c.width / 2 - fx), ty = a.top + a.height / 2 - fy - k * (c.top + c.height / 2 - fy);
+    b3vFly.animate([{ transform: 'none' }, { transform: `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})` }],
+      { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+    if (b3vFrom._pose) b3Tween(b3vBox, b3vFrom._pose, 420);
+  }
+  b3vShut = setTimeout(done, 420);
 }
 function b3vReset() {
   const p = b3vBox._pose, v = b3At(b3vBox, B3_VIEW);   // come back the short way round
@@ -2713,13 +2773,11 @@ function swapLang(l) {
 }
 
 /* ==================== js/sound.js ==================== */
-/* Sound: background music, switched on and off by the button beside the languages; a soft click on every button and
-   link; and, as the mouse comes over a button or text link, the same click lower and softer. The music starts off (a
-   browser only lets a page make sound once the visitor has touched it); the click and the hover sound play whether the
-   music is on or off. Volumes are set here: the music file is loud, so it plays well under it. */
+/* Sound: background music, switched on and off by the button beside the languages, and a soft click on every button
+   and link. The music starts off (a browser only lets a page make sound once the visitor has touched it); the click
+   plays whether the music is on or off. Volumes are set here: the music file is loud, so it plays well under it. */
 const BGM_SRC = 'audio/bgm.mp3', CLICK_SRC = 'audio/click.mp3';
 const BGM_VOL = 0.35, CLICK_VOL = 0.7;
-const HOVER_VOL = 0.3, HOVER_RATE = 0.72;   // the hover sound: the click played slower, so lower, and softer
 const sndBtns = document.querySelectorAll('.snd');
 let actx = null, clickBuf = null, bgm = null, bgmGain = null, bgmOn = false, bgmHeld = false, bgmRest = 0;
 
@@ -2753,13 +2811,12 @@ function sndTrim(buf) {
   return { buf, at: Math.max(0, a / buf.sampleRate - 0.004), len: (b - a) / buf.sampleRate + 0.03 };
 }
 
-/* the click sound at a volume and a speed (below 1: slower and lower) */
-function sndPlay(c, vol, rate) {
+function sndClick() {
+  const c = sndWake();
   if (!c || !clickBuf) return;
   const s = c.createBufferSource(), g = c.createGain();
-  g.gain.value = vol;
+  g.gain.value = CLICK_VOL;
   s.buffer = clickBuf.buf;
-  s.playbackRate.value = rate;
   s.connect(g).connect(c.destination);
   s.start(0, clickBuf.at, clickBuf.len);
 }
@@ -2801,27 +2858,11 @@ function sndText() {
 sndText();
 
 sndBtns.forEach((b) => b.addEventListener('click', () => bgmSet(!bgmOn)));
-const SND_ON = 'a[href], button, [role="button"]';   // what sounds when clicked, or (not a picture) hovered
-
-/* the mouse coming over a button or a text link: once per element, not for links made of a picture (the covers on
-   the wall), at most every 60 ms. It sounds only after the visitor's first click or key press: before that the
-   browser keeps the page silent, and the page does not ask. */
-let hoverOn = null, hoverAt = 0;
-document.addEventListener('pointerover', (e) => {
-  if (e.pointerType !== 'mouse' || !(e.target instanceof Element)) return;
-  const b = e.target.closest(SND_ON);
-  if (!b || b === hoverOn) return;
-  hoverOn = b;
-  if (b.querySelector('img, .b3') || !actx || actx.state !== 'running' || performance.now() - hoverAt < 60) return;
-  hoverAt = performance.now();
-  sndPlay(actx, HOVER_VOL, HOVER_RATE);
-});
-document.addEventListener('pointerout', (e) => { if (hoverOn && !hoverOn.contains(e.relatedTarget)) hoverOn = null; });
 addEventListener('pointerdown', sndWake, { capture: true, passive: true });
 addEventListener('keydown', sndWake, true);
 document.addEventListener('click', (e) => {
   if (!(e.target instanceof Element)) return;
-  if (e.target.closest(SND_ON)) sndPlay(sndWake(), CLICK_VOL, 1);
+  if (e.target.closest('a[href], button, [role="button"]')) sndClick();
   if (window.SELF_HOSTED && e.target.closest('.tl-card')) { bgmHeld = true; if (bgmOn) bgmPlay(false); }   // the video has its own sound
 }, true);
 addEventListener('hashchange', () => { if (bgmHeld) { bgmHeld = false; if (bgmOn) bgmPlay(!document.hidden); } });
