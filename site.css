@@ -24,7 +24,7 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--bg)}
+html{background:var(--bg);scrollbar-gutter:stable}   /* the scrollbar's room stays when a viewer locks the page, so the page behind does not shift */
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 a:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
@@ -605,7 +605,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .zv-hint,.zv-load{position:absolute;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);margin:0;padding:8px 14px;border:1px solid var(--line);background:rgba(11,11,11,.85);font-size:12px;letter-spacing:.08em;color:var(--fg-2);white-space:nowrap;pointer-events:none}
 .zv-hint{animation:hint 3.4s var(--ease-out) both}
 @keyframes hint{0%,70%{opacity:1}100%{opacity:0}}
-.zv-open body{overflow:hidden}
+.zv-open body{overflow:hidden}   /* the page keeps its width: html keeps the scrollbar's room (css/base.css) */
 .proj-imgs img{cursor:zoom-in}
 @media (max-width:640px){
   .zv-canvas{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}

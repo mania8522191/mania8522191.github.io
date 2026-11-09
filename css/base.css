@@ -21,7 +21,7 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--bg)}
+html{background:var(--bg);scrollbar-gutter:stable}   /* the scrollbar's room stays when a viewer locks the page, so the page behind does not shift */
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 a:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
