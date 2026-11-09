@@ -17,7 +17,7 @@ document.addEventListener('dragstart', (e) => {
   if (onArt(t) || (t instanceof Element && t.querySelector('img'))) e.preventDefault();   // a link around a picture
 });
 addEventListener('keydown', (e) => {
-  if (e.target.closest('.zw') || !b3v.hidden || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
+  if (zvInWin(e) || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
   const k = view === 'work' ? 'wk' : view === 'book' ? 'bk' : 'it';
   if (e.key === 'ArrowRight') location.hash = $(`#${k}-next`).getAttribute('href');
   if (e.key === 'ArrowLeft') location.hash = $(`#${k}-prev`).getAttribute('href');

@@ -1,6 +1,7 @@
-/* Image viewer: windows and the dock; the 3D viewer's frame */
-/* pictures open in windows over the page, below the site header: drag the bar to move one, an edge or a corner to
-   resize it; minimize tucks it into the dock at the bottom left; any number stay open side by side (js/lightbox.js) */
+/* Image viewer: windows and the dock; the game page's pop-up */
+/* on the Work and Art Book pages, pictures and art books' 3D covers open in windows over the page, below the site
+   header: drag the bar to move one, an edge or a corner to resize it; maximize fills the screen below the header;
+   minimize tucks it into the dock at the bottom left; any number stay open side by side (js/lightbox.js) */
 .zw-layer{position:fixed;inset:calc(var(--head) + env(safe-area-inset-top,0px)) 0 0;z-index:40;overflow:hidden;pointer-events:none}
 .zw{position:absolute;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);container-type:inline-size;border:1px solid var(--line);background:var(--bg);box-shadow:0 22px 48px rgba(0,0,0,.6);pointer-events:auto;transform-origin:0 0;transition:border-color .35s;animation:lb-in .35s var(--ease-out) both}
 .zw::before{content:"";position:absolute;left:0;right:0;top:-1px;z-index:2;height:1px;background:linear-gradient(90deg,transparent,var(--g-gold),transparent);opacity:0;transition:opacity .35s;pointer-events:none}
@@ -8,9 +9,10 @@
 .zw.front::before{opacity:.7}   /* the window in front: a gold line along its top, as on the SORT menu (css/works.css) */
 .zw:focus{outline:none}
 .zw.zw-out{pointer-events:none;animation:lb-out .38s var(--ease-io) both}
-.zw.glide{transition:border-color .35s,left .5s var(--ease-out),top .5s var(--ease-out),width .5s var(--ease-out),height .5s var(--ease-out)}   /* moving aside for the next window */
+.zw.glide{transition:border-color .35s,left .5s var(--ease-out),top .5s var(--ease-out),width .5s var(--ease-out),height .5s var(--ease-out)}   /* maximizing, or moving aside for the next window */
 .zw.flying{pointer-events:none}
 .zw.mini{visibility:hidden}   /* in the dock: hidden, kept as it was */
+.zw.max .zv-rs{display:none}   /* filling the screen: no edges to drag */
 .zw.moving,.zw.sizing{-webkit-user-select:none;user-select:none}
 .zw .zv-bar{padding:7px 7px 7px 14px;background:var(--bg-2);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .zw.moving .zv-bar{cursor:grabbing}
@@ -41,7 +43,8 @@
   .zv-rs[data-d="se"]::after{right:15px;bottom:15px}
 }
 
-/* the bar along the top; its buttons are pills like the SORT button (css/works.css), a gold icon and a word */
+/* the bar along the top; its buttons are pills like the SORT button (css/works.css), a gold icon and a word.
+   Minimize, maximize and close (and the arrows) are the icon only: their names show on hover. */
 .zv-bar{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .zv-cap{flex:1;min-width:0;margin:0;font-family:var(--f-display);font-size:14px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .zv-cap span{margin-right:10px;color:var(--g-gold);font-variant-numeric:tabular-nums}
@@ -49,16 +52,16 @@
 .zv-btn:hover{border-color:rgba(208,166,90,.6);color:var(--fg);box-shadow:0 0 0 3px rgba(208,166,90,.08)}
 .zv-btn:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
 .zv-btn[hidden]{display:none}
+.zv-ico{width:34px;padding:0}
 .zv-ic{width:15px;height:15px;flex:none;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.zv-ic-unmax{display:none}
+.zw.max .zv-ic-max{display:none}
+.zw.max .zv-ic-unmax{display:inline}   /* filling the screen: the button puts it back, two squares */
 .zv-plus{transform-origin:7px 7px;transition:transform .4s var(--ease-out)}
 .zv-zoom[aria-pressed="true"] .zv-plus{transform:scaleY(0)}   /* zoomed in, the magnifier's + turns to − */
-.zv-prev,.zv-next{position:absolute;top:calc(50% + 7px);z-index:1;width:34px;padding:0;background:rgba(11,11,11,.75)}   /* the middle of the picture's area */
+.zv-prev,.zv-next{position:absolute;top:calc(50% + 7px);z-index:1;background:rgba(11,11,11,.75)}   /* the middle of the picture's area */
 .zv-prev{left:12px}
 .zv-next{right:12px}
-@container (width <= 620px){   /* a narrower window: minimize and close show their icons only */
-  .zv-min .zv-t,.zv-close .zv-t{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-  .zv-min,.zv-close{width:34px;padding:0}
-}
 
 /* the picture: fit to the window, click to zoom into the high-resolution copy, drag to pan */
 .zv-stage{position:relative;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable both-edges;cursor:zoom-in;scrollbar-color:var(--line) transparent}   /* a scrollbar coming does not move the picture */
@@ -67,9 +70,9 @@
 .zv-stage.nozoom{cursor:default}   /* already shown at its actual size */
 .zv-canvas{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:max-content;height:max-content;min-width:100%;min-height:100%;padding:16px 12px}
 .zw.multi .zv-canvas{padding-inline:56px}   /* room for the arrows */
-@container (width <= 430px){   /* narrow: the zoom button too; the arrows go to the bottom corners (js/lightbox.js: zvFit) */
-  .zv-zoom .zv-t{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-  .zv-zoom{width:34px;padding:0}
+@container (width <= 430px){   /* narrow: zoom (the 3D view's reset) shows its icon only; the arrows go to the bottom corners (js/lightbox.js: zvFit) */
+  .zv-zoom .zv-t,.b3v-reset .zv-t{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .zv-zoom,.b3v-reset{width:34px;padding:0}
   .zw.multi .zv-canvas{padding-inline:12px}
   .zv-prev,.zv-next{top:auto;bottom:12px}
 }
@@ -87,6 +90,24 @@
 .zv-stage.nozoom ~ .zv-hint{display:none}   /* nothing to zoom */
 @keyframes hint{0%,70%{opacity:1}100%{opacity:0}}
 
+/* the game page's pop-up: one picture at a time over the page below the header, the page dimmed behind it; it does
+   not move, resize or minimize, and a click beside the picture closes it */
+.zw.pop{border:0;background:rgba(8,8,8,.8);box-shadow:none}
+.zw.pop::before,.zw.pop .zv-min,.zw.pop .zv-max,.zw.pop .zv-rs{display:none}
+.zw.pop .zv-bar{padding:10px max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));background:rgba(8,8,8,.6);cursor:default;touch-action:auto}
+.zw.pop .zv-hint,.zw.pop .zv-load{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+.zv-open body{overflow:hidden}   /* the page keeps its width: html keeps the scrollbar's room (css/base.css) */
+
+/* the 3D viewer's window (js/book3d.js): its frame fades in and out by itself, so the book flies at full strength from
+   its place on the page and back (.lift lets it out of the window on the way) */
+.zw.b3v{border-color:transparent;background:none;box-shadow:none;animation:none}
+.zw.b3v::after{content:"";position:absolute;inset:-1px;z-index:-1;border:1px solid var(--line);background:var(--bg);box-shadow:0 22px 48px rgba(0,0,0,.6);transition:border-color .35s;pointer-events:none}
+.zw.b3v.front::after{border-color:rgba(208,166,90,.3)}
+.zw.b3v::after,.zw.b3v .zv-bar,.zw.b3v .zv-hint{animation:lb-in .35s var(--ease-out) both}   /* its hint stays */
+.zw.b3v.zw-out{animation:none}
+.zw.b3v.zw-out::after,.zw.b3v.zw-out .zv-bar,.zw.b3v.zw-out .zv-hint{animation:lb-out .38s var(--ease-io) both}
+.zw.lift .b3v-stage{overflow:visible}
+
 /* the dock: minimized windows wait at the bottom left as pills, the picture and its name; a click brings one back */
 .zv-dock{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:41;display:flex;flex-wrap:wrap-reverse;gap:8px;max-width:calc(100% - 28px);pointer-events:none}
 .zv-chip{display:flex;align-items:center;height:42px;border:1px solid var(--line);border-radius:999px;background:var(--bg);box-shadow:0 12px 28px rgba(0,0,0,.55);pointer-events:auto;transition:border-color .35s,box-shadow .35s;animation:lb-in .35s var(--ease-out) both}
@@ -98,18 +119,6 @@
 .zv-chip-x{display:grid;place-items:center;flex:none;width:30px;height:30px;margin:0 5px 0 2px;padding:0;border:0;border-radius:50%;background:none;cursor:pointer;transition:background .25s}
 .zv-chip-x:hover{background:rgba(242,239,233,.07)}
 .zv-chip-b:focus-visible,.zv-chip-x:focus-visible{outline:1px solid var(--fg);outline-offset:-2px}
-
-/* the 3D viewer (css/artbook.css, js/book3d.js): a pop-up below the header, over the page and the windows. It grows
-   out of the book that was clicked; closing (.zv-out) runs it backwards */
-.zv{position:fixed;inset:calc(var(--head) + env(safe-area-inset-top,0px)) 0 0;z-index:45;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
-.zv::before{content:"";position:absolute;inset:0;z-index:-1;background:#080808}   /* solid, so the book on the page does not show through behind the one you turn */
-.zv::before,.zv .zv-bar{animation:lb-in .35s var(--ease-out) both}
-.zv.zv-out{pointer-events:none}
-.zv.zv-out::before,.zv-out .zv-bar,.zv-out .zv-hint{animation:lb-out .38s var(--ease-io) both}
-.zv[hidden]{display:none}
-.zv .zv-bar{padding:10px max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));background:rgba(8,8,8,.6)}
-.zv .zv-hint{bottom:calc(18px + env(safe-area-inset-bottom,0px))}
-.zv-open body{overflow:hidden}   /* the page keeps its width: html keeps the scrollbar's room (css/base.css) */
 .proj-imgs img{cursor:zoom-in}
 .about-txt a{text-underline-offset:5px;text-decoration-thickness:1px}
 .about-txt a:hover{color:var(--mute)}

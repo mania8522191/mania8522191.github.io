@@ -16,6 +16,7 @@ function parse() {
 /* swap the DOM to the requested view, then start watching its reveal elements */
 function apply({ h, next, idx, cat }) {
   const from = view;
+  zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
   for (const [k, v] of Object.entries(VIEWS)) v.hidden = k !== next;
   document.querySelectorAll('.nav a, .m-nav a').forEach((a) => {

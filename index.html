@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=56bfbf29">
+<link rel="stylesheet" href="site.css?v=336fa720">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -190,7 +190,7 @@ addEventListener('hashchange', function () {
         <p class="proj-goods" id="bk-r18" hidden><span data-i18n="bk.r18">這本是成人向作品，內頁已模糊處理。</span> <a href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener"><span data-i18n="nsfw.go">前往 Google 雲端相簿</span> ↗</a></p>
       </header>
       <div class="bk-cover" id="bk-cover"></div>
-      <h2 class="tl-h bk-pv">Preview</h2>
+      <div class="tl bk-pv"><p class="g-k">PREVIEW</p><h2 class="tl-h" data-i18n="bk.pv">預覽</h2></div>
       <div class="proj-imgs" id="bk-imgs"></div>
       <nav class="proj-nav" aria-label="其他畫冊" data-i18n-aria="bk.others">
         <a id="bk-prev"><span class="lbl">← Previous Book</span><span class="nm" id="bk-prev-t"></span></a>
@@ -397,35 +397,33 @@ addEventListener('hashchange', function () {
 <div class="zw-layer" id="zw-layer"></div>
 <div class="zv-dock" id="zv-dock" role="group" aria-label="縮到最小的圖片" data-i18n-aria="zv.dock"></div>
 <template id="zv-tpl">
-  <div class="zw" role="dialog" aria-label="圖片檢視" data-i18n-aria="zv.label" tabindex="-1">
+  <div class="zw" role="dialog" tabindex="-1">
     <div class="zv-bar">
       <p class="zv-cap"></p>
-      <button type="button" class="zv-btn zv-zoom" aria-pressed="false"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14M5 7h4"/><path class="zv-plus" d="M7 5v4"/></svg><span class="zv-t"></span></button>
-      <button type="button" class="zv-btn zv-min" title="縮到最小" data-i18n-title="zv.min"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 3.5 4.5 11.5M4.5 6.5v5h5"/></svg><span class="zv-t" data-i18n="zv.min">縮到最小</span></button>
-      <button type="button" class="zv-btn zv-close" title="CLOSE"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg><span class="zv-t">CLOSE</span></button>
+      <button type="button" class="zv-btn zv-ico zv-min" aria-label="縮到最小" title="縮到最小" data-i18n-aria="zv.min" data-i18n-title="zv.min"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M12.5 3.5 4.5 11.5M4.5 6.5v5h5"/></svg></button>
+      <button type="button" class="zv-btn zv-ico zv-max"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><rect class="zv-ic-max" x="3.5" y="3.5" width="9" height="9" rx="1"/><path class="zv-ic-unmax" d="M5.5 5.5v-2h7v7h-2M3.5 5.5h7v7h-7z"/></svg></button>
+      <button type="button" class="zv-btn zv-ico zv-close" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
     </div>
-    <div class="zv-stage"><div class="zv-canvas"><img class="zv-img" alt="" draggable="false"><div class="zv-tags" hidden><span></span><span></span></div></div></div>
-    <button type="button" class="zv-btn zv-prev" aria-label="上一張" data-i18n-aria="zv.prev"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg></button>
-    <button type="button" class="zv-btn zv-next" aria-label="下一張" data-i18n-aria="zv.next"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
-    <p class="zv-hint" data-i18n="zv.hint">點圖片放大，再點一下縮回</p>
-    <p class="zv-load" hidden data-i18n="zv.load">載入高解析度⋯</p>
     <i class="zv-rs" data-d="n"></i><i class="zv-rs" data-d="e"></i><i class="zv-rs" data-d="s"></i><i class="zv-rs" data-d="w"></i><i class="zv-rs" data-d="ne"></i><i class="zv-rs" data-d="se"></i><i class="zv-rs" data-d="sw"></i><i class="zv-rs" data-d="nw"></i>
   </div>
 </template>
+<template id="zv-pic-tpl">
+  <button type="button" class="zv-btn zv-zoom" aria-pressed="false"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14M5 7h4"/><path class="zv-plus" d="M7 5v4"/></svg><span class="zv-t"></span></button>
+  <div class="zv-stage"><div class="zv-canvas"><img class="zv-img" alt="" draggable="false"><div class="zv-tags" hidden><span></span><span></span></div></div></div>
+  <button type="button" class="zv-btn zv-ico zv-prev" aria-label="上一張" data-i18n-aria="zv.prev"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg></button>
+  <button type="button" class="zv-btn zv-ico zv-next" aria-label="下一張" data-i18n-aria="zv.next"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+  <p class="zv-hint" data-i18n="zv.hint">點圖片放大，再點一下縮回</p>
+  <p class="zv-load" hidden data-i18n="zv.load">載入高解析度⋯</p>
+</template>
+<template id="b3v-tpl">
+  <button type="button" class="zv-btn b3v-reset"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.4 3.2v3.6H5M2.9 9.8a5.4 5.4 0 1 0 1.28-5.62L1.4 6.8"/></svg><span class="zv-t" data-i18n="b3.reset">還原角度</span></button>
+  <div class="b3v-stage"><div class="b3v-fly"><div class="b3v-zoom"></div></div></div>
+  <p class="zv-hint" data-i18n="b3.hint">左鍵拖曳移動 · 右鍵拖曳旋轉 · 滾輪縮放 · 點兩下還原</p>
+</template>
 <template id="zv-chip-tpl">
-  <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="CLOSE" title="CLOSE"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
+  <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<div class="zv b3v" id="b3v" role="dialog" aria-modal="true" aria-label="畫冊 3D 檢視" data-i18n-aria="b3.label" hidden>
-  <div class="zv-bar">
-    <p class="zv-cap" id="b3v-cap"></p>
-    <button type="button" class="zv-btn" id="b3v-reset"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.4 3.2v3.6H5M2.9 9.8a5.4 5.4 0 1 0 1.28-5.62L1.4 6.8"/></svg><span class="zv-t" data-i18n="b3.reset">還原角度</span></button>
-    <button type="button" class="zv-btn" id="b3v-close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg><span class="zv-t">CLOSE</span></button>
-  </div>
-  <div class="b3v-stage" id="b3v-stage"><div class="b3v-fly" id="b3v-fly"><div class="b3v-zoom" id="b3v-zoom"></div></div></div>
-  <p class="zv-hint" id="b3v-hint" data-i18n="b3.hint">左鍵拖曳移動 · 右鍵拖曳旋轉 · 滾輪縮放 · 點兩下還原</p>
-</div>
-
-<script src="site.js?v=a3278f44"></script>
+<script src="site.js?v=41dddfb4"></script>
 </body>
 </html>

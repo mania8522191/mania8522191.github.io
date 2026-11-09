@@ -99,7 +99,6 @@ function swapLang(l) {
   if (/[?&]lang=/.test(location.search)) {
     try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
-  b3vClose();
   applyStatic();
   zvLang();
   heroText();

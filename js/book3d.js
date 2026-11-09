@@ -161,229 +161,237 @@ function b3Hero(b) {
   return [stage, hint];
 }
 
-/* the 3D viewer: hold and drag to turn the book (it keeps spinning a little when flung), wheel or pinch to zoom,
-   double-click or double-tap the book to put it back, click beside it to close */
-const b3v = $('#b3v'), b3vStage = $('#b3v-stage'), b3vFly = $('#b3v-fly'), b3vZoomEl = $('#b3v-zoom');
-let b3vShut = 0;   // the closing timer
-const b3Ptr = new Map();
-let b3vBox = null, b3vFrom = null, b3vZ = 1, b3Drag = null, b3Pinch = null, b3Spin = 0, b3Tap = 0;
-if (matchMedia('(hover: none)').matches) $('#b3v-hint').dataset.i18n = 'b3.hintTouch';
-let b3vQ = 1, b3vSettle = 0, b3vPX = 0, b3vPY = 0, b3Pan = null;
+/* the 3D viewer: each book's cover in a window of its own (js/lightbox.js). Hold and drag to turn the book (it keeps
+   spinning a little when flung), hold the left button to move it, wheel or pinch to zoom; double-click or double-tap
+   the book to put it back */
+if (matchMedia('(hover: none)').matches) $('#b3v-tpl').content.querySelector('.zv-hint').dataset.i18n = 'b3.hintTouch';
 const b3vDensity = () => (navigator.userAgentData ? Math.min(2, devicePixelRatio || 1) : 1);   // Chromium draws a big 3D face at no more than 1 px per CSS px
 /* move the view: the book shifts across the stage, but never so far that its middle leaves its own outline */
-function b3vPanTo(x, y) {
-  const k = b3vZ / b3vQ / 2, mx = b3vBox ? b3vBox.offsetWidth * k : 0, my = b3vBox ? b3vBox.offsetHeight * k : 0;
-  b3vPX = Math.max(-mx, Math.min(mx, x));
-  b3vPY = Math.max(-my, Math.min(my, y));
-  b3vZoomEl.style.setProperty('--px', `${b3vPX.toFixed(1)}px`);
-  b3vZoomEl.style.setProperty('--py', `${b3vPY.toFixed(1)}px`);
+function b3vPanTo(w, x, y) {
+  const k = w.z / w.q / 2, mx = w.book.offsetWidth * k, my = w.book.offsetHeight * k;
+  w.px = Math.max(-mx, Math.min(mx, x));
+  w.py = Math.max(-my, Math.min(my, y));
+  w.zoomEl.style.setProperty('--px', `${w.px.toFixed(1)}px`);
+  w.zoomEl.style.setProperty('--py', `${w.py.toFixed(1)}px`);
 }
-function b3vView(z, x, y, now) {
-  b3vZ = Math.min(2.4, Math.max(0.6, z));
-  b3vZoomEl.style.setProperty('--z', b3vZ.toFixed(3));
-  b3vPanTo(x, y);
-  clearTimeout(b3vSettle);
-  if (now) b3vSharpen();
-  else b3vSettle = setTimeout(() => { if (!b3Pinch) b3vSharpen(); }, 450);   // once the zoom has eased in
+function b3vView(w, z, x, y, now) {
+  w.z = Math.min(2.4, Math.max(0.6, z));
+  w.zoomEl.style.setProperty('--z', w.z.toFixed(3));
+  b3vPanTo(w, x, y);
+  clearTimeout(w.settle);
+  if (now) b3vSharpen(w);
+  else w.settle = setTimeout(() => { if (!w.pinch) b3vSharpen(w); }, 450);   // once the zoom has eased in
 }
-function b3vZoomTo(z, now, ax = 0, ay = 0) {   // ax, ay: the point, from the stage's centre, that stays where it is
-  const k = Math.min(2.4, Math.max(0.6, z)) / b3vZ;
-  b3vView(z, ax - (ax - b3vPX) * k, ay - (ay - b3vPY) * k, now);
+function b3vZoomTo(w, z, now, ax = 0, ay = 0) {   // ax, ay: the point, from the stage's centre, that stays where it is
+  const k = Math.min(2.4, Math.max(0.6, z)) / w.z;
+  b3vView(w, z, ax - (ax - w.px) * k, ay - (ay - w.py) * k, now);
 }
 /* lay the book out at the size it is shown, so it is drawn sharp; the zoom layer's scale changes with it, without easing */
-function b3vSharpen() {
-  clearTimeout(b3vSettle);
-  const q = b3vZ * b3vDensity();
-  if (Math.abs(q - b3vQ) < 0.005) return;
-  b3vQ = q;
-  b3vZoomEl.classList.add('settle');
-  b3vZoomEl.style.setProperty('--q', q.toFixed(3));
-  void b3vZoomEl.offsetWidth;
-  b3vZoomEl.classList.remove('settle');
+function b3vSharpen(w) {
+  clearTimeout(w.settle);
+  const q = w.z * b3vDensity();
+  if (Math.abs(q - w.q) < 0.005) return;
+  w.q = q;
+  w.zoomEl.classList.add('settle');
+  w.zoomEl.style.setProperty('--q', q.toFixed(3));
+  void w.zoomEl.offsetWidth;
+  w.zoomEl.classList.remove('settle');
 }
-function b3vOpen(b, from) {
-  clearTimeout(b3vShut);   // opened again while closing
-  b3v.classList.remove('zv-out');
-  b3vFly.getAnimations().forEach((x) => x.cancel());
-  const a = from.getBoundingClientRect();
-  b3vFrom = from;
-  b3vBox = b3Make(b, true);
-  b3vBox._src = `img/ab/x/${b.slug}_p0.webp`;   // full size: the viewer zooms in; the page's copy shows until it is ready
-  b3vBox.style.setProperty('--img', from.style.getPropertyValue('--img'));
-  b3Load(b3vBox);
-  b3vZoomEl.replaceChildren(b3vBox);
-  b3vView(1, 0, 0, true);
-  $('#b3v-cap').replaceChildren(el('span', '', 'COVER'), document.createTextNode(bkName(b)));
-  b3v.hidden = false;
-  document.documentElement.classList.add('zv-open');
-  b3Pose(b3vBox, from._pose.rx, from._pose.ry);
-  if (!CALM && b3vFly.animate) {   // the book rises from where it sat on the page
-    const c = b3vBox.getBoundingClientRect();
-    b3vFly.animate([
+/* opening, the book rises from where it sat on the page into its window; closing, it flies back, turning back to how
+   it sits there, as the window fades (.lift lets it out of the window on the way). With the page's book not on the
+   screen, it grows in or fades out where it is. Returns how long it takes (ms). */
+function b3vFly(w, out) {
+  if (CALM || !w.fly.animate) return 0;
+  w.fly.getAnimations().forEach((x) => x.cancel());
+  const a = zvRectOf(w.from), c = w.book.getBoundingClientRect();
+  if (!a || !c.width) {
+    const away = { opacity: 0, transform: 'scale(.92)' }, here = { opacity: 1, transform: 'none' };
+    w.fly.animate(out ? [here, away] : [away, here], { duration: out ? 380 : 520, easing: out ? 'cubic-bezier(.4,0,.2,1)' : EASE_OUT, fill: out ? 'forwards' : 'none' });
+    return out ? 380 : 520;
+  }
+  w.el.classList.add('lift');
+  if (!out) {
+    w.fly.animate([
       { transform: `translate(${(a.left + a.width / 2 - c.left - c.width / 2).toFixed(1)}px,${(a.top + a.height / 2 - c.top - c.height / 2).toFixed(1)}px) scale(${(a.width / c.width).toFixed(4)})` },
       { transform: 'none' },
-    ], { duration: 720, easing: EASE_OUT });
+    ], { duration: 720, easing: EASE_OUT }).finished.then(() => w.el.classList.remove('lift'), () => {});
+    return 720;
   }
-  b3Tween(b3vBox, b3At(b3vBox, B3_VIEW), 1000);
-  $('#b3v-close').focus({ preventScroll: true });
+  /* the fly layer scales about its centre, so aim the book's centre, wherever the visitor moved it, at its place */
+  const f = w.fly.getBoundingClientRect(), k = a.width / c.width, fx = f.left + f.width / 2, fy = f.top + f.height / 2;
+  const tx = a.left + a.width / 2 - fx - k * (c.left + c.width / 2 - fx), ty = a.top + a.height / 2 - fy - k * (c.top + c.height / 2 - fy);
+  w.fly.animate([{ transform: 'none' }, { transform: `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})` }],
+    { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+  if (w.from._pose) b3Tween(w.book, w.from._pose, 420);
+  return 420;
 }
-/* closing, the book flies back to its place on the page, turning back to how it sits there, as the viewer fades */
-function b3vClose() {
-  if (b3v.hidden || b3v.classList.contains('zv-out')) return;
-  cancelAnimationFrame(b3Spin);
-  if (b3vBox) cancelAnimationFrame(b3vBox._tw);
-  b3Ptr.clear();
-  b3Drag = b3Pinch = b3Pan = null;
-  b3vStage.classList.remove('drag', 'pinch', 'pan');
-  const done = () => {
-    b3v.hidden = true;
-    b3v.classList.remove('zv-out');
-    if (b3vBox) cancelAnimationFrame(b3vBox._tw);
-    b3vFly.getAnimations().forEach((x) => x.cancel());
-    document.documentElement.classList.remove('zv-open');
-    const s = b3vFrom && b3vFrom.closest('button');
-    if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
-  };
-  if (CALM) { done(); return; }
-  b3v.classList.add('zv-out');
-  const a = b3vFrom && b3vFrom.isConnected && !b3vFrom.closest('[hidden]') ? b3vFrom.getBoundingClientRect() : null;
-  if (a && a.width && b3vBox && b3vFly.animate) {
-    /* the fly layer scales about its centre, so aim the book's centre, wherever the visitor moved it, at its place */
-    const c = b3vBox.getBoundingClientRect(), f = b3vFly.getBoundingClientRect(), k = a.width / c.width;
-    const fx = f.left + f.width / 2, fy = f.top + f.height / 2;
-    const tx = a.left + a.width / 2 - fx - k * (c.left + c.width / 2 - fx), ty = a.top + a.height / 2 - fy - k * (c.top + c.height / 2 - fy);
-    b3vFly.animate([{ transform: 'none' }, { transform: `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})` }],
-      { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-    if (b3vFrom._pose) b3Tween(b3vBox, b3vFrom._pose, 420);
-  }
-  b3vShut = setTimeout(done, 420);
+/* open a book's 3D cover in a window (the book page's cover, clicked); one that is open already comes to the front */
+function b3vOpen(b, from) {
+  const same = zvWins.find((o) => !o.shut && o.kind === 'b3' && o.b === b);
+  if (same) { same.from = from; zvBack(same); return; }
+  const w = zvFrame('b3', from), parts = $('#b3v-tpl').content.cloneNode(true), pick = (s) => w.el.querySelector(s);
+  w.el.classList.add('b3v');
+  w.el.querySelector('.zv-min').before(parts.querySelector('.b3v-reset'));
+  w.bar.after(...parts.children);
+  textsIn(w.el);
+  w.el.dataset.i18nAria = 'b3.label';
+  w.el.setAttribute('aria-label', tr('b3.label'));
+  const book = b3Make(b, true), name = () => w.cap.replaceChildren(el('span', '', 'COVER'), document.createTextNode(bkName(b)));
+  Object.assign(w, {
+    b, book, stage: pick('.b3v-stage'), fly: pick('.b3v-fly'), zoomEl: pick('.b3v-zoom'),
+    z: 1, q: 1, px: 0, py: 0, settle: 0, ptr: new Map(), drag: null, pinch: null, pan: null, spin: 0, tap: 0,
+    fit: () => b3vPanTo(w, w.px, w.py),   // the book takes the stage's size by itself (css/artbook.css); it stays in view
+    want: (maxW, maxH, side) => {   // as css/artbook.css sizes the book: at most 60% of the stage's width, 62% of its height
+      const arn = b.pages[0][0] / 2 / b.pages[0][1], sh = maxH - w.bar.offsetHeight - 2;
+      return [Math.min(maxW, Math.max(side ? 0 : 480, (0.62 * sh * arn) / 0.6 + 2)), maxH];
+    },
+    keys: (e) => b3vKey(w, e),
+    leave: (out) => b3vFly(w, out),
+    land: () => { w.fly.getAnimations().forEach((x) => x.finish()); w.el.classList.remove('lift'); },
+    end: () => { cancelAnimationFrame(w.spin); cancelAnimationFrame(book._tw); clearTimeout(w.settle); w.ptr.clear(); w.drag = w.pinch = w.pan = null; },
+    badge: () => ({ src: b3Src(b, false), pos: b.rtl ? '25% 50%' : '75% 50%', name: bkName(b), full: `COVER · ${bkName(b)}` }),   // the chip shows the front cover
+    lang: name,
+  });
+  name();
+  book._src = `img/ab/x/${b.slug}_p0.webp`;   // full size: the viewer zooms in; the page's copy shows until it is ready
+  book.style.setProperty('--img', from.style.getPropertyValue('--img'));
+  b3Load(book);
+  w.zoomEl.replaceChildren(book);
+  pick('.b3v-reset').addEventListener('click', () => b3vReset(w));
+  b3vWire(w);
+  zvPut(w);
+  b3vView(w, 1, 0, 0, true);
+  b3Pose(book, from._pose.rx, from._pose.ry);
+  b3vFly(w, false);
+  b3Tween(book, b3At(book, B3_VIEW), 1000);
 }
-function b3vReset() {
-  const p = b3vBox._pose, v = b3At(b3vBox, B3_VIEW);   // come back the short way round
-  b3Pose(b3vBox, p.rx, v.ry + ((((p.ry - v.ry) % 360) + 540) % 360 - 180));
-  b3Tween(b3vBox, v, 800);
-  b3vView(1, 0, 0);
+function b3vReset(w) {
+  const p = w.book._pose, v = b3At(w.book, B3_VIEW);   // come back the short way round
+  b3Pose(w.book, p.rx, v.ry + ((((p.ry - v.ry) % 360) + 540) % 360 - 180));
+  b3Tween(w.book, v, 800);
+  b3vView(w, 1, 0, 0);
 }
-function b3Fling(vx, vy) {
+function b3Fling(w, vx, vy) {
   vx = Math.max(-2.2, Math.min(2.2, vx));
   vy = Math.max(-1.2, Math.min(1.2, vy));
   let last = performance.now();
   const step = (now) => {
-    const dt = Math.min(40, now - last), p = b3vBox._pose;
+    const dt = Math.min(40, now - last), p = w.book._pose;
     last = now;
-    b3Pose(b3vBox, b3Tilt(p.rx - vy * dt * 0.35), p.ry + vx * dt * 0.45);
+    b3Pose(w.book, b3Tilt(p.rx - vy * dt * 0.35), p.ry + vx * dt * 0.45);
     vx *= Math.pow(0.93, dt / 16.7);
     vy *= Math.pow(0.84, dt / 16.7);
-    if (Math.abs(vx) + Math.abs(vy) > 0.015) b3Spin = requestAnimationFrame(step);
+    if (Math.abs(vx) + Math.abs(vy) > 0.015) w.spin = requestAnimationFrame(step);
   };
-  b3Spin = requestAnimationFrame(step);
+  w.spin = requestAnimationFrame(step);
 }
-b3vStage.addEventListener('pointerdown', (e) => {
-  if (!b3vBox) return;
-  if (e.pointerType === 'mouse' && (e.button === 0 || e.button === 1)) {   // the left button (or the wheel) held: move the view
-    if (e.button === 1) e.preventDefault();
-    try { b3vStage.setPointerCapture(e.pointerId); } catch (_) { /* move without capture */ }
-    cancelAnimationFrame(b3Spin);
-    b3Pan = { id: e.pointerId, btn: e.button, x: e.clientX, y: e.clientY, px: b3vPX, py: b3vPY, moved: false };
+function b3vKey(w, e) {   // the arrows turn the book, + and - zoom, 0 or Home puts it back
+  const p = w.book._pose, turn = { ArrowLeft: [0, -30], ArrowRight: [0, 30], ArrowUp: [15, 0], ArrowDown: [-15, 0] }[e.key];
+  if (turn) { cancelAnimationFrame(w.spin); b3Tween(w.book, { rx: b3Tilt(p.rx + turn[0]), ry: p.ry + turn[1] }, 450); }
+  else if (e.key === '+' || e.key === '=') b3vZoomTo(w, w.z * 1.25);
+  else if (e.key === '-') b3vZoomTo(w, w.z / 1.25);
+  else if (e.key === '0' || e.key === 'Home') b3vReset(w);
+  else return false;
+  return true;
+}
+function b3vUp(w, e) {
+  const st = w.stage;
+  if (w.pan && e.pointerId === w.pan.id) {
+    const pn = w.pan;
+    w.pan = null;
+    st.classList.remove('pan');
+    if (!pn.moved && pn.btn === 0 && e.type !== 'pointercancel') b3vTap(w, e);   // a left click, not a drag
     return;
   }
-  if (e.pointerType === 'mouse' && e.button !== 2) return;   // the right button turns the book, as one finger does
-  b3Ptr.set(e.pointerId, [e.clientX, e.clientY]);
-  try { b3vStage.setPointerCapture(e.pointerId); } catch (_) { /* keep turning without capture */ }
-  cancelAnimationFrame(b3Spin);
-  cancelAnimationFrame(b3vBox._tw);
-  if (b3Ptr.size === 2) {   // a second finger: pinch to zoom
-    const [[x1, y1], [x2, y2]] = b3Ptr.values();
-    const r = b3vStage.getBoundingClientRect();
-    b3Pinch = { d: Math.hypot(x2 - x1, y2 - y1) || 1, z: b3vZ, cx: (x1 + x2) / 2 - r.left - r.width / 2, cy: (y1 + y2) / 2 - r.top - r.height / 2, px: b3vPX, py: b3vPY };
-    b3Drag = null;
-    b3vStage.classList.add('pinch');
-  } else if (b3Ptr.size === 1) {
-    const p = b3vBox._pose;
-    b3Drag = { x: e.clientX, y: e.clientY, rx: p.rx, ry: p.ry, moved: false, lx: e.clientX, ly: e.clientY, lt: e.timeStamp, vx: 0, vy: 0, mouse: e.pointerType === 'mouse' };
-  }
-});
-b3vStage.addEventListener('pointermove', (e) => {
-  if (b3Pan && e.pointerId === b3Pan.id) {
-    const dx = e.clientX - b3Pan.x, dy = e.clientY - b3Pan.y;
-    if (!b3Pan.moved) {
-      if (Math.abs(dx) + Math.abs(dy) < 5) return;   // still a click
-      b3Pan.moved = true;
-      b3vStage.classList.add('pan');
-    }
-    b3vPanTo(b3Pan.px + dx, b3Pan.py + dy);
+  if (!w.ptr.delete(e.pointerId)) return;
+  if (w.pinch) {
+    if (!w.ptr.size) { w.pinch = null; st.classList.remove('pinch'); b3vSharpen(w); }
     return;
   }
-  if (!b3Ptr.has(e.pointerId)) return;
-  b3Ptr.set(e.pointerId, [e.clientX, e.clientY]);
-  if (b3Pinch) {
-    if (b3Ptr.size < 2) return;
-    const [[x1, y1], [x2, y2]] = b3Ptr.values(), r = b3vStage.getBoundingClientRect(), p = b3Pinch;
-    const z = Math.min(2.4, Math.max(0.6, p.z * Math.hypot(x2 - x1, y2 - y1) / p.d)), k = z / p.z;   // the point under the fingers stays under them
-    b3vView(z, (x1 + x2) / 2 - r.left - r.width / 2 - (p.cx - p.px) * k, (y1 + y2) / 2 - r.top - r.height / 2 - (p.cy - p.py) * k);
-    return;
-  }
-  const d = b3Drag;
-  if (!d) return;
-  const dx = e.clientX - d.x, dy = e.clientY - d.y;
-  if (!d.moved) {
-    if (Math.abs(dx) + Math.abs(dy) < 5) return;
-    d.moved = true;
-    b3vStage.classList.add('drag');
-  }
-  const dt = Math.max(8, e.timeStamp - d.lt);
-  d.vx = 0.7 * (e.clientX - d.lx) / dt + 0.3 * d.vx;
-  d.vy = 0.7 * (e.clientY - d.ly) / dt + 0.3 * d.vy;
-  d.lx = e.clientX; d.ly = e.clientY; d.lt = e.timeStamp;
-  b3Pose(b3vBox, b3Tilt(d.rx - dy * 0.35), d.ry + dx * 0.45);
-});
-function b3vUp(e) {
-  if (b3Pan && e.pointerId === b3Pan.id) {
-    const pn = b3Pan;
-    b3Pan = null;
-    b3vStage.classList.remove('pan');
-    if (!pn.moved && pn.btn === 0 && e.type !== 'pointercancel') b3vTap(e);   // a left click, not a drag
-    return;
-  }
-  if (!b3Ptr.delete(e.pointerId)) return;
-  if (b3Pinch) {
-    if (!b3Ptr.size) { b3Pinch = null; b3vStage.classList.remove('pinch'); b3vSharpen(); }
-    return;
-  }
-  const d = b3Drag;
-  b3Drag = null;
-  b3vStage.classList.remove('drag');
+  const d = w.drag;
+  w.drag = null;
+  st.classList.remove('drag');
   if (!d || e.type === 'pointercancel') return;
-  if (d.moved) { if (!CALM && e.timeStamp - d.lt < 90) b3Fling(d.vx, d.vy); return; }
-  if (!d.mouse) b3vTap(e);   // a tap; a right click on its own does nothing
+  if (d.moved) { if (!CALM && e.timeStamp - d.lt < 90) b3Fling(w, d.vx, d.vy); return; }
+  if (!d.mouse) b3vTap(w, e);   // a tap; a right click on its own does nothing
 }
-/* a click or tap beside the book closes the viewer; two in a row on it put it back */
-function b3vTap(e) {
-  const r = b3vBox.getBoundingClientRect(), pad = 40;
-  if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) { b3vClose(); return; }
-  if (b3Tap && e.timeStamp - b3Tap < 350) { b3Tap = 0; b3vReset(); } else b3Tap = e.timeStamp;
+/* two clicks or taps in a row on the book put it back */
+function b3vTap(w, e) {
+  const r = w.book.getBoundingClientRect(), pad = 40;
+  if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) return;
+  if (w.tap && e.timeStamp - w.tap < 350) { w.tap = 0; b3vReset(w); } else w.tap = e.timeStamp;
 }
-b3vStage.addEventListener('pointerup', b3vUp);
-b3vStage.addEventListener('pointercancel', b3vUp);
-b3vStage.addEventListener('wheel', (e) => {   // zooms toward the pointer
-  e.preventDefault();
-  const r = b3vStage.getBoundingClientRect();
-  b3vZoomTo(b3vZ * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015)), false, e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2);
-}, { passive: false });
-b3vStage.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });   // no autoscroll when the wheel is held
-b3vStage.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
-b3vStage.addEventListener('contextmenu', (e) => e.preventDefault());   // the right button turns the book
-$('#b3v-close').addEventListener('click', b3vClose);
-$('#b3v-reset').addEventListener('click', b3vReset);
-addEventListener('keydown', (e) => {
-  if (b3v.hidden || !b3vBox || e.altKey || e.metaKey || e.ctrlKey) return;
-  const p = b3vBox._pose, turn = { ArrowLeft: [0, -30], ArrowRight: [0, 30], ArrowUp: [15, 0], ArrowDown: [-15, 0] }[e.key];
-  if (e.key === 'Escape') b3vClose();
-  else if (turn) { cancelAnimationFrame(b3Spin); b3Tween(b3vBox, { rx: b3Tilt(p.rx + turn[0]), ry: p.ry + turn[1] }, 450); }
-  else if (e.key === '+' || e.key === '=') b3vZoomTo(b3vZ * 1.25);
-  else if (e.key === '-') b3vZoomTo(b3vZ / 1.25);
-  else if (e.key === '0' || e.key === 'Home') b3vReset();
-  else return;
-  e.preventDefault();
-});
-addEventListener('hashchange', b3vClose);
+/* the stage's pointers: the left button (or the wheel) held moves the view, the right button or one finger turns the
+   book, two fingers pinch to zoom; the wheel zooms toward the pointer */
+function b3vWire(w) {
+  const st = w.stage;
+  st.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && (e.button === 0 || e.button === 1)) {
+      if (e.button === 1) e.preventDefault();
+      try { st.setPointerCapture(e.pointerId); } catch (_) { /* move without capture */ }
+      cancelAnimationFrame(w.spin);
+      w.pan = { id: e.pointerId, btn: e.button, x: e.clientX, y: e.clientY, px: w.px, py: w.py, moved: false };
+      return;
+    }
+    if (e.pointerType === 'mouse' && e.button !== 2) return;
+    w.ptr.set(e.pointerId, [e.clientX, e.clientY]);
+    try { st.setPointerCapture(e.pointerId); } catch (_) { /* keep turning without capture */ }
+    cancelAnimationFrame(w.spin);
+    cancelAnimationFrame(w.book._tw);
+    if (w.ptr.size === 2) {   // a second finger: pinch to zoom
+      const [[x1, y1], [x2, y2]] = w.ptr.values();
+      const r = st.getBoundingClientRect();
+      w.pinch = { d: Math.hypot(x2 - x1, y2 - y1) || 1, z: w.z, cx: (x1 + x2) / 2 - r.left - r.width / 2, cy: (y1 + y2) / 2 - r.top - r.height / 2, px: w.px, py: w.py };
+      w.drag = null;
+      st.classList.add('pinch');
+    } else if (w.ptr.size === 1) {
+      const p = w.book._pose;
+      w.drag = { x: e.clientX, y: e.clientY, rx: p.rx, ry: p.ry, moved: false, lx: e.clientX, ly: e.clientY, lt: e.timeStamp, vx: 0, vy: 0, mouse: e.pointerType === 'mouse' };
+    }
+  });
+  st.addEventListener('pointermove', (e) => {
+    const pn = w.pan;
+    if (pn && e.pointerId === pn.id) {
+      const dx = e.clientX - pn.x, dy = e.clientY - pn.y;
+      if (!pn.moved) {
+        if (Math.abs(dx) + Math.abs(dy) < 5) return;   // still a click
+        pn.moved = true;
+        st.classList.add('pan');
+      }
+      b3vPanTo(w, pn.px + dx, pn.py + dy);
+      return;
+    }
+    if (!w.ptr.has(e.pointerId)) return;
+    w.ptr.set(e.pointerId, [e.clientX, e.clientY]);
+    if (w.pinch) {
+      if (w.ptr.size < 2) return;
+      const [[x1, y1], [x2, y2]] = w.ptr.values(), r = st.getBoundingClientRect(), p = w.pinch;
+      const z = Math.min(2.4, Math.max(0.6, p.z * Math.hypot(x2 - x1, y2 - y1) / p.d)), k = z / p.z;   // the point under the fingers stays under them
+      b3vView(w, z, (x1 + x2) / 2 - r.left - r.width / 2 - (p.cx - p.px) * k, (y1 + y2) / 2 - r.top - r.height / 2 - (p.cy - p.py) * k);
+      return;
+    }
+    const d = w.drag;
+    if (!d) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.moved) {
+      if (Math.abs(dx) + Math.abs(dy) < 5) return;
+      d.moved = true;
+      st.classList.add('drag');
+    }
+    const dt = Math.max(8, e.timeStamp - d.lt);
+    d.vx = 0.7 * (e.clientX - d.lx) / dt + 0.3 * d.vx;
+    d.vy = 0.7 * (e.clientY - d.ly) / dt + 0.3 * d.vy;
+    d.lx = e.clientX; d.ly = e.clientY; d.lt = e.timeStamp;
+    b3Pose(w.book, b3Tilt(d.rx - dy * 0.35), d.ry + dx * 0.45);
+  });
+  st.addEventListener('pointerup', (e) => b3vUp(w, e));
+  st.addEventListener('pointercancel', (e) => b3vUp(w, e));
+  st.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const r = st.getBoundingClientRect();
+    b3vZoomTo(w, w.z * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015)), false, e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2);
+  }, { passive: false });
+  st.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });   // no autoscroll when the wheel is held
+  st.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
+  st.addEventListener('contextmenu', (e) => e.preventDefault());   // the right button turns the book
+}

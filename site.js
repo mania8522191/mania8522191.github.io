@@ -260,6 +260,9 @@ const I18N = {
     "zv.next": "下一張",
     "zv.min": "縮到最小",
     "zv.dock": "縮到最小的圖片",
+    "zv.max": "最大化",
+    "zv.unmax": "還原大小",
+    "zv.close": "關閉",
     "zv.hint": "點圖片放大，再點一下縮回",
     "zv.load": "載入高解析度⋯",
     "zv.workAlt": "{t}（第 {n} 張）",
@@ -315,6 +318,7 @@ const I18N = {
     "bk.coverAlt": "{t} 封面與封底",
     "bk.blurAlt": "{t} 內頁（成人向，已模糊處理）",
     "bk.others": "其他畫冊",
+    "bk.pv": "預覽",
     "bk.r18": "這本是成人向作品，內頁已模糊處理。",
     "b3.open": "點擊放大，可 360° 旋轉",
     "b3.book": "{t} 封面與封底：點擊放大，可 360° 旋轉",
@@ -447,6 +451,9 @@ const I18N = {
     "zv.next": "Next",
     "zv.min": "Minimize",
     "zv.dock": "Minimized pictures",
+    "zv.max": "Maximize",
+    "zv.unmax": "Restore size",
+    "zv.close": "Close",
     "zv.hint": "Click the picture to zoom in, click again to zoom out",
     "zv.load": "Loading full resolution…",
     "zv.workAlt": "{t} (image {n})",
@@ -502,6 +509,7 @@ const I18N = {
     "bk.coverAlt": "{t}: front and back cover",
     "bk.blurAlt": "{t}: inside pages (adult content, blurred)",
     "bk.others": "Other art books",
+    "bk.pv": "Preview",
     "bk.r18": "This book is adult content; its inside pages are blurred.",
     "b3.open": "Click to enlarge and turn it 360°",
     "b3.book": "{t}: front and back cover. Click to enlarge and turn it 360°",
@@ -634,6 +642,9 @@ const I18N = {
     "zv.next": "次へ",
     "zv.min": "最小化",
     "zv.dock": "最小化した画像",
+    "zv.max": "最大化",
+    "zv.unmax": "元のサイズに戻す",
+    "zv.close": "閉じる",
     "zv.hint": "画像をクリックで拡大、もう一度クリックで元に戻ります",
     "zv.load": "高解像度を読み込み中…",
     "zv.workAlt": "{t}（{n}枚目）",
@@ -689,6 +700,7 @@ const I18N = {
     "bk.coverAlt": "{t} 表紙と裏表紙",
     "bk.blurAlt": "{t} 本文（成人向け・ぼかし加工）",
     "bk.others": "ほかの画集",
+    "bk.pv": "プレビュー",
     "bk.r18": "成人向けの本のため、本文はぼかしています。",
     "b3.open": "クリックで拡大・360°回転できます",
     "b3.book": "{t} 表紙と裏表紙：クリックで拡大・360°回転",
@@ -906,14 +918,18 @@ SHOTS.forEach((cap, i) => {
 showShot(0, false);
 
 /* ==================== js/lightbox.js ==================== */
-/* Image viewer: windows that move, resize, minimize into the dock and stay open side by side; fit, zoom, pan */
-/* ---------- image viewer: each picture opens in a window of its own, over the page below the header. Drag the bar
-   to move it, an edge or a corner to resize it; minimize tucks it into the dock at the bottom left, and a click there
-   brings it back as it was. Any number stay open side by side while the page goes on. In each: click to zoom into the
+/* Image viewer: windows on the Work and Art Book pages (move, resize, maximize, minimize, side by side); a pop-up on the game page */
+/* ---------- picture windows: on the Work and Art Book pages each picture opens in a window of its own over the page,
+   below the header, and so does an art book's 3D cover (js/book3d.js). Drag the bar to move a window, an edge or a
+   corner to resize it; maximize fills the screen below the header (so does a double-click on the bar); minimize tucks
+   it into the dock at the bottom left, and a click there brings it back as it was. Any number stay open side by side
+   while you look round that part of the site; going to another part (another link in the header) closes them all.
+   On the game page a picture opens in a pop-up over the page instead, one at a time. In both: click to zoom into the
    high-resolution copy, drag to pan. ---------- */
 const zwLayer = $('#zw-layer'), zvDock = $('#zv-dock');
 const ZV_MIN_W = 240, ZV_MIN_H = 180;   // the smallest a window can be made
-const ZV_SETS = {   // what a window steps through; made again in another language (zvLang)
+const ZV_POP = new Set(['shots', 'chars', 'cards']);   // the game page's pictures: the pop-up
+const ZV_SETS = {   // what a window steps through; made again in another language
   proc: (id) => {   // a work's process animations; the full-size one, where there is one, on zoom
     const w = WORKS[byId[id]], list = w.proc || [];
     return list.map(([f, W, H, ZW, ZH], n) => ({
@@ -952,22 +968,25 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
     return { src: `img/cards/${f}.webp`, w: 336, h: 960, zw: 420, no: `${no2(i + 1)} / ${no2(DECK.length)}`, cap: `${c} · ${name}`, alt: tr('cards.alt', { c, name }) };
   }),
 };
-const zvWins = [];   // the open windows, those in the dock too
+const zvWins = [];   // the open windows (those in the dock too) and the pop-up
 let zvTop = 0;       // the stacking order: the window in front has the highest
 const zvShown = () => zvWins.filter((o) => !o.chip && !o.shut).sort((a, b) => a.el.style.zIndex - b.el.style.zIndex);   // on screen, back to front
+const zvFull = (w) => zvBox(w, 0, 0, zwLayer.clientWidth, zwLayer.clientHeight);   // the whole screen below the header
+const zvInWin = (e) => e.target instanceof Element && !!e.target.closest('.zw');   // a key or click in a window
 
-function zvFit(w, it) {
-  const W = w.box.w - 2, H = w.box.h - 2;   // inside the border
+/* ---- a picture's size in its window ---- */
+function zvFit(w, it, live) {
+  /* from the window's size, not from the picture's area as it is now: that can be short of a scrollbar along the
+     bottom for a moment, brought by a picture still at its old size. While the window glides (live), as it is now. */
+  const bd = w.pop ? 0 : 2, W = live ? w.el.clientWidth : w.box.w - bd, H = live ? w.el.clientHeight : w.box.h - bd;   // inside the border
   const side = w.set.length > 1 && W > 430 ? 112 : 24;   // the picture's side margins, with room for the arrows (css/lightbox.css)
-  /* from the window's size, not from the picture's area as it is now: that can be on its way (a window gliding
-     aside), or short of a scrollbar along the bottom for a moment, brought by a picture still at its old size */
   const sw = W - (w.stage.offsetWidth - w.stage.clientWidth) - side, sh = H - w.bar.offsetHeight - 32 - (it.tags ? 40 : 0);
   const r = it.h / it.w;
   if (r > 2.9) return Math.max(40, Math.min(sw, it.zw, 1000));   // long process strips: fit the width, scroll down
   return Math.max(40, Math.min(sw, sh / r, it.zw));
 }
-function zvSize(w) {
-  const it = w.set[w.at], fit = zvFit(w, it);
+function zvSize(w, live) {
+  const it = w.set[w.at], fit = zvFit(w, it, live);
   const px = w.zoomed ? it.zw : fit;   // zoomed: the picture at its actual size, 100%
   w.img.style.width = `${Math.round(px)}px`;
   w.img.style.height = `${Math.round(px * it.h / it.w)}px`;
@@ -1017,7 +1036,7 @@ function zvZoom(w, on, cx, cy) {
   }
   if (on) zvHiRes(w);
 }
-/* the words for the picture a window shows, in the language chosen; its chip in the dock too */
+/* the words for the picture a window shows, in the language chosen */
 function zvText(w) {
   const it = w.set[w.at];
   w.img.alt = it.alt;
@@ -1026,10 +1045,6 @@ function zvText(w) {
   if (it.tags) {
     w.tags.style.gridTemplateColumns = it.tags.cols;
     w.tags.children[0].textContent = it.tags.l; w.tags.children[1].textContent = it.tags.r;
-  }
-  if (w.chip) {
-    w.chip.querySelector('.zv-chip-t').textContent = it.cap;
-    w.chip.querySelector('.zv-chip-b').title = `${it.no} · ${it.cap}`;
   }
 }
 function zvShow(w, i, opening) {
@@ -1085,6 +1100,7 @@ function zvFly(w, out) {
   return ms;
 }
 
+/* ---- windows: their place and size, moving, resizing, maximize, minimize ---- */
 /* a window's place and size: on the screen below the header, with enough of it showing that its bar can be reached */
 function zvBox(w, x, y, W, H) {
   const lw = zwLayer.clientWidth, lh = zwLayer.clientHeight;
@@ -1095,27 +1111,31 @@ function zvBox(w, x, y, W, H) {
   const sized = !w.box || W !== w.box.w || H !== w.box.h;
   w.box = { x, y, w: W, h: H };
   Object.assign(w.el.style, { left: `${x}px`, top: `${y}px`, width: `${W}px`, height: `${H}px` });
-  if (sized && w.img.getAttribute('src')) zvSize(w);
+  if (sized && !w.el.classList.contains('glide')) w.fit();   // gliding, it follows the frame as it goes (zvGlide)
 }
-/* where a window goes, shaped about like its picture and as big as fits it (most of a phone's screen): in the middle
-   of the given half of the screen (side 'l' or 'r'), or else where it covers the other windows least, nearest the
-   middle */
+/* move or resize a window smoothly; what it shows follows the size as it goes */
+function zvGlide(w, fn) {
+  if (CALM) { fn(); return; }
+  clearTimeout(w.glide);
+  w.el.classList.add('glide');
+  fn();
+  const t0 = performance.now(), step = (now) => {
+    if (!w.el.classList.contains('glide')) return;
+    w.fit(true);
+    if (now - t0 < 520) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+  w.glide = setTimeout(() => { w.el.classList.remove('glide'); w.fit(); }, 540);
+}
+/* where a window goes, its size from what it shows (w.want; most of a phone's screen): in the middle of the given half
+   of the screen (side 'l' or 'r'), or else where it covers the other windows least, nearest the middle */
 function zvPlace(w, side) {
-  const LW = zwLayer.clientWidth, lh = zwLayer.clientHeight, it = w.set[w.at], r = it.h / it.w;
+  const LW = zwLayer.clientWidth, lh = zwLayer.clientHeight;
   const lw = side ? Math.floor(LW / 2) : LW, ax = side === 'r' ? LW - lw : 0;   // the area it goes in
-  if (!w.box) zvBox(w, 0, 0, 600, 400);   // a new one: some size for now, to measure the frame around the picture
-  const fw = w.stage.offsetWidth - w.stage.clientWidth + 2 + (w.set.length > 1 ? 112 : 24);   // scrollbar room, border, margins
-  const fh = w.bar.offsetHeight + 2 + 32 + (it.tags ? 40 : 0);
-  let W, H;
-  if (LW <= 640) { W = lw - 16; H = lh * 0.86; }
-  else {
-    const maxW = side ? lw - 24 : Math.max(480, lw * 0.72), maxH = lh * 0.88;
-    const pw = Math.min(maxW - fw, it.zw, r > 2.9 ? 1000 : (maxH - fh) / r);
-    W = Math.min(maxW, Math.max(side ? 0 : 480, pw + fw));
-    H = r > 2.9 ? maxH : Math.min(maxH, Math.max(320, pw * r + fh));
-  }
+  if (!w.box) zvBox(w, 0, 0, 600, 400);   // a new one: some size for now, to measure the frame round what it shows
+  let [W, H] = LW <= 640 ? [lw - 16, lh * 0.86] : w.want(side ? lw - 24 : Math.max(480, lw * 0.72), lh * 0.88, side);
   W = Math.round(W); H = Math.round(H);
-  w.auto = true;   // put here, not by the visitor: the next picture opened may move it aside (zvOpen)
+  w.auto = true;   // put here, not by the visitor: the next window opened may move it aside (zvPut)
   if (side) { zvBox(w, ax + (lw - W) / 2, (lh - H) / 2, W, H); return; }
   const others = zvShown().filter((o) => o !== w).map((o) => o.box);
   const mx = Math.max(0, lw - W), my = Math.max(0, lh - H), nx = LW <= 640 ? 0 : 10;   // phones: always centred left to right
@@ -1131,25 +1151,57 @@ function zvPlace(w, side) {
   }
   zvBox(w, best.x, best.y, W, H);
 }
+/* a new window goes in. The pop-up fills the screen below the header. A window opened beside one other that is still
+   where it was put goes side by side with it: that one glides to the left half, this one opens in the right.
+   Otherwise it goes where it covers the others least. */
+function zvPut(w) {
+  zwLayer.append(w.el);
+  zvWins.push(w);
+  if (w.pop) { zvFull(w); document.documentElement.classList.add('zv-open'); }
+  else {
+    const shown = zvShown().filter((o) => o !== w);
+    const mate = shown.length === 1 && shown[0].auto && zwLayer.clientWidth >= 1000 ? shown[0] : null;
+    if (mate) zvGlide(mate, () => zvPlace(mate, 'l'));
+    zvPlace(w, mate ? 'r' : '');
+  }
+  zvFront(w);
+  w.el.focus({ preventScroll: true });
+}
 function zvFront(w) {
   if (w.el.classList.contains('front')) return;
   zvWins.forEach((o) => o.el.classList.toggle('front', o === w));
   w.el.style.zIndex = ++zvTop;
 }
+/* a window that is open already comes to the front, or back from the dock */
+function zvBack(w) {
+  if (w.chip) zvRestore(w);
+  else { zvFront(w); w.el.focus({ preventScroll: true }); }
+}
 /* drag the bar to move a window (d = ''), an edge or a corner to resize it (d = n, e, s, w, ne, se, sw or nw) */
 function zvGrab(w, e, d) {
-  if (e.button !== 0 || w.shut) return;
+  if (e.button !== 0 || w.shut || w.pop || (d && w.max)) return;
   e.preventDefault();
   if (!w.el.contains(document.activeElement)) w.el.focus({ preventScroll: true });
   w.auto = false;   // the visitor's place for it from now on
   w.el.classList.remove('glide');
-  const t = e.currentTarget, { x, y, w: W, h: H } = w.box, sx = e.clientX, sy = e.clientY;
+  const t = e.currentTarget, sx = e.clientX, sy = e.clientY, L = zwLayer.getBoundingClientRect();
   const lw = zwLayer.clientWidth, lh = zwLayer.clientHeight;
+  let { x, y, w: W, h: H } = w.box;
   t.setPointerCapture(e.pointerId);
   w.el.classList.add(d ? 'sizing' : 'moving');
   const move = (ev) => {
     const dx = ev.clientX - sx, dy = ev.clientY - sy;
-    if (!d) { zvBox(w, x + dx, y + dy, W, H); return; }
+    if (!d) {
+      if (w.max) {   // a full window dragged by its bar goes back to its own size, held at the same place on the bar
+        if (Math.abs(dx) + Math.abs(dy) < 6) return;
+        const k = (sx - L.left - x) / W;
+        zvMaxSet(w, false);
+        ({ w: W, h: H } = w.prev);
+        x = sx - L.left - k * W; y = 0;
+      }
+      zvBox(w, x + dx, y + dy, W, H);
+      return;
+    }
     let l = x, tp = y, r = x + W, b = y + H;   // an edge that was off the screen does not jump back on
     if (d.includes('w')) l = Math.min(Math.max(x + dx, Math.min(0, x)), r - ZV_MIN_W);
     if (d.includes('e')) r = Math.max(Math.min(r + dx, Math.max(lw, r)), l + ZV_MIN_W);
@@ -1167,135 +1219,41 @@ function zvGrab(w, e, d) {
   t.addEventListener('pointerup', up);
   t.addEventListener('pointercancel', up);
 }
-function zvKey(w, e) {
-  if (e.altKey || e.metaKey || e.ctrlKey) return;
-  if (e.key === 'Escape') zvClose(w);
-  else if (e.key === 'ArrowLeft' && w.set.length > 1) zvShow(w, w.at - 1);
-  else if (e.key === 'ArrowRight' && w.set.length > 1) zvShow(w, w.at + 1);
-  else if (e.key === 'z' || e.key === '+' || e.key === '-') zvZoom(w, !w.zoomed);
-  else return;
-  e.preventDefault();
+/* maximize: the window fills the screen below the header; again, it goes back to where it was */
+function zvMaxSet(w, on) {
+  w.max = on;
+  w.el.classList.toggle('max', on);
+  const b = w.el.querySelector('.zv-max'), t = tr(on ? 'zv.unmax' : 'zv.max');
+  b.title = t;
+  b.setAttribute('aria-label', t);
 }
-/* a new window from the template in index.html, with its own controls */
-function zvMake(kind, key, set, from) {
-  const node = $('#zv-tpl').content.firstElementChild.cloneNode(true);
-  const q = (s) => node.querySelector(s);
-  const w = {
-    el: node, bar: q('.zv-bar'), cap: q('.zv-cap'), stage: q('.zv-stage'), img: q('.zv-img'), tags: q('.zv-tags'),
-    zoomBtn: q('.zv-zoom'), zoomT: q('.zv-zoom .zv-t'), load: q('.zv-load'),
-    kind, key, set, at: 0, at0: 0, from, zoomed: false, token: 0, box: null, auto: false, glide: 0, chip: null, ghost: null, morph: null, pan: null, shut: false,
-  };
-  node.setAttribute('aria-label', tr('zv.label'));
-  textsIn(node);
-  node.classList.toggle('multi', set.length > 1);
-  q('.zv-prev').hidden = q('.zv-next').hidden = set.length < 2;
-  node.addEventListener('pointerdown', () => zvFront(w), true);   // whatever is pressed, its window comes to the front
-  node.addEventListener('focusin', () => zvFront(w));
-  node.addEventListener('keydown', (e) => zvKey(w, e));
-  node.addEventListener('wheel', (e) => {   // the page behind does not scroll; a picture bigger than its window does
-    const s = w.stage;
-    if (!e.ctrlKey && !(s.contains(e.target) && (s.scrollHeight > s.clientHeight + 1 || s.scrollWidth > s.clientWidth + 1))) e.preventDefault();
-  }, { passive: false });
-  w.bar.addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) zvGrab(w, e, ''); });
-  node.querySelectorAll('.zv-rs').forEach((h) => h.addEventListener('pointerdown', (e) => zvGrab(w, e, h.dataset.d)));
-  w.zoomBtn.addEventListener('click', () => zvZoom(w, !w.zoomed));
-  q('.zv-min').addEventListener('click', () => zvMin(w));
-  q('.zv-close').addEventListener('click', () => zvClose(w));
-  q('.zv-prev').addEventListener('click', () => zvShow(w, w.at - 1));
-  q('.zv-next').addEventListener('click', () => zvShow(w, w.at + 1));
-  /* a click toggles zoom at that point; a mouse drag pans instead */
-  const st = w.stage;
-  st.addEventListener('pointerdown', (e) => {
-    if (!w.zoomed || e.pointerType !== 'mouse' || e.button !== 0) return;
-    w.pan = { x: e.clientX, y: e.clientY, l: st.scrollLeft, t: st.scrollTop, moved: false };
-    st.setPointerCapture(e.pointerId);
-  });
-  st.addEventListener('pointermove', (e) => {
-    const p = w.pan;
-    if (!p) return;
-    const dx = e.clientX - p.x, dy = e.clientY - p.y;
-    if (Math.abs(dx) + Math.abs(dy) > 4) { p.moved = true; st.classList.add('drag'); }
-    st.scrollLeft = p.l - dx;
-    st.scrollTop = p.t - dy;
-  });
-  const endPan = () => { st.classList.remove('drag'); setTimeout(() => { w.pan = null; }, 0); };
-  st.addEventListener('pointerup', endPan);
-  st.addEventListener('pointercancel', endPan);
-  st.addEventListener('click', (e) => {
-    if ((w.pan && w.pan.moved) || e.target.closest('.zv-tags')) return;
-    const r = w.img.getBoundingClientRect();
-    if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) zvZoom(w, !w.zoomed, e.clientX, e.clientY);
-  });
-  zwLayer.append(node);
-  zvWins.push(w);
-  return w;
-}
-/* open a picture in a new window; one that is open already (in the dock too) comes to the front instead */
-function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'book' ? lastBook : '';
-  const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
-  const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
-  if (same) {
-    same.from = from; same.at0 = at;
-    if (same.chip) zvRestore(same);
-    else { zvFront(same); same.el.focus({ preventScroll: true }); }
-    return;
-  }
-  const w = zvMake(kind, key, set, from);
-  w.at = w.at0 = at;
-  const shown = zvShown().filter((o) => o !== w);
-  const mate = shown.length === 1 && shown[0].auto && zwLayer.clientWidth >= 1000 ? shown[0] : null;
-  if (mate) {   // one window open, where it was put: side by side, it glides to the left half and this one opens in the right
-    mate.el.classList.add('glide');
-    zvPlace(mate, 'l');
-    clearTimeout(mate.glide);
-    mate.glide = setTimeout(() => mate.el.classList.remove('glide'), 600);
-    zvPlace(w, 'r');
-  } else zvPlace(w);
-  zvShow(w, at, true);
-  zvFront(w);
-  w.el.focus({ preventScroll: true });
-  zvFly(w, false);
-}
-function zvClose(w) {
-  if (w.shut) return;
-  w.shut = true;
-  ++w.token;
-  const had = w.el.contains(document.activeElement) || (w.chip && w.chip.contains(document.activeElement));
-  const done = () => {
-    zvGhostOut(w);
-    w.el.remove();
-    if (w.chip) w.chip.remove();
-    zvWins.splice(zvWins.indexOf(w), 1);
-    const next = zvShown().pop();
-    if (next) zvFront(next);
-    if (!had) return;
-    if (next) next.el.focus({ preventScroll: true });   // the keyboard goes on in the window now in front, or on the picture this one came from
-    else if (w.from && w.from.isConnected && !w.from.closest('[hidden]')) w.from.focus({ preventScroll: true });
-  };
-  if (CALM || !w.el.animate) { done(); return; }
-  if (w.chip) {   // closed from the dock: the chip goes; the window stays hidden, even halfway into the dock
-    w.el.classList.add('mini');
-    w.chip.style.pointerEvents = 'none';
-    w.chip.animate([{ opacity: 0, transform: 'scale(.9)' }], { duration: 200, easing: 'ease-in', fill: 'forwards' }).finished.then(done, done);
-    return;
-  }
-  if (w.morph) w.morph.cancel();
-  w.el.classList.add('zw-out');
-  setTimeout(done, zvFly(w, true) || 380);
+function zvMax(w, on = !w.max) {
+  if (w.pop || w.shut || w.chip || on === w.max) return;
+  if (on) w.prev = { ...w.box };
+  zvMaxSet(w, on);
+  w.auto = false;
+  zvGlide(w, () => (on ? zvFull(w) : zvBox(w, w.prev.x, w.prev.y, w.prev.w, w.prev.h)));
 }
 /* minimize: the window shrinks into a chip in the dock and waits there, hidden but as it was */
+function zvChipFill(w) {
+  if (!w.chip) return;
+  const { src, pos, name, full } = w.badge(), im = w.chip.querySelector('img');   // its picture (and the part of it to show), its name
+  if (im.getAttribute('src') !== src) im.src = src;
+  im.style.objectPosition = pos || '';
+  w.chip.querySelector('.zv-chip-t').textContent = name;
+  w.chip.querySelector('.zv-chip-b').title = full;
+}
 function zvMin(w) {
-  if (w.shut || w.chip) return;
+  if (w.shut || w.chip || w.pop) return;
   const had = w.el.contains(document.activeElement);
   const chip = $('#zv-chip-tpl').content.firstElementChild.cloneNode(true);
   w.chip = chip;
-  chip.querySelector('img').src = w.set[w.at].src;
-  zvText(w);
+  textsIn(chip);
+  zvChipFill(w);
   chip.querySelector('.zv-chip-b').addEventListener('click', () => zvRestore(w));
   chip.querySelector('.zv-chip-x').addEventListener('click', () => zvClose(w));
   zvDock.append(chip);
-  zvGhostOut(w);
+  w.land();
   w.el.classList.remove('front');
   const next = zvShown().pop();
   if (next) zvFront(next);
@@ -1320,7 +1278,7 @@ function zvRestore(w) {
   chip.remove();
   if (w.morph) w.morph.cancel();
   w.el.classList.remove('mini', 'flying');
-  zvBox(w, w.box.x, w.box.y, w.box.w, w.box.h);   // the screen may have changed meanwhile
+  if (w.max) zvFull(w); else zvBox(w, w.box.x, w.box.y, w.box.w, w.box.h);   // the screen may have changed meanwhile
   zvFront(w);
   if (!CALM && w.el.animate && b.width) {
     const a = w.el.getBoundingClientRect();
@@ -1329,11 +1287,164 @@ function zvRestore(w) {
   }
   w.el.focus({ preventScroll: true });
 }
-/* another language: the windows' sets made again, their words in it (the marked texts change with the page's) */
-function zvLang() {
-  zvWins.forEach((w) => { w.set = ZV_SETS[w.kind](w.key); zvText(w); zvSize(w); });
+function zvClose(w) {
+  if (w.shut) return;
+  w.shut = true;
+  const had = w.el.contains(document.activeElement) || (w.chip && w.chip.contains(document.activeElement));
+  const done = () => {
+    w.end();
+    w.el.remove();
+    if (w.chip) w.chip.remove();
+    const i = zvWins.indexOf(w);
+    if (i < 0) return;   // all closed meanwhile (zvCloseAll)
+    zvWins.splice(i, 1);
+    if (w.pop) document.documentElement.classList.remove('zv-open');
+    const next = zvShown().pop();
+    if (next) zvFront(next);
+    if (!had) return;
+    if (next) next.el.focus({ preventScroll: true });   // the keyboard goes on in the window now in front, or on what this one came from
+    else if (w.from && w.from.isConnected && !w.from.closest('[hidden]')) (w.from.closest('button') || w.from).focus({ preventScroll: true });
+  };
+  if (CALM || !w.el.animate) { done(); return; }
+  if (w.chip) {   // closed from the dock: the chip goes; the window stays hidden, even halfway into the dock
+    w.el.classList.add('mini');
+    w.chip.style.pointerEvents = 'none';
+    w.chip.animate([{ opacity: 0, transform: 'scale(.9)' }], { duration: 200, easing: 'ease-in', fill: 'forwards' }).finished.then(done, done);
+    return;
+  }
+  if (w.morph) w.morph.cancel();
+  w.el.classList.add('zw-out');
+  setTimeout(done, w.leave(true) || 380);
 }
-addEventListener('resize', () => zvWins.forEach((w) => zvBox(w, w.box.x, w.box.y, w.box.w, w.box.h)));
+/* going to another part of the site: every window closes at once (under the curtain, or as the page changes) */
+function zvCloseAll() {
+  zvWins.splice(0).forEach((w) => { w.shut = true; w.end(); w.el.remove(); if (w.chip) w.chip.remove(); });
+  document.documentElement.classList.remove('zv-open');
+}
+let zvPart = '';
+function zvPage(next) {   // every page change (js/router.js: apply)
+  const a = [...document.querySelectorAll('.nav a')].find((x) => x.dataset.v.split(' ').includes(next));
+  const part = a ? a.dataset.v : next;   // the part of the site: the header link the page lights up (Work: the wall and the works' pages)
+  if (part !== zvPart) zvCloseAll();
+  zvPart = part;
+}
+function zvKey(w, e) {
+  if (e.altKey || e.metaKey || e.ctrlKey) return;
+  if (e.key === 'Escape') zvClose(w);
+  else if (!w.keys(e)) return;
+  e.preventDefault();
+}
+/* another language: what the windows say, in it (the marked texts change with the page's) */
+function zvLang() {
+  zvWins.forEach((w) => { w.lang(); zvMaxSet(w, w.max); zvChipFill(w); });
+}
+
+/* a window's frame from the template in index.html: the bar with its caption and the minimize, maximize and close
+   buttons, the edges that resize it. What it shows goes in after the bar; the hooks it sets say how it behaves:
+   fit (what it shows takes the window's size), want (the size it would like), keys, leave (flying out on closing),
+   land (anything flying lands now), end (stop all on closing), badge (its chip in the dock), lang */
+function zvFrame(kind, from, pop) {
+  const el = $('#zv-tpl').content.firstElementChild.cloneNode(true);
+  const w = { el, bar: el.querySelector('.zv-bar'), cap: el.querySelector('.zv-cap'), kind, from, pop: !!pop,
+    box: null, prev: null, max: false, auto: false, glide: 0, chip: null, morph: null, shut: false };
+  el.classList.toggle('pop', w.pop);
+  if (w.pop) el.setAttribute('aria-modal', 'true');
+  zvMaxSet(w, false);
+  el.addEventListener('pointerdown', () => zvFront(w), true);   // whatever is pressed, its window comes to the front
+  el.addEventListener('focusin', () => zvFront(w));
+  el.addEventListener('keydown', (e) => zvKey(w, e));
+  el.addEventListener('wheel', (e) => { if (!e.ctrlKey && !(w.scrolls && w.scrolls(e))) e.preventDefault(); }, { passive: false });   // the page behind does not scroll
+  w.bar.addEventListener('pointerdown', (e) => { if (!e.target.closest('button')) zvGrab(w, e, ''); });
+  w.bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button')) zvMax(w); });
+  el.querySelectorAll('.zv-rs').forEach((h) => h.addEventListener('pointerdown', (e) => zvGrab(w, e, h.dataset.d)));
+  el.querySelector('.zv-min').addEventListener('click', () => zvMin(w));
+  el.querySelector('.zv-max').addEventListener('click', () => zvMax(w));
+  el.querySelector('.zv-close').addEventListener('click', () => zvClose(w));
+  return w;
+}
+/* a picture's window (the pop-up for the game page's), with the zoom button, the picture, the arrows */
+function zvMake(kind, key, set, from) {
+  const w = zvFrame(kind, from, ZV_POP.has(kind)), parts = $('#zv-pic-tpl').content.cloneNode(true), q = (s) => w.el.querySelector(s);
+  w.el.querySelector('.zv-min').before(parts.querySelector('.zv-zoom'));
+  w.bar.after(...parts.children);
+  textsIn(w.el);
+  w.el.dataset.i18nAria = 'zv.label';
+  w.el.setAttribute('aria-label', tr('zv.label'));
+  w.el.classList.toggle('multi', set.length > 1);
+  q('.zv-prev').hidden = q('.zv-next').hidden = set.length < 2;
+  Object.assign(w, {
+    stage: q('.zv-stage'), img: q('.zv-img'), tags: q('.zv-tags'), zoomBtn: q('.zv-zoom'), zoomT: q('.zv-zoom .zv-t'), load: q('.zv-load'),
+    key, set, at: 0, at0: 0, zoomed: false, token: 0, ghost: null, pan: null,
+    fit: (live) => { if (w.img.getAttribute('src')) zvSize(w, live); },
+    want: (maxW, maxH, side) => {
+      const it = w.set[w.at], r = it.h / it.w;
+      const fw = w.stage.offsetWidth - w.stage.clientWidth + 2 + (w.set.length > 1 ? 112 : 24), fh = w.bar.offsetHeight + 2 + 32 + (it.tags ? 40 : 0);   // scrollbar room, border, margins
+      const pw = Math.min(maxW - fw, it.zw, r > 2.9 ? 1000 : (maxH - fh) / r);
+      return [Math.min(maxW, Math.max(side ? 0 : 480, pw + fw)), r > 2.9 ? maxH : Math.min(maxH, Math.max(320, pw * r + fh))];
+    },
+    keys: (e) => {
+      if (e.key === 'ArrowLeft' && w.set.length > 1) zvShow(w, w.at - 1);
+      else if (e.key === 'ArrowRight' && w.set.length > 1) zvShow(w, w.at + 1);
+      else if (e.key === 'z' || e.key === '+' || e.key === '-') zvZoom(w, !w.zoomed);
+      else return false;
+      return true;
+    },
+    scrolls: (e) => {   // a picture bigger than its window scrolls
+      const s = w.stage;
+      return s.contains(e.target) && (s.scrollHeight > s.clientHeight + 1 || s.scrollWidth > s.clientWidth + 1);
+    },
+    leave: (out) => zvFly(w, out),
+    land: () => zvGhostOut(w),
+    end: () => { ++w.token; zvGhostOut(w); },
+    badge: () => { const it = w.set[w.at]; return { src: it.src, name: it.cap, full: `${it.no} · ${it.cap}` }; },
+    lang: () => { w.set = ZV_SETS[w.kind](w.key); zvText(w); zvSize(w); },
+  });
+  w.zoomBtn.addEventListener('click', () => zvZoom(w, !w.zoomed));
+  q('.zv-prev').addEventListener('click', () => zvShow(w, w.at - 1));
+  q('.zv-next').addEventListener('click', () => zvShow(w, w.at + 1));
+  /* a click toggles zoom at that point (in the pop-up, a click beside the picture closes it); a mouse drag pans */
+  const st = w.stage;
+  st.addEventListener('pointerdown', (e) => {
+    if (!w.zoomed || e.pointerType !== 'mouse' || e.button !== 0) return;
+    w.pan = { x: e.clientX, y: e.clientY, l: st.scrollLeft, t: st.scrollTop, moved: false };
+    st.setPointerCapture(e.pointerId);
+  });
+  st.addEventListener('pointermove', (e) => {
+    const p = w.pan;
+    if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) { p.moved = true; st.classList.add('drag'); }
+    st.scrollLeft = p.l - dx;
+    st.scrollTop = p.t - dy;
+  });
+  const endPan = () => { st.classList.remove('drag'); setTimeout(() => { w.pan = null; }, 0); };
+  st.addEventListener('pointerup', endPan);
+  st.addEventListener('pointercancel', endPan);
+  st.addEventListener('click', (e) => {
+    if ((w.pan && w.pan.moved) || e.target.closest('.zv-tags')) return;
+    const r = w.img.getBoundingClientRect();
+    if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) zvZoom(w, !w.zoomed, e.clientX, e.clientY);
+    else if (w.pop && !w.zoomed) zvClose(w);
+  });
+  return w;
+}
+/* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
+function zvOpen(kind, i, from) {
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'book' ? lastBook : '';
+  const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
+  const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
+  if (same) { same.from = from; same.at0 = at; zvBack(same); return; }
+  const w = zvMake(kind, key, set, from);
+  w.at = w.at0 = at;
+  zvPut(w);
+  zvShow(w, at, true);
+  zvFly(w, false);
+}
+addEventListener('resize', () => zvWins.forEach((w) => (w.pop || w.max ? zvFull(w) : zvBox(w, w.box.x, w.box.y, w.box.w, w.box.h))));
+addEventListener('keydown', (e) => {   // the pop-up takes the keys wherever the focus is (a window, when the focus is in it)
+  const p = zvWins.find((o) => o.pop && !o.shut);
+  if (p && !zvInWin(e)) zvKey(p, e);
+});
 
 $('#wk-tl-jump').addEventListener('click', () => $('#wk-tl').scrollIntoView({ behavior: CALM ? 'auto' : 'smooth', block: 'center' }));
 $('#shot-big').addEventListener('click', (e) => zvOpen('shots', shotAt, e.currentTarget));
@@ -1352,7 +1463,6 @@ $('#wk-proc-box').addEventListener('click', (e) => {
 /* ---------- phone menu ---------- */
 const menuBtn = $('#menu-btn');
 function setMenu(open) {
-  if (open) b3vClose();   // the 3D viewer would cover the menu's links; picture windows wait hidden behind it (css/lightbox.css)
   document.documentElement.classList.toggle('menu-open', open);
   menuBtn.setAttribute('aria-expanded', String(open));
   menuBtn.querySelector('.menu-lbl').textContent = open ? 'CLOSE' : 'MENU';
@@ -2225,232 +2335,240 @@ function b3Hero(b) {
   return [stage, hint];
 }
 
-/* the 3D viewer: hold and drag to turn the book (it keeps spinning a little when flung), wheel or pinch to zoom,
-   double-click or double-tap the book to put it back, click beside it to close */
-const b3v = $('#b3v'), b3vStage = $('#b3v-stage'), b3vFly = $('#b3v-fly'), b3vZoomEl = $('#b3v-zoom');
-let b3vShut = 0;   // the closing timer
-const b3Ptr = new Map();
-let b3vBox = null, b3vFrom = null, b3vZ = 1, b3Drag = null, b3Pinch = null, b3Spin = 0, b3Tap = 0;
-if (matchMedia('(hover: none)').matches) $('#b3v-hint').dataset.i18n = 'b3.hintTouch';
-let b3vQ = 1, b3vSettle = 0, b3vPX = 0, b3vPY = 0, b3Pan = null;
+/* the 3D viewer: each book's cover in a window of its own (js/lightbox.js). Hold and drag to turn the book (it keeps
+   spinning a little when flung), hold the left button to move it, wheel or pinch to zoom; double-click or double-tap
+   the book to put it back */
+if (matchMedia('(hover: none)').matches) $('#b3v-tpl').content.querySelector('.zv-hint').dataset.i18n = 'b3.hintTouch';
 const b3vDensity = () => (navigator.userAgentData ? Math.min(2, devicePixelRatio || 1) : 1);   // Chromium draws a big 3D face at no more than 1 px per CSS px
 /* move the view: the book shifts across the stage, but never so far that its middle leaves its own outline */
-function b3vPanTo(x, y) {
-  const k = b3vZ / b3vQ / 2, mx = b3vBox ? b3vBox.offsetWidth * k : 0, my = b3vBox ? b3vBox.offsetHeight * k : 0;
-  b3vPX = Math.max(-mx, Math.min(mx, x));
-  b3vPY = Math.max(-my, Math.min(my, y));
-  b3vZoomEl.style.setProperty('--px', `${b3vPX.toFixed(1)}px`);
-  b3vZoomEl.style.setProperty('--py', `${b3vPY.toFixed(1)}px`);
+function b3vPanTo(w, x, y) {
+  const k = w.z / w.q / 2, mx = w.book.offsetWidth * k, my = w.book.offsetHeight * k;
+  w.px = Math.max(-mx, Math.min(mx, x));
+  w.py = Math.max(-my, Math.min(my, y));
+  w.zoomEl.style.setProperty('--px', `${w.px.toFixed(1)}px`);
+  w.zoomEl.style.setProperty('--py', `${w.py.toFixed(1)}px`);
 }
-function b3vView(z, x, y, now) {
-  b3vZ = Math.min(2.4, Math.max(0.6, z));
-  b3vZoomEl.style.setProperty('--z', b3vZ.toFixed(3));
-  b3vPanTo(x, y);
-  clearTimeout(b3vSettle);
-  if (now) b3vSharpen();
-  else b3vSettle = setTimeout(() => { if (!b3Pinch) b3vSharpen(); }, 450);   // once the zoom has eased in
+function b3vView(w, z, x, y, now) {
+  w.z = Math.min(2.4, Math.max(0.6, z));
+  w.zoomEl.style.setProperty('--z', w.z.toFixed(3));
+  b3vPanTo(w, x, y);
+  clearTimeout(w.settle);
+  if (now) b3vSharpen(w);
+  else w.settle = setTimeout(() => { if (!w.pinch) b3vSharpen(w); }, 450);   // once the zoom has eased in
 }
-function b3vZoomTo(z, now, ax = 0, ay = 0) {   // ax, ay: the point, from the stage's centre, that stays where it is
-  const k = Math.min(2.4, Math.max(0.6, z)) / b3vZ;
-  b3vView(z, ax - (ax - b3vPX) * k, ay - (ay - b3vPY) * k, now);
+function b3vZoomTo(w, z, now, ax = 0, ay = 0) {   // ax, ay: the point, from the stage's centre, that stays where it is
+  const k = Math.min(2.4, Math.max(0.6, z)) / w.z;
+  b3vView(w, z, ax - (ax - w.px) * k, ay - (ay - w.py) * k, now);
 }
 /* lay the book out at the size it is shown, so it is drawn sharp; the zoom layer's scale changes with it, without easing */
-function b3vSharpen() {
-  clearTimeout(b3vSettle);
-  const q = b3vZ * b3vDensity();
-  if (Math.abs(q - b3vQ) < 0.005) return;
-  b3vQ = q;
-  b3vZoomEl.classList.add('settle');
-  b3vZoomEl.style.setProperty('--q', q.toFixed(3));
-  void b3vZoomEl.offsetWidth;
-  b3vZoomEl.classList.remove('settle');
+function b3vSharpen(w) {
+  clearTimeout(w.settle);
+  const q = w.z * b3vDensity();
+  if (Math.abs(q - w.q) < 0.005) return;
+  w.q = q;
+  w.zoomEl.classList.add('settle');
+  w.zoomEl.style.setProperty('--q', q.toFixed(3));
+  void w.zoomEl.offsetWidth;
+  w.zoomEl.classList.remove('settle');
 }
-function b3vOpen(b, from) {
-  clearTimeout(b3vShut);   // opened again while closing
-  b3v.classList.remove('zv-out');
-  b3vFly.getAnimations().forEach((x) => x.cancel());
-  const a = from.getBoundingClientRect();
-  b3vFrom = from;
-  b3vBox = b3Make(b, true);
-  b3vBox._src = `img/ab/x/${b.slug}_p0.webp`;   // full size: the viewer zooms in; the page's copy shows until it is ready
-  b3vBox.style.setProperty('--img', from.style.getPropertyValue('--img'));
-  b3Load(b3vBox);
-  b3vZoomEl.replaceChildren(b3vBox);
-  b3vView(1, 0, 0, true);
-  $('#b3v-cap').replaceChildren(el('span', '', 'COVER'), document.createTextNode(bkName(b)));
-  b3v.hidden = false;
-  document.documentElement.classList.add('zv-open');
-  b3Pose(b3vBox, from._pose.rx, from._pose.ry);
-  if (!CALM && b3vFly.animate) {   // the book rises from where it sat on the page
-    const c = b3vBox.getBoundingClientRect();
-    b3vFly.animate([
+/* opening, the book rises from where it sat on the page into its window; closing, it flies back, turning back to how
+   it sits there, as the window fades (.lift lets it out of the window on the way). With the page's book not on the
+   screen, it grows in or fades out where it is. Returns how long it takes (ms). */
+function b3vFly(w, out) {
+  if (CALM || !w.fly.animate) return 0;
+  w.fly.getAnimations().forEach((x) => x.cancel());
+  const a = zvRectOf(w.from), c = w.book.getBoundingClientRect();
+  if (!a || !c.width) {
+    const away = { opacity: 0, transform: 'scale(.92)' }, here = { opacity: 1, transform: 'none' };
+    w.fly.animate(out ? [here, away] : [away, here], { duration: out ? 380 : 520, easing: out ? 'cubic-bezier(.4,0,.2,1)' : EASE_OUT, fill: out ? 'forwards' : 'none' });
+    return out ? 380 : 520;
+  }
+  w.el.classList.add('lift');
+  if (!out) {
+    w.fly.animate([
       { transform: `translate(${(a.left + a.width / 2 - c.left - c.width / 2).toFixed(1)}px,${(a.top + a.height / 2 - c.top - c.height / 2).toFixed(1)}px) scale(${(a.width / c.width).toFixed(4)})` },
       { transform: 'none' },
-    ], { duration: 720, easing: EASE_OUT });
+    ], { duration: 720, easing: EASE_OUT }).finished.then(() => w.el.classList.remove('lift'), () => {});
+    return 720;
   }
-  b3Tween(b3vBox, b3At(b3vBox, B3_VIEW), 1000);
-  $('#b3v-close').focus({ preventScroll: true });
+  /* the fly layer scales about its centre, so aim the book's centre, wherever the visitor moved it, at its place */
+  const f = w.fly.getBoundingClientRect(), k = a.width / c.width, fx = f.left + f.width / 2, fy = f.top + f.height / 2;
+  const tx = a.left + a.width / 2 - fx - k * (c.left + c.width / 2 - fx), ty = a.top + a.height / 2 - fy - k * (c.top + c.height / 2 - fy);
+  w.fly.animate([{ transform: 'none' }, { transform: `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})` }],
+    { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+  if (w.from._pose) b3Tween(w.book, w.from._pose, 420);
+  return 420;
 }
-/* closing, the book flies back to its place on the page, turning back to how it sits there, as the viewer fades */
-function b3vClose() {
-  if (b3v.hidden || b3v.classList.contains('zv-out')) return;
-  cancelAnimationFrame(b3Spin);
-  if (b3vBox) cancelAnimationFrame(b3vBox._tw);
-  b3Ptr.clear();
-  b3Drag = b3Pinch = b3Pan = null;
-  b3vStage.classList.remove('drag', 'pinch', 'pan');
-  const done = () => {
-    b3v.hidden = true;
-    b3v.classList.remove('zv-out');
-    if (b3vBox) cancelAnimationFrame(b3vBox._tw);
-    b3vFly.getAnimations().forEach((x) => x.cancel());
-    document.documentElement.classList.remove('zv-open');
-    const s = b3vFrom && b3vFrom.closest('button');
-    if (s && !s.closest('[hidden]')) s.focus({ preventScroll: true });
-  };
-  if (CALM) { done(); return; }
-  b3v.classList.add('zv-out');
-  const a = b3vFrom && b3vFrom.isConnected && !b3vFrom.closest('[hidden]') ? b3vFrom.getBoundingClientRect() : null;
-  if (a && a.width && b3vBox && b3vFly.animate) {
-    /* the fly layer scales about its centre, so aim the book's centre, wherever the visitor moved it, at its place */
-    const c = b3vBox.getBoundingClientRect(), f = b3vFly.getBoundingClientRect(), k = a.width / c.width;
-    const fx = f.left + f.width / 2, fy = f.top + f.height / 2;
-    const tx = a.left + a.width / 2 - fx - k * (c.left + c.width / 2 - fx), ty = a.top + a.height / 2 - fy - k * (c.top + c.height / 2 - fy);
-    b3vFly.animate([{ transform: 'none' }, { transform: `translate(${tx.toFixed(1)}px,${ty.toFixed(1)}px) scale(${k.toFixed(4)})` }],
-      { duration: 420, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
-    if (b3vFrom._pose) b3Tween(b3vBox, b3vFrom._pose, 420);
-  }
-  b3vShut = setTimeout(done, 420);
+/* open a book's 3D cover in a window (the book page's cover, clicked); one that is open already comes to the front */
+function b3vOpen(b, from) {
+  const same = zvWins.find((o) => !o.shut && o.kind === 'b3' && o.b === b);
+  if (same) { same.from = from; zvBack(same); return; }
+  const w = zvFrame('b3', from), parts = $('#b3v-tpl').content.cloneNode(true), pick = (s) => w.el.querySelector(s);
+  w.el.classList.add('b3v');
+  w.el.querySelector('.zv-min').before(parts.querySelector('.b3v-reset'));
+  w.bar.after(...parts.children);
+  textsIn(w.el);
+  w.el.dataset.i18nAria = 'b3.label';
+  w.el.setAttribute('aria-label', tr('b3.label'));
+  const book = b3Make(b, true), name = () => w.cap.replaceChildren(el('span', '', 'COVER'), document.createTextNode(bkName(b)));
+  Object.assign(w, {
+    b, book, stage: pick('.b3v-stage'), fly: pick('.b3v-fly'), zoomEl: pick('.b3v-zoom'),
+    z: 1, q: 1, px: 0, py: 0, settle: 0, ptr: new Map(), drag: null, pinch: null, pan: null, spin: 0, tap: 0,
+    fit: () => b3vPanTo(w, w.px, w.py),   // the book takes the stage's size by itself (css/artbook.css); it stays in view
+    want: (maxW, maxH, side) => {   // as css/artbook.css sizes the book: at most 60% of the stage's width, 62% of its height
+      const arn = b.pages[0][0] / 2 / b.pages[0][1], sh = maxH - w.bar.offsetHeight - 2;
+      return [Math.min(maxW, Math.max(side ? 0 : 480, (0.62 * sh * arn) / 0.6 + 2)), maxH];
+    },
+    keys: (e) => b3vKey(w, e),
+    leave: (out) => b3vFly(w, out),
+    land: () => { w.fly.getAnimations().forEach((x) => x.finish()); w.el.classList.remove('lift'); },
+    end: () => { cancelAnimationFrame(w.spin); cancelAnimationFrame(book._tw); clearTimeout(w.settle); w.ptr.clear(); w.drag = w.pinch = w.pan = null; },
+    badge: () => ({ src: b3Src(b, false), pos: b.rtl ? '25% 50%' : '75% 50%', name: bkName(b), full: `COVER · ${bkName(b)}` }),   // the chip shows the front cover
+    lang: name,
+  });
+  name();
+  book._src = `img/ab/x/${b.slug}_p0.webp`;   // full size: the viewer zooms in; the page's copy shows until it is ready
+  book.style.setProperty('--img', from.style.getPropertyValue('--img'));
+  b3Load(book);
+  w.zoomEl.replaceChildren(book);
+  pick('.b3v-reset').addEventListener('click', () => b3vReset(w));
+  b3vWire(w);
+  zvPut(w);
+  b3vView(w, 1, 0, 0, true);
+  b3Pose(book, from._pose.rx, from._pose.ry);
+  b3vFly(w, false);
+  b3Tween(book, b3At(book, B3_VIEW), 1000);
 }
-function b3vReset() {
-  const p = b3vBox._pose, v = b3At(b3vBox, B3_VIEW);   // come back the short way round
-  b3Pose(b3vBox, p.rx, v.ry + ((((p.ry - v.ry) % 360) + 540) % 360 - 180));
-  b3Tween(b3vBox, v, 800);
-  b3vView(1, 0, 0);
+function b3vReset(w) {
+  const p = w.book._pose, v = b3At(w.book, B3_VIEW);   // come back the short way round
+  b3Pose(w.book, p.rx, v.ry + ((((p.ry - v.ry) % 360) + 540) % 360 - 180));
+  b3Tween(w.book, v, 800);
+  b3vView(w, 1, 0, 0);
 }
-function b3Fling(vx, vy) {
+function b3Fling(w, vx, vy) {
   vx = Math.max(-2.2, Math.min(2.2, vx));
   vy = Math.max(-1.2, Math.min(1.2, vy));
   let last = performance.now();
   const step = (now) => {
-    const dt = Math.min(40, now - last), p = b3vBox._pose;
+    const dt = Math.min(40, now - last), p = w.book._pose;
     last = now;
-    b3Pose(b3vBox, b3Tilt(p.rx - vy * dt * 0.35), p.ry + vx * dt * 0.45);
+    b3Pose(w.book, b3Tilt(p.rx - vy * dt * 0.35), p.ry + vx * dt * 0.45);
     vx *= Math.pow(0.93, dt / 16.7);
     vy *= Math.pow(0.84, dt / 16.7);
-    if (Math.abs(vx) + Math.abs(vy) > 0.015) b3Spin = requestAnimationFrame(step);
+    if (Math.abs(vx) + Math.abs(vy) > 0.015) w.spin = requestAnimationFrame(step);
   };
-  b3Spin = requestAnimationFrame(step);
+  w.spin = requestAnimationFrame(step);
 }
-b3vStage.addEventListener('pointerdown', (e) => {
-  if (!b3vBox) return;
-  if (e.pointerType === 'mouse' && (e.button === 0 || e.button === 1)) {   // the left button (or the wheel) held: move the view
-    if (e.button === 1) e.preventDefault();
-    try { b3vStage.setPointerCapture(e.pointerId); } catch (_) { /* move without capture */ }
-    cancelAnimationFrame(b3Spin);
-    b3Pan = { id: e.pointerId, btn: e.button, x: e.clientX, y: e.clientY, px: b3vPX, py: b3vPY, moved: false };
+function b3vKey(w, e) {   // the arrows turn the book, + and - zoom, 0 or Home puts it back
+  const p = w.book._pose, turn = { ArrowLeft: [0, -30], ArrowRight: [0, 30], ArrowUp: [15, 0], ArrowDown: [-15, 0] }[e.key];
+  if (turn) { cancelAnimationFrame(w.spin); b3Tween(w.book, { rx: b3Tilt(p.rx + turn[0]), ry: p.ry + turn[1] }, 450); }
+  else if (e.key === '+' || e.key === '=') b3vZoomTo(w, w.z * 1.25);
+  else if (e.key === '-') b3vZoomTo(w, w.z / 1.25);
+  else if (e.key === '0' || e.key === 'Home') b3vReset(w);
+  else return false;
+  return true;
+}
+function b3vUp(w, e) {
+  const st = w.stage;
+  if (w.pan && e.pointerId === w.pan.id) {
+    const pn = w.pan;
+    w.pan = null;
+    st.classList.remove('pan');
+    if (!pn.moved && pn.btn === 0 && e.type !== 'pointercancel') b3vTap(w, e);   // a left click, not a drag
     return;
   }
-  if (e.pointerType === 'mouse' && e.button !== 2) return;   // the right button turns the book, as one finger does
-  b3Ptr.set(e.pointerId, [e.clientX, e.clientY]);
-  try { b3vStage.setPointerCapture(e.pointerId); } catch (_) { /* keep turning without capture */ }
-  cancelAnimationFrame(b3Spin);
-  cancelAnimationFrame(b3vBox._tw);
-  if (b3Ptr.size === 2) {   // a second finger: pinch to zoom
-    const [[x1, y1], [x2, y2]] = b3Ptr.values();
-    const r = b3vStage.getBoundingClientRect();
-    b3Pinch = { d: Math.hypot(x2 - x1, y2 - y1) || 1, z: b3vZ, cx: (x1 + x2) / 2 - r.left - r.width / 2, cy: (y1 + y2) / 2 - r.top - r.height / 2, px: b3vPX, py: b3vPY };
-    b3Drag = null;
-    b3vStage.classList.add('pinch');
-  } else if (b3Ptr.size === 1) {
-    const p = b3vBox._pose;
-    b3Drag = { x: e.clientX, y: e.clientY, rx: p.rx, ry: p.ry, moved: false, lx: e.clientX, ly: e.clientY, lt: e.timeStamp, vx: 0, vy: 0, mouse: e.pointerType === 'mouse' };
-  }
-});
-b3vStage.addEventListener('pointermove', (e) => {
-  if (b3Pan && e.pointerId === b3Pan.id) {
-    const dx = e.clientX - b3Pan.x, dy = e.clientY - b3Pan.y;
-    if (!b3Pan.moved) {
-      if (Math.abs(dx) + Math.abs(dy) < 5) return;   // still a click
-      b3Pan.moved = true;
-      b3vStage.classList.add('pan');
-    }
-    b3vPanTo(b3Pan.px + dx, b3Pan.py + dy);
+  if (!w.ptr.delete(e.pointerId)) return;
+  if (w.pinch) {
+    if (!w.ptr.size) { w.pinch = null; st.classList.remove('pinch'); b3vSharpen(w); }
     return;
   }
-  if (!b3Ptr.has(e.pointerId)) return;
-  b3Ptr.set(e.pointerId, [e.clientX, e.clientY]);
-  if (b3Pinch) {
-    if (b3Ptr.size < 2) return;
-    const [[x1, y1], [x2, y2]] = b3Ptr.values(), r = b3vStage.getBoundingClientRect(), p = b3Pinch;
-    const z = Math.min(2.4, Math.max(0.6, p.z * Math.hypot(x2 - x1, y2 - y1) / p.d)), k = z / p.z;   // the point under the fingers stays under them
-    b3vView(z, (x1 + x2) / 2 - r.left - r.width / 2 - (p.cx - p.px) * k, (y1 + y2) / 2 - r.top - r.height / 2 - (p.cy - p.py) * k);
-    return;
-  }
-  const d = b3Drag;
-  if (!d) return;
-  const dx = e.clientX - d.x, dy = e.clientY - d.y;
-  if (!d.moved) {
-    if (Math.abs(dx) + Math.abs(dy) < 5) return;
-    d.moved = true;
-    b3vStage.classList.add('drag');
-  }
-  const dt = Math.max(8, e.timeStamp - d.lt);
-  d.vx = 0.7 * (e.clientX - d.lx) / dt + 0.3 * d.vx;
-  d.vy = 0.7 * (e.clientY - d.ly) / dt + 0.3 * d.vy;
-  d.lx = e.clientX; d.ly = e.clientY; d.lt = e.timeStamp;
-  b3Pose(b3vBox, b3Tilt(d.rx - dy * 0.35), d.ry + dx * 0.45);
-});
-function b3vUp(e) {
-  if (b3Pan && e.pointerId === b3Pan.id) {
-    const pn = b3Pan;
-    b3Pan = null;
-    b3vStage.classList.remove('pan');
-    if (!pn.moved && pn.btn === 0 && e.type !== 'pointercancel') b3vTap(e);   // a left click, not a drag
-    return;
-  }
-  if (!b3Ptr.delete(e.pointerId)) return;
-  if (b3Pinch) {
-    if (!b3Ptr.size) { b3Pinch = null; b3vStage.classList.remove('pinch'); b3vSharpen(); }
-    return;
-  }
-  const d = b3Drag;
-  b3Drag = null;
-  b3vStage.classList.remove('drag');
+  const d = w.drag;
+  w.drag = null;
+  st.classList.remove('drag');
   if (!d || e.type === 'pointercancel') return;
-  if (d.moved) { if (!CALM && e.timeStamp - d.lt < 90) b3Fling(d.vx, d.vy); return; }
-  if (!d.mouse) b3vTap(e);   // a tap; a right click on its own does nothing
+  if (d.moved) { if (!CALM && e.timeStamp - d.lt < 90) b3Fling(w, d.vx, d.vy); return; }
+  if (!d.mouse) b3vTap(w, e);   // a tap; a right click on its own does nothing
 }
-/* a click or tap beside the book closes the viewer; two in a row on it put it back */
-function b3vTap(e) {
-  const r = b3vBox.getBoundingClientRect(), pad = 40;
-  if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) { b3vClose(); return; }
-  if (b3Tap && e.timeStamp - b3Tap < 350) { b3Tap = 0; b3vReset(); } else b3Tap = e.timeStamp;
+/* two clicks or taps in a row on the book put it back */
+function b3vTap(w, e) {
+  const r = w.book.getBoundingClientRect(), pad = 40;
+  if (e.clientX < r.left - pad || e.clientX > r.right + pad || e.clientY < r.top - pad || e.clientY > r.bottom + pad) return;
+  if (w.tap && e.timeStamp - w.tap < 350) { w.tap = 0; b3vReset(w); } else w.tap = e.timeStamp;
 }
-b3vStage.addEventListener('pointerup', b3vUp);
-b3vStage.addEventListener('pointercancel', b3vUp);
-b3vStage.addEventListener('wheel', (e) => {   // zooms toward the pointer
-  e.preventDefault();
-  const r = b3vStage.getBoundingClientRect();
-  b3vZoomTo(b3vZ * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015)), false, e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2);
-}, { passive: false });
-b3vStage.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });   // no autoscroll when the wheel is held
-b3vStage.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
-b3vStage.addEventListener('contextmenu', (e) => e.preventDefault());   // the right button turns the book
-$('#b3v-close').addEventListener('click', b3vClose);
-$('#b3v-reset').addEventListener('click', b3vReset);
-addEventListener('keydown', (e) => {
-  if (b3v.hidden || !b3vBox || e.altKey || e.metaKey || e.ctrlKey) return;
-  const p = b3vBox._pose, turn = { ArrowLeft: [0, -30], ArrowRight: [0, 30], ArrowUp: [15, 0], ArrowDown: [-15, 0] }[e.key];
-  if (e.key === 'Escape') b3vClose();
-  else if (turn) { cancelAnimationFrame(b3Spin); b3Tween(b3vBox, { rx: b3Tilt(p.rx + turn[0]), ry: p.ry + turn[1] }, 450); }
-  else if (e.key === '+' || e.key === '=') b3vZoomTo(b3vZ * 1.25);
-  else if (e.key === '-') b3vZoomTo(b3vZ / 1.25);
-  else if (e.key === '0' || e.key === 'Home') b3vReset();
-  else return;
-  e.preventDefault();
-});
-addEventListener('hashchange', b3vClose);
+/* the stage's pointers: the left button (or the wheel) held moves the view, the right button or one finger turns the
+   book, two fingers pinch to zoom; the wheel zooms toward the pointer */
+function b3vWire(w) {
+  const st = w.stage;
+  st.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && (e.button === 0 || e.button === 1)) {
+      if (e.button === 1) e.preventDefault();
+      try { st.setPointerCapture(e.pointerId); } catch (_) { /* move without capture */ }
+      cancelAnimationFrame(w.spin);
+      w.pan = { id: e.pointerId, btn: e.button, x: e.clientX, y: e.clientY, px: w.px, py: w.py, moved: false };
+      return;
+    }
+    if (e.pointerType === 'mouse' && e.button !== 2) return;
+    w.ptr.set(e.pointerId, [e.clientX, e.clientY]);
+    try { st.setPointerCapture(e.pointerId); } catch (_) { /* keep turning without capture */ }
+    cancelAnimationFrame(w.spin);
+    cancelAnimationFrame(w.book._tw);
+    if (w.ptr.size === 2) {   // a second finger: pinch to zoom
+      const [[x1, y1], [x2, y2]] = w.ptr.values();
+      const r = st.getBoundingClientRect();
+      w.pinch = { d: Math.hypot(x2 - x1, y2 - y1) || 1, z: w.z, cx: (x1 + x2) / 2 - r.left - r.width / 2, cy: (y1 + y2) / 2 - r.top - r.height / 2, px: w.px, py: w.py };
+      w.drag = null;
+      st.classList.add('pinch');
+    } else if (w.ptr.size === 1) {
+      const p = w.book._pose;
+      w.drag = { x: e.clientX, y: e.clientY, rx: p.rx, ry: p.ry, moved: false, lx: e.clientX, ly: e.clientY, lt: e.timeStamp, vx: 0, vy: 0, mouse: e.pointerType === 'mouse' };
+    }
+  });
+  st.addEventListener('pointermove', (e) => {
+    const pn = w.pan;
+    if (pn && e.pointerId === pn.id) {
+      const dx = e.clientX - pn.x, dy = e.clientY - pn.y;
+      if (!pn.moved) {
+        if (Math.abs(dx) + Math.abs(dy) < 5) return;   // still a click
+        pn.moved = true;
+        st.classList.add('pan');
+      }
+      b3vPanTo(w, pn.px + dx, pn.py + dy);
+      return;
+    }
+    if (!w.ptr.has(e.pointerId)) return;
+    w.ptr.set(e.pointerId, [e.clientX, e.clientY]);
+    if (w.pinch) {
+      if (w.ptr.size < 2) return;
+      const [[x1, y1], [x2, y2]] = w.ptr.values(), r = st.getBoundingClientRect(), p = w.pinch;
+      const z = Math.min(2.4, Math.max(0.6, p.z * Math.hypot(x2 - x1, y2 - y1) / p.d)), k = z / p.z;   // the point under the fingers stays under them
+      b3vView(w, z, (x1 + x2) / 2 - r.left - r.width / 2 - (p.cx - p.px) * k, (y1 + y2) / 2 - r.top - r.height / 2 - (p.cy - p.py) * k);
+      return;
+    }
+    const d = w.drag;
+    if (!d) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.moved) {
+      if (Math.abs(dx) + Math.abs(dy) < 5) return;
+      d.moved = true;
+      st.classList.add('drag');
+    }
+    const dt = Math.max(8, e.timeStamp - d.lt);
+    d.vx = 0.7 * (e.clientX - d.lx) / dt + 0.3 * d.vx;
+    d.vy = 0.7 * (e.clientY - d.ly) / dt + 0.3 * d.vy;
+    d.lx = e.clientX; d.ly = e.clientY; d.lt = e.timeStamp;
+    b3Pose(w.book, b3Tilt(d.rx - dy * 0.35), d.ry + dx * 0.45);
+  });
+  st.addEventListener('pointerup', (e) => b3vUp(w, e));
+  st.addEventListener('pointercancel', (e) => b3vUp(w, e));
+  st.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const r = st.getBoundingClientRect();
+    b3vZoomTo(w, w.z * Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0015)), false, e.clientX - r.left - r.width / 2, e.clientY - r.top - r.height / 2);
+  }, { passive: false });
+  st.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });   // no autoscroll when the wheel is held
+  st.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
+  st.addEventListener('contextmenu', (e) => e.preventDefault());   // the right button turns the book
+}
 
 /* ==================== js/motion.js ==================== */
 /* Motion: reduced-motion switch, scroll reveals, hero parallax */
@@ -2693,6 +2811,7 @@ function parse() {
 /* swap the DOM to the requested view, then start watching its reveal elements */
 function apply({ h, next, idx, cat }) {
   const from = view;
+  zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
   for (const [k, v] of Object.entries(VIEWS)) v.hidden = k !== next;
   document.querySelectorAll('.nav a, .m-nav a').forEach((a) => {
@@ -2977,7 +3096,6 @@ function swapLang(l) {
   if (/[?&]lang=/.test(location.search)) {
     try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
-  b3vClose();
   applyStatic();
   zvLang();
   heroText();
@@ -3114,7 +3232,7 @@ document.addEventListener('dragstart', (e) => {
   if (onArt(t) || (t instanceof Element && t.querySelector('img'))) e.preventDefault();   // a link around a picture
 });
 addEventListener('keydown', (e) => {
-  if (e.target.closest('.zw') || !b3v.hidden || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
+  if (zvInWin(e) || (view !== 'work' && view !== 'item' && view !== 'book') || e.altKey || e.metaKey || e.ctrlKey) return;
   const k = view === 'work' ? 'wk' : view === 'book' ? 'bk' : 'it';
   if (e.key === 'ArrowRight') location.hash = $(`#${k}-next`).getAttribute('href');
   if (e.key === 'ArrowLeft') location.hash = $(`#${k}-prev`).getAttribute('href');
