@@ -55,4 +55,5 @@
 .site-foot .in{display:grid;justify-items:center;gap:14px;padding-block:34px;font-size:13px;color:var(--mute);text-align:center}
 .foot-links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px}
 .site-foot a{text-decoration:none}
+.foot-ai{margin-top:-8px;font-size:12px}   /* a note under the copyright line, close to it */
 .site-foot a:hover{color:var(--fg)}
