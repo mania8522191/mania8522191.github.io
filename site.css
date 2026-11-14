@@ -1,4 +1,4 @@
-/* Built by tools/build.py from css/*.css in this order: base, home, artbook, works, goods, nav, game, lightbox, about, motion, responsive. Edit those files, not this one. */
+/* Built by tools/build.py from css/*.css in this order: base, home, artbook, works, goods, nav, game, lightbox, about, event, motion, responsive. Edit those files, not this one. */
 
 /* ==================== css/base.css ==================== */
 /* Base: colours, type, the header and its navigation, the category curtain, views */
@@ -83,6 +83,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .hero-txt{will-change:transform,opacity}
 .hero-name .hl{display:inline-block}
 /* at the foot of the carousel: the title of the work shown (a link to it), and a dot for each work */
+/* the next convention, under the name: a pill like the SORT button (css/works.css), to the events page */
+.hero-ev{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 12px;margin-top:clamp(18px,3.2vh,34px);padding:10px 20px;border:1px solid rgba(242,239,233,.32);border-radius:999px;background:rgba(8,8,8,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--fg);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:border-color .35s,box-shadow .35s}
+.hero-ev:hover{border-color:rgba(208,166,90,.6);box-shadow:0 0 0 3px rgba(208,166,90,.08)}
+.hero-ev:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
+.hero-ev[hidden]{display:none}
+.hero-ev-k{font-size:10px;letter-spacing:.3em;color:var(--g-gold)}
+.hero-ev-n{font-family:var(--f-display);letter-spacing:.08em}
+.hero-ev-p{color:var(--fg-2)}
+@media (max-width:560px){.hero-ev{border-radius:18px;padding:10px 16px}}
 .hero-cap{position:absolute;left:0;right:0;bottom:calc(clamp(14px,3vh,32px) + 40px);width:fit-content;max-width:calc(100% - var(--pad-l) - var(--pad-r));margin-inline:auto;display:flex;align-items:baseline;gap:.7em;font-size:13px;letter-spacing:.06em;color:var(--fg-2);text-decoration:none;text-shadow:0 1px 14px rgba(0,0,0,.8);transition:color .3s}
 .hero-cap-t{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .hero-cap-ar{transition:transform .5s var(--ease-out)}
@@ -755,6 +764,24 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .foot-ai{margin-top:-8px;font-size:12px}   /* a note under the copyright line, close to it */
 .site-foot a:hover{color:var(--fg)}
 
+/* ==================== css/event.css ==================== */
+/* Events: the conventions I take part in (js/event.js) */
+/* the coming ones, then the past ones, under headings like the contact page's (css/about.css): the name large on
+   the left, the days and the place on the right; the dates of the coming ones in gold, the past ones greyed */
+.event{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
+.evs{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.ev{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:6px 24px;padding:22px 4px;border-bottom:1px solid var(--line)}
+.ev-n{grid-row:1 / span 2;align-self:center;font-family:var(--f-display);font-size:clamp(20px,2.6vw,30px);letter-spacing:.08em}
+.ev-d{font-size:15px;letter-spacing:.06em;font-variant-numeric:tabular-nums;text-align:right}
+.ev-p{font-size:13px;letter-spacing:.04em;color:var(--mute);text-align:right}
+.evs-next .ev-d{color:var(--g-gold)}
+.evs-past .ev-n,.evs-past .ev-d{color:var(--mute)}
+@media (max-width:640px){
+  .ev{grid-template-columns:minmax(0,1fr);gap:6px}
+  .ev-n{grid-row:auto}
+  .ev-d,.ev-p{text-align:left}
+}
+
 /* ==================== css/motion.css ==================== */
 /* Motion: first-load intro, page changes, scroll reveals, hover tweens, page-to-page morph */
 /* ---------- motion ---------- */
@@ -830,8 +857,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .shot-thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}
   .feats{grid-template-columns:minmax(0,1fr)}
 }
-/* the phone menu takes over below 901px: narrower than that, the header has no room for the seven page links, the languages and the music button */
-@media (max-width:900px){
+/* the phone menu takes over below 1000px: narrower than that, the header has no room for the eight page links, the languages and the music button */
+@media (max-width:999px){
   .nav,.site-head .lang,.site-head .snd{display:none}
   .menu-btn{display:inline-flex}
   .m-nav{position:fixed;inset:0;z-index:19;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3.6vh,28px);background:var(--bg);padding:calc(var(--head) + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility 0s linear .45s}
@@ -846,6 +873,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .menu-open .m-nav a:nth-child(5){transition-delay:.24s}
   .menu-open .m-nav a:nth-child(6){transition-delay:.3s}
   .menu-open .m-nav a:nth-child(7){transition-delay:.36s}
+  .menu-open .m-nav a:nth-child(8){transition-delay:.42s}
 }
 @media (max-width:560px){
   .g-grid{grid-template-columns:minmax(0,1fr)}

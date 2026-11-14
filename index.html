@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=a77a3aa9">
+<link rel="stylesheet" href="site.css?v=684fb38f">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -53,6 +53,7 @@ addEventListener('hashchange', function () {
       <a href="#work" data-v="works work">Work</a>
       <a href="#artbook" data-v="artbook book">Art Book</a>
       <a href="#goods" data-v="goods item">Goods</a>
+      <a href="#event" data-v="event">Event</a>
       <a href="#game" data-v="game">Game</a>
       <a href="#about" data-v="about">About</a>
       <a href="#contact" data-v="contact">Contact</a>
@@ -67,6 +68,7 @@ addEventListener('hashchange', function () {
   <a href="#work" data-v="works work">Work</a>
   <a href="#artbook" data-v="artbook book">Art Book</a>
   <a href="#goods" data-v="goods item">Goods</a>
+  <a href="#event" data-v="event">Event</a>
   <a href="#game" data-v="game">Game</a>
   <a href="#about" data-v="about">About</a>
   <a href="#contact" data-v="contact">Contact</a>
@@ -81,6 +83,7 @@ addEventListener('hashchange', function () {
       <div class="hero-txt">
         <p class="hero-by">Illustrations by</p>
         <h1 class="hero-name" aria-label="MANIA8522191"><span class="hl" aria-hidden="true" style="--i:0">M</span><span class="hl" aria-hidden="true" style="--i:1">A</span><span class="hl" aria-hidden="true" style="--i:2">N</span><span class="hl" aria-hidden="true" style="--i:3">I</span><span class="hl" aria-hidden="true" style="--i:4">A</span><span class="hl" aria-hidden="true" style="--i:5">8</span><span class="hl" aria-hidden="true" style="--i:6">5</span><span class="hl" aria-hidden="true" style="--i:7">2</span><span class="hl" aria-hidden="true" style="--i:8">2</span><span class="hl" aria-hidden="true" style="--i:9">1</span><span class="hl" aria-hidden="true" style="--i:10">9</span><span class="hl" aria-hidden="true" style="--i:11">1</span></h1>
+        <a class="hero-ev" id="hero-ev" href="#event" hidden><span class="hero-ev-k">NEXT EVENT</span><span class="hero-ev-n"></span><span class="hero-ev-d"></span><span class="hero-ev-p"></span></a>
       </div>
       <a class="hero-cap" id="hero-cap" href="#work"><span class="hero-cap-t"></span><span class="hero-cap-ar" aria-hidden="true">→</span></a>
       <div class="hero-dots" id="hero-dots" role="group" aria-label="切換作品" data-i18n-aria="home.dots"></div>
@@ -335,6 +338,22 @@ addEventListener('hashchange', function () {
     </div>
   </section>
 
+  <!-- events: the conventions I take part in (js/event.js) -->
+  <section class="view event in" id="v-event" hidden>
+    <h1 class="sec-title">EVENT</h1>
+    <p class="sec-sub" data-i18n="event.sub">參加的同人展：時間與地點。</p>
+    <div class="groups">
+      <section aria-labelledby="g-ev-next">
+        <h2 class="group-t" id="g-ev-next" data-i18n="ev.next">即將參加</h2>
+        <ul class="evs evs-next" id="ev-next"></ul>
+      </section>
+      <section aria-labelledby="g-ev-past">
+        <h2 class="group-t" id="g-ev-past" data-i18n="ev.past">已結束</h2>
+        <ul class="evs evs-past" id="ev-past"></ul>
+      </section>
+    </div>
+  </section>
+
   <!-- contact -->
   <section class="view contact in" id="v-contact" hidden>
     <h1 class="sec-title">CONTACT</h1>
@@ -434,6 +453,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=2be2f922"></script>
+<script src="site.js?v=979f829e"></script>
 </body>
 </html>

@@ -1,9 +1,9 @@
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #about #contact #w-<work id> #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastItem = null;
 function parse() {
   const h = decodeURIComponent(location.hash.slice(1));
-  if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game') return { h, next: h, idx: -1 };
+  if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-') && h.slice(2) in byId) return { h, next: 'work', idx: byId[h.slice(2)] };
@@ -68,8 +68,8 @@ function apply({ h, next, idx, cat }) {
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
-const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'game', 'about', 'contact']);
+const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', event: 'EVENT', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
+const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'event', 'game', 'about', 'contact']);
 let curtainBusy = false;
 function curtainTo(r) {
   curtainBusy = true;

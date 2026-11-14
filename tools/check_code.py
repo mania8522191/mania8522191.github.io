@@ -10,7 +10,7 @@ change instead of piling up. It reports:
   - CSS declarations that a later rule with the same selector, in the same @media, always overrides
   - custom properties (--name) set but never read, or read but never set; @keyframes nothing plays
   - texts in js/i18n.js missing in a language, written twice, never used, or asked for but not there
-  - fields in js/data.js (WORKS, GOODS, BOOKS) that no script reads, and HOME_SLIDES entries that are not works
+  - fields in js/data.js (WORKS, GOODS, BOOKS, EVENTS) that no script reads, and HOME_SLIDES entries that are not works
 A name put together while the page runs, such as 'bk.size.' + b.size or `b3-${face}`, counts as used when its
 prefix is put together that way somewhere. The tool only reports. If it lists something that is in fact used
 (a way of using it that the tool does not know), teach the tool instead of leaving the warning.
@@ -214,7 +214,7 @@ def findings():
         head = f'const {name} = '
         return json.JSONDecoder().raw_decode(data[data.index(head) + len(head):])[0] if head in data else None
 
-    for name in ('WORKS', 'GOODS', 'BOOKS'):
+    for name in ('WORKS', 'GOODS', 'BOOKS', 'EVENTS'):
         items = listed(name)
         if items is None:
             out.append(f'js/data.js: {name} not found: update tools/check_code.py')

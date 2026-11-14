@@ -1,0 +1,16 @@
+/* Events: the conventions I take part in (js/event.js) */
+/* the coming ones, then the past ones, under headings like the contact page's (css/about.css): the name large on
+   the left, the days and the place on the right; the dates of the coming ones in gold, the past ones greyed */
+.event{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
+.evs{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
+.ev{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:6px 24px;padding:22px 4px;border-bottom:1px solid var(--line)}
+.ev-n{grid-row:1 / span 2;align-self:center;font-family:var(--f-display);font-size:clamp(20px,2.6vw,30px);letter-spacing:.08em}
+.ev-d{font-size:15px;letter-spacing:.06em;font-variant-numeric:tabular-nums;text-align:right}
+.ev-p{font-size:13px;letter-spacing:.04em;color:var(--mute);text-align:right}
+.evs-next .ev-d{color:var(--g-gold)}
+.evs-past .ev-n,.evs-past .ev-d{color:var(--mute)}
+@media (max-width:640px){
+  .ev{grid-template-columns:minmax(0,1fr);gap:6px}
+  .ev-n{grid-row:auto}
+  .ev-d,.ev-p{text-align:left}
+}

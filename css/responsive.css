@@ -9,8 +9,8 @@
   .shot-thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}
   .feats{grid-template-columns:minmax(0,1fr)}
 }
-/* the phone menu takes over below 901px: narrower than that, the header has no room for the seven page links, the languages and the music button */
-@media (max-width:900px){
+/* the phone menu takes over below 1000px: narrower than that, the header has no room for the eight page links, the languages and the music button */
+@media (max-width:999px){
   .nav,.site-head .lang,.site-head .snd{display:none}
   .menu-btn{display:inline-flex}
   .m-nav{position:fixed;inset:0;z-index:19;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3.6vh,28px);background:var(--bg);padding:calc(var(--head) + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility 0s linear .45s}
@@ -25,6 +25,7 @@
   .menu-open .m-nav a:nth-child(5){transition-delay:.24s}
   .menu-open .m-nav a:nth-child(6){transition-delay:.3s}
   .menu-open .m-nav a:nth-child(7){transition-delay:.36s}
+  .menu-open .m-nav a:nth-child(8){transition-delay:.42s}
 }
 @media (max-width:560px){
   .g-grid{grid-template-columns:minmax(0,1fr)}

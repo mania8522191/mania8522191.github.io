@@ -13,7 +13,7 @@ WORKS.forEach((w, i) => {
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
   a.dataset.r = r.toFixed(4);
-  a.dataset.date = w.d;
+  a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers
   a.dataset.cat = w.cat;
   a.style.cssText = `--ar:${r.toFixed(4)};--pos:${w.pos}`;
   {   // a different direction for every cover, and every visit
@@ -29,8 +29,8 @@ WORKS.forEach((w, i) => {
   wall.appendChild(a);
 });
 function fillCover(a, w) {
-  const meta = `${dot(w.d.slice(0, 7))}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
-  a.setAttribute('aria-label', `${w.t} (${dot(w.d)})`);
+  const meta = `${dot(madeOn(w))}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
+  a.setAttribute('aria-label', `${w.t} (${dot(madeOn(w))})`);
   a.querySelector('.ov-m').textContent = meta;
   a.querySelector('.cap-m').textContent = meta;
 }
@@ -54,7 +54,7 @@ function seeded(seed) {
   };
 }
 /* the wall shows one category at a time (Fan Art / Original Art); the other category's covers are hidden */
-const allCovers = [...wall.querySelectorAll('.cover')].sort((a, b) => b.dataset.date.localeCompare(a.dataset.date) || b.id.localeCompare(a.id));
+const allCovers = [...wall.querySelectorAll('.cover')].sort((a, b) => byMade(WORKS[byId[a.id.slice(2)]], WORKS[byId[b.id.slice(2)]]));
 let wallOrder = [], wallCat = '', wallSort = 'new';   // wallSort: 'new' newest first, 'old' oldest first
 let wallUnits = null;
 /* the wall doubles as the timeline: a header opens every year, and the year bar above jumps between them */
@@ -170,7 +170,7 @@ function indexWall() {
 }
 /* {n} works between {a} and {b} for the category on the wall */
 function catVars() {
-  const list = CAT_LIST[wallCat] || CAT_LIST.fan, ys = list.map((w) => w.d.slice(0, 4)).sort();
+  const list = CAT_LIST[wallCat] || CAT_LIST.fan, ys = list.map((w) => madeOn(w).slice(0, 4)).sort();
   return { n: list.length, a: ys[0], b: ys[ys.length - 1] };
 }
 function catText() {

@@ -1,4 +1,4 @@
-/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, wall, work, artbook, book3d, motion, home, router, about, lang-switch, sound, main. Edit those files, not this one. */
+/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, artbook, book3d, motion, home, router, about, lang-switch, sound, main. Edit those files, not this one. */
 
 /* ==================== js/data.js ==================== */
 /* Site data. One item per line; the scripts in tools/ read and write this file (keep each list valid JSON).
@@ -131,19 +131,30 @@ const BOOKS = [
   {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]}
 ];
 
+/* conventions I take part in: js/event.js lists the ones not over yet as coming (the next one also on the home page),
+   the rest as past. from / to: the first and last day; venue and city in each language */
+const EVENTS = [
+  {"name":"Fancy Frontier 48","from":"2027-02-19","to":"2027-02-21","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}},
+  {"name":"Fancy Frontier 47","from":"2026-08-21","to":"2026-08-23","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}}
+];
+
 const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';
 
 /* ==================== js/core.js ==================== */
 /* Shared helpers: lookups, DOM shortcuts, the page views, cssUrl */
 const byId = Object.fromEntries(WORKS.map((w, i) => [w.id, i]));
-const CAT_LIST = { fan: WORKS.filter((w) => w.cat === 'fan'), original: WORKS.filter((w) => w.cat === 'original') };   // Fan Art (pixiv fan works) / Original Art, newest first
+/* when a work was finished: its year and month (ym), or, for one without (most older works), the month it went up
+   on pixiv. The wall, its year headers and a work's previous / next go by it, latest first. */
+const madeOn = (w) => (w.ym ? w.ym.replace('.', '-') : w.d.slice(0, 7));
+const byMade = (a, b) => madeOn(b).localeCompare(madeOn(a)) || b.d.localeCompare(a.d) || b.id.localeCompare(a.id);
+const CAT_LIST = { fan: WORKS.filter((w) => w.cat === 'fan').sort(byMade), original: WORKS.filter((w) => w.cat === 'original').sort(byMade) };   // Fan Art (pixiv fan works) / Original Art
 const bySlug = Object.fromEntries(GOODS.map((g, i) => [g.slug, i]));
 const byBook = Object.fromEntries(BOOKS.map((b, i) => [b.slug, i]));
 const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
 
 /* a url() for a CSS custom property, made absolute so it points at the same file whichever stylesheet uses it */
 const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
@@ -240,6 +251,10 @@ const I18N = {
     "facts.pages": "張圖",
     "facts.since": "開始在 pixiv 發表",
     "contact.sub": "在以下平台都找得到我。作品相關的聯絡，請直接私訊。",
+    "event.sub": "參加的同人展：時間與地點。",
+    "ev.next": "即將參加",
+    "ev.past": "已結束",
+    "ev.hero": "下一場參加的展場：{n}，{d}，{p}",
     "grp.social": "社群",
     "grp.works": "作品",
     "grp.shop": "周邊",
@@ -300,6 +315,7 @@ const I18N = {
     "cur.game": "獨立遊戲",
     "cur.about": "關於我",
     "cur.contact": "聯絡方式",
+    "cur.event": "參加展場",
     "years.nav": "依年份瀏覽",
     "years.go": "跳到 {y} 年",
     "wall.count": "{n} 件",
@@ -434,6 +450,10 @@ const I18N = {
     "facts.pages": "images",
     "facts.since": "first pixiv post",
     "contact.sub": "You can find me on all of these platforms. For anything about my work, please send a direct message.",
+    "event.sub": "The conventions I take part in: dates and venues.",
+    "ev.next": "Upcoming",
+    "ev.past": "Past",
+    "ev.hero": "Next convention: {n}, {d}, {p}",
     "grp.social": "Social",
     "grp.works": "Portfolio",
     "grp.shop": "Goods",
@@ -494,6 +514,7 @@ const I18N = {
     "cur.game": "Indie card game",
     "cur.about": "About the artist",
     "cur.contact": "Get in touch",
+    "cur.event": "Conventions",
     "years.nav": "Browse by year",
     "years.go": "Jump to {y}",
     "wall.count": "{n} works",
@@ -628,6 +649,10 @@ const I18N = {
     "facts.pages": "枚のイラスト",
     "facts.since": "pixiv 投稿開始",
     "contact.sub": "以下のプラットフォームで活動しています。作品に関するご連絡は、各SNSのDMまでお願いします。",
+    "event.sub": "参加するイベントの日程と会場です。",
+    "ev.next": "参加予定",
+    "ev.past": "終了したイベント",
+    "ev.hero": "次の参加イベント：{n}、{d}、{p}",
     "grp.social": "SNS",
     "grp.works": "作品",
     "grp.shop": "グッズ",
@@ -688,6 +713,7 @@ const I18N = {
     "cur.game": "インディーゲーム",
     "cur.about": "プロフィール",
     "cur.contact": "コンタクト",
+    "cur.event": "参加イベント",
     "years.nav": "年ごとに見る",
     "years.go": "{y}年へ移動",
     "wall.count": "{n}作品",
@@ -1495,7 +1521,7 @@ function setMenu(open) {
 menuBtn.addEventListener('click', () => setMenu(!document.documentElement.classList.contains('menu-open')));
 $('#m-nav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
-matchMedia('(min-width: 901px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+matchMedia('(min-width: 1000px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
 
 /* ==================== js/goods.js ==================== */
 /* Goods: prices, the goods list, goods item pages */
@@ -1575,6 +1601,39 @@ function renderItem(i) {
   $('#it-next').href = '#g-' + nx.slug; $('#it-next-t').textContent = L(nx.name);
 }
 
+/* ==================== js/event.js ==================== */
+/* Events: the conventions I take part in (EVENTS in js/data.js); the next one is also on the home page */
+/* ---------- the events page: the ones to come, nearest first, then the past ones, latest first. An event counts
+   as coming until its last day is over, so it moves across by itself. ---------- */
+const evToday = () => { const t = new Date(); return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`; };
+const evNext = () => EVENTS.filter((e) => e.to >= evToday()).sort((a, b) => a.from.localeCompare(b.from));
+const evPast = () => EVENTS.filter((e) => e.to < evToday()).sort((a, b) => b.from.localeCompare(a.from));
+const evDays = (e) => (e.from === e.to ? dot(e.from) : `${dot(e.from)} – ${dot(e.from.slice(0, 4) === e.to.slice(0, 4) ? e.to.slice(5) : e.to)}`);   // 2027.02.19 – 02.21
+const evPlace = (e) => `${e.venue[LANG]} · ${e.city[LANG]}`;
+function evRows(ul, list) {
+  ul.replaceChildren(...list.map((e) => {
+    const li = el('li', 'ev');
+    li.append(el('span', 'ev-n', e.name), el('span', 'ev-d', evDays(e)), el('span', 'ev-p'));
+    li._ev = e;
+    return li;
+  }));
+  ul.closest('section').hidden = !list.length;   // nothing to come (or nothing past yet): no heading either
+}
+evRows($('#ev-next'), evNext());
+evRows($('#ev-past'), evPast());
+/* the words that change with the language: the places, and the next event under the name on the home page */
+function eventText() {
+  document.querySelectorAll('.ev').forEach((li) => { li.querySelector('.ev-p').textContent = evPlace(li._ev); });
+  const e = evNext()[0], a = $('#hero-ev');
+  a.hidden = !e;
+  if (!e) return;
+  a.querySelector('.hero-ev-n').textContent = e.name;
+  a.querySelector('.hero-ev-d').textContent = evDays(e);
+  a.querySelector('.hero-ev-p').textContent = evPlace(e);
+  a.setAttribute('aria-label', tr('ev.hero', { n: e.name, d: evDays(e), p: evPlace(e) }));
+}
+eventText();
+
 /* ==================== js/wall.js ==================== */
 /* Works wall: categories, year headers and bar, sort menu, the cover layout */
 /* ---------- cover wall: masonry; wide works span two columns so every cover shows its art at a similar
@@ -1591,7 +1650,7 @@ WORKS.forEach((w, i) => {
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
   a.dataset.r = r.toFixed(4);
-  a.dataset.date = w.d;
+  a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers
   a.dataset.cat = w.cat;
   a.style.cssText = `--ar:${r.toFixed(4)};--pos:${w.pos}`;
   {   // a different direction for every cover, and every visit
@@ -1607,8 +1666,8 @@ WORKS.forEach((w, i) => {
   wall.appendChild(a);
 });
 function fillCover(a, w) {
-  const meta = `${dot(w.d.slice(0, 7))}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
-  a.setAttribute('aria-label', `${w.t} (${dot(w.d)})`);
+  const meta = `${dot(madeOn(w))}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
+  a.setAttribute('aria-label', `${w.t} (${dot(madeOn(w))})`);
   a.querySelector('.ov-m').textContent = meta;
   a.querySelector('.cap-m').textContent = meta;
 }
@@ -1632,7 +1691,7 @@ function seeded(seed) {
   };
 }
 /* the wall shows one category at a time (Fan Art / Original Art); the other category's covers are hidden */
-const allCovers = [...wall.querySelectorAll('.cover')].sort((a, b) => b.dataset.date.localeCompare(a.dataset.date) || b.id.localeCompare(a.id));
+const allCovers = [...wall.querySelectorAll('.cover')].sort((a, b) => byMade(WORKS[byId[a.id.slice(2)]], WORKS[byId[b.id.slice(2)]]));
 let wallOrder = [], wallCat = '', wallSort = 'new';   // wallSort: 'new' newest first, 'old' oldest first
 let wallUnits = null;
 /* the wall doubles as the timeline: a header opens every year, and the year bar above jumps between them */
@@ -1748,7 +1807,7 @@ function indexWall() {
 }
 /* {n} works between {a} and {b} for the category on the wall */
 function catVars() {
-  const list = CAT_LIST[wallCat] || CAT_LIST.fan, ys = list.map((w) => w.d.slice(0, 4)).sort();
+  const list = CAT_LIST[wallCat] || CAT_LIST.fan, ys = list.map((w) => madeOn(w).slice(0, 4)).sort();
   return { n: list.length, a: ys[0], b: ys[ys.length - 1] };
 }
 function catText() {
@@ -2609,7 +2668,7 @@ const onScreen = (e) => { if (!e) return false; const r = e.getBoundingClientRec
   .forEach(([sel, kind, d]) => document.querySelectorAll(sel).forEach((e) => { e.dataset.rv = kind; if (d) e.dataset.d = d + 's'; }));
 document.querySelectorAll('.about-txt p').forEach((e, i) => { e.dataset.rv = 'up'; e.dataset.d = (0.15 + i * 0.12) + 's'; });
 document.querySelectorAll('.g-head').forEach((h) => [...h.children].forEach((e, i) => { e.dataset.rv = 'up'; e.dataset.d = (i * 0.08) + 's'; }));
-document.querySelectorAll('.channels').forEach((ul) => ul.querySelectorAll('li').forEach((li, i) => { li.dataset.rv = 'x'; li.dataset.d = (i * 0.07) + 's'; }));
+document.querySelectorAll('.channels, .evs').forEach((ul) => ul.querySelectorAll('li').forEach((li, i) => { li.dataset.rv = 'x'; li.dataset.d = (i * 0.07) + 's'; }));
 document.querySelectorAll('.facts dd').forEach((dd) => { if (+dd.textContent < 1000) dd.dataset.count = dd.textContent; });
 
 const io = !CALM && 'IntersectionObserver' in window
@@ -2819,11 +2878,11 @@ heroPick();
 
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #about #contact #w-<work id> #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastItem = null;
 function parse() {
   const h = decodeURIComponent(location.hash.slice(1));
-  if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game') return { h, next: h, idx: -1 };
+  if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-') && h.slice(2) in byId) return { h, next: 'work', idx: byId[h.slice(2)] };
@@ -2888,8 +2947,8 @@ function apply({ h, next, idx, cat }) {
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
-const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'game', 'about', 'contact']);
+const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', event: 'EVENT', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
+const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'event', 'game', 'about', 'contact']);
 let curtainBusy = false;
 function curtainTo(r) {
   curtainBusy = true;
@@ -3124,6 +3183,7 @@ function swapLang(l) {
   applyStatic();
   zvLang();
   heroText();
+  eventText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));

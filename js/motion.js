@@ -11,7 +11,7 @@ const onScreen = (e) => { if (!e) return false; const r = e.getBoundingClientRec
   .forEach(([sel, kind, d]) => document.querySelectorAll(sel).forEach((e) => { e.dataset.rv = kind; if (d) e.dataset.d = d + 's'; }));
 document.querySelectorAll('.about-txt p').forEach((e, i) => { e.dataset.rv = 'up'; e.dataset.d = (0.15 + i * 0.12) + 's'; });
 document.querySelectorAll('.g-head').forEach((h) => [...h.children].forEach((e, i) => { e.dataset.rv = 'up'; e.dataset.d = (i * 0.08) + 's'; }));
-document.querySelectorAll('.channels').forEach((ul) => ul.querySelectorAll('li').forEach((li, i) => { li.dataset.rv = 'x'; li.dataset.d = (i * 0.07) + 's'; }));
+document.querySelectorAll('.channels, .evs').forEach((ul) => ul.querySelectorAll('li').forEach((li, i) => { li.dataset.rv = 'x'; li.dataset.d = (i * 0.07) + 's'; }));
 document.querySelectorAll('.facts dd').forEach((dd) => { if (+dd.textContent < 1000) dd.dataset.count = dd.textContent; });
 
 const io = !CALM && 'IntersectionObserver' in window

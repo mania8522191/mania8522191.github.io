@@ -9,4 +9,4 @@ function setMenu(open) {
 menuBtn.addEventListener('click', () => setMenu(!document.documentElement.classList.contains('menu-open')));
 $('#m-nav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
-matchMedia('(min-width: 901px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+matchMedia('(min-width: 1000px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });

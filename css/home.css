@@ -12,6 +12,15 @@
 .hero-txt{will-change:transform,opacity}
 .hero-name .hl{display:inline-block}
 /* at the foot of the carousel: the title of the work shown (a link to it), and a dot for each work */
+/* the next convention, under the name: a pill like the SORT button (css/works.css), to the events page */
+.hero-ev{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 12px;margin-top:clamp(18px,3.2vh,34px);padding:10px 20px;border:1px solid rgba(242,239,233,.32);border-radius:999px;background:rgba(8,8,8,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--fg);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:border-color .35s,box-shadow .35s}
+.hero-ev:hover{border-color:rgba(208,166,90,.6);box-shadow:0 0 0 3px rgba(208,166,90,.08)}
+.hero-ev:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
+.hero-ev[hidden]{display:none}
+.hero-ev-k{font-size:10px;letter-spacing:.3em;color:var(--g-gold)}
+.hero-ev-n{font-family:var(--f-display);letter-spacing:.08em}
+.hero-ev-p{color:var(--fg-2)}
+@media (max-width:560px){.hero-ev{border-radius:18px;padding:10px 16px}}
 .hero-cap{position:absolute;left:0;right:0;bottom:calc(clamp(14px,3vh,32px) + 40px);width:fit-content;max-width:calc(100% - var(--pad-l) - var(--pad-r));margin-inline:auto;display:flex;align-items:baseline;gap:.7em;font-size:13px;letter-spacing:.06em;color:var(--fg-2);text-decoration:none;text-shadow:0 1px 14px rgba(0,0,0,.8);transition:color .3s}
 .hero-cap-t{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .hero-cap-ar{transition:transform .5s var(--ease-out)}

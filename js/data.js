@@ -128,4 +128,11 @@ const BOOKS = [
   {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]}
 ];
 
+/* conventions I take part in: js/event.js lists the ones not over yet as coming (the next one also on the home page),
+   the rest as past. from / to: the first and last day; venue and city in each language */
+const EVENTS = [
+  {"name":"Fancy Frontier 48","from":"2027-02-19","to":"2027-02-21","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}},
+  {"name":"Fancy Frontier 47","from":"2026-08-21","to":"2026-08-23","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}}
+];
+
 const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';

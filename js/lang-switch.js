@@ -102,6 +102,7 @@ function swapLang(l) {
   applyStatic();
   zvLang();
   heroText();
+  eventText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
