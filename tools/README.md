@@ -126,7 +126,7 @@
 標題裡有 PROCESS、TIMELAPSE、插圖、插畫、畫圖、繪圖、イラスト 這類字的才算繪圖影片（清單是 `tools/yt_latest.py` 的 `DRAWING`），
 所以鸚鵡、遊戲開發、旅行的影片不會出現；繪圖影片用了別的標題的話，把那個字加進 `DRAWING`。
 清單在網站根目錄的 `yt-latest.json`，由 `tools/yt_latest.py` 讀頻道的公開 RSS 產生。
-GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影片就自動提交，所以上傳後一小時內首頁會換上新的。
+GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影片就自動提交，所以上傳後大約一個半小時內首頁會換上新的（GitHub 的排程有時會晚半小時左右才開始）。
 - 想馬上更新：GitHub 的 Actions 分頁 → Latest YouTube videos → Run workflow；或在本機跑 `python tools/yt_latest.py` 再提交
 - 改了 `tools/yt_latest.py`（例如 `DRAWING`）或這個工作流程並推上去時，也會馬上跑一次，不用等下一次排程
 - 網站超過 60 天沒有任何提交的話，GitHub 會暫停排程並寄信通知，到 Actions 分頁按一下就能恢復

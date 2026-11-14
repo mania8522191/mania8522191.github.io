@@ -11,8 +11,9 @@ When the feed holds fewer than three drawing videos (a run of other uploads), th
 so the list never shrinks. Writes the file only when the list changed.
 
 .github/workflows/yt-latest.yml runs this on GitHub every hour and commits the file when it changed, so a new drawing
-video shows on the home page within the hour. It also runs when this script or the workflow is pushed, so a change to
-DRAWING shows at once. It needs nothing but Python's own modules, so it runs there as it is.
+video shows on the home page within about an hour and a half (GitHub can start a scheduled run half an hour late). It
+also runs when this script or the workflow is pushed, so a change to DRAWING shows at once. It needs nothing but
+Python's own modules, so it runs there as it is.
 """
 import json
 import os
