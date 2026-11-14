@@ -142,3 +142,31 @@ function heroText() {
   SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: s.w.t })));
 }
 heroPick();
+
+/* ---------- under the carousel, the latest three videos on the YouTube channel, newest first: yt-latest.json, which
+   .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click plays one here. ---------- */
+const ytGrid = $('#yt-grid');
+function ytText() {
+  ytGrid.querySelectorAll('.tl-card').forEach((c) => c.setAttribute('aria-label', tr('tl.play', { t: c.dataset.t })));
+}
+fetch('yt-latest.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  .then(({ videos }) => {
+    ytGrid.replaceChildren(...videos.slice(0, 3).map((v) => {
+      const item = el('div', 'yt-item'), card = el('a', 'tl-card'), im = el('img');
+      card.href = `https://www.youtube.com/watch?v=${v.id}`; card.target = '_blank'; card.rel = 'noopener';
+      card.dataset.t = v.t;
+      im.width = 1280; im.height = 720; im.alt = ''; im.loading = 'lazy';
+      const hq = () => { im.src = `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`; };   // a video without a full-size picture
+      im.addEventListener('error', hq, { once: true });
+      im.addEventListener('load', () => { if (im.naturalWidth < 200 && !im.src.includes('hqdefault')) hq(); });   // YouTube's stand-in is 120 px
+      im.src = `https://i.ytimg.com/vi/${v.id}/maxresdefault.jpg`;
+      card.append(im, el('span', 'tl-play'));
+      if (window.SELF_HOSTED) ytInline(card, v.id, v.t);
+      item.append(card, el('p', 'yt-t', v.t), el('p', 'yt-d', dot(v.d)));
+      return item;
+    }));
+    ytText();
+    $('#home-yt').hidden = !videos.length;
+  })
+  .catch(() => {});   // no list: the section stays hidden

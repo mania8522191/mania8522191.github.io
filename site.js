@@ -184,6 +184,8 @@ const I18N = {
     "tl.h": "製作過程影片",
     "tl.yt": "在 YouTube 觀看 ↗",
     "tl.play": "在 YouTube 播放：{t}",
+    "yt.h": "最新影片",
+    "yt.more": "在 YouTube 看更多 ↗",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。",
     "goods.shopName": "買動漫賣場「Mania Art」",
     "goods.shopBtn": "前往賣場 ↗",
@@ -383,6 +385,8 @@ const I18N = {
     "tl.h": "Process timelapse",
     "tl.yt": "Watch on YouTube ↗",
     "tl.play": "Play on YouTube: {t}",
+    "yt.h": "Latest videos",
+    "yt.more": "More on YouTube ↗",
     "goods.sub": "Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.",
     "goods.shopName": "MyACG shop “Mania Art”",
     "goods.shopBtn": "Visit the shop ↗",
@@ -582,6 +586,8 @@ const I18N = {
     "tl.h": "メイキング動画",
     "tl.yt": "YouTubeで見る ↗",
     "tl.play": "YouTubeで再生：{t}",
+    "yt.h": "最新動画",
+    "yt.more": "YouTubeでもっと見る ↗",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。",
     "goods.shopName": "買動漫（MyACG）ショップ「Mania Art」",
     "goods.shopBtn": "ショップへ ↗",
@@ -2030,17 +2036,7 @@ function renderWork(i) {
     const im = el('img');
     im.src = `img/yt/${w.yt.id}.webp`; im.width = 1280; im.height = 720; im.alt = ''; im.loading = 'lazy';
     card.append(im, el('span', 'tl-play'), el('span', 'tl-dur', w.yt.dur));
-    if (window.SELF_HOSTED) {
-      card.addEventListener('click', (e) => {
-        e.preventDefault();
-        const f = el('iframe');
-        f.src = `https://www.youtube-nocookie.com/embed/${w.yt.id}?autoplay=1&rel=0`;
-        f.title = w.yt.t;
-        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-        f.allowFullscreen = true;
-        card.replaceWith(f);
-      });
-    }
+    if (window.SELF_HOSTED) ytInline(card, w.yt.id, w.yt.t);
     $('#wk-tl-box').replaceChildren(card);
     $('#wk-tl-title').textContent = w.yt.t;
     $('#wk-tl-link').href = url;
@@ -2092,6 +2088,23 @@ function workText(i) {
   const card = $('#wk-tl-box .tl-card');
   if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }
+/* a YouTube card that plays here, in its own place, when clicked (the work page's timelapse, the home page's latest
+   videos). Changing page only hides a view, so a player still going is put back to its card then: no sound left
+   playing on a page you have left. */
+const ytPlaying = new Map();   // player -> its card
+function ytInline(card, id, t) {
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    const f = el('iframe');
+    f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    f.title = t;
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    card.replaceWith(f);
+    ytPlaying.set(f, card);
+  });
+}
+addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });
 
 /* ==================== js/artbook.js ==================== */
 /* Art books: the list and the book page */
@@ -2876,6 +2889,34 @@ function heroText() {
 }
 heroPick();
 
+/* ---------- under the carousel, the latest three videos on the YouTube channel, newest first: yt-latest.json, which
+   .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click plays one here. ---------- */
+const ytGrid = $('#yt-grid');
+function ytText() {
+  ytGrid.querySelectorAll('.tl-card').forEach((c) => c.setAttribute('aria-label', tr('tl.play', { t: c.dataset.t })));
+}
+fetch('yt-latest.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  .then(({ videos }) => {
+    ytGrid.replaceChildren(...videos.slice(0, 3).map((v) => {
+      const item = el('div', 'yt-item'), card = el('a', 'tl-card'), im = el('img');
+      card.href = `https://www.youtube.com/watch?v=${v.id}`; card.target = '_blank'; card.rel = 'noopener';
+      card.dataset.t = v.t;
+      im.width = 1280; im.height = 720; im.alt = ''; im.loading = 'lazy';
+      const hq = () => { im.src = `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`; };   // a video without a full-size picture
+      im.addEventListener('error', hq, { once: true });
+      im.addEventListener('load', () => { if (im.naturalWidth < 200 && !im.src.includes('hqdefault')) hq(); });   // YouTube's stand-in is 120 px
+      im.src = `https://i.ytimg.com/vi/${v.id}/maxresdefault.jpg`;
+      card.append(im, el('span', 'tl-play'));
+      if (window.SELF_HOSTED) ytInline(card, v.id, v.t);
+      item.append(card, el('p', 'yt-t', v.t), el('p', 'yt-d', dot(v.d)));
+      return item;
+    }));
+    ytText();
+    $('#home-yt').hidden = !videos.length;
+  })
+  .catch(() => {});   // no list: the section stays hidden
+
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
 /* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> #g-<goods slug> ---------- */
@@ -3184,6 +3225,7 @@ function swapLang(l) {
   zvLang();
   heroText();
   eventText();
+  ytText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));

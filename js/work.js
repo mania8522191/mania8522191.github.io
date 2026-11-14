@@ -41,17 +41,7 @@ function renderWork(i) {
     const im = el('img');
     im.src = `img/yt/${w.yt.id}.webp`; im.width = 1280; im.height = 720; im.alt = ''; im.loading = 'lazy';
     card.append(im, el('span', 'tl-play'), el('span', 'tl-dur', w.yt.dur));
-    if (window.SELF_HOSTED) {
-      card.addEventListener('click', (e) => {
-        e.preventDefault();
-        const f = el('iframe');
-        f.src = `https://www.youtube-nocookie.com/embed/${w.yt.id}?autoplay=1&rel=0`;
-        f.title = w.yt.t;
-        f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
-        f.allowFullscreen = true;
-        card.replaceWith(f);
-      });
-    }
+    if (window.SELF_HOSTED) ytInline(card, w.yt.id, w.yt.t);
     $('#wk-tl-box').replaceChildren(card);
     $('#wk-tl-title').textContent = w.yt.t;
     $('#wk-tl-link').href = url;
@@ -103,3 +93,20 @@ function workText(i) {
   const card = $('#wk-tl-box .tl-card');
   if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }
+/* a YouTube card that plays here, in its own place, when clicked (the work page's timelapse, the home page's latest
+   videos). Changing page only hides a view, so a player still going is put back to its card then: no sound left
+   playing on a page you have left. */
+const ytPlaying = new Map();   // player -> its card
+function ytInline(card, id, t) {
+  card.addEventListener('click', (e) => {
+    e.preventDefault();
+    const f = el('iframe');
+    f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+    f.title = t;
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    card.replaceWith(f);
+    ytPlaying.set(f, card);
+  });
+}
+addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });

@@ -120,6 +120,15 @@
 `venue` 會場和 `city` 城市（三種語言各一）。最後一天還沒過的列在「即將參加」，最近的一場也會顯示在首頁名字下面；
 過了就自動移到「已結束」，不用改資料。改完跑 `python tools/build.py`。
 
+## 首頁的最新影片
+
+首頁輪播下面放 YouTube 頻道（@mania852）最新的 3 部影片，不含 Shorts（跟頻道的「影片」分頁一樣）。
+清單在網站根目錄的 `yt-latest.json`，由 `tools/yt_latest.py` 讀頻道的公開 RSS 產生。
+GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影片就自動提交，所以上傳後一小時內首頁會換上新的。
+- 想馬上更新：GitHub 的 Actions 分頁 → Latest YouTube videos → Run workflow；或在本機跑 `python tools/yt_latest.py` 再提交
+- 網站超過 60 天沒有任何提交的話，GitHub 會暫停排程並寄信通知，到 Actions 分頁按一下就能恢復
+- 在頁面上點影片會直接在網站播放，背景音樂會暫停；換頁時播放中的影片會停下
+
 ## 看圖的視窗
 
 Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊的 3D 封面，會開在一個視窗裡
@@ -176,6 +185,7 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `check_code.py` | 列出沒在用的程式、樣式、文字、資料欄位，和不會生效的樣式（`build.py` 每次都會跑） |
 | `check_images.py` | 列出沒用到的、缺少的圖片和音檔（`build.py` 每次都會跑） |
 | `check_deploy.py` | 等部署完成，比對線上檔案 |
+| `yt_latest.py` | 首頁最新影片的清單 `yt-latest.json`（GitHub 每小時自動跑） |
 | `common.py` | 共用的設定和函式（尺寸、品質、讀寫 `js/data.js`） |
 
 做圖的工具都可以加 `--out <資料夾>`，先把圖做到別的地方看看，不動到網站。
