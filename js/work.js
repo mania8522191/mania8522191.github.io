@@ -7,7 +7,7 @@ function renderWork(i) {
   $('#wk-ym').textContent = w.ym;
   $('#wk-ym').hidden = !w.ym;
   $('#wk-link').href = 'https://www.pixiv.net/artworks/' + w.id;
-  $('#wk-link-li').hidden = w.cat !== 'fan';   // the original pieces are not on pixiv
+  $('#wk-link-li').hidden = w.cat !== 'fan' || !/^\d+$/.test(w.id);   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
 
   const tags = $('#wk-tags');
   tags.replaceChildren(...w.tags.map((t) => { const li = document.createElement('li'); li.textContent = '#' + t; return li; }));
