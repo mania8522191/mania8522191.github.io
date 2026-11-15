@@ -140,28 +140,34 @@ GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影�
 由 `tools/ig_latest.py` 透過 Meta 的 Instagram API 讀取。
 GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼文就自動提交，不再列出的圖也會一起刪掉。
 
-第一次要先做下面的設定，只有帳號本人能做，做一次就好。IG 要是專業帳號（創作者或商家）。
-Meta 後台的按鈕名稱照英文版寫：
-1. 用 Facebook 帳號（IG 帳號不行）登入 https://developers.facebook.com 。第一次會要你註冊成開發者：同意條款，再驗證手機或 email。
-   接著按 Create app，用途（use case）選 Manage messaging & content on Instagram。
-   商家資產（business portfolio）選你 Facebook 帳號底下的任何一個，不一定要是 IG 的；清單是空的話，先到 https://business.facebook.com 建一個
-2. 到 Use cases → Customize → API setup with Unified login：
-   - Create new configuration：權杖選 System-user access token，到期（expiration）選 Never，權限要有 `instagram_basic`；
-     存好後按 Use this configuration
-   - Redirect URL 填 `https://mania8522191.github.io/`，按 Save
-3. Add account：把你的 IG 加成 Instagram Tester。
-   再用 IG 帳號登入電腦版 instagram.com，到「設定 → 網站權限 → 應用程式和網站 → 測試人員邀請」接受
-4. 回到後台按 Generate token，在跳出的視窗用 IG 帳號登入，再複製權杖（只會顯示一次）
-5. GitHub 上這個 repo 的 Settings → Secrets and variables → Actions → New repository secret：
-   名稱填 `IG_TOKEN`，內容貼上權杖
-6. Actions 分頁 → Latest Instagram posts → Run workflow，跑完首頁就會出現
+2026-11-15 設定好了：Meta 的應用程式「mania8522191 site」（屬於商家資產管理組合「Mania8522191」），
+登入設定「Site latest posts」只要 `instagram_basic`（只能讀貼文），權杖永不過期，存在 GitHub 的 `IG_TOKEN`。
 
 - 權杖只放在 GitHub 的 Secrets，不要貼進任何檔案或提交
-- 還沒設定 `IG_TOKEN` 時，排程什麼都不做，首頁也不會出現這一區
+- 沒有 `IG_TOKEN` 時，排程什麼都不做，首頁也不會出現這一區
 - IG 那邊忙或網路出錯時，清單維持原樣，下個小時再試
 - 權杖失效時（例如在後台移除了測試人員），清單也維持原樣，排程每天早上 9 點左右會失敗一次，GitHub 會寄信通知。
-  照第 4、5 步產生新的權杖，換掉 `IG_TOKEN` 就好
+  照下面第 6、7 步產生新的權杖，換掉 `IG_TOKEN` 就好
 - 想馬上更新：Actions 分頁 → Latest Instagram posts → Run workflow
+
+從頭設定的步驟（只有帳號本人能做，IG 要是專業帳號）。按鈕名稱照中文版的 Meta 後台：
+1. 用 Facebook 帳號（IG 帳號不行）登入 https://developers.facebook.com ，第一次會要你註冊成開發者。
+   「建立應用程式」：用途選「管理 Instagram 的訊息和內容」，商家可以先選「我還不想連結商家資產管理組合」
+2. 應用程式裡「使用案例 → 自訂 → API setup with Unified login」一定要有商家資產管理組合：
+   沒有的話照畫面「建立新帳號」建一個（免費，跟個人檔案分開；名稱被拒就照它建議的寫法），驗證可以按「稍後驗證」
+3. 同一頁的「權限和功能」：只把 `instagram_basic` 按「新增」
+4. 左邊選單「商家專用 Facebook 登入 → 設定 → 建立設定」：登入資料版本「一般」、存取權杖「系統用戶存取權杖」、
+   到期「永不」、資產只勾「Instagram 帳號」（再勾「必要的資產」）、權限選 `instagram_basic`，按「建立」。
+   不要用 Unified login 頁上的「建立新設定」：那是範本，一次要 6 種權限，包括發文、私訊和廣告
+5. 回到「API setup with Unified login」：剛建的設定會顯示「與 Instagram 登入相容」並自動選上。
+   重新導向網址填 `https://mania8522191.github.io/`，按「儲存」。
+   再到「應用程式角色 → 角色 → 新增用戶」，選「Instagram 測試人員」，填 IG 帳號名稱，按「新增」；
+   然後用 IG 帳號登入電腦版 instagram.com，到「設定 → 應用程式和網站 → 測試員邀請」按「接受」
+6. 「API setup with Unified login → 2. 產生存取權杖」：IG 帳號那一列按「產生權杖」，用 IG 登入。
+   跳出「已產生權杖」後勾「我瞭解」，按「複製」。權杖只顯示這一次，存好之前先別按「完成」
+7. 用 mania8522191 登入 GitHub（沒登入時設定頁會顯示 404），到這個 repo 的
+   Settings → Secrets and variables → Actions → New repository secret：名稱填 `IG_TOKEN`，貼上權杖。
+   再到 Actions 分頁 → Latest Instagram posts → Run workflow，跑完首頁就會出現
 
 ## 看圖的視窗
 
