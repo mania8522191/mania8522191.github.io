@@ -172,16 +172,17 @@ GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼�
 ## 外部連結的標誌
 
 Contact 頁每個平台前面的金色圓圈，和頁尾每個連結前面的小圖示，都用 `index.html` 頁尾前面那組 `sns-*` 圖形
-（`<symbol id="sns-x">` 等）；顏色和大小在 `css/about.css` 的 `.sns`、`.sns-ring`、`.foot-links`。
+（`<symbol id="sns-x">` 等）；顏色和大小在 `css/about.css` 的 `.sns`、`.sns-badge`、`.foot-links`。
 - 大部分圖形來自 Simple Icons（CC0），只把顏色改成網站的金色。巴哈姆特用它網址圖示裡的龍和彎月，
   買動漫是照它 16px 的網址圖示（購物袋加 M）重畫的
 - 每個圖形的 viewBox 大小不一樣，是為了讓它們在同一個框裡看起來一樣大；新增時也照這個比例調
 - 加一個平台：在那組圖形裡加一個 `<symbol>`，再在連結前面放 `<svg class="sns" aria-hidden="true"><use href="#sns-名稱"/></svg>`；
-  Contact 頁的要包在 `<span class="sns-ring" aria-hidden="true">` 裡
+  Contact 頁的圓圈和標誌要畫在同一個 svg 裡（照其他列複製 `<svg class="sns-badge" …>` 那段，改 `href`），
+  不要用外框包住圖示：兩個分開的框在滑鼠移上去、整列往右滑的時候會各自對齊像素，標誌會在圈裡晃一下
 - 連結文字要翻譯時，`data-i18n` 照樣放在 `<a>` 上，標誌放在文字前面：換語言時只換標誌後面的文字
   （`js/lang-switch.js` 的 `setText`），切換語言的淡出淡入也會連標誌一起動。
   不要把文字另外包一層 `<span data-i18n>`，那樣淡入淡出只有字在動，標誌不動
-- Contact 頁的圓圈裡沒有文字，靠 `js/lang-switch.js` 的 `TX_ALSO` 才會跟名稱一起淡出淡入（網站上的圖片則不動）
+- Contact 頁的圓圈沒有文字，靠 `js/lang-switch.js` 的 `TX_ALSO` 才會跟名稱一起淡出淡入（網站上的圖片則不動）
 
 ## 看圖的視窗
 

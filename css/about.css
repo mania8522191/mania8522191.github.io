@@ -35,11 +35,13 @@
 .channels{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
 .channels a{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:baseline;gap:18px;padding:19px 4px;border-bottom:1px solid var(--line);text-decoration:none}
 .channels a:hover{padding-left:16px;color:var(--mute)}
-/* the site's logo in a thin gold ring, in front of each channel name (the logos are the sns-* symbols in index.html) */
+/* the site's logo in a thin gold ring, in front of each channel name (the logos are the sns-* symbols in index.html).
+   Ring and logo are one svg: as separate boxes they snapped to pixels apart while the row slid on hover, and the
+   logo wobbled inside its ring */
 .sns{flex:none;fill:var(--g-gold)}
-.sns-ring{align-self:center;display:grid;place-items:center;width:clamp(40px,4.4vw,50px);aspect-ratio:1;border:1px solid rgba(208,166,90,.42);border-radius:50%;transition:border-color .35s,background-color .35s}
-.sns-ring .sns{width:60%;height:60%}
-.channels a:hover .sns-ring{border-color:var(--g-gold);background-color:rgba(208,166,90,.08)}
+.sns-badge{align-self:center;width:clamp(40px,4.4vw,50px);height:auto;overflow:visible;fill:var(--g-gold)}
+.sns-c{fill:transparent;stroke:rgba(208,166,90,.42);vector-effect:non-scaling-stroke;transition:stroke .35s,fill .35s}
+.channels a:hover .sns-c{stroke:var(--g-gold);fill:rgba(208,166,90,.08)}
 .ch{font-family:var(--f-display);font-size:clamp(20px,2.6vw,30px);letter-spacing:.08em}
 .hd{font-size:14px;color:var(--mute);overflow-wrap:anywhere}
 /* a channel with several accounts: one big name, the main handle on its row, the others stacked
