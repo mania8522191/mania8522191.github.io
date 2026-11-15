@@ -170,3 +170,26 @@ fetch('yt-latest.json', { cache: 'no-cache' })
     $('#home-yt').hidden = !videos.length;
   })
   .catch(() => {});   // no list: the section stays hidden
+
+/* ---------- then the newest posts on Instagram: ig-latest.json, with their pictures in img/ig/, which
+   .github/workflows/ig-latest.yml brings up to date every hour (tools/ig_latest.py). A click opens the post on
+   Instagram. ---------- */
+const igGrid = $('#ig-grid');
+function igText() {
+  igGrid.querySelectorAll('.ig-item').forEach((a) => a.setAttribute('aria-label', tr('ig.post', { d: dot(a.dataset.d) })));
+}
+fetch('ig-latest.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  .then(({ posts }) => {
+    igGrid.replaceChildren(...posts.map((p) => {
+      const a = el('a', p.kind === 'image' ? 'ig-item' : `ig-item ig-${p.kind}`), im = el('img');
+      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+      a.dataset.d = p.d;
+      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
+      a.append(im);
+      return a;
+    }));
+    igText();
+    $('#home-ig').hidden = !posts.length;
+  })
+  .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): the section stays hidden

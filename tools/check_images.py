@@ -4,7 +4,8 @@ files that are missing.
 usage: python tools/check_images.py
 
 It works out every picture the pages can ask for: the paths written in index.html and js/, plus the ones the
-scripts build from the data (works, process animations, art books, goods, the game page). Sounds are named in full
+scripts build from the data (works, process animations, art books, goods, the game page) and the Instagram posts in
+ig-latest.json (img/ig/, kept up to date by tools/ig_latest.py on GitHub). Sounds are named in full
 in js/ (js/sound.js). tools/build.py runs it every time it builds. It only reports; delete files yourself (they stay
 in the git history).
 """
@@ -67,6 +68,9 @@ def referenced():
     refs |= {f'img/cards/{c}.webp' for g in const(game, 'DECK_GROUPS') for c in g['cards']}
     for i in range(1, len(const(game, 'SHOTS')) + 1):
         refs |= {f'img/shot{i}.webp', f'img/shot{i}-t.webp'}
+    ig = os.path.join(C.ROOT, 'ig-latest.json')
+    if os.path.exists(ig):
+        refs |= {p['img'] for p in json.load(open(ig, encoding='utf-8'))['posts']}
     return refs
 
 

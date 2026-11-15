@@ -132,6 +132,36 @@ GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影�
 - 網站超過 60 天沒有任何提交的話，GitHub 會暫停排程並寄信通知，到 Actions 分頁按一下就能恢復
 - 在頁面上點影片會直接在網站播放，背景音樂會暫停；換頁時播放中的影片會停下
 
+## 首頁的 Instagram
+
+首頁影片下面放 Instagram（@mania8522191）最新的 6 則貼文，點了會開 IG 上的那則貼文。
+影片和 Reels 放封面，多張的放第一張，角落有跟 IG 一樣的小標記。
+清單在網站根目錄的 `ig-latest.json`，圖存在 `img/ig/`（IG 給的圖片連結過一陣子會失效，所以要存下來），
+由 `tools/ig_latest.py` 透過 Meta 的 Instagram API 讀取。
+GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼文就自動提交，不再列出的圖也會一起刪掉。
+
+第一次要先做下面的設定，只有帳號本人能做，做一次就好。IG 要是專業帳號（創作者或商家）。
+Meta 後台的按鈕名稱照英文版寫：
+1. 用 Facebook 帳號登入 https://developers.facebook.com ，按 Create app。
+   用途（use case）選 Manage messaging & content on Instagram，商家資產（business portfolio）選你 IG 的那一個
+2. 到 Use cases → Customize → API setup with Unified login：
+   - Create new configuration：權杖選 System-user access token，到期（expiration）選 Never，權限要有 `instagram_basic`；
+     存好後按 Use this configuration
+   - Redirect URL 填 `https://mania8522191.github.io/`，按 Save
+3. Add account：把你的 IG 加成 Instagram Tester。
+   再到電腦版 instagram.com 的「設定 → 網站權限 → 應用程式和網站 → 測試人員邀請」接受
+4. 回到後台按 Generate token，登入後複製權杖（只會顯示一次）
+5. GitHub 上這個 repo 的 Settings → Secrets and variables → Actions → New repository secret：
+   名稱填 `IG_TOKEN`，內容貼上權杖
+6. Actions 分頁 → Latest Instagram posts → Run workflow，跑完首頁就會出現
+
+- 權杖只放在 GitHub 的 Secrets，不要貼進任何檔案或提交
+- 還沒設定 `IG_TOKEN` 時，排程什麼都不做，首頁也不會出現這一區
+- IG 那邊忙或網路出錯時，清單維持原樣，下個小時再試
+- 權杖失效時（例如在後台移除了測試人員），清單也維持原樣，排程每天早上 9 點左右會失敗一次，GitHub 會寄信通知。
+  照第 4、5 步產生新的權杖，換掉 `IG_TOKEN` 就好
+- 想馬上更新：Actions 分頁 → Latest Instagram posts → Run workflow
+
 ## 看圖的視窗
 
 Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊的 3D 封面，會開在一個視窗裡
@@ -189,6 +219,7 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `check_images.py` | 列出沒用到的、缺少的圖片和音檔（`build.py` 每次都會跑） |
 | `check_deploy.py` | 等部署完成，比對線上檔案 |
 | `yt_latest.py` | 首頁最新影片的清單 `yt-latest.json`（GitHub 每小時自動跑） |
+| `ig_latest.py` | 首頁 Instagram 最新貼文的清單 `ig-latest.json` 和圖（GitHub 每小時自動跑，要先設定 `IG_TOKEN`） |
 | `common.py` | 共用的設定和函式（尺寸、品質、讀寫 `js/data.js`） |
 
 做圖的工具都可以加 `--out <資料夾>`，先把圖做到別的地方看看，不動到網站。

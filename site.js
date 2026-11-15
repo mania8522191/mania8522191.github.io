@@ -186,6 +186,9 @@ const I18N = {
     "tl.play": "在 YouTube 播放：{t}",
     "yt.h": "最新繪圖直播",
     "yt.more": "在 YouTube 看更多 ↗",
+    "ig.h": "最新貼文",
+    "ig.more": "在 Instagram 看更多 ↗",
+    "ig.post": "在 Instagram 看這則貼文（{d}）",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。",
     "goods.shopName": "買動漫賣場「Mania Art」",
     "goods.shopBtn": "前往賣場 ↗",
@@ -387,6 +390,9 @@ const I18N = {
     "tl.play": "Play on YouTube: {t}",
     "yt.h": "Latest drawing streams",
     "yt.more": "More on YouTube ↗",
+    "ig.h": "Latest posts",
+    "ig.more": "More on Instagram ↗",
+    "ig.post": "View this post on Instagram ({d})",
     "goods.sub": "Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.",
     "goods.shopName": "MyACG shop “Mania Art”",
     "goods.shopBtn": "Visit the shop ↗",
@@ -588,6 +594,9 @@ const I18N = {
     "tl.play": "YouTubeで再生：{t}",
     "yt.h": "最新のお絵描き配信",
     "yt.more": "YouTubeでもっと見る ↗",
+    "ig.h": "最新の投稿",
+    "ig.more": "Instagramでもっと見る ↗",
+    "ig.post": "Instagramでこの投稿を見る（{d}）",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。",
     "goods.shopName": "買動漫（MyACG）ショップ「Mania Art」",
     "goods.shopBtn": "ショップへ ↗",
@@ -2917,6 +2926,29 @@ fetch('yt-latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});   // no list: the section stays hidden
 
+/* ---------- then the newest posts on Instagram: ig-latest.json, with their pictures in img/ig/, which
+   .github/workflows/ig-latest.yml brings up to date every hour (tools/ig_latest.py). A click opens the post on
+   Instagram. ---------- */
+const igGrid = $('#ig-grid');
+function igText() {
+  igGrid.querySelectorAll('.ig-item').forEach((a) => a.setAttribute('aria-label', tr('ig.post', { d: dot(a.dataset.d) })));
+}
+fetch('ig-latest.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  .then(({ posts }) => {
+    igGrid.replaceChildren(...posts.map((p) => {
+      const a = el('a', p.kind === 'image' ? 'ig-item' : `ig-item ig-${p.kind}`), im = el('img');
+      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+      a.dataset.d = p.d;
+      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
+      a.append(im);
+      return a;
+    }));
+    igText();
+    $('#home-ig').hidden = !posts.length;
+  })
+  .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): the section stays hidden
+
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
 /* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> #g-<goods slug> ---------- */
@@ -3226,6 +3258,7 @@ function swapLang(l) {
   heroText();
   eventText();
   ytText();
+  igText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
