@@ -169,6 +169,17 @@ GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼�
    Settings → Secrets and variables → Actions → New repository secret：名稱填 `IG_TOKEN`，貼上權杖。
    再到 Actions 分頁 → Latest Instagram posts → Run workflow，跑完首頁就會出現
 
+## 外部連結的標誌
+
+Contact 頁每個平台前面的金色圓圈，和頁尾每個連結前面的小圖示，都用 `index.html` 頁尾前面那組 `sns-*` 圖形
+（`<symbol id="sns-x">` 等）；顏色和大小在 `css/about.css` 的 `.sns`、`.sns-ring`、`.foot-links`。
+- 大部分圖形來自 Simple Icons（CC0），只把顏色改成網站的金色。巴哈姆特用它網址圖示裡的龍和彎月，
+  買動漫是照它 16px 的網址圖示（購物袋加 M）重畫的
+- 每個圖形的 viewBox 大小不一樣，是為了讓它們在同一個框裡看起來一樣大；新增時也照這個比例調
+- 加一個平台：在那組圖形裡加一個 `<symbol>`，再在連結前面放 `<svg class="sns" aria-hidden="true"><use href="#sns-名稱"/></svg>`；
+  Contact 頁的要包在 `<span class="sns-ring" aria-hidden="true">` 裡
+- 連結文字要翻譯時，`data-i18n` 放在包住文字的 `<span>` 上，不要放在 `<a>` 上，不然換語言時圖示會被清掉
+
 ## 看圖的視窗
 
 Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊的 3D 封面，會開在一個視窗裡

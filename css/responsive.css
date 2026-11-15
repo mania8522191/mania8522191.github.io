@@ -37,9 +37,10 @@
   .about-fig .about-badge{right:10px}
   .proj-nav{grid-template-columns:minmax(0,1fr)}
   .proj-nav .next{text-align:left;justify-items:start}
-  .channels a{grid-template-columns:minmax(0,1fr) auto;row-gap:2px;padding-block:16px}
-  .channels .hd{grid-column:1;grid-row:2}
-  .ch-subs{justify-items:stretch;padding-bottom:12px}
+  .channels a{grid-template-columns:auto minmax(0,1fr) auto;row-gap:2px;padding-block:16px}
+  .channels .sns-ring{grid-row:1 / span 2}
+  .channels .hd{grid-column:2;grid-row:2}
+  .ch-subs{justify-items:stretch;padding-bottom:12px;padding-left:62px}   /* under the channel name, past the 40px logo ring */
   .channels .ch-subs a{display:grid;grid-auto-flow:row;grid-template-columns:auto minmax(0,1fr) auto auto;gap:10px}
   .channels .ch-subs .off-tag{grid-column:3}
   .channels .ch-subs .ar{grid-column:4}
