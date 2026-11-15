@@ -1,9 +1,16 @@
 /* Switching language: everything on screen is redrawn in place, with a short tween */
 /* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
 const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : { n: WORKS.length });
+/* a link with a logo in front (the footer's .sns) keeps the logo: only the text after it changes, so the link
+   stays one piece of text and the language tween fades the logo with its name */
+function setText(e, s) {
+  const t = e.lastChild;
+  if (e.firstElementChild && t && t.nodeType === 3) t.data = s;
+  else e.textContent = s;
+}
 /* the texts marked in the page, or in a part of it made later (a picture window: js/lightbox.js) */
 function textsIn(root) {
-  root.querySelectorAll('[data-i18n]').forEach((e) => { e.textContent = tr(e.dataset.i18n, subVars(e)); });
+  root.querySelectorAll('[data-i18n]').forEach((e) => setText(e, tr(e.dataset.i18n, subVars(e))));
   root.querySelectorAll('[data-i18n-aria]').forEach((e) => e.setAttribute('aria-label', tr(e.dataset.i18nAria)));
   root.querySelectorAll('[data-i18n-alt]').forEach((e) => { e.alt = tr(e.dataset.i18nAlt); });
   root.querySelectorAll('[data-i18n-title]').forEach((e) => { e.title = tr(e.dataset.i18nTitle); });

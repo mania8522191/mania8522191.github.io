@@ -178,7 +178,9 @@ Contact 頁每個平台前面的金色圓圈，和頁尾每個連結前面的小
 - 每個圖形的 viewBox 大小不一樣，是為了讓它們在同一個框裡看起來一樣大；新增時也照這個比例調
 - 加一個平台：在那組圖形裡加一個 `<symbol>`，再在連結前面放 `<svg class="sns" aria-hidden="true"><use href="#sns-名稱"/></svg>`；
   Contact 頁的要包在 `<span class="sns-ring" aria-hidden="true">` 裡
-- 連結文字要翻譯時，`data-i18n` 放在包住文字的 `<span>` 上，不要放在 `<a>` 上，不然換語言時圖示會被清掉
+- 連結文字要翻譯時，`data-i18n` 照樣放在 `<a>` 上，標誌放在文字前面：換語言時只換標誌後面的文字
+  （`js/lang-switch.js` 的 `setText`），切換語言的淡出淡入也會連標誌一起動。
+  不要把文字另外包一層 `<span data-i18n>`，那樣淡入淡出只有字在動，標誌不動
 
 ## 看圖的視窗
 
