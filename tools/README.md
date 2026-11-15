@@ -142,15 +142,16 @@ GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼�
 
 第一次要先做下面的設定，只有帳號本人能做，做一次就好。IG 要是專業帳號（創作者或商家）。
 Meta 後台的按鈕名稱照英文版寫：
-1. 用 Facebook 帳號登入 https://developers.facebook.com ，按 Create app。
-   用途（use case）選 Manage messaging & content on Instagram，商家資產（business portfolio）選你 IG 的那一個
+1. 用 Facebook 帳號（IG 帳號不行）登入 https://developers.facebook.com 。第一次會要你註冊成開發者：同意條款，再驗證手機或 email。
+   接著按 Create app，用途（use case）選 Manage messaging & content on Instagram。
+   商家資產（business portfolio）選你 Facebook 帳號底下的任何一個，不一定要是 IG 的；清單是空的話，先到 https://business.facebook.com 建一個
 2. 到 Use cases → Customize → API setup with Unified login：
    - Create new configuration：權杖選 System-user access token，到期（expiration）選 Never，權限要有 `instagram_basic`；
      存好後按 Use this configuration
    - Redirect URL 填 `https://mania8522191.github.io/`，按 Save
 3. Add account：把你的 IG 加成 Instagram Tester。
-   再到電腦版 instagram.com 的「設定 → 網站權限 → 應用程式和網站 → 測試人員邀請」接受
-4. 回到後台按 Generate token，登入後複製權杖（只會顯示一次）
+   再用 IG 帳號登入電腦版 instagram.com，到「設定 → 網站權限 → 應用程式和網站 → 測試人員邀請」接受
+4. 回到後台按 Generate token，在跳出的視窗用 IG 帳號登入，再複製權杖（只會顯示一次）
 5. GitHub 上這個 repo 的 Settings → Secrets and variables → Actions → New repository secret：
    名稱填 `IG_TOKEN`，內容貼上權杖
 6. Actions 分頁 → Latest Instagram posts → Run workflow，跑完首頁就會出現
