@@ -1,4 +1,47 @@
 {
- "user": "",
- "posts": []
+ "user": "mania8522191",
+ "posts": [
+  {
+   "id": "18122509076054023",
+   "url": "https://www.instagram.com/p/Dfm8caHj9Ii/",
+   "d": "2026-11-11",
+   "kind": "image",
+   "img": "img/ig/18122509076054023.jpg"
+  },
+  {
+   "id": "18176778178452045",
+   "url": "https://www.instagram.com/p/Dfh6SfnjwpE/",
+   "d": "2026-11-09",
+   "kind": "image",
+   "img": "img/ig/18176778178452045.jpg"
+  },
+  {
+   "id": "18110201135187919",
+   "url": "https://www.instagram.com/p/Dfbk0TVj9PU/",
+   "d": "2026-11-07",
+   "kind": "image",
+   "img": "img/ig/18110201135187919.jpg"
+  },
+  {
+   "id": "18122915383942441",
+   "url": "https://www.instagram.com/p/DfZrIODE9Kj/",
+   "d": "2026-11-06",
+   "kind": "image",
+   "img": "img/ig/18122915383942441.jpg"
+  },
+  {
+   "id": "18450126331122077",
+   "url": "https://www.instagram.com/p/DfTqP5Jk4kb/",
+   "d": "2026-11-04",
+   "kind": "album",
+   "img": "img/ig/18450126331122077.jpg"
+  },
+  {
+   "id": "18101088722552682",
+   "url": "https://www.instagram.com/p/DfJMZ0iE_w2/",
+   "d": "2026-10-31",
+   "kind": "album",
+   "img": "img/ig/18101088722552682.jpg"
+  }
+ ]
 }
