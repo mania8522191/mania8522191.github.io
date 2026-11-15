@@ -3206,15 +3206,16 @@ addEventListener('resize', () => { clearTimeout(evenTimer); evenTimer = setTimeo
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(evenIntros);
 
 /* language switch tween: the words on screen blur out, the new language waves in from top to bottom;
-   pictures stay put. Text off screen just switches. */
+   pictures stay put, but the logo rings on Contact move with the names beside them. Text off screen just switches. */
 const TX_SKIP = '.site-head, .m-nav, .curtain, script, style, svg, [hidden]';
+const TX_ALSO = '.sns-ring';
 function textOnScreen() {
   const roots = [VIEWS[view], $('.site-foot')].filter(Boolean), picked = [];
   const mark = new Set();
   for (const root of roots) {
     const tw = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => (n.matches(TX_SKIP) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     for (let n = tw.nextNode(); n; n = tw.nextNode()) {
-      if (![...n.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim())) continue;
+      if (!n.matches(TX_ALSO) && ![...n.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim())) continue;
       let inside = false;
       for (let a = n.parentElement; a && a !== root; a = a.parentElement) if (mark.has(a)) { inside = true; break; }
       if (inside) continue;
