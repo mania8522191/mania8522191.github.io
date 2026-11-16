@@ -2,37 +2,40 @@
 /* ---------- cover wall: masonry; wide works span two columns so every cover shows its art at a similar
    scale, tall ones keep one full column, nothing is cropped, and later covers fill any hole ---------- */
 const wall = $('#wall');
-WORKS.forEach((w, i) => {
-  const [W, H] = w.dims[0];
-  const r = W / H;
-
-  const a = document.createElement('a');
-  a.className = 'cover';
-  a.id = 'c-' + w.id;
-  a.href = '#w-' + w.id;
+/* a cover: a picture that links on, with its words over it on hover (under it on touch screens); it flies in from
+   a direction of its own, new on every visit. The wall's works, and a collection's pieces on its work page. */
+function makeCover(href, img, W, H, pos, eager) {
+  const r = W / H, a = el('a', 'cover');
+  a.href = href;
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
   a.dataset.r = r.toFixed(4);
+  a.style.cssText = `--ar:${r.toFixed(4)};--pos:${pos}`;
+  const ang = Math.random() * Math.PI * 2, dist = (150 + Math.random() * 150) * (innerWidth < 700 ? 0.55 : 1);
+  a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
+  a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
+  a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
+  a.innerHTML = `<span class="frame mask"><img src="${img}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async"><span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
+  return a;
+}
+function coverText(a, t, meta, label) {
+  a.querySelector('.ov-t').textContent = a.querySelector('.cap-t').textContent = t;
+  a.querySelector('.ov-m').textContent = a.querySelector('.cap-m').textContent = meta;
+  a.setAttribute('aria-label', label);
+}
+WORKS.forEach((w, i) => {
+  const [W, H] = w.dims[0];
+  const a = makeCover('#w-' + w.id, src(w.id, 0), W, H, w.pos, i < 4);
+  a.id = 'c-' + w.id;
   a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers
   a.dataset.cat = w.cat;
-  a.style.cssText = `--ar:${r.toFixed(4)};--pos:${w.pos}`;
-  {   // a different direction for every cover, and every visit
-    const ang = Math.random() * Math.PI * 2, dist = (150 + Math.random() * 150) * (innerWidth < 700 ? 0.55 : 1);
-    a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
-    a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
-    a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
-  }
-  a.innerHTML = `<span class="frame mask"><img src="${src(w.id, 0)}" width="${W}" height="${H}" alt="" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async"><span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
-  a.querySelector('.ov-t').textContent = w.t;
-  a.querySelector('.cap-t').textContent = w.t;
   fillCover(a, w);
   wall.appendChild(a);
 });
+/* a work cover's words; again on a language change (a collection's title is in three languages) */
 function fillCover(a, w) {
   const meta = `${dot(madeOn(w))}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
-  a.setAttribute('aria-label', `${w.t} (${dot(madeOn(w))})`);
-  a.querySelector('.ov-m').textContent = meta;
-  a.querySelector('.cap-m').textContent = meta;
+  coverText(a, L(w.t), meta, `${L(w.t)} (${dot(madeOn(w))})`);
 }
 /* Collage layout on a tight skeleton. Two lanes on wide screens (one on narrow ones), each two columns
    wide: a wide work fills a lane; single-column works go side by side with the next one in date order,
@@ -218,8 +221,8 @@ addEventListener('scroll', () => { if (!yearsRaf) yearsRaf = requestAnimationFra
 /* units in date order: a wide work alone; a single-column work beside the next single-column one of the same year.
    When that one is far taller or shorter, the closest in height among the next few takes its place, so a long work
    is not left beside a short one; if even that is far shorter, the works after it stack under the short one */
-function buildUnits() {
-  const items = wallOrder.map((el) => ({ el, r: +el.dataset.r, y: el.dataset.date.slice(0, 4) }));
+function buildUnits(order) {
+  const items = order.map((el) => ({ el, r: +el.dataset.r, y: el.dataset.date.slice(0, 4) }));
   const units = [], used = new Set();
   const fits = (c, y) => c.y === y && c.r < 1.4;   // single-column, same year
   for (let k = 0; k < items.length; k++) {
@@ -262,15 +265,22 @@ function placeCover(el, x, y, tilt) {
 }
 function layoutWall() {
   if (VIEWS.works.hidden || !wall.clientWidth) return;
-  const rand = seeded(WALL_SEED);
-  wallUnits = wallUnits || buildUnits();
-  const W = wall.clientWidth;
+  wallUnits = wallUnits || buildUnits(wallOrder);
+  collage(wall, wallOrder, wallUnits, WALL_SEED, yearHead);
+  yearNow = '';
+  yearsUpdate();
+}
+/* place the covers of `order` (grouped into `units`) on `box`, the same way everywhere: the wall (with its year
+   headers, `heads`) and a collection's pieces (no headers) */
+function collage(box, order, units, seed, heads) {
+  const rand = seeded(seed);
+  const W = box.clientWidth;
   const lanes = W >= 680 ? 2 : 1;
   const gap = W >= 1000 ? 26 : W >= 600 ? 18 : 12;
   const laneW = (W - (lanes - 1) * gap) / lanes;
   const colW = (laneW - gap) / 2;
   const touch = matchMedia('(hover: none)').matches;
-  const plan = wallUnits.map((u) => {
+  const plan = units.map((u) => {
     const p = { u, wa: u.pair ? colW * (0.9 + rand() * 0.1) : laneW * (0.86 + rand() * 0.14) };
     if (u.b) p.wb = colW * (0.9 + rand() * 0.1);
     p.ex = u.sa || u.sb || [];
@@ -280,7 +290,7 @@ function layoutWall() {
     p.ex.forEach((c, i) => { c.el.style.width = `${Math.round(p.we[i])}px`; });
     return p;
   });
-  const h = new Map(wallOrder.map((el) => [el, el.offsetHeight]));   // one layout pass for every cover
+  const h = new Map(order.map((el) => [el, el.offsetHeight]));   // one layout pass for every cover
   const laneH = new Array(lanes).fill(0);
   const tilt = () => (rand() < 0.5 ? (rand() - 0.5) * 2 : 0);
   const fresh = new Array(lanes).fill(true);   // nothing placed in this lane since the last year header
@@ -289,9 +299,9 @@ function layoutWall() {
   let z = 1, curYear = '';
   plan.forEach((p, k) => {
     const yr = p.u.a.el.dataset.date.slice(0, 4);
-    if (yr !== curYear) {
-      curYear = yr;
-      const hd = yearHead.get(yr);
+    const hd = yr !== curYear && heads && heads.get(yr);
+    curYear = yr;
+    if (hd) {
       const top = k === 0 ? 0 : Math.max(...laneH) + gap * 2.6;
       hd.style.top = `${Math.round(top)}px`;
       laneH.fill(top + hd.offsetHeight + gap * 1.1);
@@ -341,9 +351,7 @@ function layoutWall() {
     laneH[L] = bottom;
     fresh[L] = false;
   });
-  wall.style.height = `${Math.ceil(Math.max(...laneH))}px`;
-  yearNow = '';
-  yearsUpdate();
+  box.style.height = `${Math.ceil(Math.max(...laneH))}px`;
 }
 let wallRaf = 0;
 addEventListener('resize', () => { cancelAnimationFrame(wallRaf); wallRaf = requestAnimationFrame(layoutWall); });

@@ -16,18 +16,30 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
     return list.map(([f, W, H, ZW, ZH], n) => ({
       src: `img/proc/${f}`, zsrc: ZW ? `img/proc/z/${f}` : null, eager: true,
       w: W, h: H, zw: ZW || W,
-      no: `${n + 1} / ${list.length}`, cap: `${w.t} · ${tr('proc.h')}`,
-      alt: tr('proc.alt', { t: w.t }),
+      no: `${n + 1} / ${list.length}`, cap: `${L(w.t)} · ${tr('proc.h')}`,
+      alt: tr('proc.alt', { t: L(w.t) }),
     }));
   },
   work: (id) => {
-    const w = WORKS[byId[id]];
+    const w = WORKS[byId[id]], t = L(w.t);
     return w.dims.map(([W, H, ZW, ZH], n) => ({
       src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
       w: W, h: H, zw: ZW || W,
-      no: `${n + 1} / ${w.dims.length}`, cap: w.t,
-      alt: w.dims.length > 1 ? tr('zv.workAlt', { t: w.t, n: n + 1 }) : w.t,
+      no: `${n + 1} / ${w.dims.length}`, cap: t,
+      alt: w.dims.length > 1 ? tr('zv.workAlt', { t, n: n + 1 }) : t,
     }));
+  },
+  piece: (key) => {   // a collection's piece (key "<work id>/<piece from 0>"): its finished picture, other versions, sketch
+    const [id, p] = key.split('/'), w = WORKS[byId[id]], n = +p, t = L(w.t), list = pieceImgs(w, n);
+    return list.map((q, k) => {
+      const [W, H, ZW] = q.d;
+      return {
+        src: q.src, zsrc: ZW ? q.src.replace('img/', 'img/z/') : null,
+        w: W, h: H, zw: ZW || W,
+        no: `${k + 1} / ${list.length}`, cap: `${t} · No.${no2(n + 1)}${k ? ' · ' + tr('wk.' + q.k, { n: q.j }) : ''}`,
+        alt: tr(`wk.${q.k}Alt`, { t, n: n + 1, k: q.j }),
+      };
+    });
   },
   shots: () => SHOTS.map((s, i) => ({ src: `img/shot${i + 1}.webp`, w: 1600, h: 900, zw: 1600, no: `${no2(i + 1)} / ${no2(SHOTS.length)}`, cap: tr(s), alt: tr(s) })),
   chars: () => artChars.map((n) => (CHAR_CARD.has(n)
@@ -525,7 +537,7 @@ function zvMake(kind, key, set, from) {
 }
 /* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
 function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'book' ? lastBook : '';
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : '';
   const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
   const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
   if (same) { same.from = from; same.at0 = at; zvBack(same); return; }
@@ -546,7 +558,8 @@ $('#shot-big').addEventListener('click', (e) => zvOpen('shots', shotAt, e.curren
 charList.addEventListener('click', (e) => { const b = e.target.closest('.char-btn'); if (b) zvOpen('chars', artChars.indexOf(+b.dataset.n), b); });
 $('#wk-imgs').addEventListener('click', (e) => {
   const im = e.target.closest('img');
-  if (im) zvOpen('work', [...$('#wk-imgs').children].indexOf(im), im);
+  if (!im || im.closest('a')) return;   // a collection's grid: each piece is a link to its own page
+  zvOpen(lastPiece >= 0 ? 'piece' : 'work', [...$('#wk-imgs').querySelectorAll('img')].indexOf(im), im);
 });
 $('#wk-proc-box').addEventListener('click', (e) => {
   const im = e.target.closest('img');

@@ -323,13 +323,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 }
 .years-prog{display:block;height:1px;margin-top:6px;background:var(--line)}
 .years-prog i{display:block;height:1px;background:var(--g-gold);transform-origin:0 50%;transform:scaleX(0)}
-/* cover wall: JS places every cover (see layoutWall); wide works fill a two-column lane, tall ones share it in pairs */
-.wall{position:relative;isolation:isolate;margin-top:clamp(36px,5vw,64px)}
+/* cover wall: JS places every cover (see collage() in js/wall.js); wide works fill a two-column lane, tall ones share it
+   in pairs. The same collage shows a collection's pieces on its work page (.pc-wall) */
+.wall,.pc-wall{position:relative;isolation:isolate}
+.wall{margin-top:clamp(36px,5vw,64px)}
 .cover{position:absolute;left:0;top:0;display:block;text-decoration:none;scroll-margin-top:calc(var(--head) + 24px)}
-.cover .frame{box-shadow:0 14px 36px rgba(0,0,0,.55)}
-.wall .cover .frame{transform:rotate(var(--tilt,0deg));transition:clip-path 1.3s var(--ease-out) var(--d,0s),transform .6s var(--ease-out)}
+.cover .frame{box-shadow:0 14px 36px rgba(0,0,0,.55);transform:rotate(var(--tilt,0deg));transition:clip-path 1.3s var(--ease-out) var(--d,0s),transform .6s var(--ease-out)}
 .cover:hover,.cover:focus-visible{z-index:90!important}
-.wall .cover:hover .frame,.wall .cover:focus-visible .frame{transform:none}
+.cover:hover .frame,.cover:focus-visible .frame{transform:none}
 .frame{position:relative;display:block;aspect-ratio:var(--ar);max-width:100%;overflow:hidden;background:var(--bg-2)}
 .frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos)}
 .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;background:var(--veil);opacity:0}
@@ -364,6 +365,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .proj-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--mute);max-width:46em}
 .proj-imgs{display:grid;justify-items:center;gap:clamp(16px,3vw,44px)}
 .proj-imgs img{display:block;height:auto;max-width:100%;background:var(--bg-2)}
+/* a collection's piece on its own page: the finished picture, its other versions and its sketch, two to a row (one
+   under the other on narrow screens) */
+.pc-pair{display:grid;grid-template-columns:repeat(var(--cols),auto);justify-content:center;align-items:start;gap:clamp(16px,3vw,44px)}
+.pc-fig{display:grid;justify-items:center;gap:12px;margin:0;min-width:0}
+.pc-cap{font-size:12px;letter-spacing:.32em;color:var(--mute)}
+.pc-fig img{display:block;width:auto;height:auto;max-width:100%;max-height:calc(100svh - 200px);background:var(--bg-2);cursor:zoom-in}
 .proj-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:clamp(72px,9vw,128px);padding-top:28px;border-top:1px solid var(--line)}
 .proj-nav a{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;align-content:start;text-decoration:none;min-width:0}
 .proj-nav .nm.fit{justify-self:stretch;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -920,6 +927,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .about-fig .about-badge{right:10px}
   .proj-nav{grid-template-columns:minmax(0,1fr)}
   .proj-nav .next{text-align:left;justify-items:start}
+  .pc-pair{grid-template-columns:minmax(0,auto)}
   .channels a{grid-template-columns:auto minmax(0,1fr) auto;row-gap:2px;padding-block:16px}
   .channels .sns-badge{grid-row:1 / span 2}
   .channels .hd{grid-column:2;grid-row:2}

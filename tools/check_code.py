@@ -202,7 +202,7 @@ def findings():
             if not re.search(r'[\'"`]' + re.escape(k) + r'[\'"`]', rest) and not built(k, rest, '.'):
                 out.append(f'js/i18n.js: "{k}" is never used')
         asked = {k for _, k in re.findall(r'\btr\(\s*([\'"`])([^\'"`$]+)\1(?!\s*\+)', rest)}
-        asked |= {k for _, k in re.findall(r'\.dataset\.i18n\w*\s*=\s*([\'"`])([^\'"`$]+)\1', rest)}
+        asked |= {k for _, k in re.findall(r'\.dataset\.i18n\w*\s*=\s*([\'"`])([^\'"`$]+)\1(?!\s*\+)', rest)}   # not a name put together ('wk.' + k)
         asked |= set(re.findall(r'data-i18n(?:-\w+)?="([^"]+)"', html))
         out += [f'"{k}" is asked for, but js/i18n.js does not have it' for k in sorted(asked - set(order))]
 

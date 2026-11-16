@@ -104,7 +104,7 @@ function heroShow(i) {
   s.box.classList.add('on');
   SLIDES.forEach((x, k) => x.dot.setAttribute('aria-current', String(k === i)));
   heroCap.href = '#w-' + s.w.id;
-  heroCap.querySelector('.hero-cap-t').textContent = s.w.t;
+  heroCap.querySelector('.hero-cap-t').textContent = L(s.w.t);
   if (!first && !CALM) heroCap.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
 }
 const heroStep = (d) => { heroShow((heroAt + d + SLIDES.length) % SLIDES.length); heroPlay(); };
@@ -139,7 +139,7 @@ addEventListener('keydown', (e) => {
 
 /* the dots' names, again after a language change */
 function heroText() {
-  SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: s.w.t })));
+  SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: L(s.w.t) })));
 }
 heroPick();
 

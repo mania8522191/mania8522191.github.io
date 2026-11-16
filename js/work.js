@@ -1,19 +1,28 @@
 /* Work page */
-/* ---------- single work page ---------- */
-function renderWork(i) {
-  const w = WORKS[i];
+/* ---------- single work page. A collection ("pieces": true, each page a piece of its own) shows its finished pieces
+   as covers on a collage like the works wall's; each piece has a page of its own (#w-<id>/<n>) with its other
+   versions ("alt") and its sketch ("sk") beside it, where it has them ---------- */
+function renderWork(i, piece = -1) {
+  const w = WORKS[i], one = w.pieces && piece >= 0;
   $('#wk-lab').textContent = w.lab;
-  $('#wk-title').textContent = w.t;
   $('#wk-ym').textContent = w.ym;
   $('#wk-ym').hidden = !w.ym;
   $('#wk-link').href = 'https://www.pixiv.net/artworks/' + w.id;
   $('#wk-link-li').hidden = w.cat !== 'fan' || !/^\d+$/.test(w.id);   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
+  $('#wk-all-li').hidden = !one;   // a piece's page: back to the whole collection
+  $('#wk-all').href = '#w-' + w.id;
 
   const tags = $('#wk-tags');
   tags.replaceChildren(...w.tags.map((t) => { const li = document.createElement('li'); li.textContent = '#' + t; return li; }));
 
   const box = $('#wk-imgs');
-  box.replaceChildren(...w.dims.map(([W, H], n) => {
+  box.removeAttribute('style');   // a collage's height, a piece page's columns
+  box.className = !w.pieces ? 'proj-imgs' : one ? 'pc-pair' : 'pc-wall';
+  if (one) {
+    box.replaceChildren(...pieceFigs(w, piece));
+    box.style.setProperty('--cols', Math.min(2, box.children.length));
+  } else if (w.pieces) box.replaceChildren(...w.dims.map(([W, H], n) => pieceCover(w, n, W, H)));
+  else box.replaceChildren(...w.dims.map(([W, H], n) => {
     const img = document.createElement('img');
     const r = W / H;
     img.src = src(w.id, n);
@@ -57,22 +66,83 @@ function renderWork(i) {
     return im;
   }));
 
-  /* previous / next stay inside Fan Art or Original Art and follow the wall's order */
-  const list = wallSort === 'old' ? [...CAT_LIST[w.cat]].reverse() : CAT_LIST[w.cat], k = list.indexOf(w);
-  const p = list[(k - 1 + list.length) % list.length];
-  const nx = list[(k + 1) % list.length];
-  $('#wk-prev').href = '#w-' + p.id; $('#wk-prev-t').textContent = p.t;
-  $('#wk-next').href = '#w-' + nx.id; $('#wk-next-t').textContent = nx.t;
-  workText(i);
+  /* previous / next: on a piece's page, the collection's other pieces; otherwise they stay inside Fan Art or
+     Original Art and follow the wall's order */
+  $('#wk-prev .lbl').textContent = one ? '← Previous Piece' : '← Previous Project';
+  $('#wk-next .lbl').textContent = one ? 'Next Piece →' : 'Next Project →';
+  if (one) {
+    const m = w.dims.length, p = (piece - 1 + m) % m, nx = (piece + 1) % m;
+    $('#wk-prev').href = `#w-${w.id}/${p + 1}`; $('#wk-prev-t').textContent = `No.${no2(p + 1)}`;
+    $('#wk-next').href = `#w-${w.id}/${nx + 1}`; $('#wk-next-t').textContent = `No.${no2(nx + 1)}`;
+  } else {
+    const list = wallSort === 'old' ? [...CAT_LIST[w.cat]].reverse() : CAT_LIST[w.cat], k = list.indexOf(w);
+    $('#wk-prev').href = '#w-' + list[(k - 1 + list.length) % list.length].id;
+    $('#wk-next').href = '#w-' + list[(k + 1) % list.length].id;
+  }
+  workText(i, piece);
+}
+/* a collection's piece on its collage: a cover like the wall's, linking to the piece's page */
+function pieceCover(w, n, W, H) {
+  const a = makeCover(`#w-${w.id}/${n + 1}`, src(w.id, n), W, H, w.pos, n < 4);
+  a.dataset.n = n;
+  a.dataset.date = madeOn(w);   // one date for them all: the collage pairs them in order
+  return a;
+}
+const PIECE_SEED = (WALL_SEED ^ 0x9e3779b9) >>> 0;   // an arrangement of its own, kept while browsing like the wall's
+function layoutPieces() {
+  const box = $('#wk-imgs');
+  if (VIEWS.work.hidden || !box.classList.contains('pc-wall') || !box.clientWidth) return;
+  const order = [...box.querySelectorAll('.cover')];
+  collage(box, order, buildUnits(order), PIECE_SEED, null);
+}
+addEventListener('resize', () => requestAnimationFrame(layoutPieces));
+if (document.fonts) document.fonts.ready.then(layoutPieces);
+/* the pictures on a piece's page: the finished one, its other versions, its sketch */
+function pieceImgs(w, n) {
+  const sk = w.sk && w.sk[n];
+  return [
+    { k: 'final', src: src(w.id, n), d: w.dims[n] },
+    ...((w.alt && w.alt[n]) || []).map((d, j) => ({ k: 'alt', j: j + 1, src: `img/${w.id}_a${n}_${j + 1}.webp`, d })),
+    ...(sk ? [{ k: 'sketch', src: `img/${w.id}_s${n}.webp`, d: sk }] : []),
+  ];
+}
+/* a piece's page: its pictures, each with its caption (written by workText) */
+function pieceFigs(w, n) {
+  return pieceImgs(w, n).map((p, j) => {
+    const f = el('figure', 'pc-fig'), img = el('img');
+    img.src = p.src;
+    [img.width, img.height] = p.d;
+    img.decoding = 'async';
+    if (j) f.dataset.rv = 'up';
+    f.append(el('figcaption', 'pc-cap'), img);
+    return f;
+  });
 }
 /* the words on a work page; also run on a language switch so the images and the video player stay put */
-function workText(i) {
-  const w = WORKS[i];
+function workText(i, piece = -1) {
+  const w = WORKS[i], t = L(w.t), one = w.pieces && piece >= 0;
+  $('#wk-title').textContent = t;
   $('#wk-date').textContent = tr(w.cat === 'original' ? 'wk.made' : 'wk.posted', { d: dot(w.d) });
-  $('#wk-pages').textContent = pagesText(w.dims.length);
-  $('#wk-imgs').querySelectorAll('img').forEach((img, n) => {
-    img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t: w.t, n: n + 1, m: w.dims.length }) : w.t;
-  });
+  $('#wk-pages').textContent = one ? `No.${no2(piece + 1)} / ${no2(w.dims.length)}` : pagesText(w.dims.length);
+  if (!one) {   // the names of the works before and after this one (a piece's page shows the pieces' numbers)
+    for (const k of ['prev', 'next']) $(`#wk-${k}-t`).textContent = L(WORKS[byId[$(`#wk-${k}`).getAttribute('href').slice(3)]].t);   // href: #w-<id>
+  }
+  const box = $('#wk-imgs');
+  if (one) {   // a piece's page: each picture's caption and description
+    const figs = box.querySelectorAll('.pc-fig');
+    pieceImgs(w, piece).forEach((p, j) => {
+      figs[j].querySelector('.pc-cap').textContent = tr('wk.' + p.k, { n: p.j });
+      figs[j].querySelector('img').alt = tr(`wk.${p.k}Alt`, { t, n: piece + 1, k: p.j });
+    });
+  } else if (w.pieces) {   // a collection's covers: the piece's number, and how many pictures its page has
+    box.querySelectorAll('.cover').forEach((a) => {
+      const n = +a.dataset.n, m = pieceImgs(w, n).length;
+      coverText(a, `No.${no2(n + 1)}`, `${dot(madeOn(w))}${m > 1 ? ' · ' + tr('cover.pages', { n: m }) : ''}`, tr('wk.finalAlt', { t, n: n + 1 }));
+    });
+    layoutPieces();   // after the words: on touch screens they sit under the pictures and add to the covers' height
+  } else {
+    box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
+  }
   /* cross-link: goods made from this piece, or the goods page for the catalog itself */
   const gl = $('#wk-goods');
   const made = GOODS.filter((g) => g.works.includes(w.id));
@@ -89,7 +159,7 @@ function workText(i) {
   gl.hidden = !gl.childNodes.length;
 
   const procs = $('#wk-proc-box').querySelectorAll('img');
-  procs.forEach((im, n) => { im.alt = tr('proc.alt', { t: w.t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
+  procs.forEach((im, n) => { im.alt = tr('proc.alt', { t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
   const card = $('#wk-tl-box .tl-card');
   if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }

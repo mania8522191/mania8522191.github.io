@@ -123,7 +123,7 @@ function swapLang(l) {
   });
   shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
   showShot(shotAt, false);
-  if (view === 'work') workText(byId[lastWork]);
+  if (view === 'work') workText(byId[lastWork], lastPiece);
   if (view === 'item') renderItem(bySlug[lastItem]);
   abText();
   if (view === 'book') bookText(byBook[lastBook]);

@@ -65,7 +65,7 @@ function renderItem(i) {
     const a = el('a'); a.href = '#w-' + id;
     a.dataset.rv = 'up'; a.dataset.d = `${n * 0.1}s`;
     const im = el('img'); im.src = src(id, 0); im.alt = ''; im.loading = 'lazy'; im.style.objectPosition = w.pos;
-    a.append(im, el('span', '', w.t));
+    a.append(im, el('span', '', L(w.t)));
     return a;
   }));
 

@@ -44,6 +44,16 @@ def referenced():
             refs.add(f'img/{name}')
             if len(d) > 2 and d[2]:
                 refs.add(f'img/z/{name}')
+        for n, d in enumerate(w.get('sk') or []):   # a collection's sketches, 0 for a piece without one
+            if d:
+                refs.add(f'img/{w["id"]}_s{n}.webp')
+                if len(d) > 2 and d[2]:
+                    refs.add(f'img/z/{w["id"]}_s{n}.webp')
+        for n, versions in (w.get('alt') or {}).items():   # a collection piece's other versions
+            for k, d in enumerate(versions, 1):
+                refs.add(f'img/{w["id"]}_a{n}_{k}.webp')
+                if len(d) > 2 and d[2]:
+                    refs.add(f'img/z/{w["id"]}_a{n}_{k}.webp')
         for p in w.get('proc') or []:
             refs.add(f'img/proc/{p[0]}')
             if len(p) > 3 and p[3]:

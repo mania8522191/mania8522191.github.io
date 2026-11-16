@@ -75,6 +75,16 @@
 4. 工具最後會印出檢查結果，看到 `no leftovers` 就沒問題（缺圖也會列在這裡）。
 5. 本機預覽，再上線（見下方）。
 
+**合集**（好幾張各自獨立的圖，例如塗鴉合集）：作品頁先把全部完稿排成跟作品牆一樣的拼貼（共用 `js/wall.js` 的
+`makeCover`、`collage`），點一張進到那張自己的頁面（`#w-<id>/<n>`），完稿旁邊放差分和草稿；
+左右鍵和頁尾的 Previous / Next 會換到上一張、下一張。
+1. `WORKS` 那一行多加 `"pieces": true`。標題 `t` 可以寫成三種語言：`{"zh": "…", "en": "…", "ja": "…"}`（其他作品也可以）
+2. 完稿照順序當成每一頁：`python tools/work_images.py <id> <完稿1> <完稿2> ... --save`
+3. 草稿一頁配一張，沒有草稿的寫 `-`：`python tools/work_images.py <id> --sketches <草稿1> - <草稿3> ... --save`
+   （存進 `sk`，圖是 `img/<id>_s<n>.webp`，n 從 0 數）
+4. 有差分的話，一張完稿跑一次，編號用網站上的 No.：`python tools/work_images.py <id> --alts <No.> <差分1> [<差分2> ...] --save`
+   （存進 `alt`，圖是 `img/<id>_a<n>_<k>.webp`，n 從 0 數、k 從 1 數）
+
 ## 加一本畫冊
 
 1. 跨頁 JPG 放在 `gpt/AB-JPG/<YYYYMM- FFnn>/`：封面跨頁（左封底、右封面）和內頁跨頁，裁切好、sRGB。

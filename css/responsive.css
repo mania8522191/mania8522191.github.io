@@ -37,6 +37,7 @@
   .about-fig .about-badge{right:10px}
   .proj-nav{grid-template-columns:minmax(0,1fr)}
   .proj-nav .next{text-align:left;justify-items:start}
+  .pc-pair{grid-template-columns:minmax(0,auto)}
   .channels a{grid-template-columns:auto minmax(0,1fr) auto;row-gap:2px;padding-block:16px}
   .channels .sns-badge{grid-row:1 / span 2}
   .channels .hd{grid-column:2;grid-row:2}

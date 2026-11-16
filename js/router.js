@@ -1,12 +1,18 @@
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> #g-<goods slug> ---------- */
-let view = null, lastWork = null, lastItem = null;
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #g-<goods slug> ---------- */
+let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 function parse() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
-  if (h.startsWith('w-') && h.slice(2) in byId) return { h, next: 'work', idx: byId[h.slice(2)] };
+  if (h.startsWith('w-')) {
+    const [id, pn] = h.slice(2).split('/'), n = Number(pn);
+    if (id in byId) {
+      const w = WORKS[byId[id]];
+      return { h, next: 'work', idx: byId[id], piece: w.pieces && Number.isInteger(n) && n >= 1 && n <= w.dims.length ? n - 1 : -1 };
+    }
+  }
   if (h.startsWith('g-') && h.slice(2) in bySlug) return { h, next: 'item', idx: bySlug[h.slice(2)] };
   if (h === 'artbook') return { h, next: 'artbook', idx: -1 };
   if (h.startsWith('ab-') && h.slice(3) in byBook) return { h, next: 'book', idx: byBook[h.slice(3)] };
@@ -14,8 +20,8 @@ function parse() {
 }
 
 /* swap the DOM to the requested view, then start watching its reveal elements */
-function apply({ h, next, idx, cat }) {
-  const from = view;
+function apply({ h, next, idx, cat, piece = -1 }) {
+  const from = view, fromPiece = lastPiece;
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
   for (const [k, v] of Object.entries(VIEWS)) v.hidden = k !== next;
@@ -29,7 +35,11 @@ function apply({ h, next, idx, cat }) {
   const behavior = same && !CALM ? 'smooth' : 'auto';
   let els;
   if (next === 'work') {
-    renderWork(idx); lastWork = WORKS[idx].id; scrollTo(0, 0); els = prime(root);
+    /* back from a piece's page to its collection: the grid opens at that piece */
+    const back = from === 'work' && lastWork === WORKS[idx].id && piece < 0 && fromPiece >= 0;
+    renderWork(idx, piece); lastWork = WORKS[idx].id; lastPiece = piece;
+    const tile = back && $(`#wk-imgs [data-n="${fromPiece}"]`);
+    if (tile) { tile.scrollIntoView({ block: 'center' }); els = [...pending(root), ...prime($('#wk-imgs'))]; } else { scrollTo(0, 0); els = prime(root); }
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
@@ -116,8 +126,15 @@ function route() {
   const r = parse();
   const from = view;
   if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
-  if (from === null || from === r.next || !VT) { apply(r); return; }
+  /* inside a collection: between its grid and a piece's page, the picture morphs too */
+  const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
+  const fromPiece = lastPiece;
+  if (from === null || (from === r.next && !hop) || !VT) { apply(r); return; }
   const pick = (fwd) => {
+    if (hop) {
+      const tile = $(`#wk-imgs [data-n="${r.piece < 0 ? fromPiece : r.piece}"] img`), big = $('#wk-imgs .pc-fig img');
+      return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
+    }
     if (from === 'works' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
     if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
     if (from === 'work' && r.next === 'works') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);

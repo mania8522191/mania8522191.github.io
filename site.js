@@ -59,6 +59,7 @@ const WORKS = [
   {"id":"86397683","t":"❤","ym":"","d":"2020-12-19","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー","VTuber","黒スト","hololive"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
   {"id":"86259443","t":"❤","ym":"","d":"2020-12-12","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","VTuber","私服","hololive"],"dims":[[750,1200,1500,2400]],"pos":"50% 35%","cat":"fan"},
   {"id":"85812772","t":"星街すいせい","ym":"","d":"2020-11-21","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","カラータイツ","VTuber","hololive"],"dims":[[750,1200,1500,2400]],"pos":"50% 35%","cat":"fan"},
+  {"id":"f-pw-mtm","t":{"zh":"VTuber塗鴉合集","en":"VTuber Doodle Log","ja":"VTuberらくがきまとめ"},"ym":"2020.10","d":"2020-10","lab":"VTuber","tags":["バーチャルYouTuber","らくがき"],"dims":[[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[1200,1200,2500,2500],[750,1200,2500,4000],[750,1200,2500,4000]],"pos":"50% 35%","cat":"fan","pieces":true,"sk":[[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],0,[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],0,[750,1200,2500,4000],0,0,0,0,0],"alt":{"1":[[750,1200,2500,4000],[750,1200,2500,4000]]}},
   {"id":"79077513","t":"台湾FF35新刊(中国語注意)","ym":"","d":"2020-01-24","lab":"アズールレーン","tags":["アズールレーン","私服","アドミラル・ヒッパー(アズールレーン)","プリンツ・オイゲン(アズールレーン)","ドイッチュラント(アズールレーン)","アドミラル・グラーフ・シュペー(アズールレーン)"],"dims":[[800,1130],[800,1130],[1200,1200,2000,2000],[1200,960],[1200,960]],"pos":"50% 35%","cat":"fan"},
   {"id":"78848192","t":"プリンツ・オイゲン","ym":"","d":"2020-01-12","lab":"アズールレーン","tags":["アズールレーン","プリンツ・オイゲン(アズールレーン)","私服"],"dims":[[900,1200],[900,1200]],"pos":"50% 35%","cat":"fan"},
   {"id":"78715432","t":"ドイッチュラント","ym":"","d":"2020-01-05","lab":"アズールレーン","tags":["アズールレーン","ドイッチュラント(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%","cat":"fan"},
@@ -180,6 +181,13 @@ const I18N = {
     "wk.madeGoods": "這張插畫做成了周邊：",
     "wk.goodsLink": "看周邊詳細介紹 →",
     "wk.others": "其他作品",
+    "wk.all": "← 全部完稿",
+    "wk.final": "完稿",
+    "wk.sketch": "草稿",
+    "wk.alt": "差分 {n}",
+    "wk.finalAlt": "{t}（第 {n} 張完稿）",
+    "wk.altAlt": "{t}（第 {n} 張的差分 {k}）",
+    "wk.sketchAlt": "{t}（第 {n} 張的草稿）",
     "list.sep": "、",
     "tl.h": "製作過程影片",
     "tl.yt": "在 YouTube 觀看 ↗",
@@ -384,6 +392,13 @@ const I18N = {
     "wk.madeGoods": "Made into goods: ",
     "wk.goodsLink": "See the goods →",
     "wk.others": "Other works",
+    "wk.all": "← All pieces",
+    "wk.final": "Final",
+    "wk.sketch": "Sketch",
+    "wk.alt": "Variant {n}",
+    "wk.finalAlt": "{t} (piece {n})",
+    "wk.altAlt": "{t} (variant {k} of piece {n})",
+    "wk.sketchAlt": "{t} (sketch for piece {n})",
     "list.sep": ", ",
     "tl.h": "Process timelapse",
     "tl.yt": "Watch on YouTube ↗",
@@ -588,6 +603,13 @@ const I18N = {
     "wk.madeGoods": "グッズ化：",
     "wk.goodsLink": "グッズ紹介を見る →",
     "wk.others": "ほかの作品",
+    "wk.all": "← 完成イラスト一覧",
+    "wk.final": "完成",
+    "wk.sketch": "ラフ",
+    "wk.alt": "差分{n}",
+    "wk.finalAlt": "{t}（{n}枚目）",
+    "wk.altAlt": "{t}（{n}枚目の差分{k}）",
+    "wk.sketchAlt": "{t}（{n}枚目のラフ）",
     "list.sep": "、",
     "tl.h": "メイキング動画",
     "tl.yt": "YouTubeで見る ↗",
@@ -987,18 +1009,30 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
     return list.map(([f, W, H, ZW, ZH], n) => ({
       src: `img/proc/${f}`, zsrc: ZW ? `img/proc/z/${f}` : null, eager: true,
       w: W, h: H, zw: ZW || W,
-      no: `${n + 1} / ${list.length}`, cap: `${w.t} · ${tr('proc.h')}`,
-      alt: tr('proc.alt', { t: w.t }),
+      no: `${n + 1} / ${list.length}`, cap: `${L(w.t)} · ${tr('proc.h')}`,
+      alt: tr('proc.alt', { t: L(w.t) }),
     }));
   },
   work: (id) => {
-    const w = WORKS[byId[id]];
+    const w = WORKS[byId[id]], t = L(w.t);
     return w.dims.map(([W, H, ZW, ZH], n) => ({
       src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
       w: W, h: H, zw: ZW || W,
-      no: `${n + 1} / ${w.dims.length}`, cap: w.t,
-      alt: w.dims.length > 1 ? tr('zv.workAlt', { t: w.t, n: n + 1 }) : w.t,
+      no: `${n + 1} / ${w.dims.length}`, cap: t,
+      alt: w.dims.length > 1 ? tr('zv.workAlt', { t, n: n + 1 }) : t,
     }));
+  },
+  piece: (key) => {   // a collection's piece (key "<work id>/<piece from 0>"): its finished picture, other versions, sketch
+    const [id, p] = key.split('/'), w = WORKS[byId[id]], n = +p, t = L(w.t), list = pieceImgs(w, n);
+    return list.map((q, k) => {
+      const [W, H, ZW] = q.d;
+      return {
+        src: q.src, zsrc: ZW ? q.src.replace('img/', 'img/z/') : null,
+        w: W, h: H, zw: ZW || W,
+        no: `${k + 1} / ${list.length}`, cap: `${t} · No.${no2(n + 1)}${k ? ' · ' + tr('wk.' + q.k, { n: q.j }) : ''}`,
+        alt: tr(`wk.${q.k}Alt`, { t, n: n + 1, k: q.j }),
+      };
+    });
   },
   shots: () => SHOTS.map((s, i) => ({ src: `img/shot${i + 1}.webp`, w: 1600, h: 900, zw: 1600, no: `${no2(i + 1)} / ${no2(SHOTS.length)}`, cap: tr(s), alt: tr(s) })),
   chars: () => artChars.map((n) => (CHAR_CARD.has(n)
@@ -1496,7 +1530,7 @@ function zvMake(kind, key, set, from) {
 }
 /* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
 function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'book' ? lastBook : '';
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : '';
   const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
   const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
   if (same) { same.from = from; same.at0 = at; zvBack(same); return; }
@@ -1517,7 +1551,8 @@ $('#shot-big').addEventListener('click', (e) => zvOpen('shots', shotAt, e.curren
 charList.addEventListener('click', (e) => { const b = e.target.closest('.char-btn'); if (b) zvOpen('chars', artChars.indexOf(+b.dataset.n), b); });
 $('#wk-imgs').addEventListener('click', (e) => {
   const im = e.target.closest('img');
-  if (im) zvOpen('work', [...$('#wk-imgs').children].indexOf(im), im);
+  if (!im || im.closest('a')) return;   // a collection's grid: each piece is a link to its own page
+  zvOpen(lastPiece >= 0 ? 'piece' : 'work', [...$('#wk-imgs').querySelectorAll('img')].indexOf(im), im);
 });
 $('#wk-proc-box').addEventListener('click', (e) => {
   const im = e.target.closest('img');
@@ -1606,7 +1641,7 @@ function renderItem(i) {
     const a = el('a'); a.href = '#w-' + id;
     a.dataset.rv = 'up'; a.dataset.d = `${n * 0.1}s`;
     const im = el('img'); im.src = src(id, 0); im.alt = ''; im.loading = 'lazy'; im.style.objectPosition = w.pos;
-    a.append(im, el('span', '', w.t));
+    a.append(im, el('span', '', L(w.t)));
     return a;
   }));
 
@@ -1654,37 +1689,40 @@ eventText();
 /* ---------- cover wall: masonry; wide works span two columns so every cover shows its art at a similar
    scale, tall ones keep one full column, nothing is cropped, and later covers fill any hole ---------- */
 const wall = $('#wall');
-WORKS.forEach((w, i) => {
-  const [W, H] = w.dims[0];
-  const r = W / H;
-
-  const a = document.createElement('a');
-  a.className = 'cover';
-  a.id = 'c-' + w.id;
-  a.href = '#w-' + w.id;
+/* a cover: a picture that links on, with its words over it on hover (under it on touch screens); it flies in from
+   a direction of its own, new on every visit. The wall's works, and a collection's pieces on its work page. */
+function makeCover(href, img, W, H, pos, eager) {
+  const r = W / H, a = el('a', 'cover');
+  a.href = href;
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
   a.dataset.r = r.toFixed(4);
+  a.style.cssText = `--ar:${r.toFixed(4)};--pos:${pos}`;
+  const ang = Math.random() * Math.PI * 2, dist = (150 + Math.random() * 150) * (innerWidth < 700 ? 0.55 : 1);
+  a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
+  a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
+  a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
+  a.innerHTML = `<span class="frame mask"><img src="${img}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async"><span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
+  return a;
+}
+function coverText(a, t, meta, label) {
+  a.querySelector('.ov-t').textContent = a.querySelector('.cap-t').textContent = t;
+  a.querySelector('.ov-m').textContent = a.querySelector('.cap-m').textContent = meta;
+  a.setAttribute('aria-label', label);
+}
+WORKS.forEach((w, i) => {
+  const [W, H] = w.dims[0];
+  const a = makeCover('#w-' + w.id, src(w.id, 0), W, H, w.pos, i < 4);
+  a.id = 'c-' + w.id;
   a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers
   a.dataset.cat = w.cat;
-  a.style.cssText = `--ar:${r.toFixed(4)};--pos:${w.pos}`;
-  {   // a different direction for every cover, and every visit
-    const ang = Math.random() * Math.PI * 2, dist = (150 + Math.random() * 150) * (innerWidth < 700 ? 0.55 : 1);
-    a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
-    a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
-    a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
-  }
-  a.innerHTML = `<span class="frame mask"><img src="${src(w.id, 0)}" width="${W}" height="${H}" alt="" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async"><span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
-  a.querySelector('.ov-t').textContent = w.t;
-  a.querySelector('.cap-t').textContent = w.t;
   fillCover(a, w);
   wall.appendChild(a);
 });
+/* a work cover's words; again on a language change (a collection's title is in three languages) */
 function fillCover(a, w) {
   const meta = `${dot(madeOn(w))}${w.dims.length > 1 ? ' · ' + tr('cover.pages', { n: w.dims.length }) : ''}${w.yt ? ' · ' + tr('cover.video') : ''}`;
-  a.setAttribute('aria-label', `${w.t} (${dot(madeOn(w))})`);
-  a.querySelector('.ov-m').textContent = meta;
-  a.querySelector('.cap-m').textContent = meta;
+  coverText(a, L(w.t), meta, `${L(w.t)} (${dot(madeOn(w))})`);
 }
 /* Collage layout on a tight skeleton. Two lanes on wide screens (one on narrow ones), each two columns
    wide: a wide work fills a lane; single-column works go side by side with the next one in date order,
@@ -1870,8 +1908,8 @@ addEventListener('scroll', () => { if (!yearsRaf) yearsRaf = requestAnimationFra
 /* units in date order: a wide work alone; a single-column work beside the next single-column one of the same year.
    When that one is far taller or shorter, the closest in height among the next few takes its place, so a long work
    is not left beside a short one; if even that is far shorter, the works after it stack under the short one */
-function buildUnits() {
-  const items = wallOrder.map((el) => ({ el, r: +el.dataset.r, y: el.dataset.date.slice(0, 4) }));
+function buildUnits(order) {
+  const items = order.map((el) => ({ el, r: +el.dataset.r, y: el.dataset.date.slice(0, 4) }));
   const units = [], used = new Set();
   const fits = (c, y) => c.y === y && c.r < 1.4;   // single-column, same year
   for (let k = 0; k < items.length; k++) {
@@ -1914,15 +1952,22 @@ function placeCover(el, x, y, tilt) {
 }
 function layoutWall() {
   if (VIEWS.works.hidden || !wall.clientWidth) return;
-  const rand = seeded(WALL_SEED);
-  wallUnits = wallUnits || buildUnits();
-  const W = wall.clientWidth;
+  wallUnits = wallUnits || buildUnits(wallOrder);
+  collage(wall, wallOrder, wallUnits, WALL_SEED, yearHead);
+  yearNow = '';
+  yearsUpdate();
+}
+/* place the covers of `order` (grouped into `units`) on `box`, the same way everywhere: the wall (with its year
+   headers, `heads`) and a collection's pieces (no headers) */
+function collage(box, order, units, seed, heads) {
+  const rand = seeded(seed);
+  const W = box.clientWidth;
   const lanes = W >= 680 ? 2 : 1;
   const gap = W >= 1000 ? 26 : W >= 600 ? 18 : 12;
   const laneW = (W - (lanes - 1) * gap) / lanes;
   const colW = (laneW - gap) / 2;
   const touch = matchMedia('(hover: none)').matches;
-  const plan = wallUnits.map((u) => {
+  const plan = units.map((u) => {
     const p = { u, wa: u.pair ? colW * (0.9 + rand() * 0.1) : laneW * (0.86 + rand() * 0.14) };
     if (u.b) p.wb = colW * (0.9 + rand() * 0.1);
     p.ex = u.sa || u.sb || [];
@@ -1932,7 +1977,7 @@ function layoutWall() {
     p.ex.forEach((c, i) => { c.el.style.width = `${Math.round(p.we[i])}px`; });
     return p;
   });
-  const h = new Map(wallOrder.map((el) => [el, el.offsetHeight]));   // one layout pass for every cover
+  const h = new Map(order.map((el) => [el, el.offsetHeight]));   // one layout pass for every cover
   const laneH = new Array(lanes).fill(0);
   const tilt = () => (rand() < 0.5 ? (rand() - 0.5) * 2 : 0);
   const fresh = new Array(lanes).fill(true);   // nothing placed in this lane since the last year header
@@ -1941,9 +1986,9 @@ function layoutWall() {
   let z = 1, curYear = '';
   plan.forEach((p, k) => {
     const yr = p.u.a.el.dataset.date.slice(0, 4);
-    if (yr !== curYear) {
-      curYear = yr;
-      const hd = yearHead.get(yr);
+    const hd = yr !== curYear && heads && heads.get(yr);
+    curYear = yr;
+    if (hd) {
       const top = k === 0 ? 0 : Math.max(...laneH) + gap * 2.6;
       hd.style.top = `${Math.round(top)}px`;
       laneH.fill(top + hd.offsetHeight + gap * 1.1);
@@ -1993,9 +2038,7 @@ function layoutWall() {
     laneH[L] = bottom;
     fresh[L] = false;
   });
-  wall.style.height = `${Math.ceil(Math.max(...laneH))}px`;
-  yearNow = '';
-  yearsUpdate();
+  box.style.height = `${Math.ceil(Math.max(...laneH))}px`;
 }
 let wallRaf = 0;
 addEventListener('resize', () => { cancelAnimationFrame(wallRaf); wallRaf = requestAnimationFrame(layoutWall); });
@@ -2003,21 +2046,30 @@ if (document.fonts) document.fonts.ready.then(layoutWall);
 
 /* ==================== js/work.js ==================== */
 /* Work page */
-/* ---------- single work page ---------- */
-function renderWork(i) {
-  const w = WORKS[i];
+/* ---------- single work page. A collection ("pieces": true, each page a piece of its own) shows its finished pieces
+   as covers on a collage like the works wall's; each piece has a page of its own (#w-<id>/<n>) with its other
+   versions ("alt") and its sketch ("sk") beside it, where it has them ---------- */
+function renderWork(i, piece = -1) {
+  const w = WORKS[i], one = w.pieces && piece >= 0;
   $('#wk-lab').textContent = w.lab;
-  $('#wk-title').textContent = w.t;
   $('#wk-ym').textContent = w.ym;
   $('#wk-ym').hidden = !w.ym;
   $('#wk-link').href = 'https://www.pixiv.net/artworks/' + w.id;
   $('#wk-link-li').hidden = w.cat !== 'fan' || !/^\d+$/.test(w.id);   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
+  $('#wk-all-li').hidden = !one;   // a piece's page: back to the whole collection
+  $('#wk-all').href = '#w-' + w.id;
 
   const tags = $('#wk-tags');
   tags.replaceChildren(...w.tags.map((t) => { const li = document.createElement('li'); li.textContent = '#' + t; return li; }));
 
   const box = $('#wk-imgs');
-  box.replaceChildren(...w.dims.map(([W, H], n) => {
+  box.removeAttribute('style');   // a collage's height, a piece page's columns
+  box.className = !w.pieces ? 'proj-imgs' : one ? 'pc-pair' : 'pc-wall';
+  if (one) {
+    box.replaceChildren(...pieceFigs(w, piece));
+    box.style.setProperty('--cols', Math.min(2, box.children.length));
+  } else if (w.pieces) box.replaceChildren(...w.dims.map(([W, H], n) => pieceCover(w, n, W, H)));
+  else box.replaceChildren(...w.dims.map(([W, H], n) => {
     const img = document.createElement('img');
     const r = W / H;
     img.src = src(w.id, n);
@@ -2061,22 +2113,83 @@ function renderWork(i) {
     return im;
   }));
 
-  /* previous / next stay inside Fan Art or Original Art and follow the wall's order */
-  const list = wallSort === 'old' ? [...CAT_LIST[w.cat]].reverse() : CAT_LIST[w.cat], k = list.indexOf(w);
-  const p = list[(k - 1 + list.length) % list.length];
-  const nx = list[(k + 1) % list.length];
-  $('#wk-prev').href = '#w-' + p.id; $('#wk-prev-t').textContent = p.t;
-  $('#wk-next').href = '#w-' + nx.id; $('#wk-next-t').textContent = nx.t;
-  workText(i);
+  /* previous / next: on a piece's page, the collection's other pieces; otherwise they stay inside Fan Art or
+     Original Art and follow the wall's order */
+  $('#wk-prev .lbl').textContent = one ? '← Previous Piece' : '← Previous Project';
+  $('#wk-next .lbl').textContent = one ? 'Next Piece →' : 'Next Project →';
+  if (one) {
+    const m = w.dims.length, p = (piece - 1 + m) % m, nx = (piece + 1) % m;
+    $('#wk-prev').href = `#w-${w.id}/${p + 1}`; $('#wk-prev-t').textContent = `No.${no2(p + 1)}`;
+    $('#wk-next').href = `#w-${w.id}/${nx + 1}`; $('#wk-next-t').textContent = `No.${no2(nx + 1)}`;
+  } else {
+    const list = wallSort === 'old' ? [...CAT_LIST[w.cat]].reverse() : CAT_LIST[w.cat], k = list.indexOf(w);
+    $('#wk-prev').href = '#w-' + list[(k - 1 + list.length) % list.length].id;
+    $('#wk-next').href = '#w-' + list[(k + 1) % list.length].id;
+  }
+  workText(i, piece);
+}
+/* a collection's piece on its collage: a cover like the wall's, linking to the piece's page */
+function pieceCover(w, n, W, H) {
+  const a = makeCover(`#w-${w.id}/${n + 1}`, src(w.id, n), W, H, w.pos, n < 4);
+  a.dataset.n = n;
+  a.dataset.date = madeOn(w);   // one date for them all: the collage pairs them in order
+  return a;
+}
+const PIECE_SEED = (WALL_SEED ^ 0x9e3779b9) >>> 0;   // an arrangement of its own, kept while browsing like the wall's
+function layoutPieces() {
+  const box = $('#wk-imgs');
+  if (VIEWS.work.hidden || !box.classList.contains('pc-wall') || !box.clientWidth) return;
+  const order = [...box.querySelectorAll('.cover')];
+  collage(box, order, buildUnits(order), PIECE_SEED, null);
+}
+addEventListener('resize', () => requestAnimationFrame(layoutPieces));
+if (document.fonts) document.fonts.ready.then(layoutPieces);
+/* the pictures on a piece's page: the finished one, its other versions, its sketch */
+function pieceImgs(w, n) {
+  const sk = w.sk && w.sk[n];
+  return [
+    { k: 'final', src: src(w.id, n), d: w.dims[n] },
+    ...((w.alt && w.alt[n]) || []).map((d, j) => ({ k: 'alt', j: j + 1, src: `img/${w.id}_a${n}_${j + 1}.webp`, d })),
+    ...(sk ? [{ k: 'sketch', src: `img/${w.id}_s${n}.webp`, d: sk }] : []),
+  ];
+}
+/* a piece's page: its pictures, each with its caption (written by workText) */
+function pieceFigs(w, n) {
+  return pieceImgs(w, n).map((p, j) => {
+    const f = el('figure', 'pc-fig'), img = el('img');
+    img.src = p.src;
+    [img.width, img.height] = p.d;
+    img.decoding = 'async';
+    if (j) f.dataset.rv = 'up';
+    f.append(el('figcaption', 'pc-cap'), img);
+    return f;
+  });
 }
 /* the words on a work page; also run on a language switch so the images and the video player stay put */
-function workText(i) {
-  const w = WORKS[i];
+function workText(i, piece = -1) {
+  const w = WORKS[i], t = L(w.t), one = w.pieces && piece >= 0;
+  $('#wk-title').textContent = t;
   $('#wk-date').textContent = tr(w.cat === 'original' ? 'wk.made' : 'wk.posted', { d: dot(w.d) });
-  $('#wk-pages').textContent = pagesText(w.dims.length);
-  $('#wk-imgs').querySelectorAll('img').forEach((img, n) => {
-    img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t: w.t, n: n + 1, m: w.dims.length }) : w.t;
-  });
+  $('#wk-pages').textContent = one ? `No.${no2(piece + 1)} / ${no2(w.dims.length)}` : pagesText(w.dims.length);
+  if (!one) {   // the names of the works before and after this one (a piece's page shows the pieces' numbers)
+    for (const k of ['prev', 'next']) $(`#wk-${k}-t`).textContent = L(WORKS[byId[$(`#wk-${k}`).getAttribute('href').slice(3)]].t);   // href: #w-<id>
+  }
+  const box = $('#wk-imgs');
+  if (one) {   // a piece's page: each picture's caption and description
+    const figs = box.querySelectorAll('.pc-fig');
+    pieceImgs(w, piece).forEach((p, j) => {
+      figs[j].querySelector('.pc-cap').textContent = tr('wk.' + p.k, { n: p.j });
+      figs[j].querySelector('img').alt = tr(`wk.${p.k}Alt`, { t, n: piece + 1, k: p.j });
+    });
+  } else if (w.pieces) {   // a collection's covers: the piece's number, and how many pictures its page has
+    box.querySelectorAll('.cover').forEach((a) => {
+      const n = +a.dataset.n, m = pieceImgs(w, n).length;
+      coverText(a, `No.${no2(n + 1)}`, `${dot(madeOn(w))}${m > 1 ? ' · ' + tr('cover.pages', { n: m }) : ''}`, tr('wk.finalAlt', { t, n: n + 1 }));
+    });
+    layoutPieces();   // after the words: on touch screens they sit under the pictures and add to the covers' height
+  } else {
+    box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
+  }
   /* cross-link: goods made from this piece, or the goods page for the catalog itself */
   const gl = $('#wk-goods');
   const made = GOODS.filter((g) => g.works.includes(w.id));
@@ -2093,7 +2206,7 @@ function workText(i) {
   gl.hidden = !gl.childNodes.length;
 
   const procs = $('#wk-proc-box').querySelectorAll('img');
-  procs.forEach((im, n) => { im.alt = tr('proc.alt', { t: w.t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
+  procs.forEach((im, n) => { im.alt = tr('proc.alt', { t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
   const card = $('#wk-tl-box .tl-card');
   if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }
@@ -2859,7 +2972,7 @@ function heroShow(i) {
   s.box.classList.add('on');
   SLIDES.forEach((x, k) => x.dot.setAttribute('aria-current', String(k === i)));
   heroCap.href = '#w-' + s.w.id;
-  heroCap.querySelector('.hero-cap-t').textContent = s.w.t;
+  heroCap.querySelector('.hero-cap-t').textContent = L(s.w.t);
   if (!first && !CALM) heroCap.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 900, easing: 'cubic-bezier(.16,1,.3,1)' });
 }
 const heroStep = (d) => { heroShow((heroAt + d + SLIDES.length) % SLIDES.length); heroPlay(); };
@@ -2894,7 +3007,7 @@ addEventListener('keydown', (e) => {
 
 /* the dots' names, again after a language change */
 function heroText() {
-  SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: s.w.t })));
+  SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: L(s.w.t) })));
 }
 heroPick();
 
@@ -2951,14 +3064,20 @@ fetch('ig-latest.json', { cache: 'no-cache' })
 
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> #g-<goods slug> ---------- */
-let view = null, lastWork = null, lastItem = null;
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #g-<goods slug> ---------- */
+let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 function parse() {
   const h = decodeURIComponent(location.hash.slice(1));
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
-  if (h.startsWith('w-') && h.slice(2) in byId) return { h, next: 'work', idx: byId[h.slice(2)] };
+  if (h.startsWith('w-')) {
+    const [id, pn] = h.slice(2).split('/'), n = Number(pn);
+    if (id in byId) {
+      const w = WORKS[byId[id]];
+      return { h, next: 'work', idx: byId[id], piece: w.pieces && Number.isInteger(n) && n >= 1 && n <= w.dims.length ? n - 1 : -1 };
+    }
+  }
   if (h.startsWith('g-') && h.slice(2) in bySlug) return { h, next: 'item', idx: bySlug[h.slice(2)] };
   if (h === 'artbook') return { h, next: 'artbook', idx: -1 };
   if (h.startsWith('ab-') && h.slice(3) in byBook) return { h, next: 'book', idx: byBook[h.slice(3)] };
@@ -2966,8 +3085,8 @@ function parse() {
 }
 
 /* swap the DOM to the requested view, then start watching its reveal elements */
-function apply({ h, next, idx, cat }) {
-  const from = view;
+function apply({ h, next, idx, cat, piece = -1 }) {
+  const from = view, fromPiece = lastPiece;
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
   for (const [k, v] of Object.entries(VIEWS)) v.hidden = k !== next;
@@ -2981,7 +3100,11 @@ function apply({ h, next, idx, cat }) {
   const behavior = same && !CALM ? 'smooth' : 'auto';
   let els;
   if (next === 'work') {
-    renderWork(idx); lastWork = WORKS[idx].id; scrollTo(0, 0); els = prime(root);
+    /* back from a piece's page to its collection: the grid opens at that piece */
+    const back = from === 'work' && lastWork === WORKS[idx].id && piece < 0 && fromPiece >= 0;
+    renderWork(idx, piece); lastWork = WORKS[idx].id; lastPiece = piece;
+    const tile = back && $(`#wk-imgs [data-n="${fromPiece}"]`);
+    if (tile) { tile.scrollIntoView({ block: 'center' }); els = [...pending(root), ...prime($('#wk-imgs'))]; } else { scrollTo(0, 0); els = prime(root); }
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
@@ -3068,8 +3191,15 @@ function route() {
   const r = parse();
   const from = view;
   if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
-  if (from === null || from === r.next || !VT) { apply(r); return; }
+  /* inside a collection: between its grid and a piece's page, the picture morphs too */
+  const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
+  const fromPiece = lastPiece;
+  if (from === null || (from === r.next && !hop) || !VT) { apply(r); return; }
   const pick = (fwd) => {
+    if (hop) {
+      const tile = $(`#wk-imgs [data-n="${r.piece < 0 ? fromPiece : r.piece}"] img`), big = $('#wk-imgs .pc-fig img');
+      return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
+    }
     if (from === 'works' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
     if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
     if (from === 'work' && r.next === 'works') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
@@ -3277,7 +3407,7 @@ function swapLang(l) {
   });
   shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
   showShot(shotAt, false);
-  if (view === 'work') workText(byId[lastWork]);
+  if (view === 'work') workText(byId[lastWork], lastPiece);
   if (view === 'item') renderItem(bySlug[lastItem]);
   abText();
   if (view === 'book') bookText(byBook[lastBook]);
