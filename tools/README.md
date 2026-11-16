@@ -135,9 +135,16 @@
 `venue` 會場和 `city` 城市（三種語言各一）。最後一天還沒過的列在「即將參加」，最近的一場也會顯示在首頁名字下面；
 過了就自動移到「已結束」，不用改資料。改完跑 `python tools/build.py`。
 
+## 首頁右下角的按鈕
+
+首頁右下角由上到下是 X、Instagram、YouTube 三顆圓形按鈕（`index.html` 的 `#sns-dock`，程式在 `js/home.js`）。
+按下去，按鈕的金色圓框會往左上拉開成視窗，顯示最新的貼文或影片；LOGO 留在右下角。
+關掉：再按一次同一顆按鈕、在視窗外面任何地方按右鍵、手機上點視窗外面，或按 Esc（左鍵點外面不會關）。
+哪一份清單還沒有（例如還沒設定金鑰），那顆按鈕就不會出現。視窗打開前不會載入裡面的圖。
+
 ## 首頁的最新影片
 
-首頁輪播下面放 YouTube 頻道（@mania852）最新的 3 部繪圖影片（含直播），不含 Shorts。
+首頁右下角的 YouTube 按鈕，打開是 YouTube 頻道（@mania852）最新的 3 部繪圖影片（含直播），不含 Shorts。
 標題裡有 PROCESS、TIMELAPSE、插圖、插畫、畫圖、繪圖、イラスト 這類字的才算繪圖影片（清單是 `tools/yt_latest.py` 的 `DRAWING`），
 所以鸚鵡、遊戲開發、旅行的影片不會出現；繪圖影片用了別的標題的話，把那個字加進 `DRAWING`。
 清單在網站根目錄的 `yt-latest.json`，由 `tools/yt_latest.py` 讀頻道的公開 RSS 產生。
@@ -149,7 +156,7 @@ GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影�
 
 ## 首頁的 Instagram
 
-首頁影片下面放 Instagram（@mania8522191）最新的 6 則貼文，點了會開 IG 上的那則貼文。
+首頁右下角的 Instagram 按鈕，打開是 Instagram（@mania8522191）最新的 6 則貼文，點了會開 IG 上的那則貼文。
 影片和 Reels 放封面，多張的放第一張，角落有跟 IG 一樣的小標記。
 清單在網站根目錄的 `ig-latest.json`，圖存在 `img/ig/`（IG 給的圖片連結過一陣子會失效，所以要存下來），
 由 `tools/ig_latest.py` 透過 Meta 的 Instagram API 讀取。
@@ -159,7 +166,7 @@ GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼�
 登入設定「Site latest posts」只要 `instagram_basic`（只能讀貼文），權杖永不過期，存在 GitHub 的 `IG_TOKEN`。
 
 - 權杖只放在 GitHub 的 Secrets，不要貼進任何檔案或提交
-- 沒有 `IG_TOKEN` 時，排程什麼都不做，首頁也不會出現這一區
+- 沒有 `IG_TOKEN` 時，排程什麼都不做，首頁也不會出現 Instagram 按鈕
 - IG 那邊忙或網路出錯時，清單維持原樣，下個小時再試
 - 權杖失效時（例如在後台移除了測試人員），清單也維持原樣，排程每天早上 9 點左右會失敗一次，GitHub 會寄信通知。
   照下面第 6、7 步產生新的權杖，換掉 `IG_TOKEN` 就好
@@ -183,6 +190,32 @@ GitHub 上的 `.github/workflows/ig-latest.yml` 每小時跑一次，有新貼�
 7. 用 mania8522191 登入 GitHub（沒登入時設定頁會顯示 404），到這個 repo 的
    Settings → Secrets and variables → Actions → New repository secret：名稱填 `IG_TOKEN`，貼上權杖。
    再到 Actions 分頁 → Latest Instagram posts → Run workflow，跑完首頁就會出現
+
+## 首頁的 X
+
+首頁右下角的 X 按鈕，打開是 X（@mania8522191）最新的 6 則自己發的貼文，點了會開 X 上的那則貼文。
+不抓轉發、回覆和引用（引用要連原文一起顯示會多收費）。有圖的放第一張圖（影片放封面，多張的角落有標記），只有字的直接放字。
+清單在網站根目錄的 `x-latest.json`，圖存在 `img/x/`（原尺寸），由 `tools/x_latest.py` 透過 X API 讀取，
+GitHub 上的 `.github/workflows/x-latest.yml` 每小時跑一次，有新貼文就自動提交。
+
+X API 用多少付多少（要先在 X 那邊儲值），所以每次只問「上次之後的新貼文」：沒有新貼文的那一小時不扣錢。
+用自己帳號的金鑰讀自己的貼文，一則 0.001 美元，貼文裡的圖另外算（X 公告 2026-11-22 起）。用量和餘額在 https://console.x.com 看。
+
+- 4 個金鑰只放在 GitHub 的 Secrets，不要貼進任何檔案或提交
+- 沒有金鑰時，排程什麼都不做，首頁也不會出現 X 按鈕
+- X 那邊忙或網路出錯時，清單維持原樣，下個小時再試
+- 金鑰失效或額度用完時，清單也維持原樣，排程每天早上 9 點左右會失敗一次，GitHub 會寄信通知：到 console.x.com 儲值，或重新產生金鑰換掉
+- 在 X 刪掉的貼文，要等新貼文把它擠出 6 則才會從網站消失
+- 想馬上更新：Actions 分頁 → Latest X posts → Run workflow
+
+從頭設定的步驟（只有帳號本人能做）：
+1. 用 X 帳號（@mania8522191）登入 https://console.x.com ，建立 App（用途照實寫，例如「在個人網站顯示自己最新的貼文」）
+2. 在 console 的帳單頁加信用卡、買額度（第一次綁卡送 20 美元額度，3 個月內有效）
+3. App 的「Keys and tokens」：產生 API Key and Secret，和自己帳號的 Access Token and Secret（權限 Read 就好）。
+   金鑰只顯示一次，存好之前先別關
+4. 用 mania8522191 登入 GitHub，到這個 repo 的 Settings → Secrets and variables → Actions → New repository secret，
+   建 4 個：`X_API_KEY`、`X_API_SECRET`、`X_ACCESS_TOKEN`、`X_ACCESS_SECRET`
+5. Actions 分頁 → Latest X posts → Run workflow，跑完首頁就會出現 X 按鈕
 
 ## 外部連結的標誌
 
@@ -257,6 +290,7 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `check_deploy.py` | 等部署完成，比對線上檔案 |
 | `yt_latest.py` | 首頁最新影片的清單 `yt-latest.json`（GitHub 每小時自動跑） |
 | `ig_latest.py` | 首頁 Instagram 最新貼文的清單 `ig-latest.json` 和圖（GitHub 每小時自動跑，要先設定 `IG_TOKEN`） |
+| `x_latest.py` | 首頁 X 最新貼文的清單 `x-latest.json` 和圖（GitHub 每小時自動跑，要先設定 4 個 `X_*` 金鑰） |
 | `common.py` | 共用的設定和函式（尺寸、品質、讀寫 `js/data.js`） |
 
 做圖的工具都可以加 `--out <資料夾>`，先把圖做到別的地方看看，不動到網站。

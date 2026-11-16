@@ -196,6 +196,9 @@ const I18N = {
     "ig.h": "最新貼文",
     "ig.more": "在 Instagram 看更多 ↗",
     "ig.post": "在 Instagram 看這則貼文（{d}）",
+    "x.h": "最新貼文",
+    "x.more": "在 X 看更多 ↗",
+    "x.post": "在 X 看這則貼文（{d}）",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。",
     "goods.shopName": "買動漫賣場「Mania Art」",
     "goods.shopBtn": "前往賣場 ↗",
@@ -407,6 +410,9 @@ const I18N = {
     "ig.h": "Latest posts",
     "ig.more": "More on Instagram ↗",
     "ig.post": "View this post on Instagram ({d})",
+    "x.h": "Latest posts",
+    "x.more": "More on X ↗",
+    "x.post": "View this post on X ({d})",
     "goods.sub": "Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.",
     "goods.shopName": "MyACG shop “Mania Art”",
     "goods.shopBtn": "Visit the shop ↗",
@@ -618,6 +624,9 @@ const I18N = {
     "ig.h": "最新の投稿",
     "ig.more": "Instagramでもっと見る ↗",
     "ig.post": "Instagramでこの投稿を見る（{d}）",
+    "x.h": "最新のポスト",
+    "x.more": "Xでもっと見る ↗",
+    "x.post": "Xでこのポストを見る（{d}）",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。",
     "goods.shopName": "買動漫（MyACG）ショップ「Mania Art」",
     "goods.shopBtn": "ショップへ ↗",
@@ -3106,12 +3115,45 @@ fetch('ig-latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): no button
 
+/* ---------- the newest posts on X, the account's own (no reposts, replies or quotes): x-latest.json, with their
+   pictures in img/x/, which .github/workflows/x-latest.yml brings up to date every hour (tools/x_latest.py). A post
+   with a picture shows it with its first words under it; one without, its words in the picture's place. A click
+   opens the post on X. ---------- */
+const xGrid = $('#x-grid');
+function xText() {
+  xGrid.querySelectorAll('.x-item').forEach((a) => a.setAttribute('aria-label', tr('x.post', { d: dot(a.dataset.d) })));
+}
+fetch('x-latest.json', { cache: 'no-cache' })
+  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+  .then(({ posts }) => {
+    xGrid.replaceChildren(...posts.map((p) => {
+      const a = el('a', `x-item x-${p.kind}`), pic = el('span', p.img ? 'x-pic' : 'x-pic x-say');
+      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+      a.dataset.d = p.d;
+      if (p.img) {
+        const im = el('img');
+        im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
+        pic.append(im);
+        a.append(pic, el('span', 'x-t', p.text));
+      } else {
+        pic.append(el('span', 'x-t', p.text));
+        a.append(pic);
+      }
+      a.append(el('span', 'x-d', dot(p.d)));
+      return a;
+    }));
+    xText();
+    $('#x-btn').hidden = !posts.length;
+    snsFit();
+  })
+  .catch(() => {});   // no list yet (before the X secrets are set): no button
+
 /* ---------- on the home page, a round button in the corner for each of those: its ring opens into its window, which
    stretches from the button toward the top left with the ring's curve at every corner, the logo staying at the bottom
    right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
    on a touch screen, and Esc. A video playing in it stops when it closes. ---------- */
 const snsDock = $('#sns-dock');
-const SNS = ['yt', 'ig'].map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
+const SNS = ['x', 'ig', 'yt'].map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
 let snsAt = null;   // the open one
 /* where a window sits (its bottom right corner on its button's) and how big it is open: its contents, no taller than
    the room between the header and the button; and the gold line round it */
@@ -3505,6 +3547,7 @@ function swapLang(l) {
   eventText();
   ytText();
   igText();
+  xText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));

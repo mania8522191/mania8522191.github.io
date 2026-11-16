@@ -1,0 +1,47 @@
+# The home page's latest X posts: every hour, read the account's own newest posts through the X API
+# (tools/x_latest.py, with the four X_* secrets) and, when there is a new one, commit x-latest.json and the pictures
+# in img/x/; GitHub Pages then publishes them. Also runs when this file or the script is pushed, and can be run by
+# hand from the Actions tab. Until the secrets are set (tools/README.md says how), it does nothing.
+name: Latest X posts
+
+on:
+  schedule:
+    - cron: '41 * * * *'
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/x-latest.yml
+      - tools/x_latest.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: x-latest
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read the latest posts
+        env:
+          X_API_KEY: ${{ secrets.X_API_KEY }}
+          X_API_SECRET: ${{ secrets.X_API_SECRET }}
+          X_ACCESS_TOKEN: ${{ secrets.X_ACCESS_TOKEN }}
+          X_ACCESS_SECRET: ${{ secrets.X_ACCESS_SECRET }}
+        run: python3 tools/x_latest.py
+      - name: Commit them if they changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(git status --porcelain -- x-latest.json img)" ]; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- x-latest.json img
+          git commit -m "Latest X posts"
+          git pull --rebase
+          git push
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" > /dev/null || true
