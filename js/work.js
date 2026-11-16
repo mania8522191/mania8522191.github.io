@@ -3,12 +3,12 @@
    as covers on a collage like the works wall's; each piece has a page of its own (#w-<id>/<n>) with its other
    versions ("alt") and its sketch ("sk") beside it, where it has them ---------- */
 function renderWork(i, piece = -1) {
-  const w = WORKS[i], one = w.pieces && piece >= 0;
+  const w = WORKS[i], one = w.pieces && piece >= 0, px = one && w.px && w.px[piece];   // px: a piece posted on pixiv by itself
   $('#wk-lab').textContent = w.lab;
   $('#wk-ym').textContent = w.ym;
   $('#wk-ym').hidden = !w.ym;
-  $('#wk-link').href = 'https://www.pixiv.net/artworks/' + w.id;
-  $('#wk-link-li').hidden = w.cat !== 'fan' || !/^\d+$/.test(w.id);   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
+  $('#wk-link').href = 'https://www.pixiv.net/artworks/' + (px || w.id);
+  $('#wk-link-li').hidden = !px && (w.cat !== 'fan' || !/^\d+$/.test(w.id));   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
   $('#wk-all-li').hidden = !one;   // a piece's page: back to the whole collection
   $('#wk-all').href = '#w-' + w.id;
 
@@ -83,7 +83,7 @@ function renderWork(i, piece = -1) {
 }
 /* a collection's piece on its collage: a cover like the wall's, linking to the piece's page */
 function pieceCover(w, n, W, H) {
-  const a = makeCover(`#w-${w.id}/${n + 1}`, [src(w.id, n)], W, H, w.pos, n < 4);
+  const a = makeCover(`#w-${w.id}/${n + 1}`, [[src(w.id, n), W, H]], w.pos, n < 4);
   a.dataset.n = n;
   a.dataset.date = madeOn(w);   // one date for them all: the collage pairs them in order
   return a;

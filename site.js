@@ -50,16 +50,13 @@ const WORKS = [
   {"id":"92332684","t":"夏","ym":"","d":"2021-08-28","lab":"hololive","tags":["バーチャルYouTuber","猫又おかゆ","戌神ころね","水着","ホロライブ","おかころ"],"dims":[[1200,750,1600,1000]],"pos":"50% 35%","cat":"fan"},
   {"id":"91801023","t":"夏","ym":"","d":"2021-08-08","lab":"hololive English","tags":["バーチャルYouTuber","一伊那尓栖","小鳥遊キアラ","森カリオペ","ワトソン・アメリア","がうる・ぐら"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
   {"id":"91312872","t":"夏","ym":"","d":"2021-07-17","lab":"hololive","tags":["バーチャルYouTuber","天音かなた","桐生ココ","星街すいせい","水着"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
-  {"id":"88261414","t":"❤","ym":"","d":"2021-03-06","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","制服"],"dims":[[900,1200,1500,2000]],"pos":"50% 35%","cat":"fan"},
-  {"id":"87418759","t":"❤","ym":"","d":"2021-01-30","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","VTuber","ほしまちぎゃらりー","マイク"],"dims":[[900,1200,1800,2400]],"pos":"50% 35%","cat":"fan"},
   {"id":"87254319","t":"❤","ym":"","d":"2021-01-23","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","魅惑のふともも"],"dims":[[900,1200,1800,2400]],"pos":"50% 35%","cat":"fan"},
   {"id":"87098130","t":"❤","ym":"","d":"2021-01-16","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","私服","メイド","VTuber","黒スト"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
   {"id":"86771770","t":"❤","ym":"","d":"2021-01-02","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","私服","VTuber","着物"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
   {"id":"86560442","t":"❤","ym":"","d":"2020-12-26","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","VTuber","黒スト","私服","hololive"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
   {"id":"86397683","t":"❤","ym":"","d":"2020-12-19","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","ほしまちぎゃらりー","VTuber","黒スト","hololive"],"dims":[[1200,750,2400,1500]],"pos":"50% 35%","cat":"fan"},
-  {"id":"86259443","t":"❤","ym":"","d":"2020-12-12","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","VTuber","私服","hololive"],"dims":[[750,1200,1500,2400]],"pos":"50% 35%","cat":"fan"},
-  {"id":"85812772","t":"星街すいせい","ym":"","d":"2020-11-21","lab":"hololive","tags":["ホロライブ","バーチャルYouTuber","星街すいせい","カラータイツ","VTuber","hololive"],"dims":[[750,1200,1500,2400]],"pos":"50% 35%","cat":"fan"},
-  {"id":"f-pw-mtm","t":{"zh":"VTuber塗鴉合集","en":"VTuber Doodle Log","ja":"VTuberらくがきまとめ"},"ym":"2020.10","d":"2020-10","lab":"VTuber","tags":["バーチャルYouTuber","らくがき"],"dims":[[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[1200,1200,2500,2500],[750,1200,2500,4000],[750,1200,2500,4000]],"pos":"50% 35%","cat":"fan","pieces":true,"sk":[[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],0,[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],0,[750,1200,2500,4000],0,0,0,0,0],"alt":{"1":[[750,1200,2500,4000],[750,1200,2500,4000]]}},
+  {"id":"f-suisei","t":{"zh":"星街すいせい 塗鴉合集","en":"Hoshimachi Suisei Doodle Log","ja":"星街すいせい らくがきまとめ"},"ym":"2020.10","d":"2020-10","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","らくがき"],"dims":[[1200,1200,2500,2500],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,1500,2400],[750,1200,1500,2400],[900,1200,1800,2400],[900,1200,1500,2000]],"pos":"50% 35%","cat":"fan","pieces":true,"px":{"3":"85812772","4":"86259443","5":"87418759","6":"88261414"}},
+  {"id":"f-pw-mtm","t":{"zh":"VTuber 塗鴉合集","en":"VTuber Doodle Log","ja":"VTuber らくがきまとめ"},"ym":"2020.10","d":"2020-10","lab":"VTuber","tags":["バーチャルYouTuber","らくがき"],"dims":[[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000]],"pos":"50% 35%","cat":"fan","pieces":true,"sk":[[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],0,[750,1200,2500,4000],[750,1200,2500,4000],[750,1200,2500,4000],0,[750,1200,2500,4000],0,0],"alt":{"1":[[750,1200,2500,4000],[750,1200,2500,4000]]}},
   {"id":"79077513","t":"台湾FF35新刊(中国語注意)","ym":"","d":"2020-01-24","lab":"アズールレーン","tags":["アズールレーン","私服","アドミラル・ヒッパー(アズールレーン)","プリンツ・オイゲン(アズールレーン)","ドイッチュラント(アズールレーン)","アドミラル・グラーフ・シュペー(アズールレーン)"],"dims":[[800,1130],[800,1130],[1200,1200,2000,2000],[1200,960],[1200,960]],"pos":"50% 35%","cat":"fan"},
   {"id":"78848192","t":"プリンツ・オイゲン","ym":"","d":"2020-01-12","lab":"アズールレーン","tags":["アズールレーン","プリンツ・オイゲン(アズールレーン)","私服"],"dims":[[900,1200],[900,1200]],"pos":"50% 35%","cat":"fan"},
   {"id":"78715432","t":"ドイッチュラント","ym":"","d":"2020-01-05","lab":"アズールレーン","tags":["アズールレーン","ドイッチュラント(アズールレーン)","私服"],"dims":[[900,1200],[600,800]],"pos":"50% 35%","cat":"fan"},
@@ -88,6 +85,8 @@ const WORKS = [
   {"id":"o-64","t":"Original01","ym":"","d":"2021-05-15","lab":"Original Art","tags":[],"dims":[[1200,750,4000,2500]],"pos":"50% 35%","cat":"original"},
   {"id":"76899789","t":"Underwater Room","ym":"","d":"2019-09-21","lab":"Original Art","tags":["女の子","原創"],"dims":[[900,1200]],"pos":"50% 35%","cat":"original"}
 ];
+/* works that became pieces of a collection: their old addresses (#w-<id>) open the piece (js/router.js) */
+const MOVED = {"85812772":"f-suisei/4","86259443":"f-suisei/5","87418759":"f-suisei/6","88261414":"f-suisei/7"};
 
 /* the home page carousel: every visit, and every press of Home, shows five of these works (HERO_N in home.js),
    picked and ordered at random;
@@ -1691,10 +1690,10 @@ eventText();
 const wall = $('#wall');
 /* a cover: a picture that links on, with its words over it on hover (under it on touch screens); it flies in from
    a direction of its own, new on every visit. The wall's works, and a collection's pieces on its work page.
-   `imgs`: one picture, or three of the same size W x H dealt as a hand of cards (a collection on the wall). */
-function makeCover(href, imgs, W, H, pos, eager) {
-  const fan = imgs.length > 1 && dealCards(W / H);
-  const r = fan ? fan.r : W / H, a = el('a', 'cover');
+   `pics`: [src, width, height] of one picture, or of three dealt as a hand of cards (a collection on the wall). */
+function makeCover(href, pics, pos, eager) {
+  const fan = pics.length > 1 && dealCards(pics.map(([, W, H]) => W / H));
+  const r = fan ? fan.r : pics[0][1] / pics[0][2], a = el('a', 'cover');
   a.href = href;
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
@@ -1705,44 +1704,40 @@ function makeCover(href, imgs, W, H, pos, eager) {
   a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
   a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
   a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
-  const pics = imgs.map((s) => `<img src="${s}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`);
+  const imgs = pics.map(([s, W, H]) => `<img src="${s}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`);
   const pct = (v) => `${(v * 100).toFixed(2)}%`;
   const art = fan
-    ? `<span class="frame mask fan" style="--cw:${pct(fan.cw)};--ca:${(W / H).toFixed(4)}">${pics.map((p, k) => `<span class="fan-c" style="left:${pct(fan.cards[k].l)};top:${pct(fan.cards[k].t)};--r:${fan.cards[k].r.toFixed(1)}deg">${p}</span>`).join('')}`
-    : `<span class="frame mask">${pics[0]}`;
+    ? `<span class="frame mask fan" style="--cw:${pct(fan.cw)}">${imgs.map((p, k) => `<span class="fan-c" style="left:${pct(fan.cards[k].l)};top:${pct(fan.cards[k].t)};--r:${fan.cards[k].r.toFixed(1)}deg;--ca:${(pics[k][1] / pics[k][2]).toFixed(4)}">${p}</span>`).join('')}`
+    : `<span class="frame mask">${imgs[0]}`;
   a.innerHTML = `${art}<span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
   return a;
 }
-/* three cards dealt loosely, from left to right and top to bottom: each a bit right of and below the one before and
-   over it (the last in front), each at a slight turn of its own that grows from left to right, with a little chance
-   in every step and turn so they never lie quite even (new on every page load, like the wall). Returns the box
-   around them (width / height, about square for tall cards, so it takes one column on the wall), a card's width
-   (cw), and each card's top left corner before it turns (l, t) and its turn in degrees (r): fractions of that box.
-   a: one card's width / height. */
-function dealCards(a) {
-  const h = 1 / a, wobble = (m) => (Math.random() * 2 - 1) * m;
-  const cards = [0, 1, 2].map((k) => ({ x: k * (0.34 + wobble(0.07)), y: k * h * (0.09 + wobble(0.04)), r: -8 + k * 7 + wobble(3) }));
+/* cards dealt loosely, from left to right and top to bottom: each a bit right of and below the one before and over
+   it (the last in front), each at a slight turn of its own that grows from left to right, with a little chance in
+   every step and turn so they never lie quite even (new on every page load, like the wall). Every card keeps its
+   picture's shape at one width, so a squarer picture is a shorter card; the steps go between the cards' middles.
+   Returns the box around them (width / height), a card's width (cw), and each card's top left corner before it
+   turns (l, t) and its turn in degrees (r): fractions of that box. as: each card's width / height. */
+function dealCards(as) {
+  const hs = as.map((a) => 1 / a), hm = hs.reduce((s, h) => s + h, 0) / hs.length, wobble = (m) => (Math.random() * 2 - 1) * m;
+  const cards = hs.map((h, k) => ({ h, mx: 0.5 + k * (0.34 + wobble(0.07)), my: hm / 2 + k * hm * (0.09 + wobble(0.04)), r: -8 + k * 7 + wobble(3) }));
   const xs = [], ys = [];
   for (const c of cards) {   // each card's corners, turned about its middle
-    const t = c.r * Math.PI / 180, s = Math.sin(t), co = Math.cos(t), mx = c.x + 0.5, my = c.y + h / 2;
-    for (const [px, py] of [[-0.5, -h / 2], [0.5, -h / 2], [-0.5, h / 2], [0.5, h / 2]]) {
-      xs.push(mx + px * co - py * s);
-      ys.push(my + px * s + py * co);
+    const t = c.r * Math.PI / 180, s = Math.sin(t), co = Math.cos(t);
+    for (const [px, py] of [[-0.5, -c.h / 2], [0.5, -c.h / 2], [-0.5, c.h / 2], [0.5, c.h / 2]]) {
+      xs.push(c.mx + px * co - py * s);
+      ys.push(c.my + px * s + py * co);
     }
   }
   const x0 = Math.min(...xs), y0 = Math.min(...ys), W = Math.max(...xs) - x0, H = Math.max(...ys) - y0;
-  return { r: W / H, cw: 1 / W, cards: cards.map((c) => ({ l: (c.x - x0) / W, t: (c.y - y0) / H, r: c.r })) };
+  return { r: W / H, cw: 1 / W, cards: cards.map((c) => ({ l: (c.mx - 0.5 - x0) / W, t: (c.my - c.h / 2 - y0) / H, r: c.r })) };
 }
-/* a collection on the wall shows three of its pieces, a new pick on every page load, in number order along the deal
-   (the last in front); only pieces of its most common shape, so the cards match (a square one among tall ones is
-   left out) */
+/* a collection on the wall shows three of its pieces, any of them whatever its shape, a new pick on every page load,
+   in number order along the deal (the last in front) */
 function coverPieces(w) {
-  const shape = ([W, H]) => (W / H).toFixed(3), count = new Map();
-  w.dims.forEach((d) => count.set(shape(d), (count.get(shape(d)) || 0) + 1));
-  const most = [...count].sort((a, b) => b[1] - a[1])[0][0];
-  const pool = w.dims.map((d, n) => n).filter((n) => shape(w.dims[n]) === most);
+  const pool = w.dims.map((d, n) => n);
   for (let k = pool.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [pool[k], pool[j]] = [pool[j], pool[k]]; }
-  return pool.length >= 3 ? pool.slice(0, 3).sort((a, b) => a - b) : [pool[0] || 0];
+  return pool.length >= 3 ? pool.slice(0, 3).sort((a, b) => a - b) : pool.slice(0, 1);
 }
 function coverText(a, t, meta, label) {
   a.querySelector('.ov-t').textContent = a.querySelector('.cap-t').textContent = t;
@@ -1750,8 +1745,8 @@ function coverText(a, t, meta, label) {
   a.setAttribute('aria-label', label);
 }
 WORKS.forEach((w, i) => {
-  const picks = w.pieces ? coverPieces(w) : [0], [W, H] = w.dims[picks[0]];
-  const a = makeCover('#w-' + w.id, picks.map((n) => src(w.id, n)), W, H, w.pos, i < 4);
+  const picks = w.pieces ? coverPieces(w) : [0];
+  const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, i < 4);
   a.id = 'c-' + w.id;
   a.dataset.n = picks[picks.length - 1];   // the picture in front: the page morph lands on its piece (js/router.js)
   a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers
@@ -2092,12 +2087,12 @@ if (document.fonts) document.fonts.ready.then(layoutWall);
    as covers on a collage like the works wall's; each piece has a page of its own (#w-<id>/<n>) with its other
    versions ("alt") and its sketch ("sk") beside it, where it has them ---------- */
 function renderWork(i, piece = -1) {
-  const w = WORKS[i], one = w.pieces && piece >= 0;
+  const w = WORKS[i], one = w.pieces && piece >= 0, px = one && w.px && w.px[piece];   // px: a piece posted on pixiv by itself
   $('#wk-lab').textContent = w.lab;
   $('#wk-ym').textContent = w.ym;
   $('#wk-ym').hidden = !w.ym;
-  $('#wk-link').href = 'https://www.pixiv.net/artworks/' + w.id;
-  $('#wk-link-li').hidden = w.cat !== 'fan' || !/^\d+$/.test(w.id);   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
+  $('#wk-link').href = 'https://www.pixiv.net/artworks/' + (px || w.id);
+  $('#wk-link-li').hidden = !px && (w.cat !== 'fan' || !/^\d+$/.test(w.id));   // the original pieces, and fan pieces not posted there (f-…), are not on pixiv
   $('#wk-all-li').hidden = !one;   // a piece's page: back to the whole collection
   $('#wk-all').href = '#w-' + w.id;
 
@@ -2172,7 +2167,7 @@ function renderWork(i, piece = -1) {
 }
 /* a collection's piece on its collage: a cover like the wall's, linking to the piece's page */
 function pieceCover(w, n, W, H) {
-  const a = makeCover(`#w-${w.id}/${n + 1}`, [src(w.id, n)], W, H, w.pos, n < 4);
+  const a = makeCover(`#w-${w.id}/${n + 1}`, [[src(w.id, n), W, H]], w.pos, n < 4);
   a.dataset.n = n;
   a.dataset.date = madeOn(w);   // one date for them all: the collage pairs them in order
   return a;
@@ -3114,6 +3109,7 @@ function parse() {
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-')) {
+    if (h.slice(2) in MOVED) { history.replaceState(null, '', '#w-' + MOVED[h.slice(2)]); return parse(); }   // now a collection's piece
     const [id, pn] = h.slice(2).split('/'), n = Number(pn);
     if (id in byId) {
       const w = WORKS[byId[id]];

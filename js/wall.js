@@ -4,10 +4,10 @@
 const wall = $('#wall');
 /* a cover: a picture that links on, with its words over it on hover (under it on touch screens); it flies in from
    a direction of its own, new on every visit. The wall's works, and a collection's pieces on its work page.
-   `imgs`: one picture, or three of the same size W x H dealt as a hand of cards (a collection on the wall). */
-function makeCover(href, imgs, W, H, pos, eager) {
-  const fan = imgs.length > 1 && dealCards(W / H);
-  const r = fan ? fan.r : W / H, a = el('a', 'cover');
+   `pics`: [src, width, height] of one picture, or of three dealt as a hand of cards (a collection on the wall). */
+function makeCover(href, pics, pos, eager) {
+  const fan = pics.length > 1 && dealCards(pics.map(([, W, H]) => W / H));
+  const r = fan ? fan.r : pics[0][1] / pics[0][2], a = el('a', 'cover');
   a.href = href;
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
@@ -18,44 +18,40 @@ function makeCover(href, imgs, W, H, pos, eager) {
   a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
   a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
   a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
-  const pics = imgs.map((s) => `<img src="${s}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`);
+  const imgs = pics.map(([s, W, H]) => `<img src="${s}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`);
   const pct = (v) => `${(v * 100).toFixed(2)}%`;
   const art = fan
-    ? `<span class="frame mask fan" style="--cw:${pct(fan.cw)};--ca:${(W / H).toFixed(4)}">${pics.map((p, k) => `<span class="fan-c" style="left:${pct(fan.cards[k].l)};top:${pct(fan.cards[k].t)};--r:${fan.cards[k].r.toFixed(1)}deg">${p}</span>`).join('')}`
-    : `<span class="frame mask">${pics[0]}`;
+    ? `<span class="frame mask fan" style="--cw:${pct(fan.cw)}">${imgs.map((p, k) => `<span class="fan-c" style="left:${pct(fan.cards[k].l)};top:${pct(fan.cards[k].t)};--r:${fan.cards[k].r.toFixed(1)}deg;--ca:${(pics[k][1] / pics[k][2]).toFixed(4)}">${p}</span>`).join('')}`
+    : `<span class="frame mask">${imgs[0]}`;
   a.innerHTML = `${art}<span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
   return a;
 }
-/* three cards dealt loosely, from left to right and top to bottom: each a bit right of and below the one before and
-   over it (the last in front), each at a slight turn of its own that grows from left to right, with a little chance
-   in every step and turn so they never lie quite even (new on every page load, like the wall). Returns the box
-   around them (width / height, about square for tall cards, so it takes one column on the wall), a card's width
-   (cw), and each card's top left corner before it turns (l, t) and its turn in degrees (r): fractions of that box.
-   a: one card's width / height. */
-function dealCards(a) {
-  const h = 1 / a, wobble = (m) => (Math.random() * 2 - 1) * m;
-  const cards = [0, 1, 2].map((k) => ({ x: k * (0.34 + wobble(0.07)), y: k * h * (0.09 + wobble(0.04)), r: -8 + k * 7 + wobble(3) }));
+/* cards dealt loosely, from left to right and top to bottom: each a bit right of and below the one before and over
+   it (the last in front), each at a slight turn of its own that grows from left to right, with a little chance in
+   every step and turn so they never lie quite even (new on every page load, like the wall). Every card keeps its
+   picture's shape at one width, so a squarer picture is a shorter card; the steps go between the cards' middles.
+   Returns the box around them (width / height), a card's width (cw), and each card's top left corner before it
+   turns (l, t) and its turn in degrees (r): fractions of that box. as: each card's width / height. */
+function dealCards(as) {
+  const hs = as.map((a) => 1 / a), hm = hs.reduce((s, h) => s + h, 0) / hs.length, wobble = (m) => (Math.random() * 2 - 1) * m;
+  const cards = hs.map((h, k) => ({ h, mx: 0.5 + k * (0.34 + wobble(0.07)), my: hm / 2 + k * hm * (0.09 + wobble(0.04)), r: -8 + k * 7 + wobble(3) }));
   const xs = [], ys = [];
   for (const c of cards) {   // each card's corners, turned about its middle
-    const t = c.r * Math.PI / 180, s = Math.sin(t), co = Math.cos(t), mx = c.x + 0.5, my = c.y + h / 2;
-    for (const [px, py] of [[-0.5, -h / 2], [0.5, -h / 2], [-0.5, h / 2], [0.5, h / 2]]) {
-      xs.push(mx + px * co - py * s);
-      ys.push(my + px * s + py * co);
+    const t = c.r * Math.PI / 180, s = Math.sin(t), co = Math.cos(t);
+    for (const [px, py] of [[-0.5, -c.h / 2], [0.5, -c.h / 2], [-0.5, c.h / 2], [0.5, c.h / 2]]) {
+      xs.push(c.mx + px * co - py * s);
+      ys.push(c.my + px * s + py * co);
     }
   }
   const x0 = Math.min(...xs), y0 = Math.min(...ys), W = Math.max(...xs) - x0, H = Math.max(...ys) - y0;
-  return { r: W / H, cw: 1 / W, cards: cards.map((c) => ({ l: (c.x - x0) / W, t: (c.y - y0) / H, r: c.r })) };
+  return { r: W / H, cw: 1 / W, cards: cards.map((c) => ({ l: (c.mx - 0.5 - x0) / W, t: (c.my - c.h / 2 - y0) / H, r: c.r })) };
 }
-/* a collection on the wall shows three of its pieces, a new pick on every page load, in number order along the deal
-   (the last in front); only pieces of its most common shape, so the cards match (a square one among tall ones is
-   left out) */
+/* a collection on the wall shows three of its pieces, any of them whatever its shape, a new pick on every page load,
+   in number order along the deal (the last in front) */
 function coverPieces(w) {
-  const shape = ([W, H]) => (W / H).toFixed(3), count = new Map();
-  w.dims.forEach((d) => count.set(shape(d), (count.get(shape(d)) || 0) + 1));
-  const most = [...count].sort((a, b) => b[1] - a[1])[0][0];
-  const pool = w.dims.map((d, n) => n).filter((n) => shape(w.dims[n]) === most);
+  const pool = w.dims.map((d, n) => n);
   for (let k = pool.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [pool[k], pool[j]] = [pool[j], pool[k]]; }
-  return pool.length >= 3 ? pool.slice(0, 3).sort((a, b) => a - b) : [pool[0] || 0];
+  return pool.length >= 3 ? pool.slice(0, 3).sort((a, b) => a - b) : pool.slice(0, 1);
 }
 function coverText(a, t, meta, label) {
   a.querySelector('.ov-t').textContent = a.querySelector('.cap-t').textContent = t;
@@ -63,8 +59,8 @@ function coverText(a, t, meta, label) {
   a.setAttribute('aria-label', label);
 }
 WORKS.forEach((w, i) => {
-  const picks = w.pieces ? coverPieces(w) : [0], [W, H] = w.dims[picks[0]];
-  const a = makeCover('#w-' + w.id, picks.map((n) => src(w.id, n)), W, H, w.pos, i < 4);
+  const picks = w.pieces ? coverPieces(w) : [0];
+  const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, i < 4);
   a.id = 'c-' + w.id;
   a.dataset.n = picks[picks.length - 1];   // the picture in front: the page morph lands on its piece (js/router.js)
   a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers

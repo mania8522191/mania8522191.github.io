@@ -7,6 +7,7 @@ function parse() {
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-')) {
+    if (h.slice(2) in MOVED) { history.replaceState(null, '', '#w-' + MOVED[h.slice(2)]); return parse(); }   // now a collection's piece
     const [id, pn] = h.slice(2).split('/'), n = Number(pn);
     if (id in byId) {
       const w = WORKS[byId[id]];
