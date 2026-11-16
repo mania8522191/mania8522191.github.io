@@ -12,6 +12,7 @@ function makeCover(href, imgs, W, H, pos, eager) {
   a.dataset.rv = 'fly';
   a.dataset.d = `${(Math.random() * 0.22).toFixed(2)}s`;
   a.dataset.r = r.toFixed(4);
+  if (fan) a.dataset.cw = fan.cw.toFixed(4);   // a card's share of the hand's width: the wall sizes the hand by its cards
   a.style.cssText = `--ar:${r.toFixed(4)};--pos:${pos}`;
   const ang = Math.random() * Math.PI * 2, dist = (150 + Math.random() * 150) * (innerWidth < 700 ? 0.55 : 1);
   a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
@@ -257,17 +258,18 @@ function yearsUpdate() {
   yearsProg.style.transform = `scaleX(${Math.min(1, Math.max(0, (line - wr.top) / wr.height)).toFixed(4)})`;
 }
 addEventListener('scroll', () => { if (!yearsRaf) yearsRaf = requestAnimationFrame(yearsUpdate); }, { passive: true });
-/* units in date order: a wide work alone; a single-column work beside the next single-column one of the same year.
+/* units in date order: a wide work alone (and a collection's hand of cards: across a whole lane its cards come out
+   about as big as the covers around them); a single-column work beside the next single-column one of the same year.
    When that one is far taller or shorter, the closest in height among the next few takes its place, so a long work
    is not left beside a short one; if even that is far shorter, the works after it stack under the short one */
 function buildUnits(order) {
-  const items = order.map((el) => ({ el, r: +el.dataset.r, y: el.dataset.date.slice(0, 4) }));
+  const items = order.map((el) => ({ el, r: +el.dataset.r, wide: +el.dataset.r >= 1.4 || 'cw' in el.dataset, y: el.dataset.date.slice(0, 4) }));
   const units = [], used = new Set();
-  const fits = (c, y) => c.y === y && c.r < 1.4;   // single-column, same year
+  const fits = (c, y) => c.y === y && !c.wide;   // single-column, same year
   for (let k = 0; k < items.length; k++) {
     if (used.has(k)) continue;
     const a = items[k];
-    if (a.r >= 1.4) { units.push({ a }); continue; }
+    if (a.wide) { units.push({ a }); continue; }
     let pick = -1, pickQ = Infinity;
     for (let j = k + 1, n = 0; j < items.length && n < 3; j++) {
       if (used.has(j)) continue;
@@ -320,7 +322,8 @@ function collage(box, order, units, seed, heads) {
   const colW = (laneW - gap) / 2;
   const touch = matchMedia('(hover: none)').matches;
   const plan = units.map((u) => {
-    const p = { u, wa: u.pair ? colW * (0.9 + rand() * 0.1) : laneW * (0.86 + rand() * 0.14) };
+    const card = u.a.el.dataset.cw;   // a hand of cards: as wide as makes each card the size of a one-column cover
+    const p = { u, wa: u.pair ? colW * (0.9 + rand() * 0.1) : card ? Math.min(laneW, colW * (0.9 + rand() * 0.1) / card) : laneW * (0.86 + rand() * 0.14) };
     if (u.b) p.wb = colW * (0.9 + rand() * 0.1);
     p.ex = u.sa || u.sb || [];
     p.we = p.ex.map(() => colW * (0.9 + rand() * 0.1));
