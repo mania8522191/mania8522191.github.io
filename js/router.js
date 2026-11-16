@@ -130,14 +130,18 @@ function route() {
   const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
   const fromPiece = lastPiece;
   if (from === null || (from === r.next && !hop) || !VT) { apply(r); return; }
+  /* the picture a work page shares with its wall cover: the cover's picture in front (a collection's cover deals a
+     random three, the last on top), and on the page its first one, or on a collection's page that same piece */
+  const coverPic = (id) => [...document.querySelectorAll(`#c-${id} img`)].pop();
+  const pagePic = (id) => $(`#wk-imgs [data-n="${$('#c-' + id).dataset.n}"] img`) || $('#wk-imgs img');
   const pick = (fwd) => {
     if (hop) {
       const tile = $(`#wk-imgs [data-n="${r.piece < 0 ? fromPiece : r.piece}"] img`), big = $('#wk-imgs .pc-fig img');
       return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
     }
-    if (from === 'works' && r.next === 'work') return fwd ? document.querySelector(`#c-${WORKS[r.idx].id} img`) : document.querySelector('#wk-imgs img');
+    if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
     if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
-    if (from === 'work' && r.next === 'works') return fwd ? document.querySelector('#wk-imgs img') : lastWork && document.querySelector(`#c-${lastWork} img`);
+    if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
     if (from === 'item' && r.next === 'goods') return fwd ? $('#it-img') : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);

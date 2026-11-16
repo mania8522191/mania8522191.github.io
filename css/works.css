@@ -63,6 +63,15 @@
 .cover:hover .frame,.cover:focus-visible .frame{transform:none}
 .frame{position:relative;display:block;aspect-ratio:var(--ar);max-width:100%;overflow:hidden;background:var(--bg-2)}
 .frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:var(--pos)}
+/* a collection on the wall: three of its pieces dealt loosely as a hand of cards, from top left to bottom right, the
+   last on top (each card's place and turn come from dealCards() in js/wall.js); on hover each turns a little further */
+.frame.fan{overflow:visible;background:none;box-shadow:none}
+.fan-c{position:absolute;width:var(--cw);aspect-ratio:var(--ca);overflow:hidden;background:var(--bg-2);box-shadow:0 10px 26px rgba(0,0,0,.55);transform:rotate(var(--r));transition:transform .6s var(--ease-out)}
+.cover:hover .fan-c,.cover:focus-visible .fan-c{transform:rotate(calc(1.5 * var(--r)))}
+/* on hover the cards darken one by one, as much as --veil, instead of a box over them: turned further they reach past it */
+.frame.fan .ov{background:none}
+.fan-c img{transition:filter .5s var(--ease-out)}
+.cover:hover .frame.fan img,.cover:focus-visible .frame.fan img{filter:brightness(.48);transition:transform 1.4s var(--ease-out),filter .5s var(--ease-out)}
 .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;background:var(--veil);opacity:0}
 .ov-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,24px);letter-spacing:.06em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
 .ov-m{font-size:12px;letter-spacing:.16em;color:var(--fg);opacity:.8}

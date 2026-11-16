@@ -83,7 +83,7 @@ function renderWork(i, piece = -1) {
 }
 /* a collection's piece on its collage: a cover like the wall's, linking to the piece's page */
 function pieceCover(w, n, W, H) {
-  const a = makeCover(`#w-${w.id}/${n + 1}`, src(w.id, n), W, H, w.pos, n < 4);
+  const a = makeCover(`#w-${w.id}/${n + 1}`, [src(w.id, n)], W, H, w.pos, n < 4);
   a.dataset.n = n;
   a.dataset.date = madeOn(w);   // one date for them all: the collage pairs them in order
   return a;
