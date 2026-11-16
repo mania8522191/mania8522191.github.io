@@ -2,7 +2,8 @@
 /* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 function parse() {
-  const h = decodeURIComponent(location.hash.slice(1));
+  let h = location.hash.slice(1);
+  try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
@@ -73,6 +74,7 @@ function apply({ h, next, idx, cat, piece = -1 }) {
   if (next === 'about') preloadAbout();
   if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
   heroPlay();   // the carousel moves on only while the home page is shown
+  snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
   parallax();
 }

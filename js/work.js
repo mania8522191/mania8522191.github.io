@@ -179,4 +179,9 @@ function ytInline(card, id, t) {
     ytPlaying.set(f, card);
   });
 }
-addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });
+/* put playing videos back to their cards (those inside box, or all): on a page change, and when the home page's
+   video window shuts (js/home.js) */
+function ytStop(box) {
+  ytPlaying.forEach((card, f) => { if (!box || box.contains(f)) { f.replaceWith(card); ytPlaying.delete(f); } });
+}
+addEventListener('hashchange', () => ytStop());

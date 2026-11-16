@@ -143,7 +143,7 @@ function heroText() {
 }
 heroPick();
 
-/* ---------- under the carousel, the latest three videos on the YouTube channel, newest first: yt-latest.json, which
+/* ---------- the latest three videos on the YouTube channel, newest first: yt-latest.json, which
    .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click plays one here. ---------- */
 const ytGrid = $('#yt-grid');
 function ytText() {
@@ -167,11 +167,12 @@ fetch('yt-latest.json', { cache: 'no-cache' })
       return item;
     }));
     ytText();
-    $('#home-yt').hidden = !videos.length;
+    $('#yt-btn').hidden = !videos.length;
+    snsFit();
   })
-  .catch(() => {});   // no list: the section stays hidden
+  .catch(() => {});   // no list: no button
 
-/* ---------- then the newest posts on Instagram: ig-latest.json, with their pictures in img/ig/, which
+/* ---------- the newest posts on Instagram: ig-latest.json, with their pictures in img/ig/, which
    .github/workflows/ig-latest.yml brings up to date every hour (tools/ig_latest.py). A click opens the post on
    Instagram. ---------- */
 const igGrid = $('#ig-grid');
@@ -190,6 +191,64 @@ fetch('ig-latest.json', { cache: 'no-cache' })
       return a;
     }));
     igText();
-    $('#home-ig').hidden = !posts.length;
+    $('#ig-btn').hidden = !posts.length;
+    snsFit();
   })
-  .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): the section stays hidden
+  .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): no button
+
+/* ---------- on the home page, a round button in the corner for each of those: its ring opens into its window, which
+   stretches from the button toward the top left with the ring's curve at every corner, the logo staying at the bottom
+   right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
+   on a touch screen, and Esc. A video playing in it stops when it closes. ---------- */
+const snsDock = $('#sns-dock');
+const SNS = ['yt', 'ig'].map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
+let snsAt = null;   // the open one
+/* where a window sits (its bottom right corner on its button's) and how big it is open: its contents, no taller than
+   the room between the header and the button; and the gold line round it */
+function snsSize(s) {
+  const inner = s.pop.firstElementChild, b = s.btn.offsetWidth;
+  s.pop.style.bottom = `${snsDock.offsetHeight - s.btn.offsetTop - b}px`;
+  inner.style.maxHeight = `${Math.max(160, s.btn.getBoundingClientRect().bottom - $('.site-head').getBoundingClientRect().bottom - 16)}px`;
+  return [inner.offsetWidth + 2, inner.offsetHeight + 2];
+}
+/* the ring opens into the window, or the window closes back into the ring, from wherever it is now */
+function snsMove(s, open) {
+  const pop = s.pop, b = s.btn.offsetWidth;
+  const from = pop.hidden ? [b, b] : [pop.offsetWidth, pop.offsetHeight];
+  if (pop.anim) pop.anim.cancel();
+  pop.hidden = false;
+  const to = open ? snsSize(s) : [b, b];
+  pop.style.width = `${to[0]}px`; pop.style.height = `${to[1]}px`;
+  s.btn.classList.add('morph');
+  const done = () => { pop.anim = null; if (!open) { pop.hidden = true; s.btn.classList.remove('morph'); } };
+  if (CALM) { done(); return; }
+  const a = pop.anim = pop.animate({ width: [`${from[0]}px`, `${to[0]}px`], height: [`${from[1]}px`, `${to[1]}px`] }, { duration: 550, easing: 'cubic-bezier(.16,1,.3,1)' });
+  a.finished.then(() => { if (pop.anim === a) done(); }, () => {});   // cancelled: a newer move took over
+}
+/* the open window fits its contents again: when they change size (another screen size, another language), when the
+   screen gets taller or shorter, when a button comes */
+function snsFit() {
+  if (!snsAt || snsAt.pop.anim) return;
+  const [w, h] = snsSize(snsAt);
+  snsAt.pop.style.width = `${w}px`; snsAt.pop.style.height = `${h}px`;
+}
+const snsWatch = new ResizeObserver(() => requestAnimationFrame(snsFit));
+SNS.forEach((s) => snsWatch.observe(s.pop.firstElementChild));
+addEventListener('resize', snsFit);
+/* open s (one of SNS), or shut the open one (null) */
+function snsSet(s) {
+  if (s === snsAt) return;
+  if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); ytStop(snsAt.pop); }
+  snsAt = s;
+  if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
+}
+SNS.forEach((s) => s.btn.addEventListener('click', () => snsSet(snsAt === s ? null : s)));
+const snsOut = (e) => snsAt && e.target instanceof Element && !e.target.closest('.sns-dock');
+document.addEventListener('contextmenu', (e) => { if (snsOut(e)) { e.preventDefault(); snsSet(null); } });
+document.addEventListener('click', (e) => { if (snsOut(e) && matchMedia('(hover: none)').matches) snsSet(null); });
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && snsAt) { const b = snsAt.btn; snsSet(null); b.focus(); } });
+/* the buttons are there on the home page only (js/router.js); leaving it shuts the window at once */
+function snsShow(on) {
+  snsDock.hidden = !on;
+  if (!on && snsAt) { const p = snsAt.pop; snsSet(null); if (p.anim) p.anim.finish(); }
+}

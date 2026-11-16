@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=933be761">
+<link rel="stylesheet" href="site.css?v=260fe719">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -87,18 +87,6 @@ addEventListener('hashchange', function () {
       </div>
       <a class="hero-cap" id="hero-cap" href="#work"><span class="hero-cap-t"></span><span class="hero-cap-ar" aria-hidden="true">→</span></a>
       <div class="hero-dots" id="hero-dots" role="group" aria-label="切換作品" data-i18n-aria="home.dots"></div>
-    </section>
-    <section class="home-yt in" id="home-yt" aria-labelledby="home-yt-h" data-rv="up" hidden>
-      <p class="g-k">NEW ART IN PROGRESS</p>
-      <h2 class="tl-h" id="home-yt-h" data-i18n="yt.h">最新繪圖直播</h2>
-      <div class="yt-grid" id="yt-grid"></div>
-      <a class="home-more" href="https://www.youtube.com/@mania852" target="_blank" rel="noopener" data-i18n="yt.more">在 YouTube 看更多 ↗</a>
-    </section>
-    <section class="home-ig in" id="home-ig" aria-labelledby="home-ig-h" data-rv="up" hidden>
-      <p class="g-k">INSTAGRAM</p>
-      <h2 class="tl-h" id="home-ig-h" data-i18n="ig.h">最新貼文</h2>
-      <div class="ig-grid" id="ig-grid"></div>
-      <a class="home-more" href="https://www.instagram.com/mania8522191/" target="_blank" rel="noopener" data-i18n="ig.more">在 Instagram 看更多 ↗</a>
     </section>
   </div>
 
@@ -455,6 +443,25 @@ addEventListener('hashchange', function () {
 
 <div class="zw-layer" id="zw-layer"></div>
 <div class="zv-dock" id="zv-dock" role="group" aria-label="縮到最小的圖片" data-i18n-aria="zv.dock"></div>
+<!-- home: the latest videos and Instagram posts, each behind a round button in the bottom right corner (js/home.js) -->
+<div class="sns-dock" id="sns-dock" hidden>
+  <section class="sns-pop" id="home-yt" aria-labelledby="home-yt-h" hidden><div class="sns-in">
+    <p class="g-k">NEW ART IN PROGRESS</p>
+    <h2 class="tl-h" id="home-yt-h" data-i18n="yt.h">最新繪圖直播</h2>
+    <div class="yt-grid" id="yt-grid"></div>
+    <a class="home-more" href="https://www.youtube.com/@mania852" target="_blank" rel="noopener" data-i18n="yt.more">在 YouTube 看更多 ↗</a>
+  </div></section>
+  <section class="sns-pop" id="home-ig" aria-labelledby="home-ig-h" hidden><div class="sns-in">
+    <p class="g-k">INSTAGRAM</p>
+    <h2 class="tl-h" id="home-ig-h" data-i18n="ig.h">最新貼文</h2>
+    <div class="ig-grid" id="ig-grid"></div>
+    <a class="home-more" href="https://www.instagram.com/mania8522191/" target="_blank" rel="noopener" data-i18n="ig.more">在 Instagram 看更多 ↗</a>
+  </div></section>
+  <div class="sns-btns">
+    <button class="sns-btn" id="ig-btn" type="button" aria-label="Instagram" aria-controls="home-ig" aria-expanded="false" hidden><svg viewBox="0 0 50 50" aria-hidden="true"><circle class="sns-c" cx="25" cy="25" r="24.5"/><use href="#sns-ig" x="12" y="12" width="26" height="26"/></svg></button>
+    <button class="sns-btn" id="yt-btn" type="button" aria-label="YouTube" aria-controls="home-yt" aria-expanded="false" hidden><svg viewBox="0 0 50 50" aria-hidden="true"><circle class="sns-c" cx="25" cy="25" r="24.5"/><use href="#sns-yt" x="12" y="12" width="26" height="26"/></svg></button>
+  </div>
+</div>
 <template id="zv-tpl">
   <div class="zw" role="dialog" tabindex="-1">
     <div class="zv-bar">
@@ -483,6 +490,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=e409b409"></script>
+<script src="site.js?v=8da44397"></script>
 </body>
 </html>
