@@ -28,13 +28,16 @@
 .sns-btn.morph .sns-c{opacity:0}
 .sns-btn.over{z-index:2}   /* below an open window: above its shadow, which would dim it */
 /* the window: the button's ring stretched; its line dim like the ring's, lit while the pointer is on it or its button */
-.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:rgba(11,11,11,.96);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(208,166,90,.42);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);transition:border-color .35s}
+.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(208,166,90,.42);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);transition:border-color .35s}
 .sns-pop.lit{border-color:var(--g-gold)}
 /* the contents keep their size and their place at the bottom right while the window opens round them. On a screen
    too short for them they scroll with the wheel or a finger, but there is no scrollbar to show or drag */
 .sns-in{position:absolute;right:0;bottom:0;box-sizing:border-box;width:min(820px,calc(100vw - 46px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;display:grid;justify-items:center;gap:8px;padding:24px 28px 22px;text-align:center}
 .sns-in::-webkit-scrollbar{display:none}
-#home-ig .sns-in,#home-x .sns-in{width:min(600px,calc(100vw - 46px))}   /* room for a scrollbar beside the page */
+#home-ig .sns-in{width:min(600px,calc(100vw - 46px))}   /* room for a scrollbar beside the page */
+/* X: a logo's width of room on each side, so its logo in the corner never covers a post (even scrolling) and the
+   posts stay in the middle */
+#home-x .sns-in{width:min(680px,calc(100vw - 46px));padding-left:calc(var(--b) + 16px);padding-right:calc(var(--b) + 16px)}
 .sns-pop .tl-h{margin:0;font-size:clamp(22px,2vw,26px)}
 .home-more{margin-top:10px;font-size:14px;color:var(--fg);text-underline-offset:5px;text-decoration-thickness:1px}
 .home-more:hover{color:var(--mute)}
@@ -47,6 +50,7 @@
 .yt-d{margin:4px 0 0}
 /* a video's or a post's date, with its counts (views and likes; reposts and likes) at the other end of the line */
 .yt-d,.x-d{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:2px 8px;font-size:12px;letter-spacing:.08em;color:var(--mute);font-variant-numeric:tabular-nums}
+.x-d{flex-direction:column;align-items:flex-start}   /* X: the date, and the counts on a line of their own under it */
 .st-row{display:inline-flex;gap:12px;letter-spacing:.02em}   /* too long beside the date: the counts go under it, whole */
 .st{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .st svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -56,7 +60,7 @@
 .ig-item{position:relative;display:block;aspect-ratio:4 / 5;overflow:hidden;background:var(--bg-2)}
 .ig-item img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
 .ig-item:hover img{transform:scale(1.04)}
-.ig-video::after,.ig-album::before,.ig-album::after,.x-video .x-pic::after,.x-album .x-pic::before,.x-album .x-pic::after{content:"";position:absolute;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.ig-video::after,.ig-album::before,.ig-album::after,.x-video .x-pic::after,.x-album .x-pic::before,.x-album .x-pic::after{content:"";position:absolute;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}   /* above the picture, also while it grows on hover */
 .ig-video::after,.x-video .x-pic::after{top:10px;right:10px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff}
 .ig-album::before,.x-album .x-pic::before{top:9px;right:9px;width:12px;height:12px;border:2px solid #fff;border-radius:3px}
 .ig-album::after,.x-album .x-pic::after{top:14px;right:14px;width:12px;height:12px;border-radius:3px;background:#fff}

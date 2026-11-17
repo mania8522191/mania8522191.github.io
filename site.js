@@ -3198,8 +3198,9 @@ function snsSize(s) {
   return [inner.offsetWidth + 2, inner.offsetHeight + 2];
 }
 /* the ring opens into the window, or the window closes back into the ring, from wherever it is now. On the way it
-   also takes on the window's darker ground and deeper shadow, or gives them back for the button's, so that where the
-   window ends as the ring, the button takes over looking just the same */
+   also takes on the window's ground and deeper shadow, or gives them back for the button's (the same see-through
+   ground as the event pill, for now), so that where the window ends as the ring, the button takes over looking just
+   the same */
 function snsMove(s, open) {
   const pop = s.pop, b = `${s.btn.offsetWidth}px`, dock = getComputedStyle(snsDock), now = getComputedStyle(pop);
   const ring = { width: b, height: b, backgroundColor: dock.getPropertyValue('--ring-bg').trim(), boxShadow: dock.getPropertyValue('--ring-shadow').trim() };
