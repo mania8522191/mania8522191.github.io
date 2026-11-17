@@ -3062,6 +3062,10 @@ function heroText() {
 }
 heroPick();
 
+/* the corner buttons shown, top to bottom (each with its window; see below). Instagram's is left out for now, at the
+   user's wish (2026-11-17): its list is still kept up to date on GitHub; put 'ig' back between them to show it again */
+const SNS_ON = ['x', 'yt'];
+
 /* ---------- the latest three videos on the YouTube channel, newest first: yt-latest.json, which
    .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click plays one here. ---------- */
 const ytGrid = $('#yt-grid');
@@ -3098,7 +3102,7 @@ const igGrid = $('#ig-grid');
 function igText() {
   igGrid.querySelectorAll('.ig-item').forEach((a) => a.setAttribute('aria-label', tr('ig.post', { d: dot(a.dataset.d) })));
 }
-fetch('ig-latest.json', { cache: 'no-cache' })
+if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
   .then(({ posts }) => {
     igGrid.replaceChildren(...posts.map((p) => {
@@ -3153,30 +3157,50 @@ fetch('x-latest.json', { cache: 'no-cache' })
    right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
    on a touch screen, and Esc. A video playing in it stops when it closes. ---------- */
 const snsDock = $('#sns-dock');
-const SNS = ['x', 'ig', 'yt'].map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
+const SNS = SNS_ON.map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
 let snsAt = null;   // the open one
 /* where a window sits (its bottom right corner on its button's) and how big it is open: its contents, no taller than
-   the room between the header and the button; and the gold line round it */
+   the room between the header and the button (more than that scrolls with the wheel or a finger, with no scrollbar);
+   and the gold line round it */
 function snsSize(s) {
   const inner = s.pop.firstElementChild, b = s.btn.offsetWidth;
   s.pop.style.bottom = `${snsDock.offsetHeight - s.btn.offsetTop - b}px`;
-  inner.style.maxHeight = `${Math.max(160, s.btn.getBoundingClientRect().bottom - $('.site-head').getBoundingClientRect().bottom - 16)}px`;
+  inner.style.maxHeight = `${Math.max(160, s.btn.getBoundingClientRect().bottom - $('.site-head').getBoundingClientRect().bottom - 14)}px`;
   return [inner.offsetWidth + 2, inner.offsetHeight + 2];
 }
-/* the ring opens into the window, or the window closes back into the ring, from wherever it is now */
+/* the ring opens into the window, or the window closes back into the ring, from wherever it is now. On the way it
+   also takes on the window's darker ground and deeper shadow, or gives them back for the button's, so that where the
+   window ends as the ring, the button takes over looking just the same */
 function snsMove(s, open) {
-  const pop = s.pop, b = s.btn.offsetWidth;
-  const from = pop.hidden ? [b, b] : [pop.offsetWidth, pop.offsetHeight];
+  const pop = s.pop, b = `${s.btn.offsetWidth}px`, dock = getComputedStyle(snsDock), now = getComputedStyle(pop);
+  const ring = { width: b, height: b, backgroundColor: dock.getPropertyValue('--ring-bg').trim(), boxShadow: dock.getPropertyValue('--ring-shadow').trim() };
+  const from = pop.hidden ? ring : { width: now.width, height: now.height, backgroundColor: now.backgroundColor, boxShadow: now.boxShadow };
   if (pop.anim) pop.anim.cancel();
   pop.hidden = false;
-  const to = open ? snsSize(s) : [b, b];
-  pop.style.width = `${to[0]}px`; pop.style.height = `${to[1]}px`;
+  const [w, h] = open ? snsSize(s) : [s.btn.offsetWidth, s.btn.offsetWidth];
+  pop.style.width = `${w}px`; pop.style.height = `${h}px`;
+  const rest = getComputedStyle(pop);
+  const to = open ? { width: `${w}px`, height: `${h}px`, backgroundColor: rest.backgroundColor, boxShadow: rest.boxShadow } : ring;
   s.btn.classList.add('morph');
-  const done = () => { pop.anim = null; if (!open) { pop.hidden = true; s.btn.classList.remove('morph'); } };
+  snsOver();
+  const done = (a) => {
+    pop.anim = null;
+    if (!open) { pop.hidden = true; s.btn.classList.remove('morph'); if (a) a.cancel(); snsOver(); }   // the button's ring takes over
+  };
   if (CALM) { done(); return; }
-  const a = pop.anim = pop.animate({ width: [`${from[0]}px`, `${to[0]}px`], height: [`${from[1]}px`, `${to[1]}px`] }, { duration: 550, easing: 'cubic-bezier(.16,1,.3,1)' });
-  a.finished.then(() => { if (pop.anim === a) done(); }, () => {});   // cancelled: a newer move took over
+  const a = pop.anim = pop.animate([from, to], { duration: 550, easing: 'cubic-bezier(.16,1,.3,1)', fill: open ? 'none' : 'forwards' });
+  a.finished.then(() => { if (pop.anim === a) done(a); }, () => {});   // cancelled: a newer move took over
 }
+/* a button below a window that is out (open, or on its way) sits above it, so the window's shadow does not dim it;
+   a button above one stays under it, as the window grows over it */
+function snsOver() {
+  SNS.forEach((o) => o.btn.classList.toggle('over', SNS.some((s) => !s.pop.hidden && s.btn.offsetTop < o.btn.offsetTop)));
+}
+/* the window's gold line lights up while the pointer is on the window or its button, and dims when it leaves */
+SNS.forEach((s) => [s.pop, s.btn].forEach((e) => {
+  e.addEventListener('pointerenter', () => s.pop.classList.add('lit'));
+  e.addEventListener('pointerleave', () => s.pop.classList.remove('lit'));
+}));
 /* the open window fits its contents again: when they change size (another screen size, another language), when the
    screen gets taller or shorter, when a button comes */
 function snsFit() {
