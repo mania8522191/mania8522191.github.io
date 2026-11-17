@@ -257,14 +257,22 @@ function xPicks(imgs) {
    the posts and every way to cut it into rows is tried (at most four to a row, two on phones; a row of one only for a
    wide picture); the ones whose rows come closest to a comfortable height win, with a small price on each post out of
    time order, and one of the best few is taken at random. Then each cover shrinks a little in its place, moves a
-   little in it, and some turn slightly, as on the works wall. */
+   little in it, and some turn slightly, as on the works wall.
+   A hand of cards is sized by its cards, as the works wall sizes a collection: each card as tall as the pictures
+   beside it, so the hand stands taller than they do, and they sit at its middle. */
 function xLayout() {
   const W = xWall.clientWidth;
   if (!W) return;
   const rand = seeded(X_SEED), items = [...xWall.querySelectorAll('.cover')], n = items.length;
   if (!n) return;
   const wide = W >= 600, gap = wide ? 18 : 12, most = wide ? 4 : 2, target = wide ? 230 : 160;
-  const r = items.map((el) => +el.dataset.r || 1);
+  const rb = items.map((el) => +el.dataset.r || 1);   // each cover's width / height
+  const r = items.map((el, i) => {   // its width beside pictures 1 tall: a hand's, its width over a card's height
+    if (!('cw' in el.dataset)) return rb[i];
+    const hs = [...el.querySelectorAll('.fan-c')].map((c) => 1 / parseFloat(c.style.getPropertyValue('--ca')));
+    return 1 / +el.dataset.cw / (hs.reduce((s, v) => s + v, 0) / hs.length);
+  });
+  const t = r.map((v, i) => v / rb[i]);   // and its height there: 1, or more for a hand
   let all = [], strict = true;
   const cut = (order) => {   // every way to cut this order into rows
     for (let mask = 0; mask < 1 << (n - 1); mask++) {
@@ -286,16 +294,15 @@ function xLayout() {
   all.sort((a, b) => a.cost - b.cost);
   const near = all.filter((l) => l.cost <= all[0].cost + 6).slice(0, 6);
   const pick = near[Math.floor(rand() * near.length)] || all[0];
-  let y = 0, z = 0;
+  let y = 0;
   pick.rows.forEach((row, k) => {
-    const h = pick.hs[k];
+    const h = pick.hs[k], band = h * Math.max(...row.map((i) => t[i]));
     let x = 0, bottom = 0;
     row.forEach((i) => {
       const el = items[i], slot = r[i] * h, w = slot * (0.9 + rand() * 0.08);
       el.style.width = `${Math.round(w)}px`;
-      const top = y + (h - w / r[i]) * rand() + rand() * 8;
+      const top = y + (band - h * t[i]) / 2 + (h - w / r[i]) * t[i] * rand() + rand() * 8;
       placeCover(el, x + (slot - w) * rand(), top, rand() < 0.5 ? (rand() - 0.5) * 2 : 0);
-      el.style.zIndex = String(++z);
       bottom = Math.max(bottom, top + el.offsetHeight);
       x += slot + gap;
     });
@@ -347,7 +354,7 @@ function snsMove(s, open) {
   const ring = { width: b, height: b, backgroundColor: dock.getPropertyValue('--ring-bg').trim(), boxShadow: dock.getPropertyValue('--ring-shadow').trim() };
   const from = pop.hidden ? ring : { width: now.width, height: now.height, backgroundColor: now.backgroundColor, boxShadow: now.boxShadow };
   if (pop.anim) pop.anim.cancel();
-  pop.hidden = false;
+  if (pop.hidden) { pop.hidden = false; pop.querySelector('.sns-body').scrollTop = 0; }   // opened again: from its top
   const [w, h] = open ? snsSize(s) : [s.btn.offsetWidth, s.btn.offsetWidth];
   pop.style.width = `${w}px`; pop.style.height = `${h}px`;
   const rest = getComputedStyle(pop);

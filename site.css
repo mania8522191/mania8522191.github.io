@@ -98,21 +98,26 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sns-btn.morph{z-index:2;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}   /* its ring is the window now */
 .sns-btn.morph .sns-c{opacity:0}
 .sns-btn.over{z-index:2}   /* below an open window: above its shadow, which would dim it */
+/* on hover, the event pill's faint gold halo round the ring (.hero-ev:hover); the window has it while lit, so it
+   passes from one to the other as the ring opens and closes: back on the button at once, with no fade */
+.sns-btn::after{content:"";position:absolute;inset:-3px;border:3px solid rgba(208,166,90,.08);border-radius:50%;opacity:0;transition:opacity .35s;pointer-events:none}
+.sns-btn:hover::after{opacity:1}
+.sns-btn.morph::after{display:none}
 /* the window: the button's ring stretched; its line dim like the ring's, lit while the pointer is on it or its button */
-.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(208,166,90,.42);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);transition:border-color .35s}
-.sns-pop.lit{border-color:var(--g-gold)}
+.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(208,166,90,.42);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);outline:3px solid transparent;transition:border-color .35s,outline-color .35s}
+.sns-pop.lit{border-color:var(--g-gold);outline-color:rgba(208,166,90,.08)}
 /* the contents keep their size and their place at the bottom right while the window opens round them. The "more"
    link is a footer as tall as the button, so the logo in the corner sits beside it; on a screen too short for the rest
    (.sns-body), that scrolls above the footer with the wheel or a finger, never under the logo, and with no scrollbar to
-   show or drag */
-.sns-in{position:absolute;right:0;bottom:0;box-sizing:border-box;width:min(820px,calc(100vw - 46px));overflow:hidden;display:flex;flex-direction:column;padding:24px 28px 0;text-align:center}
-.sns-body{min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;display:grid;justify-items:center;gap:8px}
+   show or drag. Its room at the sides is inside it, so what reaches past the posts (a hand of cards turning on
+   hover) is not cut off there */
+.sns-in{position:absolute;right:0;bottom:0;box-sizing:border-box;width:min(820px,calc(100vw - 46px));overflow:hidden;display:flex;flex-direction:column;padding:24px 0 0;text-align:center}
+.sns-body{min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;display:grid;justify-items:center;gap:8px;padding:0 28px}
 .sns-body::-webkit-scrollbar{display:none}
 .sns-in>.home-more{flex:none;align-self:center;display:flex;align-items:center;min-height:var(--b);margin:4px 0 0}
 #home-ig .sns-in{width:min(600px,calc(100vw - 46px))}   /* room for a scrollbar beside the page */
-/* X: a logo's width of room on each side, so its logo in the corner never covers a post (even scrolling) and the
-   posts stay in the middle; wide enough between them for the collage's two lanes */
-#home-x .sns-in{width:min(820px,calc(100vw - 46px));padding-left:calc(var(--b) + 16px);padding-right:calc(var(--b) + 16px)}
+/* X: a logo's width of room on each side, so the posts stay in the middle, clear of the logo's corner */
+#home-x .sns-body{padding:0 calc(var(--b) + 16px)}
 .sns-pop .tl-h{margin:0;font-size:clamp(22px,2vw,26px)}
 .home-more{margin-top:10px;font-size:14px;color:var(--fg);text-underline-offset:5px;text-decoration-thickness:1px}
 .home-more:hover{color:var(--mute)}
@@ -143,7 +148,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
    then its date and its counts, each on a line of its own */
 .x-wall{position:relative;isolation:isolate;width:100%;margin-top:10px;text-align:left}
 .x-wall .ov{display:none}
-.x-wall .cap{display:grid;gap:4px;margin-top:8px}
+/* the words lie above every picture and its shadow, which would darken them (the covers have no stacking order of
+   their own here); a picture under the pointer rises above the others, still under the words */
+.x-wall .cap{position:relative;z-index:2;display:grid;gap:4px;margin-top:8px}
+.x-wall .cover:hover,.x-wall .cover:focus-visible{z-index:auto!important}
+.x-wall .cover:hover .frame,.x-wall .cover:focus-visible .frame{z-index:1}
 .x-wall .cap-t{font-family:var(--f-body);font-size:13px;letter-spacing:0;line-height:1.55;color:var(--fg-2);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .x-wall .cap-t:empty{display:none}
 .x-wall .cap-m{display:grid;justify-items:start;gap:2px;font-size:12px;letter-spacing:.08em;color:var(--mute);font-variant-numeric:tabular-nums}
@@ -151,7 +160,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* phones: smaller buttons; a window takes the screen's width */
 @media (max-width:720px){
   .sns-dock{--b:46px;bottom:max(72px,calc(env(safe-area-inset-bottom,0px) + 14px))}
-  .sns-in,#home-ig .sns-in,#home-x .sns-in{width:calc(100vw - 30px);padding:20px 16px 0}
+  .sns-in,#home-ig .sns-in{width:calc(100vw - 30px);padding:20px 0 0}
+  .sns-body,#home-x .sns-body{padding:0 16px}
   .yt-grid{grid-template-columns:minmax(0,1fr);gap:14px}
   .yt-item{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:12px}
   .yt-item .tl-card{grid-row:span 2}
@@ -400,7 +410,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cap{display:none}
 @media (hover:none){
   .ov{display:none}
-  .cap{display:grid;gap:2px;margin-top:12px}
+  .cap{position:relative;z-index:1;display:grid;gap:2px;margin-top:12px}   /* above its picture's shadow, which would darken it */
   .cap-t{font-family:var(--f-display);font-size:15px;letter-spacing:.04em;line-height:1.5;overflow-wrap:anywhere}
   .cap-m{font-size:12px;color:var(--mute);letter-spacing:.1em}
 }
