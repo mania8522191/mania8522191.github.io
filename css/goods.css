@@ -24,10 +24,19 @@
 .g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
 .g-meta{font-size:13px;color:var(--mute);line-height:1.6}
 .g-card .price{font-size:15px;margin-top:2px}
-.g-shop{max-width:860px;margin:clamp(72px,9vw,128px) auto 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px 32px;padding-block:28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+/* the shops online, one to a line, each with its logo (the Contact page's badge), its name and its button: the first
+   under the heading, the others below a rule. A long name takes a second line before its button goes under it (on
+   phones, every button goes under its name; the logo stays beside the name) */
+.g-shop{max-width:860px;margin:clamp(72px,9vw,128px) auto 0;padding-top:28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .g-shop p{margin:0}
 .g-shop-k{font-size:12px;letter-spacing:.3em;color:var(--mute)}
-.g-shop-n{font-family:var(--f-display);font-size:clamp(20px,2.4vw,28px);letter-spacing:.04em;line-height:1.5}
+.g-shops{margin:0;padding:0;list-style:none}
+.g-shops li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 32px;padding-block:14px 22px}
+.g-shops li+li{padding-top:22px;border-top:1px solid var(--line)}
+.g-shops .btn{flex:none}
+.g-shop-l{flex:1 1 18em;display:flex;align-items:center;gap:clamp(14px,1.6vw,20px);min-width:0;font-size:clamp(20px,2.4vw,28px)}
+.g-shop-l .sns-badge{flex:none}
+.g-shop-n{flex:1 1 auto;min-width:0;font-family:var(--f-display);letter-spacing:.04em;line-height:1.5}
 
 /* goods item */
 .gd{max-width:1200px;margin:0 auto;padding-block:clamp(56px,8vw,112px) clamp(64px,8vw,110px)}

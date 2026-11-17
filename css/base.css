@@ -18,6 +18,12 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
   --fg-2:#c9c5be;
   /* game page accents, taken from the game's own design document */
   --g-gold:#d0a65a;
+  /* the look the home page's event pill, corner buttons and their windows share (css/home.css): a see-through dark
+     ground, a dim gold line that lights up on hover with a faint halo round it, and a soft shadow */
+  --ring-bg:rgba(8,8,8,.42);
+  --ring-line:rgba(208,166,90,.42);
+  --ring-halo:rgba(208,166,90,.08);
+  --ring-shadow:0 6px 22px rgba(0,0,0,.5);
   color-scheme:dark;
 }
 *{box-sizing:border-box}

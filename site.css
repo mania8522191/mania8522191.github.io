@@ -21,6 +21,12 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
   --fg-2:#c9c5be;
   /* game page accents, taken from the game's own design document */
   --g-gold:#d0a65a;
+  /* the look the home page's event pill, corner buttons and their windows share (css/home.css): a see-through dark
+     ground, a dim gold line that lights up on hover with a faint halo round it, and a soft shadow */
+  --ring-bg:rgba(8,8,8,.42);
+  --ring-line:rgba(208,166,90,.42);
+  --ring-halo:rgba(208,166,90,.08);
+  --ring-shadow:0 6px 22px rgba(0,0,0,.5);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -87,12 +93,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
    corner of the home page. A button's ring opens into its window: it stretches toward the top left from where the
    button is, keeping the ring's curve at all four corners, and the logo stays at the bottom right corner (pressing it
    again closes the window back into the ring). Whatever the window grows over stays under it. */
-.sns-dock{--b:52px;--ring-bg:rgba(8,8,8,.42);--ring-shadow:0 6px 22px rgba(0,0,0,.5);position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 16px));z-index:18}
+.sns-dock{--b:52px;position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 16px));z-index:18}
 .sns-dock[hidden],.sns-pop[hidden],.sns-btn[hidden]{display:none}
 .sns-btns{display:flex;flex-direction:column;gap:10px}
 .sns-btn{position:relative;display:block;width:var(--b);height:var(--b);padding:0;border:0;border-radius:50%;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:var(--ring-shadow);cursor:pointer}
 .sns-btn svg{display:block;width:100%;height:100%;overflow:visible;fill:var(--g-gold)}
-.sns-btn .sns-c{transition:stroke .35s}
+.sns-btn .sns-c{stroke:var(--ring-line);transition:stroke .35s}
 .sns-btn:hover .sns-c{stroke:var(--g-gold)}
 .sns-btn:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .sns-btn.morph{z-index:2;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}   /* its ring is the window now */
@@ -100,12 +106,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sns-btn.over{z-index:2}   /* below an open window: above its shadow, which would dim it */
 /* on hover, the event pill's faint gold halo round the ring (.hero-ev:hover); the window has it while lit, so it
    passes from one to the other as the ring opens and closes: back on the button at once, with no fade */
-.sns-btn::after{content:"";position:absolute;inset:-3px;border:3px solid rgba(208,166,90,.08);border-radius:50%;opacity:0;transition:opacity .35s;pointer-events:none}
+.sns-btn::after{content:"";position:absolute;inset:-3px;border:3px solid var(--ring-halo);border-radius:50%;opacity:0;transition:opacity .35s;pointer-events:none}
 .sns-btn:hover::after{opacity:1}
 .sns-btn.morph::after{display:none}
 /* the window: the button's ring stretched; its line dim like the ring's, lit while the pointer is on it or its button */
-.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(208,166,90,.42);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);outline:3px solid transparent;transition:border-color .35s,outline-color .35s}
-.sns-pop.lit{border-color:var(--g-gold);outline-color:rgba(208,166,90,.08)}
+.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid var(--ring-line);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);outline:3px solid transparent;transition:border-color .35s,outline-color .35s}
+.sns-pop.lit{border-color:var(--g-gold);outline-color:var(--ring-halo)}
 /* the contents keep their size and their place at the bottom right while the window opens round them. The "more"
    link is a footer as tall as the button, so the logo in the corner sits beside it; on a screen too short for the rest
    (.sns-body), that scrolls above the footer with the wheel or a finger, never under the logo, and with no scrollbar to
@@ -169,9 +175,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .yt-item .tl-play{width:40px;height:40px;margin:-20px 0 0 -20px}
   .yt-item .tl-play::after{left:15px;top:11px;border-width:9px 0 9px 14px}
 }
-/* the next convention, under the name: a pill like the SORT button (css/works.css), to the events page */
-.hero-ev{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 12px;margin-top:clamp(18px,3.2vh,34px);padding:10px 20px;border:1px solid rgba(242,239,233,.32);border-radius:999px;background:rgba(8,8,8,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--fg);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:border-color .35s,box-shadow .35s}
-.hero-ev:hover{border-color:rgba(208,166,90,.6);box-shadow:0 0 0 3px rgba(208,166,90,.08)}
+/* the next convention, under the name: a pill to the events page, with the corner buttons' look (--ring-* in
+   css/base.css): the same ground, line, shadow, and the same halo on hover */
+.hero-ev{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 12px;margin-top:clamp(18px,3.2vh,34px);padding:10px 20px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:var(--ring-shadow);color:var(--fg);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:border-color .35s,box-shadow .35s}
+.hero-ev:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
 .hero-ev:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .hero-ev[hidden]{display:none}
 .hero-ev-k{font-size:10px;letter-spacing:.3em;color:var(--g-gold)}
@@ -501,10 +508,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
 .g-meta{font-size:13px;color:var(--mute);line-height:1.6}
 .g-card .price{font-size:15px;margin-top:2px}
-.g-shop{max-width:860px;margin:clamp(72px,9vw,128px) auto 0;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px 32px;padding-block:28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+/* the shops online, one to a line, each with its logo (the Contact page's badge), its name and its button: the first
+   under the heading, the others below a rule. A long name takes a second line before its button goes under it (on
+   phones, every button goes under its name; the logo stays beside the name) */
+.g-shop{max-width:860px;margin:clamp(72px,9vw,128px) auto 0;padding-top:28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .g-shop p{margin:0}
 .g-shop-k{font-size:12px;letter-spacing:.3em;color:var(--mute)}
-.g-shop-n{font-family:var(--f-display);font-size:clamp(20px,2.4vw,28px);letter-spacing:.04em;line-height:1.5}
+.g-shops{margin:0;padding:0;list-style:none}
+.g-shops li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 32px;padding-block:14px 22px}
+.g-shops li+li{padding-top:22px;border-top:1px solid var(--line)}
+.g-shops .btn{flex:none}
+.g-shop-l{flex:1 1 18em;display:flex;align-items:center;gap:clamp(14px,1.6vw,20px);min-width:0;font-size:clamp(20px,2.4vw,28px)}
+.g-shop-l .sns-badge{flex:none}
+.g-shop-n{flex:1 1 auto;min-width:0;font-family:var(--f-display);letter-spacing:.04em;line-height:1.5}
 
 /* goods item */
 .gd{max-width:1200px;margin:0 auto;padding-block:clamp(56px,8vw,112px) clamp(64px,8vw,110px)}

@@ -16,12 +16,12 @@
    corner of the home page. A button's ring opens into its window: it stretches toward the top left from where the
    button is, keeping the ring's curve at all four corners, and the logo stays at the bottom right corner (pressing it
    again closes the window back into the ring). Whatever the window grows over stays under it. */
-.sns-dock{--b:52px;--ring-bg:rgba(8,8,8,.42);--ring-shadow:0 6px 22px rgba(0,0,0,.5);position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 16px));z-index:18}
+.sns-dock{--b:52px;position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 16px));z-index:18}
 .sns-dock[hidden],.sns-pop[hidden],.sns-btn[hidden]{display:none}
 .sns-btns{display:flex;flex-direction:column;gap:10px}
 .sns-btn{position:relative;display:block;width:var(--b);height:var(--b);padding:0;border:0;border-radius:50%;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:var(--ring-shadow);cursor:pointer}
 .sns-btn svg{display:block;width:100%;height:100%;overflow:visible;fill:var(--g-gold)}
-.sns-btn .sns-c{transition:stroke .35s}
+.sns-btn .sns-c{stroke:var(--ring-line);transition:stroke .35s}
 .sns-btn:hover .sns-c{stroke:var(--g-gold)}
 .sns-btn:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .sns-btn.morph{z-index:2;background:none;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}   /* its ring is the window now */
@@ -29,12 +29,12 @@
 .sns-btn.over{z-index:2}   /* below an open window: above its shadow, which would dim it */
 /* on hover, the event pill's faint gold halo round the ring (.hero-ev:hover); the window has it while lit, so it
    passes from one to the other as the ring opens and closes: back on the button at once, with no fade */
-.sns-btn::after{content:"";position:absolute;inset:-3px;border:3px solid rgba(208,166,90,.08);border-radius:50%;opacity:0;transition:opacity .35s;pointer-events:none}
+.sns-btn::after{content:"";position:absolute;inset:-3px;border:3px solid var(--ring-halo);border-radius:50%;opacity:0;transition:opacity .35s;pointer-events:none}
 .sns-btn:hover::after{opacity:1}
 .sns-btn.morph::after{display:none}
 /* the window: the button's ring stretched; its line dim like the ring's, lit while the pointer is on it or its button */
-.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid rgba(208,166,90,.42);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);outline:3px solid transparent;transition:border-color .35s,outline-color .35s}
-.sns-pop.lit{border-color:var(--g-gold);outline-color:rgba(208,166,90,.08)}
+.sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid var(--ring-line);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);outline:3px solid transparent;transition:border-color .35s,outline-color .35s}
+.sns-pop.lit{border-color:var(--g-gold);outline-color:var(--ring-halo)}
 /* the contents keep their size and their place at the bottom right while the window opens round them. The "more"
    link is a footer as tall as the button, so the logo in the corner sits beside it; on a screen too short for the rest
    (.sns-body), that scrolls above the footer with the wheel or a finger, never under the logo, and with no scrollbar to
@@ -98,9 +98,10 @@
   .yt-item .tl-play{width:40px;height:40px;margin:-20px 0 0 -20px}
   .yt-item .tl-play::after{left:15px;top:11px;border-width:9px 0 9px 14px}
 }
-/* the next convention, under the name: a pill like the SORT button (css/works.css), to the events page */
-.hero-ev{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 12px;margin-top:clamp(18px,3.2vh,34px);padding:10px 20px;border:1px solid rgba(242,239,233,.32);border-radius:999px;background:rgba(8,8,8,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:var(--fg);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:border-color .35s,box-shadow .35s}
-.hero-ev:hover{border-color:rgba(208,166,90,.6);box-shadow:0 0 0 3px rgba(208,166,90,.08)}
+/* the next convention, under the name: a pill to the events page, with the corner buttons' look (--ring-* in
+   css/base.css): the same ground, line, shadow, and the same halo on hover */
+.hero-ev{display:inline-flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:4px 12px;margin-top:clamp(18px,3.2vh,34px);padding:10px 20px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:var(--ring-shadow);color:var(--fg);font-size:13px;letter-spacing:.06em;text-decoration:none;transition:border-color .35s,box-shadow .35s}
+.hero-ev:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
 .hero-ev:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .hero-ev[hidden]{display:none}
 .hero-ev-k{font-size:10px;letter-spacing:.3em;color:var(--g-gold)}
