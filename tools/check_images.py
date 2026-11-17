@@ -82,7 +82,8 @@ def referenced():
     for name in ('ig-latest.json', 'x-latest.json'):
         path = os.path.join(C.ROOT, name)
         if os.path.exists(path):
-            refs |= {p['img'] for p in json.load(open(path, encoding='utf-8'))['posts'] if p.get('img')}
+            for p in json.load(open(path, encoding='utf-8'))['posts']:
+                refs |= ({p['img']} if p.get('img') else set()) | {i[0] for i in p.get('imgs') or []}   # X: all a post's pictures
     return refs
 
 

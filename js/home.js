@@ -229,30 +229,90 @@ if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): no button
 
-/* ---------- the newest posts on X, the account's own with a picture (no reposts, replies, quotes, or posts of words
-   only): x-latest.json, with their pictures in img/x/, which .github/workflows/x-latest.yml brings up to date every
-   hour (tools/x_latest.py). Each shows its picture with its first words under it, then its date with its reposts and
-   likes (read again once a day). A click opens the post on X. ---------- */
-const xGrid = $('#x-grid');
+/* ---------- the newest five posts on X, the account's own with a picture (no reposts, replies, quotes, or posts of
+   words only): x-latest.json, with their pictures in img/x/, which .github/workflows/x-latest.yml brings up to date
+   every hour (tools/x_latest.py). Each is a cover like the works wall's with its picture whole; a post of several
+   pictures deals up to three of them as a hand of cards, like the doodle collections. Under each, its first words,
+   its date, and its reposts and likes (read again once a day). A click opens the post on X. ---------- */
+const xWall = $('#x-wall');
+const X_SEED = (WALL_SEED ^ 0x85ebca6b) >>> 0;   // an arrangement of its own, kept while the page is open
 function xText() {
-  xGrid.querySelectorAll('.x-item').forEach((a) => {
-    const s = tr('x.stats', { rt: a.dataset.rt, like: a.dataset.like });
-    a.setAttribute('aria-label', `${tr('x.post', { d: dot(a.dataset.d) })} ${s}`);
-    a.querySelector('.st-row').title = s;
+  xWall.querySelectorAll('.cover').forEach((a) => {
+    const d = dot(a.dataset.d), s = tr('x.stats', { rt: a.dataset.rt, like: a.dataset.like });
+    const row = stats([['rt', a.dataset.rt], ['heart', a.dataset.like]]);
+    row.title = s;
+    a.querySelector('.cap-m').replaceChildren(el('span', '', d), row);
+    a.setAttribute('aria-label', `${tr('x.post', { d })} ${s}`);
   });
-  statText(xGrid);
+  statText(xWall);
+}
+/* up to three of a post's pictures, a new pick on every page load, in their order */
+function xPicks(imgs) {
+  const pool = imgs.map((_, k) => k);
+  for (let k = pool.length - 1; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [pool[k], pool[j]] = [pool[j], pool[k]]; }
+  return pool.slice(0, 3).sort((a, b) => a - b).map((k) => imgs[k]);
+}
+/* the layout: random, but balanced first ("亂中有序", the user's wish); the time order comes second. Rows that each
+   fill the window's width: the pictures in a row share one height, so no row leaves a hole at its end. Every order of
+   the posts and every way to cut it into rows is tried (at most four to a row, two on phones; a row of one only for a
+   wide picture); the ones whose rows come closest to a comfortable height win, with a small price on each post out of
+   time order, and one of the best few is taken at random. Then each cover shrinks a little in its place, moves a
+   little in it, and some turn slightly, as on the works wall. */
+function xLayout() {
+  const W = xWall.clientWidth;
+  if (!W) return;
+  const rand = seeded(X_SEED), items = [...xWall.querySelectorAll('.cover')], n = items.length;
+  if (!n) return;
+  const wide = W >= 600, gap = wide ? 18 : 12, most = wide ? 4 : 2, target = wide ? 230 : 160;
+  const r = items.map((el) => +el.dataset.r || 1);
+  let all = [], strict = true;
+  const cut = (order) => {   // every way to cut this order into rows
+    for (let mask = 0; mask < 1 << (n - 1); mask++) {
+      const rows = [[order[0]]];
+      for (let i = 1; i < n; i++) { if (mask & (1 << (i - 1))) rows.push([]); rows[rows.length - 1].push(order[i]); }
+      if (rows.some((row) => row.length > most || (strict && row.length === 1 && r[row[0]] < 1.25 && n > 1))) continue;
+      const hs = rows.map((row) => (W - gap * (row.length - 1)) / row.reduce((s, i) => s + r[i], 0));
+      let cost = hs.reduce((s, h) => s + ((h - target) / target) ** 2 * 100, 0);
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (order[j] < order[i]) cost += 2;
+      all.push({ rows, hs, cost });
+    }
+  };
+  const perms = (rest, done) => {
+    if (!rest.length) { cut(done); return; }
+    rest.forEach((x, i) => perms([...rest.slice(0, i), ...rest.slice(i + 1)], [...done, x]));
+  };
+  perms(items.map((_, i) => i), []);
+  if (!all.length) { strict = false; perms(items.map((_, i) => i), []); }   // no wide picture to stand alone: let one that is not
+  all.sort((a, b) => a.cost - b.cost);
+  const near = all.filter((l) => l.cost <= all[0].cost + 6).slice(0, 6);
+  const pick = near[Math.floor(rand() * near.length)] || all[0];
+  let y = 0, z = 0;
+  pick.rows.forEach((row, k) => {
+    const h = pick.hs[k];
+    let x = 0, bottom = 0;
+    row.forEach((i) => {
+      const el = items[i], slot = r[i] * h, w = slot * (0.9 + rand() * 0.08);
+      el.style.width = `${Math.round(w)}px`;
+      const top = y + (h - w / r[i]) * rand() + rand() * 8;
+      placeCover(el, x + (slot - w) * rand(), top, rand() < 0.5 ? (rand() - 0.5) * 2 : 0);
+      el.style.zIndex = String(++z);
+      bottom = Math.max(bottom, top + el.offsetHeight);
+      x += slot + gap;
+    });
+    y = bottom + gap;
+  });
+  xWall.style.height = `${Math.ceil(y - gap)}px`;
 }
 fetch('x-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
   .then(({ posts }) => {
-    const shown = posts.filter((p) => p.img);
-    xGrid.replaceChildren(...shown.map((p) => {
-      const a = el('a', `x-item x-${p.kind}`), pic = el('span', 'x-pic'), im = el('img');
-      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+    const shown = posts.filter((p) => p.imgs && p.imgs.length).slice(0, 5);
+    xWall.replaceChildren(...shown.map((p) => {
+      const a = makeCover(p.url, xPicks(p.imgs), '50% 50%', false);
+      a.target = '_blank'; a.rel = 'noopener';
+      delete a.dataset.rv;   // no scroll reveal in a window
       a.dataset.d = p.d; a.dataset.rt = p.rt || 0; a.dataset.like = p.like || 0;
-      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
-      pic.append(im);
-      a.append(pic, el('span', 'x-t', p.text), dateLine('x-d', p.d, [['rt', p.rt], ['heart', p.like]]));
+      a.querySelector('.cap-t').textContent = p.text;
       return a;
     }));
     xText();
@@ -273,6 +333,7 @@ let snsAt = null;   // the open one
    and the gold line round it */
 function snsSize(s) {
   const inner = s.pop.firstElementChild, b = s.btn.offsetWidth;
+  if (inner.contains(xWall)) xLayout();
   s.pop.style.bottom = `${snsDock.offsetHeight - s.btn.offsetTop - b}px`;
   inner.style.maxHeight = `${Math.max(160, s.btn.getBoundingClientRect().bottom - $('.site-head').getBoundingClientRect().bottom - 14)}px`;
   return [inner.offsetWidth + 2, inner.offsetHeight + 2];
