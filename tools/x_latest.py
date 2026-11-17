@@ -9,8 +9,11 @@ them at its owned-reads price. X bills every post it returns, so:
   post costs nothing;
 - reposts and replies are not asked for, and quotes are left out (showing the post they quote would cost more);
 - the only extra it asks for is each post's pictures.
-Keeps the six newest, newest first. A post's first picture (a video's cover) is saved in img/x/ at the size it was
-posted, because the picture links X hands out can stop working; the pictures of posts no longer listed are deleted.
+Keeps the six newest posts with a picture, newest first: posts of words only stay off the site (the user's wish).
+When fewer than six are listed, it reads one page further back, at most once a day ("back", "backed"), until the
+list is full or the account's first post is reached ("end"). A post's first picture (a video's cover) is saved in
+img/x/ at the size it was posted, because the picture links X hands out can stop working; the pictures of posts no
+longer listed are deleted.
 Each post also keeps its reposts ("rt") and likes ("like"). A new post comes with them; the listed ones are read
 again once a day ("counted"), just those posts and nothing else, which X bills like any read (about US$0.2 a month).
 A post deleted on X stays listed until newer ones push it out. Writes only when the list changed.
@@ -125,52 +128,70 @@ def words(t):
     return re.sub(r'\s*https://t\.co/\w+', '', html.unescape(t.get('text') or '')).strip()
 
 
+PARAMS = {'exclude': 'retweets,replies', 'expansions': 'attachments.media_keys',
+          'tweet.fields': 'created_at,attachments,referenced_tweets,public_metrics', 'media.fields': 'type,url,preview_image_url'}
+
+
+def with_pictures(got, user, new):
+    """The posts in one API answer that the site shows: the account's own, not quotes, with a picture (posts of words
+    only stay off the site, the user's wish). Their first pictures go into new as {path: bytes}."""
+    media = {m['media_key']: m for m in (got.get('includes') or {}).get('media') or []}
+    out = []
+    for t in got.get('data') or []:
+        keys = (t.get('attachments') or {}).get('media_keys') or []
+        first = media.get(keys[0]) if keys else None
+        src = first and (first.get('url') or first.get('preview_image_url'))
+        if not src or any(r.get('type') == 'quoted' for r in t.get('referenced_tweets') or []):
+            continue
+        try:
+            data = download(src)
+        except OSError as e:
+            raise Passing(f'a picture did not download ({getattr(e, "reason", e)})') from None
+        end = ending(data)
+        if not end:
+            print(f"::warning::post {t['id']}: its picture is not a JPEG, WebP or PNG file, so it is left out")
+            continue
+        rt, like = metrics(t)
+        post = {'id': t['id'], 'url': f"https://x.com/{user or 'i'}/status/{t['id']}", 'd': (t.get('created_at') or '')[:10],
+                'text': words(t), 'kind': 'album' if len(keys) > 1 else 'image' if first.get('type') == 'photo' else 'video',
+                'img': f"img/x/{t['id']}{end}", 'rt': rt, 'like': like}
+        new[os.path.join(ROOT, *post['img'].split('/'))] = data
+        out.append(post)
+    return out
+
+
 def read_posts(old):
-    """(user, the newest posts, the newest post id seen, the new pictures to save as {path: bytes}). Nothing is
-    written here, so a failure halfway leaves no picture behind."""
-    if old and old.get('uid'):
+    """(user, uid, the newest posts, the newest post id seen, the new pictures to save as {path: bytes}, when the
+    counts were read, how far back the list has been filled from). Nothing is written here, so a failure halfway
+    leaves no picture behind."""
+    old = old or {}
+    if old.get('uid'):
         uid, user = old['uid'], old.get('user', '')
     else:
         me = call('users/me').get('data') or {}
         if not me.get('id'):
             raise Broken('the keys reach no account')
         uid, user = me['id'], me.get('username', '')
-    params = {'exclude': 'retweets,replies', 'max_results': 10 if old else 20, 'expansions': 'attachments.media_keys',
-              'tweet.fields': 'created_at,attachments,referenced_tweets,public_metrics', 'media.fields': 'type,url,preview_image_url'}
-    since = (old or {}).get('since')
-    if since:
-        params['since_id'] = since
-    got = call(f'users/{uid}/tweets', **params)
-    media = {m['media_key']: m for m in (got.get('includes') or {}).get('media') or []}
-    fresh, new = [], {}
+    since = old.get('since')
+    got = call(f'users/{uid}/tweets', **PARAMS, max_results=10 if old else 20, **({'since_id': since} if since else {}))
     for t in got.get('data') or []:
         since = max(since or '0', t['id'], key=int)
-        if any(r.get('type') == 'quoted' for r in t.get('referenced_tweets') or []):
-            continue
-        keys = (t.get('attachments') or {}).get('media_keys') or []
-        first = media.get(keys[0]) if keys else None
-        rt, like = metrics(t)
-        post = {'id': t['id'], 'url': f"https://x.com/{user or 'i'}/status/{t['id']}", 'd': (t.get('created_at') or '')[:10],
-                'text': words(t), 'kind': 'text', 'rt': rt, 'like': like}
-        if first:
-            post['kind'] = 'album' if len(keys) > 1 else 'image' if first.get('type') == 'photo' else 'video'
-            src = first.get('url') or first.get('preview_image_url')
-            if src:
-                try:
-                    data = download(src)
-                except OSError as e:
-                    raise Passing(f'a picture did not download ({getattr(e, "reason", e)})') from None
-                end = ending(data)
-                if end:
-                    post['img'] = f"img/x/{t['id']}{end}"
-                    new[os.path.join(ROOT, *post['img'].split('/'))] = data
-                else:
-                    print(f"::warning::post {t['id']}: its picture is not a JPEG, WebP or PNG file, so it is shown without it")
-        if post['text'] or post.get('img'):
-            fresh.append(post)
+    new = {}
+    fresh = with_pictures(got, user, new)
     known = {p['id'] for p in fresh}
-    posts = (fresh + [p for p in (old or {}).get('posts', []) if p['id'] not in known])[:N]
-    counted = (old or {}).get('counted', 0)
+    posts = (fresh + [p for p in old.get('posts', []) if p['id'] not in known and p.get('img')])[:N]
+    # fewer than six with pictures: one page further back, at most once a day, until the account's start ("end")
+    back, backed = old.get('back'), old.get('backed', 0)
+    if len(posts) < N and back != 'end' and time.time() - backed >= COUNTS_EVERY:
+        ids = [int(p['id']) for p in old.get('posts', []) + posts] + ([int(back)] if back else [])
+        page = call(f'users/{uid}/tweets', **PARAMS, max_results=20, **({'until_id': str(min(ids))} if ids else {}))
+        older = with_pictures(page, user, new)
+        known |= {p['id'] for p in older}
+        posts = (posts + [p for p in older if p['id'] not in {q['id'] for q in posts}])[:N]
+        seen = [int(t['id']) for t in page.get('data') or []]
+        back = str(min(seen)) if seen and (page.get('meta') or {}).get('next_token') else 'end'
+        backed = int(time.time())
+    counted = old.get('counted', 0)
     kept = [int(p['id']) for p in posts if p['id'] not in known]
     if kept and time.time() - counted >= COUNTS_EVERY:   # once a day: the listed posts' counts again, and nothing more
         again = call(f'users/{uid}/tweets', **{'exclude': 'retweets,replies', 'max_results': min(100, len(kept) + 10),
@@ -181,7 +202,7 @@ def read_posts(old):
             if p['id'] in now:
                 p['rt'], p['like'] = now[p['id']]
         counted = int(time.time())
-    return user, uid, since, posts, new, counted
+    return user, uid, since, posts, new, counted, back, backed
 
 
 def main():
@@ -190,7 +211,7 @@ def main():
         return 0
     old = json.load(open(OUT, encoding='utf-8')) if os.path.exists(OUT) else None
     try:
-        user, uid, since, posts, new, counted = read_posts(old)
+        user, uid, since, posts, new, counted, back, backed = read_posts(old)
     except Passing as e:
         print(f'::warning::X could not be read this time ({e}); the list stays as it is')
         return 0
@@ -199,7 +220,7 @@ def main():
         print(f"::{'error' if loud else 'warning'}::X: {e}. The list stays as it is; tools/README.md says what to check.")
         return 1 if loud else 0
     if not posts:
-        print('::warning::X gave no posts of the account\'s own; the list stays as it is')
+        print('::warning::X gave no posts of the account\'s own with a picture; the list stays as it is')
         return 0
     os.makedirs(PICS, exist_ok=True)
     for path, data in new.items():
@@ -209,7 +230,7 @@ def main():
     for f in os.listdir(PICS):
         if f not in keep:
             os.remove(os.path.join(PICS, f))
-    listed = {'user': user, 'uid': uid, 'since': since, 'counted': counted, 'posts': posts}
+    listed = {'user': user, 'uid': uid, 'since': since, 'counted': counted, 'back': back, 'backed': backed, 'posts': posts}
     if listed == old:
         print('no new posts')
         return 0

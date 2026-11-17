@@ -16,7 +16,7 @@
    corner of the home page. A button's ring opens into its window: it stretches toward the top left from where the
    button is, keeping the ring's curve at all four corners, and the logo stays at the bottom right corner (pressing it
    again closes the window back into the ring). Whatever the window grows over stays under it. */
-.sns-dock{--b:52px;--ring-bg:rgba(11,11,11,.72);--ring-shadow:0 6px 22px rgba(0,0,0,.5);position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(40px,calc(env(safe-area-inset-bottom,0px) + 16px));z-index:18}
+.sns-dock{--b:52px;--ring-bg:rgba(8,8,8,.42);--ring-shadow:0 6px 22px rgba(0,0,0,.5);position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:max(96px,calc(env(safe-area-inset-bottom,0px) + 16px));z-index:18}
 .sns-dock[hidden],.sns-pop[hidden],.sns-btn[hidden]{display:none}
 .sns-btns{display:flex;flex-direction:column;gap:10px}
 .sns-btn{position:relative;display:block;width:var(--b);height:var(--b);padding:0;border:0;border-radius:50%;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:var(--ring-shadow);cursor:pointer}
@@ -60,24 +60,19 @@
 .ig-video::after,.x-video .x-pic::after{top:10px;right:10px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff}
 .ig-album::before,.x-album .x-pic::before{top:9px;right:9px;width:12px;height:12px;border:2px solid #fff;border-radius:3px}
 .ig-album::after,.x-album .x-pic::after{top:14px;right:14px;width:12px;height:12px;border-radius:3px;background:#fff}
-/* X posts: three across, each a square picture (with the same marks) and its first words under it; a post of words
-   only has them in the square */
+/* X posts (only those with a picture): three across, each a square picture (with the same marks) and its first words
+   under it */
 .x-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 10px;width:100%;margin-top:6px;text-align:left}
 .x-item{display:grid;align-content:start;gap:6px;color:var(--fg);text-decoration:none}
 .x-pic{position:relative;display:block;aspect-ratio:1;overflow:hidden;background:var(--bg-2)}
 .x-pic img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
 .x-item:hover .x-pic img{transform:scale(1.04)}
-.x-t{font-size:13px;line-height:1.55;color:var(--fg-2);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}   /* under a picture: the words run on, so two lines say something */
-.x-say{display:flex;align-items:center;box-sizing:border-box;padding:14px;border:1px solid rgba(208,166,90,.22);transition:border-color .35s}
-.x-say .x-t{font-size:14px;color:var(--fg);white-space:pre-line;-webkit-line-clamp:6}   /* in the square: the post's own line breaks */
-.x-item:hover .x-say{border-color:rgba(208,166,90,.6)}
+.x-t{font-size:13px;line-height:1.55;color:var(--fg-2);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}   /* the words run on, so two lines say something */
 /* phones: smaller buttons; a window takes the screen's width */
 @media (max-width:720px){
-  .sns-dock{--b:46px;bottom:max(30px,calc(env(safe-area-inset-bottom,0px) + 14px))}
+  .sns-dock{--b:46px;bottom:max(72px,calc(env(safe-area-inset-bottom,0px) + 14px))}
   .sns-in,#home-ig .sns-in,#home-x .sns-in{width:calc(100vw - 30px);padding:20px 16px 18px}
-  .x-t,.x-say .x-t{font-size:12px}
-  .x-say{padding:8px}
-  .x-say .x-t{-webkit-line-clamp:5}
+  .x-t{font-size:12px}
   .yt-grid{grid-template-columns:minmax(0,1fr);gap:14px}
   .yt-item{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:12px}
   .yt-item .tl-card{grid-row:span 2}

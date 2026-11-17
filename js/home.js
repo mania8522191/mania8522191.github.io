@@ -229,10 +229,10 @@ if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): no button
 
-/* ---------- the newest posts on X, the account's own (no reposts, replies or quotes): x-latest.json, with their
-   pictures in img/x/, which .github/workflows/x-latest.yml brings up to date every hour (tools/x_latest.py). A post
-   with a picture shows it with its first words under it; one without, its words in the picture's place. Under each,
-   its date with its reposts and likes (read again once a day). A click opens the post on X. ---------- */
+/* ---------- the newest posts on X, the account's own with a picture (no reposts, replies, quotes, or posts of words
+   only): x-latest.json, with their pictures in img/x/, which .github/workflows/x-latest.yml brings up to date every
+   hour (tools/x_latest.py). Each shows its picture with its first words under it, then its date with its reposts and
+   likes (read again once a day). A click opens the post on X. ---------- */
 const xGrid = $('#x-grid');
 function xText() {
   xGrid.querySelectorAll('.x-item').forEach((a) => {
@@ -245,24 +245,18 @@ function xText() {
 fetch('x-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
   .then(({ posts }) => {
-    xGrid.replaceChildren(...posts.map((p) => {
-      const a = el('a', `x-item x-${p.kind}`), pic = el('span', p.img ? 'x-pic' : 'x-pic x-say');
+    const shown = posts.filter((p) => p.img);
+    xGrid.replaceChildren(...shown.map((p) => {
+      const a = el('a', `x-item x-${p.kind}`), pic = el('span', 'x-pic'), im = el('img');
       a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
       a.dataset.d = p.d; a.dataset.rt = p.rt || 0; a.dataset.like = p.like || 0;
-      if (p.img) {
-        const im = el('img');
-        im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
-        pic.append(im);
-        a.append(pic, el('span', 'x-t', p.text));
-      } else {
-        pic.append(el('span', 'x-t', p.text));
-        a.append(pic);
-      }
-      a.append(dateLine('x-d', p.d, [['rt', p.rt], ['heart', p.like]]));
+      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
+      pic.append(im);
+      a.append(pic, el('span', 'x-t', p.text), dateLine('x-d', p.d, [['rt', p.rt], ['heart', p.like]]));
       return a;
     }));
     xText();
-    $('#x-btn').hidden = !posts.length;
+    $('#x-btn').hidden = !shown.length;
     snsFit();
   })
   .catch(() => {});   // no list yet (before the X secrets are set): no button

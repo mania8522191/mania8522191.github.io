@@ -56,7 +56,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(evenIntros
 const TX_SKIP = '.site-head, .m-nav, .curtain, script, style, svg, [hidden]';
 const TX_ALSO = '.sns-badge';
 function textOnScreen() {
-  const roots = [VIEWS[view], $('.site-foot')].filter(Boolean), picked = [];
+  const roots = [VIEWS[view], $('.site-foot'), $('#sns-dock')].filter((r) => r && !r.hidden), picked = [];   // and the open corner window
   const mark = new Set();
   for (const root of roots) {
     const tw = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => (n.matches(TX_SKIP) && !n.matches(TX_ALSO) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
