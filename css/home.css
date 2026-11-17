@@ -41,11 +41,15 @@
 /* videos: three across (on phones a list, each picture beside its title); the cards are the work page's timelapse
    cards (css/works.css) with a smaller play button */
 .yt-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;width:100%;margin-top:6px;text-align:left}
-.yt-item iframe{display:block;width:100%;aspect-ratio:16 / 9;border:0;background:var(--bg-2)}
 .yt-item .tl-play{width:56px;height:56px;margin:-28px 0 0 -28px}
 .yt-item .tl-play::after{left:22px;top:17px;border-width:11px 0 11px 17px}
 .yt-t{margin:12px 0 0;font-size:14px;line-height:1.6;color:var(--fg-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.yt-d{margin:4px 0 0;font-size:12px;letter-spacing:.08em;color:var(--mute);font-variant-numeric:tabular-nums}
+.yt-d{margin:4px 0 0}
+/* a video's or a post's date, with its counts (views and likes; reposts and likes) at the other end of the line */
+.yt-d,.x-d{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:2px 8px;font-size:12px;letter-spacing:.08em;color:var(--mute);font-variant-numeric:tabular-nums}
+.st-row{display:inline-flex;gap:12px;letter-spacing:.02em}   /* too long beside the date: the counts go under it, whole */
+.st{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.st svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 /* posts: three across, cut to 4:5 as on an Instagram profile; a video or an album has Instagram's mark in its
    corner (a play sign; a filled square with an outlined one behind it) */
 .ig-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin-top:6px}
@@ -67,7 +71,6 @@
 .x-say{display:flex;align-items:center;box-sizing:border-box;padding:14px;border:1px solid rgba(208,166,90,.22);transition:border-color .35s}
 .x-say .x-t{font-size:14px;color:var(--fg);white-space:pre-line;-webkit-line-clamp:6}   /* in the square: the post's own line breaks */
 .x-item:hover .x-say{border-color:rgba(208,166,90,.6)}
-.x-d{font-size:12px;letter-spacing:.08em;color:var(--mute);font-variant-numeric:tabular-nums}
 /* phones: smaller buttons; a window takes the screen's width */
 @media (max-width:720px){
   .sns-dock{--b:46px;bottom:max(30px,calc(env(safe-area-inset-bottom,0px) + 14px))}
@@ -77,7 +80,7 @@
   .x-say .x-t{-webkit-line-clamp:5}
   .yt-grid{grid-template-columns:minmax(0,1fr);gap:14px}
   .yt-item{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:12px}
-  .yt-item .tl-card,.yt-item iframe{grid-row:span 2}
+  .yt-item .tl-card{grid-row:span 2}
   .yt-t{margin:0}
   .yt-item .tl-play{width:40px;height:40px;margin:-20px 0 0 -20px}
   .yt-item .tl-play::after{left:15px;top:11px;border-width:9px 0 9px 14px}

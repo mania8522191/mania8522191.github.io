@@ -146,12 +146,41 @@ heroPick();
 /* the corner buttons shown, top to bottom (each with its window; see below). Instagram's is left out for now, at the
    user's wish (2026-11-17): its list is still kept up to date on GitHub; put 'ig' back between them to show it again */
 const SNS_ON = ['x', 'yt'];
+/* counts under a video or a post, each after its mark: views, likes (thumb: YouTube, heart: X), reposts; written
+   short in the page's language (1.2萬, 1.2K, 1.2万), again on a language change */
+const STAT_ICON = {
+  view: '<path d="M1.5 12S5.3 5 12 5s10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/>',
+  thumb: '<path d="M7 10.5V20H3.5v-9.5H7Zm0 0 3.6-7a2.2 2.2 0 0 1 3.2 2.5L13 9.5h5.6a2 2 0 0 1 2 2.4l-1.4 6.5a2 2 0 0 1-2 1.6H7"/>',
+  heart: '<path d="M12 20s-7.5-4.4-7.5-10.2A4.1 4.1 0 0 1 8.6 5.6c1.5 0 2.7.8 3.4 1.9.7-1.1 1.9-1.9 3.4-1.9a4.1 4.1 0 0 1 4.1 4.2C19.5 15.6 12 20 12 20Z"/>',
+  rt: '<path d="M4.5 10V8.5a3 3 0 0 1 3-3h11m0 0-3-3m3 3-3 3M19.5 14v1.5a3 3 0 0 1-3 3h-11m0 0 3 3m-3-3 3-3"/>',
+};
+function stats(pairs) {
+  const row = el('span', 'st-row');
+  row.innerHTML = pairs.map(([k, n]) => `<span class="st"><svg viewBox="0 0 24 24" aria-hidden="true">${STAT_ICON[k]}</svg><span class="st-n" data-n="${Number(n) || 0}"></span></span>`).join('');
+  return row;
+}
+function statText(box) {
+  const f = new Intl.NumberFormat(HTML_LANG[LANG], { notation: 'compact', maximumFractionDigits: 1 });
+  box.querySelectorAll('.st-n').forEach((s) => { s.textContent = f.format(+s.dataset.n); });
+}
+/* a card's date, with its counts at the other end of the line */
+function dateLine(cls, d, pairs) {
+  const p = el('span', cls);
+  p.append(el('span', '', dot(d)), stats(pairs));
+  return p;
+}
 
-/* ---------- the latest three videos on the YouTube channel, newest first: yt-latest.json, which
-   .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click plays one here. ---------- */
+/* ---------- the latest three videos on the YouTube channel, newest first, with their views and likes: yt-latest.json,
+   which .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click opens the video on
+   YouTube in a new tab. ---------- */
 const ytGrid = $('#yt-grid');
 function ytText() {
-  ytGrid.querySelectorAll('.tl-card').forEach((c) => c.setAttribute('aria-label', tr('tl.play', { t: c.dataset.t })));
+  ytGrid.querySelectorAll('.yt-item').forEach((it) => {
+    const c = it.querySelector('.tl-card'), s = tr('yt.stats', { v: it.dataset.v, l: it.dataset.l });
+    c.setAttribute('aria-label', `${tr('tl.play', { t: c.dataset.t })} ${s}`);
+    it.querySelector('.st-row').title = s;
+  });
+  statText(ytGrid);
 }
 fetch('yt-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -166,8 +195,8 @@ fetch('yt-latest.json', { cache: 'no-cache' })
       im.addEventListener('load', () => { if (im.naturalWidth < 200 && !im.src.includes('hqdefault')) hq(); });   // YouTube's stand-in is 120 px
       im.src = `https://i.ytimg.com/vi/${v.id}/maxresdefault.jpg`;
       card.append(im, el('span', 'tl-play'));
-      if (window.SELF_HOSTED) ytInline(card, v.id, v.t);
-      item.append(card, el('p', 'yt-t', v.t), el('p', 'yt-d', dot(v.d)));
+      item.dataset.v = v.v || 0; item.dataset.l = v.l || 0;
+      item.append(card, el('p', 'yt-t', v.t), dateLine('yt-d', v.d, [['view', v.v], ['thumb', v.l]]));
       return item;
     }));
     ytText();
@@ -202,11 +231,16 @@ if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
 
 /* ---------- the newest posts on X, the account's own (no reposts, replies or quotes): x-latest.json, with their
    pictures in img/x/, which .github/workflows/x-latest.yml brings up to date every hour (tools/x_latest.py). A post
-   with a picture shows it with its first words under it; one without, its words in the picture's place. A click
-   opens the post on X. ---------- */
+   with a picture shows it with its first words under it; one without, its words in the picture's place. Under each,
+   its date with its reposts and likes (read again once a day). A click opens the post on X. ---------- */
 const xGrid = $('#x-grid');
 function xText() {
-  xGrid.querySelectorAll('.x-item').forEach((a) => a.setAttribute('aria-label', tr('x.post', { d: dot(a.dataset.d) })));
+  xGrid.querySelectorAll('.x-item').forEach((a) => {
+    const s = tr('x.stats', { rt: a.dataset.rt, like: a.dataset.like });
+    a.setAttribute('aria-label', `${tr('x.post', { d: dot(a.dataset.d) })} ${s}`);
+    a.querySelector('.st-row').title = s;
+  });
+  statText(xGrid);
 }
 fetch('x-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -214,7 +248,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
     xGrid.replaceChildren(...posts.map((p) => {
       const a = el('a', `x-item x-${p.kind}`), pic = el('span', p.img ? 'x-pic' : 'x-pic x-say');
       a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-      a.dataset.d = p.d;
+      a.dataset.d = p.d; a.dataset.rt = p.rt || 0; a.dataset.like = p.like || 0;
       if (p.img) {
         const im = el('img');
         im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
@@ -224,7 +258,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
         pic.append(el('span', 'x-t', p.text));
         a.append(pic);
       }
-      a.append(el('span', 'x-d', dot(p.d)));
+      a.append(dateLine('x-d', p.d, [['rt', p.rt], ['heart', p.like]]));
       return a;
     }));
     xText();
@@ -236,7 +270,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
 /* ---------- on the home page, a round button in the corner for each of those: its ring opens into its window, which
    stretches from the button toward the top left with the ring's curve at every corner, the logo staying at the bottom
    right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
-   on a touch screen, and Esc. A video playing in it stops when it closes. ---------- */
+   on a touch screen, and Esc. ---------- */
 const snsDock = $('#sns-dock');
 const SNS = SNS_ON.map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
 let snsAt = null;   // the open one
@@ -295,7 +329,7 @@ addEventListener('resize', snsFit);
 /* open s (one of SNS), or shut the open one (null) */
 function snsSet(s) {
   if (s === snsAt) return;
-  if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); ytStop(snsAt.pop); }
+  if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); }
   snsAt = s;
   if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
 }

@@ -163,9 +163,9 @@ function workText(i, piece = -1) {
   const card = $('#wk-tl-box .tl-card');
   if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }
-/* a YouTube card that plays here, in its own place, when clicked (the work page's timelapse, the home page's latest
-   videos). Changing page only hides a view, so a player still going is put back to its card then: no sound left
-   playing on a page you have left. */
+/* a YouTube card that plays here, in its own place, when clicked (the work page's timelapse; the home page's latest
+   videos open YouTube instead). Changing page only hides a view, so a player still going is put back to its card
+   then: no sound left playing on a page you have left. */
 const ytPlaying = new Map();   // player -> its card
 function ytInline(card, id, t) {
   card.addEventListener('click', (e) => {
@@ -179,9 +179,4 @@ function ytInline(card, id, t) {
     ytPlaying.set(f, card);
   });
 }
-/* put playing videos back to their cards (those inside box, or all): on a page change, and when the home page's
-   video window shuts (js/home.js) */
-function ytStop(box) {
-  ytPlaying.forEach((card, f) => { if (!box || box.contains(f)) { f.replaceWith(card); ytPlaying.delete(f); } });
-}
-addEventListener('hashchange', () => ytStop());
+addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });

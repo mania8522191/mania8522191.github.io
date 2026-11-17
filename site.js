@@ -199,6 +199,8 @@ const I18N = {
     "x.h": "最新貼文",
     "x.more": "在 X 看更多 ↗",
     "x.post": "在 X 看這則貼文（{d}）",
+    "x.stats": "{rt} 次轉推，{like} 個喜歡",
+    "yt.stats": "{v} 次觀看，{l} 個讚",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。",
     "goods.shopName": "買動漫賣場「Mania Art」",
     "goods.shopBtn": "前往賣場 ↗",
@@ -413,6 +415,8 @@ const I18N = {
     "x.h": "Latest posts",
     "x.more": "More on X ↗",
     "x.post": "View this post on X ({d})",
+    "x.stats": "{rt} reposts, {like} likes",
+    "yt.stats": "{v} views, {l} likes",
     "goods.sub": "Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.",
     "goods.shopName": "MyACG shop “Mania Art”",
     "goods.shopBtn": "Visit the shop ↗",
@@ -627,6 +631,8 @@ const I18N = {
     "x.h": "最新のポスト",
     "x.more": "Xでもっと見る ↗",
     "x.post": "Xでこのポストを見る（{d}）",
+    "x.stats": "リポスト {rt}・いいね {like}",
+    "yt.stats": "{v} 回視聴・高評価 {l}",
     "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。",
     "goods.shopName": "買動漫（MyACG）ショップ「Mania Art」",
     "goods.shopBtn": "ショップへ ↗",
@@ -2256,9 +2262,9 @@ function workText(i, piece = -1) {
   const card = $('#wk-tl-box .tl-card');
   if (card) card.setAttribute('aria-label', tr('tl.play', { t: w.yt.t }));
 }
-/* a YouTube card that plays here, in its own place, when clicked (the work page's timelapse, the home page's latest
-   videos). Changing page only hides a view, so a player still going is put back to its card then: no sound left
-   playing on a page you have left. */
+/* a YouTube card that plays here, in its own place, when clicked (the work page's timelapse; the home page's latest
+   videos open YouTube instead). Changing page only hides a view, so a player still going is put back to its card
+   then: no sound left playing on a page you have left. */
 const ytPlaying = new Map();   // player -> its card
 function ytInline(card, id, t) {
   card.addEventListener('click', (e) => {
@@ -2272,12 +2278,7 @@ function ytInline(card, id, t) {
     ytPlaying.set(f, card);
   });
 }
-/* put playing videos back to their cards (those inside box, or all): on a page change, and when the home page's
-   video window shuts (js/home.js) */
-function ytStop(box) {
-  ytPlaying.forEach((card, f) => { if (!box || box.contains(f)) { f.replaceWith(card); ytPlaying.delete(f); } });
-}
-addEventListener('hashchange', () => ytStop());
+addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });
 
 /* ==================== js/artbook.js ==================== */
 /* Art books: the list and the book page */
@@ -3065,12 +3066,41 @@ heroPick();
 /* the corner buttons shown, top to bottom (each with its window; see below). Instagram's is left out for now, at the
    user's wish (2026-11-17): its list is still kept up to date on GitHub; put 'ig' back between them to show it again */
 const SNS_ON = ['x', 'yt'];
+/* counts under a video or a post, each after its mark: views, likes (thumb: YouTube, heart: X), reposts; written
+   short in the page's language (1.2萬, 1.2K, 1.2万), again on a language change */
+const STAT_ICON = {
+  view: '<path d="M1.5 12S5.3 5 12 5s10.5 7 10.5 7-3.8 7-10.5 7S1.5 12 1.5 12Z"/><circle cx="12" cy="12" r="3"/>',
+  thumb: '<path d="M7 10.5V20H3.5v-9.5H7Zm0 0 3.6-7a2.2 2.2 0 0 1 3.2 2.5L13 9.5h5.6a2 2 0 0 1 2 2.4l-1.4 6.5a2 2 0 0 1-2 1.6H7"/>',
+  heart: '<path d="M12 20s-7.5-4.4-7.5-10.2A4.1 4.1 0 0 1 8.6 5.6c1.5 0 2.7.8 3.4 1.9.7-1.1 1.9-1.9 3.4-1.9a4.1 4.1 0 0 1 4.1 4.2C19.5 15.6 12 20 12 20Z"/>',
+  rt: '<path d="M4.5 10V8.5a3 3 0 0 1 3-3h11m0 0-3-3m3 3-3 3M19.5 14v1.5a3 3 0 0 1-3 3h-11m0 0 3 3m-3-3 3-3"/>',
+};
+function stats(pairs) {
+  const row = el('span', 'st-row');
+  row.innerHTML = pairs.map(([k, n]) => `<span class="st"><svg viewBox="0 0 24 24" aria-hidden="true">${STAT_ICON[k]}</svg><span class="st-n" data-n="${Number(n) || 0}"></span></span>`).join('');
+  return row;
+}
+function statText(box) {
+  const f = new Intl.NumberFormat(HTML_LANG[LANG], { notation: 'compact', maximumFractionDigits: 1 });
+  box.querySelectorAll('.st-n').forEach((s) => { s.textContent = f.format(+s.dataset.n); });
+}
+/* a card's date, with its counts at the other end of the line */
+function dateLine(cls, d, pairs) {
+  const p = el('span', cls);
+  p.append(el('span', '', dot(d)), stats(pairs));
+  return p;
+}
 
-/* ---------- the latest three videos on the YouTube channel, newest first: yt-latest.json, which
-   .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click plays one here. ---------- */
+/* ---------- the latest three videos on the YouTube channel, newest first, with their views and likes: yt-latest.json,
+   which .github/workflows/yt-latest.yml brings up to date every hour (tools/yt_latest.py). A click opens the video on
+   YouTube in a new tab. ---------- */
 const ytGrid = $('#yt-grid');
 function ytText() {
-  ytGrid.querySelectorAll('.tl-card').forEach((c) => c.setAttribute('aria-label', tr('tl.play', { t: c.dataset.t })));
+  ytGrid.querySelectorAll('.yt-item').forEach((it) => {
+    const c = it.querySelector('.tl-card'), s = tr('yt.stats', { v: it.dataset.v, l: it.dataset.l });
+    c.setAttribute('aria-label', `${tr('tl.play', { t: c.dataset.t })} ${s}`);
+    it.querySelector('.st-row').title = s;
+  });
+  statText(ytGrid);
 }
 fetch('yt-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -3085,8 +3115,8 @@ fetch('yt-latest.json', { cache: 'no-cache' })
       im.addEventListener('load', () => { if (im.naturalWidth < 200 && !im.src.includes('hqdefault')) hq(); });   // YouTube's stand-in is 120 px
       im.src = `https://i.ytimg.com/vi/${v.id}/maxresdefault.jpg`;
       card.append(im, el('span', 'tl-play'));
-      if (window.SELF_HOSTED) ytInline(card, v.id, v.t);
-      item.append(card, el('p', 'yt-t', v.t), el('p', 'yt-d', dot(v.d)));
+      item.dataset.v = v.v || 0; item.dataset.l = v.l || 0;
+      item.append(card, el('p', 'yt-t', v.t), dateLine('yt-d', v.d, [['view', v.v], ['thumb', v.l]]));
       return item;
     }));
     ytText();
@@ -3121,11 +3151,16 @@ if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
 
 /* ---------- the newest posts on X, the account's own (no reposts, replies or quotes): x-latest.json, with their
    pictures in img/x/, which .github/workflows/x-latest.yml brings up to date every hour (tools/x_latest.py). A post
-   with a picture shows it with its first words under it; one without, its words in the picture's place. A click
-   opens the post on X. ---------- */
+   with a picture shows it with its first words under it; one without, its words in the picture's place. Under each,
+   its date with its reposts and likes (read again once a day). A click opens the post on X. ---------- */
 const xGrid = $('#x-grid');
 function xText() {
-  xGrid.querySelectorAll('.x-item').forEach((a) => a.setAttribute('aria-label', tr('x.post', { d: dot(a.dataset.d) })));
+  xGrid.querySelectorAll('.x-item').forEach((a) => {
+    const s = tr('x.stats', { rt: a.dataset.rt, like: a.dataset.like });
+    a.setAttribute('aria-label', `${tr('x.post', { d: dot(a.dataset.d) })} ${s}`);
+    a.querySelector('.st-row').title = s;
+  });
+  statText(xGrid);
 }
 fetch('x-latest.json', { cache: 'no-cache' })
   .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
@@ -3133,7 +3168,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
     xGrid.replaceChildren(...posts.map((p) => {
       const a = el('a', `x-item x-${p.kind}`), pic = el('span', p.img ? 'x-pic' : 'x-pic x-say');
       a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-      a.dataset.d = p.d;
+      a.dataset.d = p.d; a.dataset.rt = p.rt || 0; a.dataset.like = p.like || 0;
       if (p.img) {
         const im = el('img');
         im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
@@ -3143,7 +3178,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
         pic.append(el('span', 'x-t', p.text));
         a.append(pic);
       }
-      a.append(el('span', 'x-d', dot(p.d)));
+      a.append(dateLine('x-d', p.d, [['rt', p.rt], ['heart', p.like]]));
       return a;
     }));
     xText();
@@ -3155,7 +3190,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
 /* ---------- on the home page, a round button in the corner for each of those: its ring opens into its window, which
    stretches from the button toward the top left with the ring's curve at every corner, the logo staying at the bottom
    right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
-   on a touch screen, and Esc. A video playing in it stops when it closes. ---------- */
+   on a touch screen, and Esc. ---------- */
 const snsDock = $('#sns-dock');
 const SNS = SNS_ON.map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
 let snsAt = null;   // the open one
@@ -3214,7 +3249,7 @@ addEventListener('resize', snsFit);
 /* open s (one of SNS), or shut the open one (null) */
 function snsSet(s) {
   if (s === snsAt) return;
-  if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); ytStop(snsAt.pop); }
+  if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); }
   snsAt = s;
   if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
 }

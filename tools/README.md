@@ -155,7 +155,9 @@ GitHub 上的 `.github/workflows/yt-latest.yml` 每小時跑一次，有新影�
 - 想馬上更新：GitHub 的 Actions 分頁 → Latest YouTube videos → Run workflow；或在本機跑 `python tools/yt_latest.py` 再提交
 - 改了 `tools/yt_latest.py`（例如 `DRAWING`）或這個工作流程並推上去時，也會馬上跑一次，不用等下一次排程
 - 網站超過 60 天沒有任何提交的話，GitHub 會暫停排程並寄信通知，到 Actions 分頁按一下就能恢復
-- 在頁面上點影片會直接在網站播放，背景音樂會暫停；換頁時播放中的影片會停下
+- 點影片會在新分頁開 YouTube（作品頁的縮時影片才是在網站上直接播放）
+- 每部影片的日期旁邊有觀看次數和讚數，也是從同一個公開 RSS 讀來的（不用錢）。
+  觀看次數一直在變，所以只有數字變的話，最多每 6 小時才寫一次檔（`yt-latest.json` 的 `at`），不會每小時都提交
 
 ## 首頁的 Instagram
 
@@ -203,6 +205,8 @@ GitHub 上的 `.github/workflows/x-latest.yml` 每小時跑一次，有新貼文
 
 X API 用多少付多少（要先在 X 那邊儲值），所以每次只問「上次之後的新貼文」：沒有新貼文的那一小時不扣錢。
 用自己帳號的金鑰讀自己的貼文，一則 0.001 美元，貼文裡的圖另外算（X 公告 2026-11-22 起）。用量和餘額在 https://console.x.com 看。
+每則貼文的日期旁邊有轉推數和愛心數：新貼文抓到時一起拿到，列出的 6 則每天重讀一次（只讀這幾則，`x-latest.json` 的 `counted`），
+一個月大約 0.2 美元；要更常更新，改 `tools/x_latest.py` 的 `COUNTS_EVERY`（例如每小時一次大約一個月 4 美元）。
 
 - 4 個金鑰只放在 GitHub 的 Secrets，不要貼進任何檔案或提交
 - 沒有金鑰時，排程什麼都不做，首頁也不會出現 X 按鈕

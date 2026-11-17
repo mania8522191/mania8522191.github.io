@@ -11,6 +11,8 @@ them at its owned-reads price. X bills every post it returns, so:
 - the only extra it asks for is each post's pictures.
 Keeps the six newest, newest first. A post's first picture (a video's cover) is saved in img/x/ at the size it was
 posted, because the picture links X hands out can stop working; the pictures of posts no longer listed are deleted.
+Each post also keeps its reposts ("rt") and likes ("like"). A new post comes with them; the listed ones are read
+again once a day ("counted"), just those posts and nothing else, which X bills like any read (about US$0.2 a month).
 A post deleted on X stays listed until newer ones push it out. Writes only when the list changed.
 
 .github/workflows/x-latest.yml runs this every hour with the four secrets and commits what changed. When X is busy or
@@ -39,6 +41,7 @@ PICS = os.path.join(ROOT, 'img', 'x')
 N = 6
 LOUD_HOUR = 1   # UTC: keys that stopped working fail the scheduled run in this hour only, so one email a day
 KEYS = ('X_API_KEY', 'X_API_SECRET', 'X_ACCESS_TOKEN', 'X_ACCESS_SECRET')
+COUNTS_EVERY = 24 * 3600   # seconds: how often the listed posts' reposts and likes are read again (each read is billed)
 HEAD = {'User-Agent': 'site-latest-posts'}
 
 
@@ -111,6 +114,12 @@ def download(src):
     return b''
 
 
+def metrics(t):
+    """A post's (reposts, likes)."""
+    m = t.get('public_metrics') or {}
+    return m.get('retweet_count', 0), m.get('like_count', 0)
+
+
 def words(t):
     """A post's words as shown: X's links (t.co, which stand for its pictures and other pages) left out."""
     return re.sub(r'\s*https://t\.co/\w+', '', html.unescape(t.get('text') or '')).strip()
@@ -127,7 +136,7 @@ def read_posts(old):
             raise Broken('the keys reach no account')
         uid, user = me['id'], me.get('username', '')
     params = {'exclude': 'retweets,replies', 'max_results': 10 if old else 20, 'expansions': 'attachments.media_keys',
-              'tweet.fields': 'created_at,attachments,referenced_tweets', 'media.fields': 'type,url,preview_image_url'}
+              'tweet.fields': 'created_at,attachments,referenced_tweets,public_metrics', 'media.fields': 'type,url,preview_image_url'}
     since = (old or {}).get('since')
     if since:
         params['since_id'] = since
@@ -140,8 +149,9 @@ def read_posts(old):
             continue
         keys = (t.get('attachments') or {}).get('media_keys') or []
         first = media.get(keys[0]) if keys else None
+        rt, like = metrics(t)
         post = {'id': t['id'], 'url': f"https://x.com/{user or 'i'}/status/{t['id']}", 'd': (t.get('created_at') or '')[:10],
-                'text': words(t), 'kind': 'text'}
+                'text': words(t), 'kind': 'text', 'rt': rt, 'like': like}
         if first:
             post['kind'] = 'album' if len(keys) > 1 else 'image' if first.get('type') == 'photo' else 'video'
             src = first.get('url') or first.get('preview_image_url')
@@ -160,7 +170,18 @@ def read_posts(old):
             fresh.append(post)
     known = {p['id'] for p in fresh}
     posts = (fresh + [p for p in (old or {}).get('posts', []) if p['id'] not in known])[:N]
-    return user, uid, since, posts, new
+    counted = (old or {}).get('counted', 0)
+    kept = [int(p['id']) for p in posts if p['id'] not in known]
+    if kept and time.time() - counted >= COUNTS_EVERY:   # once a day: the listed posts' counts again, and nothing more
+        again = call(f'users/{uid}/tweets', **{'exclude': 'retweets,replies', 'max_results': min(100, len(kept) + 10),
+                                              'since_id': str(min(kept) - 1), 'until_id': str(max(kept) + 1),
+                                              'tweet.fields': 'public_metrics'})
+        now = {t['id']: metrics(t) for t in again.get('data') or []}
+        for p in posts:
+            if p['id'] in now:
+                p['rt'], p['like'] = now[p['id']]
+        counted = int(time.time())
+    return user, uid, since, posts, new, counted
 
 
 def main():
@@ -169,7 +190,7 @@ def main():
         return 0
     old = json.load(open(OUT, encoding='utf-8')) if os.path.exists(OUT) else None
     try:
-        user, uid, since, posts, new = read_posts(old)
+        user, uid, since, posts, new, counted = read_posts(old)
     except Passing as e:
         print(f'::warning::X could not be read this time ({e}); the list stays as it is')
         return 0
@@ -188,7 +209,7 @@ def main():
     for f in os.listdir(PICS):
         if f not in keep:
             os.remove(os.path.join(PICS, f))
-    listed = {'user': user, 'uid': uid, 'since': since, 'posts': posts}
+    listed = {'user': user, 'uid': uid, 'since': since, 'counted': counted, 'posts': posts}
     if listed == old:
         print('no new posts')
         return 0
