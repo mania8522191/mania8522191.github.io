@@ -16,6 +16,9 @@
 .intro .sns-btn+.sns-btn{animation-delay:1.9s}
 .intro .sns-btn+.sns-btn+.sns-btn{animation-delay:2.05s}
 @keyframes roll-in{from{opacity:0;transform:translateX(36px) rotate(90deg) scale(.6)}}
+/* and the speech bubble pops out from its tail, toward the top left */
+.intro .sns-tip{animation:tip-in .8s var(--ease-out) 2.3s both}
+@keyframes tip-in{from{opacity:0;transform:scale(.3)}}
 
 /* with the View Transitions API the page change is animated there instead */
 .vt .view{animation:none}

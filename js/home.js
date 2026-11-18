@@ -395,6 +395,7 @@ function snsSet(s) {
   if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); }
   snsAt = s;
   if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
+  snsDock.classList.toggle('open', !!s);   // the speech bubble steps aside (css/home.css .sns-tip)
 }
 SNS.forEach((s) => s.btn.addEventListener('click', () => snsSet(snsAt === s ? null : s)));
 const snsOut = (e) => snsAt && e.target instanceof Element && !e.target.closest('.sns-dock');

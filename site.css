@@ -109,6 +109,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sns-btn::after{content:"";position:absolute;inset:-3px;border:3px solid var(--ring-halo);border-radius:50%;opacity:0;transition:opacity .35s;pointer-events:none}
 .sns-btn:hover::after{opacity:1}
 .sns-btn.morph::after{display:none}
+/* a speech bubble at the buttons' top left, as in a comic: a round gold bubble, black words ("最新 / 動態"), and a
+   small tail, a triangle of equal sides, coming out of its bottom right. The tail points down along the diagonal to
+   the middle of the buttons (the bubble stands back from them, so it does not seem to point at the top one only), so
+   it tells of all of them. Only a hint, it takes no clicks. It steps aside while a window is out, and comes back once
+   the window has gone back into its ring; with no button to point to, it is not there.
+   --d: the bubble's width; the tail's base lies inside the bubble, its tip out on that diagonal */
+.sns-tip{position:absolute;right:calc(100% + 17px);bottom:calc(50% + 43px);margin:0;pointer-events:none;transform-origin:95% 95%}
+.sns-tip-b{--d:62px;position:relative;display:grid;place-content:center;width:var(--d);height:var(--d);border-radius:50%;background:var(--g-gold);filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));font-family:var(--f-display);font-size:13px;line-height:1.35;letter-spacing:.12em;text-align:center;color:var(--bg);transform-origin:95% 95%;transition:opacity .35s .3s,transform .5s var(--ease-out) .3s}
+.sns-tip-b::after{content:"";position:absolute;left:50%;top:50%;width:calc(var(--d) * .26);height:calc(var(--d) * .225);margin-left:calc(var(--d) * -.13);background:inherit;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:50% 0;transform:rotate(-45deg) translateY(calc(var(--d) * .42))}
+.sns-tip-b span{position:relative;z-index:1;display:block;padding-left:.12em}   /* the letter spacing after the last letter, before the first too: in the middle */
+.sns-dock.open .sns-tip-b{opacity:0;transform:scale(.7);transition-delay:0s}
+.sns-dock:not(:has(.sns-btn:not([hidden]))) .sns-tip{display:none}
 /* the window: the button's ring stretched; its line dim like the ring's, lit while the pointer is on it or its button */
 .sns-pop{position:absolute;right:0;z-index:1;box-sizing:border-box;overflow:hidden;background:var(--ring-bg);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid var(--ring-line);border-radius:calc(var(--b) / 2);box-shadow:0 18px 50px rgba(0,0,0,.6);outline:3px solid transparent;transition:border-color .35s,outline-color .35s}
 .sns-pop.lit{border-color:var(--g-gold);outline-color:var(--ring-halo)}
@@ -166,6 +178,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* phones: smaller buttons; a window takes the screen's width */
 @media (max-width:720px){
   .sns-dock{--b:46px;bottom:max(72px,calc(env(safe-area-inset-bottom,0px) + 14px))}
+  .sns-tip-b{--d:56px;font-size:12px}
   .sns-in,#home-ig .sns-in{width:calc(100vw - 30px);padding:20px 0 0}
   .sns-body,#home-x .sns-body{padding:0 16px}
   .yt-grid{grid-template-columns:minmax(0,1fr);gap:14px}
@@ -928,6 +941,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .intro .sns-btn+.sns-btn{animation-delay:1.9s}
 .intro .sns-btn+.sns-btn+.sns-btn{animation-delay:2.05s}
 @keyframes roll-in{from{opacity:0;transform:translateX(36px) rotate(90deg) scale(.6)}}
+/* and the speech bubble pops out from its tail, toward the top left */
+.intro .sns-tip{animation:tip-in .8s var(--ease-out) 2.3s both}
+@keyframes tip-in{from{opacity:0;transform:scale(.3)}}
 
 /* with the View Transitions API the page change is animated there instead */
 .vt .view{animation:none}

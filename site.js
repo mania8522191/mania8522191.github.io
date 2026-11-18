@@ -197,6 +197,8 @@ const I18N = {
     "ig.more": "在 Instagram 看更多 ↗",
     "ig.post": "在 Instagram 看這則貼文（{d}）",
     "x.h": "最新貼文",
+    "sns.tip1": "最新",
+    "sns.tip2": "動態",
     "x.more": "在 X 看更多 ↗",
     "x.post": "在 X 看這則貼文（{d}）",
     "x.stats": "{rt} 次轉推，{like} 個喜歡",
@@ -418,6 +420,8 @@ const I18N = {
     "ig.more": "More on Instagram ↗",
     "ig.post": "View this post on Instagram ({d})",
     "x.h": "Latest posts",
+    "sns.tip1": "What’s",
+    "sns.tip2": "new",
     "x.more": "More on X ↗",
     "x.post": "View this post on X ({d})",
     "x.stats": "{rt} reposts, {like} likes",
@@ -639,6 +643,8 @@ const I18N = {
     "ig.more": "Instagramでもっと見る ↗",
     "ig.post": "Instagramでこの投稿を見る（{d}）",
     "x.h": "最新のポスト",
+    "sns.tip1": "最新",
+    "sns.tip2": "情報",
     "x.more": "Xでもっと見る ↗",
     "x.post": "Xでこのポストを見る（{d}）",
     "x.stats": "リポスト {rt}・いいね {like}",
@@ -3330,6 +3336,7 @@ function snsSet(s) {
   if (snsAt) { snsAt.btn.setAttribute('aria-expanded', 'false'); snsMove(snsAt, false); }
   snsAt = s;
   if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
+  snsDock.classList.toggle('open', !!s);   // the speech bubble steps aside (css/home.css .sns-tip)
 }
 SNS.forEach((s) => s.btn.addEventListener('click', () => snsSet(snsAt === s ? null : s)));
 const snsOut = (e) => snsAt && e.target instanceof Element && !e.target.closest('.sns-dock');
