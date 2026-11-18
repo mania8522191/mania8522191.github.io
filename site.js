@@ -2924,7 +2924,8 @@ function countUp(root) {
   });
 }
 
-/* hero parallax: the art drifts slower than the page, the name lifts and fades */
+/* hero parallax: the art drifts slower than the page, the name lifts. It stays clear as it goes: nothing waits below
+   the carousel to fade it out for (the latest posts and videos are behind the corner buttons now) */
 const hero = $('.hero'), heroMedia = $('.hero-media'), heroTxt = $('.hero-txt');
 let rafId = 0;
 function parallax() {
@@ -2934,7 +2935,6 @@ function parallax() {
   if (y > h + 60) return;
   heroMedia.style.transform = `translate3d(0,${(y * 0.35).toFixed(1)}px,0)`;
   heroTxt.style.transform = `translate3d(0,${(y * 0.18).toFixed(1)}px,0)`;
-  heroTxt.style.opacity = Math.max(0, 1 - y / (h * 0.8)).toFixed(3);
 }
 if (!CALM) addEventListener('scroll', () => { if (!rafId) rafId = requestAnimationFrame(parallax); }, { passive: true });
 
