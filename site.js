@@ -3475,6 +3475,19 @@ function snsShow(on) {
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
 /* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastPiece = -1, lastItem = null;
+/* where each page was scrolled when it was left (by its address), to come back to it there. The site places the page
+   itself on every change, so the browser's own scroll restoration is off: on Back it scrolled the page being left
+   first, under the picture about to go back into its list, and then the list was not where it had been */
+const leftAt = new Map();
+let shownAt = null;   // the address of the page on screen
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+/* back to a list (or a collection's grid) from one of its pages: just where it was left, so the picture goes back
+   into its place; if it does not show there (another page was opened since), it comes to the middle of the screen */
+function backTo(e) {
+  const y = leftAt.get(location.hash);
+  if (y != null) scrollTo(0, y);
+  if (!onScreen(e)) e.scrollIntoView({ block: 'center' });
+}
 function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
@@ -3516,11 +3529,11 @@ function apply({ h, next, idx, cat, piece = -1 }) {
   const behavior = same && !CALM ? 'smooth' : 'auto';
   let els;
   if (next === 'work') {
-    /* back from a piece's page to its collection: the grid opens at that piece */
+    /* back from a piece's page to its collection: the grid as it was left, that piece's tile in view (backTo) */
     const back = from === 'work' && lastWork === WORKS[idx].id && piece < 0 && fromPiece >= 0;
     renderWork(idx, piece); lastWork = WORKS[idx].id; lastPiece = piece;
     const tile = back && $(`#wk-imgs [data-n="${fromPiece}"]`);
-    if (tile) { tile.scrollIntoView({ block: 'center' }); els = [...pending(root), ...prime($('#wk-imgs'))]; } else { scrollTo(0, 0); els = prime(root); }
+    if (tile) { backTo(tile); els = [...pending(root), ...prime($('#wk-imgs'))]; } else { scrollTo(0, 0); els = prime(root); }
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
@@ -3528,7 +3541,7 @@ function apply({ h, next, idx, cat, piece = -1 }) {
     const switched = setCat(cat || (from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
     layoutWall();
     const cover = from === 'work' && lastWork && document.getElementById('c-' + lastWork);
-    if (cover && !cover.hidden) { cover.scrollIntoView({ block: 'center' }); els = pending(root); }
+    if (cover && !cover.hidden) { backTo(cover); els = pending(root); }
     else {
       scrollTo({ top: 0, behavior });
       els = !same ? prime(root) : switched ? [...pending(root), ...prime(wall), ...prime(nsfwBox)] : pending(root);   // a new category flies in
@@ -3538,7 +3551,7 @@ function apply({ h, next, idx, cat, piece = -1 }) {
   } else if (next === 'artbook') {
     if (!abBuilt) renderBooks();
     const card = from === 'book' && lastBook && document.getElementById('abc-' + lastBook);
-    if (card) { card.scrollIntoView({ block: 'center' }); els = pending(root); }
+    if (card) { backTo(card); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
     abYearsUpdate();
   } else if (next === 'catalog') {
@@ -3546,7 +3559,7 @@ function apply({ h, next, idx, cat, piece = -1 }) {
   } else if (next === 'goods') {
     if (!goodsHeadings.size) renderGoods();
     const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && document.getElementById('gc-' + lastItem);
-    if (card) { card.scrollIntoView({ block: 'center' }); els = pending(root); }
+    if (card) { backTo(card); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
   } else {
     scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root);
@@ -3609,7 +3622,9 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => move
 /* page change: cross-fade with the View Transitions API, and morph the clicked image into the next page */
 function route() {
   if (curtainBusy) return;
+  if (shownAt !== null && shownAt !== location.hash) leftAt.set(shownAt, scrollY);   // the page being left
   const r = parse();
+  shownAt = location.hash;   // (parse may have rewritten an old address)
   const from = view;
   if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   /* inside a collection: between its grid and a piece's page, the picture morphs too */
