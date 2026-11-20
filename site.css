@@ -30,7 +30,7 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{background:var(--bg);scrollbar-gutter:stable}   /* the scrollbar's room stays when a viewer locks the page, so the page behind does not shift */
+html{background:var(--bg);scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent}   /* the scrollbar's room stays when a viewer locks the page, so the page behind does not shift; and no box flashes over what a finger taps on a phone (the site has its own feedback; keyboard focus rings stay) */
 body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 a:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
@@ -329,7 +329,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .b3-foil::after{background:radial-gradient(15cqmax 19cqmax at var(--hx) var(--hy),rgba(255,255,255,.9),rgba(255,255,255,0) 75%),radial-gradient(58cqmax 68cqmax at var(--hx) var(--hy),rgba(175,212,255,.92),rgba(95,152,255,.6) 30%,rgba(60,120,255,.24) 60%,rgba(60,120,255,0));opacity:var(--hi,0)}
 /* book page: the cover stands at the top as a 3D book; a click opens the viewer */
 .bk-cover{display:grid;justify-items:center;gap:clamp(8px,1.4vw,16px);margin:calc(-1 * clamp(16px,3vw,40px)) 0 clamp(44px,6vw,92px)}
-.bk-stage{position:relative;display:grid;place-items:center;width:100%;padding:clamp(26px,4.5vw,60px) 0 clamp(44px,6vw,80px);border:0;background:radial-gradient(40% 48% at 50% 48%,rgba(255,255,255,.07),rgba(255,255,255,0) 72%);color:inherit;font:inherit;cursor:zoom-in;-webkit-tap-highlight-color:transparent}
+.bk-stage{position:relative;display:grid;place-items:center;width:100%;padding:clamp(26px,4.5vw,60px) 0 clamp(44px,6vw,80px);border:0;background:radial-gradient(40% 48% at 50% 48%,rgba(255,255,255,.07),rgba(255,255,255,0) 72%);color:inherit;font:inherit;cursor:zoom-in}
 .bk-stage .b3{width:min(84vw,700px,calc(56vh * var(--arn)))}
 .bk-stage:focus-visible{outline:1px solid var(--fg);outline-offset:-1px}
 .bk-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}
