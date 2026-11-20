@@ -4,6 +4,11 @@ let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
+  if (h === 'w-' + FF47_CATALOG.id) {
+    history.replaceState(null, '', '#g-ff47-catalog');
+    h = 'g-ff47-catalog';
+  }
+  if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
@@ -62,13 +67,17 @@ function apply({ h, next, idx, cat, piece = -1 }) {
     if (card) { card.scrollIntoView({ block: 'center' }); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
     abYearsUpdate();
+  } else if (next === 'catalog') {
+    renderCatalog(); scrollTo(0, 0); els = prime(root);
   } else if (next === 'goods') {
-    const card = from === 'item' && lastItem && document.getElementById('gc-' + lastItem);
+    if (!goodsHeadings.size) renderGoods();
+    const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && document.getElementById('gc-' + lastItem);
     if (card) { card.scrollIntoView({ block: 'center' }); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
   } else {
     scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root);
   }
+  if (next === 'goods') goodsYearsUpdate();
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
@@ -128,7 +137,7 @@ function route() {
   if (curtainBusy) return;
   const r = parse();
   const from = view;
-  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
+  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   /* inside a collection: between its grid and a piece's page, the picture morphs too */
   const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
   const fromPiece = lastPiece;

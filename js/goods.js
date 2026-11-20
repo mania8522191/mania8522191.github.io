@@ -9,9 +9,15 @@ function price(g, label) {
   return p;
 }
 
-/* ---------- goods list ---------- */
-const ggrid = $('#g-grid');
-GOODS.forEach((g, i) => {
+/* ---------- goods list: by event, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
+   `ev`, "FF47") is a section under its heading; the FF47 catalog (FF47_CATALOG) comes first in its event and opens
+   its own page (#g-ff47-catalog). Only events that have goods or the catalog are listed ---------- */
+const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
+const goodsHeadings = new Map();   // each event's heading, in the order shown
+const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
+let goodsOrder = 'new';
+/* a goods card: its picture, then its name, contents and price (fillGoodsCard, again in another language) */
+function goodsCard(g, i) {
   const a = el('a', 'g-card');
   a.href = '#g-' + g.slug;
   a.id = 'gc-' + g.slug;
@@ -24,13 +30,102 @@ GOODS.forEach((g, i) => {
   box.appendChild(img);
   a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
   fillGoodsCard(a, g);
-  ggrid.appendChild(a);
-});
+  return a;
+}
 function fillGoodsCard(a, g) {
   a.querySelector('.g-name').textContent = L(g.name);
   a.querySelector('.g-meta').textContent = L(g.meta);
   a.querySelector('.price').replaceWith(price(g, false));
 }
+
+/* the catalog's place in its event: a picture of the goods, its name and how many pages, an arrow to its page */
+function catalogCover() {
+  const a = el('a', 'catalog-cover');
+  a.id = 'gc-ff47-catalog';
+  a.href = '#g-ff47-catalog';
+  const img = el('img');
+  img.src = 'img/goods-set-a.webp';
+  [img.width, img.height] = GOODS[bySlug['set-a']].dims;
+  img.alt = '';
+  const caption = el('span', 'catalog-caption');
+  const title = el('span', 'g-name', tr('goods.catalog'));
+  title.dataset.i18n = 'goods.catalog';
+  const count = el('span', 'g-meta', pagesText(FF47_CATALOG.dims.length));
+  count.id = 'catalog-cover-count';
+  caption.append(title, count);
+  const arrow = el('span', 'catalog-arrow', '→');
+  arrow.setAttribute('aria-hidden', 'true');
+  a.append(img, caption, arrow);
+  return a;
+}
+/* the list in the order picked (the newest event first, or the oldest), and the bar's buttons to match */
+function renderGoods() {
+  const editions = goodsOrder === 'new' ? goodsEditions : [...goodsEditions].reverse();
+  goodsHeadings.clear();
+  goodsNav.replaceChildren();
+  goodsList.replaceChildren(...editions.map((code) => {
+    const section = el('section', 'ab-year');
+    const heading = el('h2', 'wall-year');
+    heading.dataset.rv = 'year';
+    heading.append(el('span', 'wy-n', code), el('span', 'wy-line'));
+    goodsHeadings.set(code, heading);
+    section.append(heading);
+    const button = el('button', '', code);
+    button.type = 'button';
+    button.dataset.y = code;
+    goodsNav.append(button);
+    if (code === FF47_CATALOG.ev) section.append(catalogCover());
+    const items = GOODS.filter((g) => g.ev === code);
+    if (items.length) {
+      const grid = el('div', 'g-grid');
+      grid.append(...items.map(goodsCard));
+      section.append(grid);
+    }
+    return section;
+  }));
+  goodsText();
+}
+/* the words that change with the language: the sort menu's, and the catalog's page count */
+function goodsText() {
+  goodsSortText(goodsOrder, goodsEditions[goodsEditions.length - 1], goodsEditions[0]);
+  const count = $('#catalog-cover-count');
+  if (count) count.textContent = pagesText(FF47_CATALOG.dims.length);
+}
+/* the bar: a button goes to its event, the one in view lights up; another order lays the list out again, and the
+   buttons slide to their new places */
+const goodsYearsUpdate = timelineNavigation(goodsBar, goodsList, goodsHeadings);
+const goodsSortText = sortControl($('#g-sort'), (dir) => {
+  if (dir === goodsOrder) return;
+  const was = yearSpots(goodsNav);
+  goodsOrder = dir;
+  renderGoods();
+  watch(prime(goodsList));
+  slideYears(goodsNav, was);
+  const top = goodsList.getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - goodsBar.offsetHeight - 14;
+  if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
+  goodsYearsUpdate();
+});
+/* ---------- the FF47 catalog's page: its date, page count and tags, then its pages one under another, as on a work's
+   page; a page opens in a picture window ---------- */
+function renderCatalog() {
+  const catalog = FF47_CATALOG;
+  $('#catalog-date').textContent = tr('wk.posted', { d: dot(catalog.d) });
+  $('#catalog-count').textContent = pagesText(catalog.dims.length);
+  $('#catalog-tags').replaceChildren(...catalog.tags.map((tag) => el('li', '', '#' + tag)));
+  $('#catalog-pages').replaceChildren(...catalog.dims.map(([width, height], i) => {
+    const img = el('img');
+    img.src = src(catalog.id, i);
+    img.width = width; img.height = height;
+    img.alt = tr('wk.imgAlt', { t: tr('goods.catalog'), n: i + 1, m: catalog.dims.length });
+    img.loading = i < 2 ? 'eager' : 'lazy';
+    img.decoding = 'async';
+    if (i) img.dataset.rv = 'up';
+    return img;
+  }));
+}
+$('#catalog-pages').addEventListener('click', (e) => {
+  if (e.target.matches('img')) zvOpen('catalog', [...e.currentTarget.children].indexOf(e.target), e.target);
+});
 
 /* ---------- goods item page ---------- */
 function renderItem(i) {

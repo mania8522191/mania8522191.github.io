@@ -510,7 +510,22 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* goods list (template 2 "selected work" captions) */
 .goods{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
-.g-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(44px,5vw,72px) clamp(20px,3vw,40px);margin-top:clamp(48px,6vw,88px)}
+.g-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(44px,5vw,72px) clamp(20px,3vw,40px);margin-top:0}
+/* by event (js/goods.js): the art books' timeline, each event under its heading, and their bar with the sort menu
+   at its end */
+#g-list h2{margin:0;font-weight:400}
+#g-events .years-row{display:flex;align-items:center;gap:8px}
+#g-events .years-in{flex:1;min-width:0;margin-right:0}
+#g-events .sortx{position:relative;top:auto;transform:none;flex:none}
+/* an event's catalog, first in its section: a picture, its name and page count, an arrow that nudges on hover */
+.catalog-cover{display:grid;grid-template-columns:minmax(0,40%) 1fr auto;align-items:center;gap:clamp(14px,3vw,44px);padding-right:clamp(16px,4vw,56px);border-block:1px solid var(--line);text-decoration:none}
+.catalog-cover img{display:block;width:100%;height:auto}
+.catalog-caption{display:grid;gap:6px}
+.catalog-caption .g-name{font-size:clamp(19px,3vw,36px)}
+.catalog-arrow{color:var(--g-gold);transition:transform .4s var(--ease-out)}
+.catalog-cover:hover .catalog-arrow{transform:translateX(4px)}
+/* the catalog's own page: each page as big as the screen allows, like a work's pictures */
+#catalog-pages img{width:min(100%,1200px,calc(100svh - 100px));height:auto}
 .g-card{display:grid;align-content:start;justify-items:center;gap:6px;text-align:center;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 24px)}
 /* cards in one row share their rows, so names, descriptions and prices line up even when one name wraps */
 @supports (grid-template-rows:subgrid){.g-grid{row-gap:0;margin-bottom:calc(-1 * clamp(44px,5vw,72px))}.g-card{grid-row:span 4;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.g-card .g-name{align-self:end}.g-card .g-meta,.g-card .price{align-self:start}}

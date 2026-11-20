@@ -39,7 +39,7 @@ def referenced():
             [js(f) for f in os.listdir(os.path.join(C.ROOT, 'js')) if f.endswith('.js')]
     for t in texts:   # paths written out in full
         refs |= set(re.findall(r'img/[\w./-]+\.(?:webp|png|jpg|gif|svg)', t))
-    for w in C.load('WORKS'):
+    for w in [*C.load('WORKS'), C.load('FF47_CATALOG')]:
         for n, d in enumerate(w['dims']):
             name = f'{w["id"]}{"_p" + str(n) if n else ""}.webp'
             refs.add(f'img/{name}')

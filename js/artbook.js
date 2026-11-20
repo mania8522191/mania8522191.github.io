@@ -1,7 +1,7 @@
 /* Art books: the list and the book page */
 /* ---------- art books: one per Fancy Frontier, on a timeline with a year bar and sort menu like the works wall ---------- */
 const NSFW_URL = 'https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing';
-const abList = $('#ab-list'), abYearsIn = $('#ab-years-in'), abYearsBar = $('#ab-years'), abYearsProg = $('#ab-years-prog');
+const abList = $('#ab-list'), abYearsIn = $('#ab-years-in'), abYearsBar = $('#ab-years');
 const abHead = new Map();
 let abSort = 'new', abBuilt = false, lastBook = null;
 const abBooks = () => (abSort === 'old' ? [...BOOKS].reverse() : BOOKS);   // BOOKS is newest first
@@ -82,30 +82,7 @@ const abSortText = sortControl($('#ab-sort'), (dir) => {
   const top = abList.getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - abYearsBar.offsetHeight - 14;
   if (scrollY > top + 4) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
 });
-abYearsIn.addEventListener('click', (e) => {
-  const b = e.target.closest('button');
-  if (!b) return;
-  const top = abHead.get(b.dataset.y).getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - abYearsBar.offsetHeight - 14;
-  scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
-});
-/* the year in view lights up in the bar and the gold line shows how far down the list you are */
-let abRaf = 0;
-function abYearsUpdate() {
-  abRaf = 0;
-  if (VIEWS.artbook.hidden) return;
-  const line = abYearsBar.getBoundingClientRect().bottom + 48;
-  let cur = '';
-  for (const [y, hd] of abHead) { if (cur && hd.getBoundingClientRect().top > line) break; cur = y; }
-  abYearsIn.querySelectorAll('button').forEach((b) => {
-    const on = String(b.dataset.y === cur);
-    if (b.getAttribute('aria-current') === on) return;
-    b.setAttribute('aria-current', on);
-    if (on === 'true' && abYearsIn.scrollWidth > abYearsIn.clientWidth) abYearsIn.scrollTo({ left: b.offsetLeft - (abYearsIn.clientWidth - b.offsetWidth) / 2, behavior: CALM ? 'auto' : 'smooth' });
-  });
-  const r = abList.getBoundingClientRect();
-  abYearsProg.style.transform = `scaleX(${Math.min(1, Math.max(0, (line - r.top) / r.height)).toFixed(4)})`;
-}
-addEventListener('scroll', () => { if (!abRaf) abRaf = requestAnimationFrame(abYearsUpdate); }, { passive: true });
+const abYearsUpdate = timelineNavigation(abYearsBar, abList, abHead);
 
 /* ---------- single art book: the cover as a 3D book, then under "Preview" the cover spread and the inside pages; blurred pages lead to the album ---------- */
 fitWatch($('#bk-title'), 9); fitWatch($('#bk-prev-t'), 10); fitWatch($('#bk-next-t'), 10);

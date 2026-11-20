@@ -159,6 +159,45 @@ function sortControl(box, onPick) {
     btn.setAttribute('aria-label', tr('sort.label', { v }));
   };
 }
+/* a timeline's bar (the art books', the goods'): a button scrolls to its year or event; the one in view lights up in
+   the bar, and the gold line shows how far down the list you are. headings: each button's key to its heading, in
+   the order shown. Returns the update, to call when the list is shown or laid out again */
+function timelineNavigation(bar, list, headings) {
+  const nav = bar.querySelector('.years-in');
+  const progress = bar.querySelector('.years-prog i');
+  nav.addEventListener('click', (e) => {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const heading = headings.get(button.dataset.y);
+    const top = heading.getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - bar.offsetHeight - 14;
+    scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
+  });
+  let frame = 0;
+  function update() {
+    frame = 0;
+    if (!bar.offsetHeight || !headings.size) return;
+    const line = bar.getBoundingClientRect().bottom + 48;
+    let current;
+    for (const [key, heading] of headings) {
+      if (current && heading.getBoundingClientRect().top > line) break;
+      current = key;
+    }
+    for (const button of nav.querySelectorAll('button')) {
+      const on = String(button.dataset.y === current);
+      if (button.getAttribute('aria-current') === on) continue;
+      button.setAttribute('aria-current', on);
+      if (on === 'true' && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({ left: nav.scrollLeft + button.getBoundingClientRect().left - nav.getBoundingClientRect().left - (nav.clientWidth - button.offsetWidth) / 2, behavior: CALM ? 'auto' : 'smooth' });
+      }
+    }
+    const rect = list.getBoundingClientRect();
+    progress.style.transform = `scaleX(${Math.min(1, Math.max(0, (line - rect.top) / rect.height)).toFixed(4)})`;
+  }
+  const schedule = () => { if (!frame && bar.offsetHeight) frame = requestAnimationFrame(update); };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  return update;
+}
 /* after a re-sort the year buttons slide from where they were to their new places */
 const yearSpots = (bar) => new Map([...bar.querySelectorAll('button')].map((y) => [y.dataset.y, y.getBoundingClientRect().left]));
 function slideYears(bar, was) {

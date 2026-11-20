@@ -143,13 +143,11 @@ function workText(i, piece = -1) {
   } else {
     box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
   }
-  /* cross-link: goods made from this piece, or the goods page for the catalog itself */
+  /* cross-link: the goods made from this piece */
   const gl = $('#wk-goods');
   const made = GOODS.filter((g) => g.works.includes(w.id));
   gl.replaceChildren();
-  if (w.id === '148499079') {
-    const a = el('a', '', tr('wk.goodsLink')); a.href = '#goods'; gl.append(a);
-  } else if (made.length) {
+  if (made.length) {
     gl.append(document.createTextNode(tr('wk.madeGoods')));
     made.forEach((g, k) => {
       if (k) gl.append(document.createTextNode(tr('list.sep')));

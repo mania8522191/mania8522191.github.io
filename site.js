@@ -15,7 +15,6 @@ const WORKS = [
   {"id":"151696428","t":"星街すいせい「全衣装」","ym":"2023.02","d":"2026-11-05","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[1200,1200,2560,2560],[1500,1500,7000,7000]],"pos":"50% 35%","proc":[["151696428.webp",1000,1000],["151696428_p1.webp",1000,1000,2100,2100]],"cat":"fan"},
   {"id":"151695370","t":"星街すいせい「SHOUT IN CRISIS」","ym":"2023.02","d":"2026-11-05","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー"],"dims":[[858,1200,5000,7000]],"pos":"50% 35%","proc":[["151695370.webp",1000,1400,1500,2100]],"cat":"fan"},
   {"id":"148923743","t":"星街すいせい×AZKi-「AZKiと未来へ」","ym":"2026.08","d":"2026-08-27","lab":"hololive","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","AZKi"],"dims":[[900,2728,3000,9094]],"pos":"50% 31%","yt":{"id":"4jt6jOjVMuA","dur":"22:20","t":"星街すいせい×AZKi-「AZKiと未来へ」PROCESS TIMELAPSE- 202608"},"cat":"fan"},
-  {"id":"148499079","t":"台湾FF47お品書き","ym":"","d":"2026-08-16","lab":"Fancy Frontier 47","tags":["バーチャルYouTuber","星街すいせい","さくらみこ","宝鐘マリン","一伊那尓栖","仲町あられ"],"dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]],"pos":"50% 35%","cat":"fan"},
   {"id":"148494165","t":"星街すいせい×花譜-KAF-「DEADPOOL」","ym":"2026.08","d":"2026-08-16","lab":"hololive × 神椿スタジオ","tags":["バーチャルYouTuber","ホロライブ","hololive","星街すいせい","ほしまちぎゃらりー","神椿スタジオ"],"dims":[[900,2728,3000,9094]],"pos":"50% 29%","yt":{"id":"CqvN1sByvPU","dur":"21:41","t":"星街すいせい×花譜-KAF-「DEADPOOL」PROCESS TIMELAPSE- 202608"},"cat":"fan"},
   {"id":"148313240","t":"チビキーホルダー","ym":"2026.08","d":"2026-08-12","lab":"hololive","tags":["バーチャルYouTuber","hololive","星街すいせい","ほしまちぎゃらりー","HololiveEN","一伊那尓栖"],"dims":[[1000,1001],[1000,1001],[1000,1001],[1000,1001]],"pos":"50% 50%","yt":{"id":"T3Oaep-xdDw","dur":"12:42","t":"チビキーホルダーPROCESS TIMELAPSE- 202608"},"cat":"fan"},
   {"id":"148068024","t":"あのそよ「ブレンドの香る窓辺で」","ym":"2026.08","d":"2026-08-06","lab":"BanG Dream!","tags":["バンドリ","BanG_Dream!","千早愛音","長崎そよ","あのそよ"],"dims":[[1200,800,4500,3000],[1500,12000]],"pos":"50% 35%","yt":{"id":"JLrV-DkgcAM","dur":"57:59","t":"あのそよ「ブレンドの香る窓辺で」PROCESS TIMELAPSE- 202608"},"cat":"fan"},
@@ -105,16 +104,20 @@ const HOME_SLIDES = [
   {"id":"148068024","pos":"40% 30%"}
 ];
 
+/* the FF47 catalog (お品書き): with the goods, on a page of its own (#g-ff47-catalog), not on the works wall; its old
+   address (#w-148499079) still leads there. ev: the event it is listed under on the goods page */
+const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","tags":["バーチャルYouTuber","星街すいせい","さくらみこ","宝鐘マリン","一伊那尓栖","仲町あられ"],"dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]]};
+/* goods, the newest event first (ev: the event, its section on the goods page) */
 const GOODS = [
-  {"slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1215,810]},
-  {"slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1215,810]},
-  {"slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1305,870]},
-  {"slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1396,930]},
-  {"slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1290,860]},
-  {"slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1350,900]},
-  {"slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1350,900]},
-  {"slug":"keychain","name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1170,780]},
-  {"slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1395,930]}
+  {"ev":"FF47","slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1215,810]},
+  {"ev":"FF47","slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1215,810]},
+  {"ev":"FF47","slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1305,870]},
+  {"ev":"FF47","slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1396,930]},
+  {"ev":"FF47","slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1290,860]},
+  {"ev":"FF47","slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1350,900]},
+  {"ev":"FF47","slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1350,900]},
+  {"ev":"FF47","slug":"keychain","name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1170,780]},
+  {"ev":"FF47","slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1395,930]}
 ];
 
 /* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
@@ -154,7 +157,7 @@ const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
 
 /* a url() for a CSS custom property, made absolute so it points at the same file whichever stylesheet uses it */
 const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
@@ -203,7 +206,9 @@ const I18N = {
     "x.post": "在 X 看這則貼文（{d}）",
     "x.stats": "{rt} 次轉推，{like} 個喜歡",
     "yt.stats": "{v} 次觀看，{l} 個讚",
-    "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。",
+    "goods.sub": "依場次瀏覽周邊與品書。標示為場次價格，通販價格及庫存請以各賣場為準。",
+    "goods.events": "依場次瀏覽",
+    "goods.catalog": "FF47 品書",
     "goods.shopName": "買動漫賣場「Mania Art」",
     "goods.shopZjm": "買動漫賣場「宅即門」馬尼 MANIA 專區",
     "goods.shopMelon": "Melonbooks 社團「Mania」",
@@ -426,7 +431,9 @@ const I18N = {
     "x.post": "View this post on X ({d})",
     "x.stats": "{rt} reposts, {like} likes",
     "yt.stats": "{v} views, {l} likes",
-    "goods.sub": "Goods released at Fancy Frontier 47 (Aug 21–22, 2026 · Taipei Expo Dome · booth J44). Prices shown are event prices; for mail order, stock and prices follow the MyACG shop.",
+    "goods.sub": "Browse goods and catalogs by event. Prices are from the event. See each shop for current prices and stock.",
+    "goods.events": "Browse by event",
+    "goods.catalog": "FF47 Catalog",
     "goods.shopName": "MyACG shop “Mania Art”",
     "goods.shopZjm": "MyACG shop “宅即門” · 馬尼 MANIA",
     "goods.shopMelon": "Melonbooks circle “Mania”",
@@ -649,7 +656,9 @@ const I18N = {
     "x.post": "Xでこのポストを見る（{d}）",
     "x.stats": "リポスト {rt}・いいね {like}",
     "yt.stats": "{v} 回視聴・高評価 {l}",
-    "goods.sub": "Fancy Frontier 47（2026.08.21–22・花博争艶館・スペース J44）で頒布したグッズです。表示はイベント頒布価格です。通販の在庫・価格は買動漫（MyACG）ショップでご確認ください。",
+    "goods.sub": "イベント別のグッズとお品書き。表示はイベント頒布価格です。通販価格と在庫は各ショップでご確認ください。",
+    "goods.events": "イベント別に見る",
+    "goods.catalog": "FF47 お品書き",
     "goods.shopName": "買動漫（MyACG）ショップ「Mania Art」",
     "goods.shopZjm": "買動漫（MyACG）ショップ「宅即門」馬尼 MANIA",
     "goods.shopMelon": "メロンブックス サークル「Mania」",
@@ -1038,6 +1047,14 @@ const zwLayer = $('#zw-layer'), zvDock = $('#zv-dock');
 const ZV_MIN_W = 240, ZV_MIN_H = 180;   // the smallest a window can be made
 const ZV_TOP = 3;   // the wheel zooms up to this many times a picture's actual size
 const ZV_POP = new Set(['shots', 'chars', 'cards']);   // the game page's pictures: the pop-up
+function galleryPages(w, t) {
+  return w.dims.map(([W, H, ZW, ZH], n) => ({
+    src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
+    w: W, h: H, zw: ZW || W,
+    no: `${n + 1} / ${w.dims.length}`, cap: t,
+    alt: w.dims.length > 1 ? tr('zv.workAlt', { t, n: n + 1 }) : t,
+  }));
+}
 const ZV_SETS = {   // what a window steps through; made again in another language
   proc: (id) => {   // a work's process animations; the full-size one, where there is one, on zoom
     const w = WORKS[byId[id]], list = w.proc || [];
@@ -1048,14 +1065,10 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
       alt: tr('proc.alt', { t: L(w.t) }),
     }));
   },
+  catalog: () => galleryPages(FF47_CATALOG, tr('goods.catalog')),
   work: (id) => {
-    const w = WORKS[byId[id]], t = L(w.t);
-    return w.dims.map(([W, H, ZW, ZH], n) => ({
-      src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
-      w: W, h: H, zw: ZW || W,
-      no: `${n + 1} / ${w.dims.length}`, cap: t,
-      alt: w.dims.length > 1 ? tr('zv.workAlt', { t, n: n + 1 }) : t,
-    }));
+    const w = WORKS[byId[id]];
+    return galleryPages(w, L(w.t));
   },
   piece: (key) => {   // a collection's piece (key "<work id>/<piece from 0>"): its finished picture, other versions, sketch
     const [id, p] = key.split('/'), w = WORKS[byId[id]], n = +p, t = L(w.t), list = pieceImgs(w, n);
@@ -1620,9 +1633,15 @@ function price(g, label) {
   return p;
 }
 
-/* ---------- goods list ---------- */
-const ggrid = $('#g-grid');
-GOODS.forEach((g, i) => {
+/* ---------- goods list: by event, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
+   `ev`, "FF47") is a section under its heading; the FF47 catalog (FF47_CATALOG) comes first in its event and opens
+   its own page (#g-ff47-catalog). Only events that have goods or the catalog are listed ---------- */
+const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
+const goodsHeadings = new Map();   // each event's heading, in the order shown
+const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
+let goodsOrder = 'new';
+/* a goods card: its picture, then its name, contents and price (fillGoodsCard, again in another language) */
+function goodsCard(g, i) {
   const a = el('a', 'g-card');
   a.href = '#g-' + g.slug;
   a.id = 'gc-' + g.slug;
@@ -1635,13 +1654,102 @@ GOODS.forEach((g, i) => {
   box.appendChild(img);
   a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
   fillGoodsCard(a, g);
-  ggrid.appendChild(a);
-});
+  return a;
+}
 function fillGoodsCard(a, g) {
   a.querySelector('.g-name').textContent = L(g.name);
   a.querySelector('.g-meta').textContent = L(g.meta);
   a.querySelector('.price').replaceWith(price(g, false));
 }
+
+/* the catalog's place in its event: a picture of the goods, its name and how many pages, an arrow to its page */
+function catalogCover() {
+  const a = el('a', 'catalog-cover');
+  a.id = 'gc-ff47-catalog';
+  a.href = '#g-ff47-catalog';
+  const img = el('img');
+  img.src = 'img/goods-set-a.webp';
+  [img.width, img.height] = GOODS[bySlug['set-a']].dims;
+  img.alt = '';
+  const caption = el('span', 'catalog-caption');
+  const title = el('span', 'g-name', tr('goods.catalog'));
+  title.dataset.i18n = 'goods.catalog';
+  const count = el('span', 'g-meta', pagesText(FF47_CATALOG.dims.length));
+  count.id = 'catalog-cover-count';
+  caption.append(title, count);
+  const arrow = el('span', 'catalog-arrow', '→');
+  arrow.setAttribute('aria-hidden', 'true');
+  a.append(img, caption, arrow);
+  return a;
+}
+/* the list in the order picked (the newest event first, or the oldest), and the bar's buttons to match */
+function renderGoods() {
+  const editions = goodsOrder === 'new' ? goodsEditions : [...goodsEditions].reverse();
+  goodsHeadings.clear();
+  goodsNav.replaceChildren();
+  goodsList.replaceChildren(...editions.map((code) => {
+    const section = el('section', 'ab-year');
+    const heading = el('h2', 'wall-year');
+    heading.dataset.rv = 'year';
+    heading.append(el('span', 'wy-n', code), el('span', 'wy-line'));
+    goodsHeadings.set(code, heading);
+    section.append(heading);
+    const button = el('button', '', code);
+    button.type = 'button';
+    button.dataset.y = code;
+    goodsNav.append(button);
+    if (code === FF47_CATALOG.ev) section.append(catalogCover());
+    const items = GOODS.filter((g) => g.ev === code);
+    if (items.length) {
+      const grid = el('div', 'g-grid');
+      grid.append(...items.map(goodsCard));
+      section.append(grid);
+    }
+    return section;
+  }));
+  goodsText();
+}
+/* the words that change with the language: the sort menu's, and the catalog's page count */
+function goodsText() {
+  goodsSortText(goodsOrder, goodsEditions[goodsEditions.length - 1], goodsEditions[0]);
+  const count = $('#catalog-cover-count');
+  if (count) count.textContent = pagesText(FF47_CATALOG.dims.length);
+}
+/* the bar: a button goes to its event, the one in view lights up; another order lays the list out again, and the
+   buttons slide to their new places */
+const goodsYearsUpdate = timelineNavigation(goodsBar, goodsList, goodsHeadings);
+const goodsSortText = sortControl($('#g-sort'), (dir) => {
+  if (dir === goodsOrder) return;
+  const was = yearSpots(goodsNav);
+  goodsOrder = dir;
+  renderGoods();
+  watch(prime(goodsList));
+  slideYears(goodsNav, was);
+  const top = goodsList.getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - goodsBar.offsetHeight - 14;
+  if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
+  goodsYearsUpdate();
+});
+/* ---------- the FF47 catalog's page: its date, page count and tags, then its pages one under another, as on a work's
+   page; a page opens in a picture window ---------- */
+function renderCatalog() {
+  const catalog = FF47_CATALOG;
+  $('#catalog-date').textContent = tr('wk.posted', { d: dot(catalog.d) });
+  $('#catalog-count').textContent = pagesText(catalog.dims.length);
+  $('#catalog-tags').replaceChildren(...catalog.tags.map((tag) => el('li', '', '#' + tag)));
+  $('#catalog-pages').replaceChildren(...catalog.dims.map(([width, height], i) => {
+    const img = el('img');
+    img.src = src(catalog.id, i);
+    img.width = width; img.height = height;
+    img.alt = tr('wk.imgAlt', { t: tr('goods.catalog'), n: i + 1, m: catalog.dims.length });
+    img.loading = i < 2 ? 'eager' : 'lazy';
+    img.decoding = 'async';
+    if (i) img.dataset.rv = 'up';
+    return img;
+  }));
+}
+$('#catalog-pages').addEventListener('click', (e) => {
+  if (e.target.matches('img')) zvOpen('catalog', [...e.currentTarget.children].indexOf(e.target), e.target);
+});
 
 /* ---------- goods item page ---------- */
 function renderItem(i) {
@@ -1880,6 +1988,45 @@ function sortControl(box, onPick) {
     box.querySelector('.sortx-v').textContent = v;
     btn.setAttribute('aria-label', tr('sort.label', { v }));
   };
+}
+/* a timeline's bar (the art books', the goods'): a button scrolls to its year or event; the one in view lights up in
+   the bar, and the gold line shows how far down the list you are. headings: each button's key to its heading, in
+   the order shown. Returns the update, to call when the list is shown or laid out again */
+function timelineNavigation(bar, list, headings) {
+  const nav = bar.querySelector('.years-in');
+  const progress = bar.querySelector('.years-prog i');
+  nav.addEventListener('click', (e) => {
+    const button = e.target.closest('button');
+    if (!button) return;
+    const heading = headings.get(button.dataset.y);
+    const top = heading.getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - bar.offsetHeight - 14;
+    scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
+  });
+  let frame = 0;
+  function update() {
+    frame = 0;
+    if (!bar.offsetHeight || !headings.size) return;
+    const line = bar.getBoundingClientRect().bottom + 48;
+    let current;
+    for (const [key, heading] of headings) {
+      if (current && heading.getBoundingClientRect().top > line) break;
+      current = key;
+    }
+    for (const button of nav.querySelectorAll('button')) {
+      const on = String(button.dataset.y === current);
+      if (button.getAttribute('aria-current') === on) continue;
+      button.setAttribute('aria-current', on);
+      if (on === 'true' && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({ left: nav.scrollLeft + button.getBoundingClientRect().left - nav.getBoundingClientRect().left - (nav.clientWidth - button.offsetWidth) / 2, behavior: CALM ? 'auto' : 'smooth' });
+      }
+    }
+    const rect = list.getBoundingClientRect();
+    progress.style.transform = `scaleX(${Math.min(1, Math.max(0, (line - rect.top) / rect.height)).toFixed(4)})`;
+  }
+  const schedule = () => { if (!frame && bar.offsetHeight) frame = requestAnimationFrame(update); };
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  return update;
 }
 /* after a re-sort the year buttons slide from where they were to their new places */
 const yearSpots = (bar) => new Map([...bar.querySelectorAll('button')].map((y) => [y.dataset.y, y.getBoundingClientRect().left]));
@@ -2263,13 +2410,11 @@ function workText(i, piece = -1) {
   } else {
     box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
   }
-  /* cross-link: goods made from this piece, or the goods page for the catalog itself */
+  /* cross-link: the goods made from this piece */
   const gl = $('#wk-goods');
   const made = GOODS.filter((g) => g.works.includes(w.id));
   gl.replaceChildren();
-  if (w.id === '148499079') {
-    const a = el('a', '', tr('wk.goodsLink')); a.href = '#goods'; gl.append(a);
-  } else if (made.length) {
+  if (made.length) {
     gl.append(document.createTextNode(tr('wk.madeGoods')));
     made.forEach((g, k) => {
       if (k) gl.append(document.createTextNode(tr('list.sep')));
@@ -2305,7 +2450,7 @@ addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceW
 /* Art books: the list and the book page */
 /* ---------- art books: one per Fancy Frontier, on a timeline with a year bar and sort menu like the works wall ---------- */
 const NSFW_URL = 'https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing';
-const abList = $('#ab-list'), abYearsIn = $('#ab-years-in'), abYearsBar = $('#ab-years'), abYearsProg = $('#ab-years-prog');
+const abList = $('#ab-list'), abYearsIn = $('#ab-years-in'), abYearsBar = $('#ab-years');
 const abHead = new Map();
 let abSort = 'new', abBuilt = false, lastBook = null;
 const abBooks = () => (abSort === 'old' ? [...BOOKS].reverse() : BOOKS);   // BOOKS is newest first
@@ -2386,30 +2531,7 @@ const abSortText = sortControl($('#ab-sort'), (dir) => {
   const top = abList.getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - abYearsBar.offsetHeight - 14;
   if (scrollY > top + 4) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
 });
-abYearsIn.addEventListener('click', (e) => {
-  const b = e.target.closest('button');
-  if (!b) return;
-  const top = abHead.get(b.dataset.y).getBoundingClientRect().top + scrollY - $('.site-head').offsetHeight - abYearsBar.offsetHeight - 14;
-  scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
-});
-/* the year in view lights up in the bar and the gold line shows how far down the list you are */
-let abRaf = 0;
-function abYearsUpdate() {
-  abRaf = 0;
-  if (VIEWS.artbook.hidden) return;
-  const line = abYearsBar.getBoundingClientRect().bottom + 48;
-  let cur = '';
-  for (const [y, hd] of abHead) { if (cur && hd.getBoundingClientRect().top > line) break; cur = y; }
-  abYearsIn.querySelectorAll('button').forEach((b) => {
-    const on = String(b.dataset.y === cur);
-    if (b.getAttribute('aria-current') === on) return;
-    b.setAttribute('aria-current', on);
-    if (on === 'true' && abYearsIn.scrollWidth > abYearsIn.clientWidth) abYearsIn.scrollTo({ left: b.offsetLeft - (abYearsIn.clientWidth - b.offsetWidth) / 2, behavior: CALM ? 'auto' : 'smooth' });
-  });
-  const r = abList.getBoundingClientRect();
-  abYearsProg.style.transform = `scaleX(${Math.min(1, Math.max(0, (line - r.top) / r.height)).toFixed(4)})`;
-}
-addEventListener('scroll', () => { if (!abRaf) abRaf = requestAnimationFrame(abYearsUpdate); }, { passive: true });
+const abYearsUpdate = timelineNavigation(abYearsBar, abList, abHead);
 
 /* ---------- single art book: the cover as a 3D book, then under "Preview" the cover spread and the inside pages; blurred pages lead to the album ---------- */
 fitWatch($('#bk-title'), 9); fitWatch($('#bk-prev-t'), 10); fitWatch($('#bk-next-t'), 10);
@@ -3356,6 +3478,11 @@ let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
+  if (h === 'w-' + FF47_CATALOG.id) {
+    history.replaceState(null, '', '#g-ff47-catalog');
+    h = 'g-ff47-catalog';
+  }
+  if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
@@ -3414,13 +3541,17 @@ function apply({ h, next, idx, cat, piece = -1 }) {
     if (card) { card.scrollIntoView({ block: 'center' }); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
     abYearsUpdate();
+  } else if (next === 'catalog') {
+    renderCatalog(); scrollTo(0, 0); els = prime(root);
   } else if (next === 'goods') {
-    const card = from === 'item' && lastItem && document.getElementById('gc-' + lastItem);
+    if (!goodsHeadings.size) renderGoods();
+    const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && document.getElementById('gc-' + lastItem);
     if (card) { card.scrollIntoView({ block: 'center' }); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
   } else {
     scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root);
   }
+  if (next === 'goods') goodsYearsUpdate();
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
@@ -3480,7 +3611,7 @@ function route() {
   if (curtainBusy) return;
   const r = parse();
   const from = view;
-  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !(from === 'item' && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
+  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   /* inside a collection: between its grid and a piece's page, the picture morphs too */
   const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
   const fromPiece = lastPiece;
@@ -3694,7 +3825,9 @@ function swapLang(l) {
   xText();
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
-  ggrid.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
+  goodsText();
+  if (view === 'catalog') renderCatalog();
+  goodsList.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
   charList.querySelectorAll('.char').forEach((li, k) => {
     const n = k + 1, btn = li.querySelector('.char-btn');
     if (btn) btn.setAttribute('aria-label', tr(CHAR_CARD.has(n) ? 'chars.viewPair' : 'chars.view', { n }));

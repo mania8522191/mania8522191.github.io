@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>mania8522191 Gallery</title>
-<meta name="description" content="mania8522191 的插畫作品集：星街すいせい、hololive、BanG Dream!、アズールレーン 同人插畫，共 55 件作品。">
+<meta name="description" content="mania8522191 的插畫作品集：星街すいせい、hololive、BanG Dream!、アズールレーン 同人插畫，共 53 件作品。">
 <link rel="alternate" hreflang="zh-Hant" href="https://mania8522191.github.io/?lang=zh">
 <link rel="alternate" hreflang="en" href="https://mania8522191.github.io/?lang=en">
 <link rel="alternate" hreflang="ja" href="https://mania8522191.github.io/?lang=ja">
@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=086331a7">
+<link rel="stylesheet" href="site.css?v=875b7568">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -52,7 +52,7 @@ addEventListener('hashchange', function () {
       <a href="#home" data-v="home">Home</a>
       <a href="#work" data-v="works work">Work</a>
       <a href="#artbook" data-v="artbook book">Art Book</a>
-      <a href="#goods" data-v="goods item">Goods</a>
+      <a href="#goods" data-v="goods item catalog">Goods</a>
       <a href="#event" data-v="event">Event</a>
       <a href="#game" data-v="game">Game</a>
       <a href="#about" data-v="about">About</a>
@@ -67,7 +67,7 @@ addEventListener('hashchange', function () {
   <a href="#home" data-v="home">Home</a>
   <a href="#work" data-v="works work">Work</a>
   <a href="#artbook" data-v="artbook book">Art Book</a>
-  <a href="#goods" data-v="goods item">Goods</a>
+  <a href="#goods" data-v="goods item catalog">Goods</a>
   <a href="#event" data-v="event">Event</a>
   <a href="#game" data-v="game">Game</a>
   <a href="#about" data-v="about">About</a>
@@ -95,7 +95,7 @@ addEventListener('hashchange', function () {
     <section class="works in" aria-labelledby="works">
       <h2 class="sec-title" id="works">WORKS</h2>
       <nav class="cats" id="cats" aria-label="作品分類" data-i18n-aria="works.cats"><a href="#fanart" data-cat="fan">Fan Art<span class="cats-n"></span></a><a href="#original" data-cat="original">Original Art<span class="cats-n"></span></a><a href="#nsfw" data-cat="nsfw">NSFW<span class="cats-n">18+</span></a></nav>
-      <p class="sec-sub" id="works-sub" data-i18n="works.sub">2019 — 2026 · 55 件作品 · 點選封面看完整作品</p>
+      <p class="sec-sub" id="works-sub" data-i18n="works.sub">2019 — 2026 · 53 件作品 · 點選封面看完整作品</p>
       <div class="years" id="years">
         <div class="years-row">
           <nav class="years-in" id="years-in" aria-label="依年份瀏覽" data-i18n-aria="years.nav"></nav>
@@ -206,8 +206,21 @@ addEventListener('hashchange', function () {
   <!-- goods list -->
   <section class="view goods in" id="v-goods" hidden>
     <h1 class="sec-title">GOODS</h1>
-    <p class="sec-sub" data-i18n="goods.sub">Fancy Frontier 47（2026.08.21–22・花博爭豔館・攤位 J44）推出的周邊。標示為場次價格，郵購的現貨與售價以買動漫賣場為準。</p>
-    <div class="g-grid" id="g-grid"></div>
+    <p class="sec-sub" data-i18n="goods.sub">依場次瀏覽周邊與品書。標示為場次價格，通販價格及庫存請以各賣場為準。</p>
+    <div class="years" id="g-events">
+      <div class="years-row">
+        <nav class="years-in" id="g-events-in" aria-label="依場次瀏覽" data-i18n-aria="goods.events"></nav>
+        <div class="sortx" id="g-sort" data-dir="new">
+          <button type="button" class="sortx-btn" aria-haspopup="true" aria-expanded="false" aria-controls="g-sort-menu"><svg class="sortx-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M3.8 9.3 8 13.5l4.2-4.2"/></svg><span class="sortx-k">SORT</span><span class="sortx-v">由新到舊</span><svg class="sortx-chev" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
+          <div class="sortx-menu" id="g-sort-menu" role="menu" aria-label="排序" data-i18n-aria="works.sort">
+            <button type="button" role="menuitemradio" data-sort="new" aria-checked="true"><i class="sortx-dot" aria-hidden="true"></i><span data-i18n="sort.new">由新到舊</span><span class="sortx-hint"></span></button>
+            <button type="button" role="menuitemradio" data-sort="old" aria-checked="false"><i class="sortx-dot" aria-hidden="true"></i><span data-i18n="sort.old">由舊到新</span><span class="sortx-hint"></span></button>
+          </div>
+        </div>
+      </div>
+      <span class="years-prog" aria-hidden="true"><i id="g-events-prog"></i></span>
+    </div>
+    <div class="ab-list" id="g-list"></div>
     <div class="g-shop">
       <p class="g-shop-k">ONLINE SHOP</p>
       <ul class="g-shops">
@@ -217,6 +230,23 @@ addEventListener('hashchange', function () {
       </ul>
     </div>
   </section>
+
+  <article class="view in" id="v-catalog" hidden>
+    <div class="proj">
+      <header class="proj-head">
+        <p class="eyebrow">Fancy Frontier 47</p>
+        <h1 class="proj-title" data-i18n="goods.catalog">FF47 品書</h1>
+        <ul class="proj-meta">
+          <li id="catalog-date"></li><li id="catalog-count"></li>
+          <li><a href="#goods" data-i18n="wk.goodsLink">看周邊詳細介紹 →</a></li>
+          <li><a href="https://www.pixiv.net/artworks/148499079" target="_blank" rel="noopener" data-i18n="wk.pixiv">在 pixiv 查看 ↗</a></li>
+        </ul>
+        <ul class="proj-tags" id="catalog-tags"></ul>
+      </header>
+      <div class="proj-imgs" id="catalog-pages"></div>
+      <p class="proj-goods"><a href="#goods" data-i18n="wk.goodsLink">看周邊詳細介紹 →</a></p>
+    </div>
+  </article>
 
   <!-- single goods item -->
   <article class="view in" id="v-item" hidden>
@@ -232,7 +262,7 @@ addEventListener('hashchange', function () {
           <dl class="gd-spec" id="it-spec"></dl>
           <div class="gd-actions">
             <a class="btn" href="https://www.myacg.com.tw/seller_market.php?seller=217467" target="_blank" rel="noopener" data-i18n="item.buy">到買動漫賣場購買 ↗</a>
-            <a class="btn ghost" href="#w-148499079" data-i18n="item.menu">看 FF47 完整品書</a>
+            <a class="btn ghost" href="#g-ff47-catalog" data-i18n="item.menu">看 FF47 完整品書</a>
           </div>
         </div>
       </div>
@@ -503,6 +533,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=7893da09"></script>
+<script src="site.js?v=87635076"></script>
 </body>
 </html>

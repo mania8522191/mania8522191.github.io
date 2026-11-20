@@ -10,6 +10,14 @@ const zwLayer = $('#zw-layer'), zvDock = $('#zv-dock');
 const ZV_MIN_W = 240, ZV_MIN_H = 180;   // the smallest a window can be made
 const ZV_TOP = 3;   // the wheel zooms up to this many times a picture's actual size
 const ZV_POP = new Set(['shots', 'chars', 'cards']);   // the game page's pictures: the pop-up
+function galleryPages(w, t) {
+  return w.dims.map(([W, H, ZW, ZH], n) => ({
+    src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
+    w: W, h: H, zw: ZW || W,
+    no: `${n + 1} / ${w.dims.length}`, cap: t,
+    alt: w.dims.length > 1 ? tr('zv.workAlt', { t, n: n + 1 }) : t,
+  }));
+}
 const ZV_SETS = {   // what a window steps through; made again in another language
   proc: (id) => {   // a work's process animations; the full-size one, where there is one, on zoom
     const w = WORKS[byId[id]], list = w.proc || [];
@@ -20,14 +28,10 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
       alt: tr('proc.alt', { t: L(w.t) }),
     }));
   },
+  catalog: () => galleryPages(FF47_CATALOG, tr('goods.catalog')),
   work: (id) => {
-    const w = WORKS[byId[id]], t = L(w.t);
-    return w.dims.map(([W, H, ZW, ZH], n) => ({
-      src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
-      w: W, h: H, zw: ZW || W,
-      no: `${n + 1} / ${w.dims.length}`, cap: t,
-      alt: w.dims.length > 1 ? tr('zv.workAlt', { t, n: n + 1 }) : t,
-    }));
+    const w = WORKS[byId[id]];
+    return galleryPages(w, L(w.t));
   },
   piece: (key) => {   // a collection's piece (key "<work id>/<piece from 0>"): its finished picture, other versions, sketch
     const [id, p] = key.split('/'), w = WORKS[byId[id]], n = +p, t = L(w.t), list = pieceImgs(w, n);
