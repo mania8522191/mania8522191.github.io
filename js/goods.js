@@ -10,11 +10,13 @@ function price(g, label) {
 }
 
 /* ---------- goods list: by event, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
-   `ev`, "FF47") is a section under its heading; the FF47 catalog (FF47_CATALOG) comes first in its event and opens
-   its own page (#g-ff47-catalog). Only events that have goods or the catalog are listed ---------- */
+   `ev`, "FF47") is a section under its heading: its catalog (FF47_CATALOG), which opens its own page
+   (#g-ff47-catalog) with the event's goods under its pages; an event without a catalog lists its goods here. Only
+   events that have goods or a catalog are listed ---------- */
 const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
 const goodsHeadings = new Map();   // each event's heading, in the order shown
 const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
+const GOODS_COVER = [1400, 1050];   // a card's picture (tools/goods_pieces.py): 4:3, its frame's shape
 let goodsOrder = 'new', catalogCard = null;
 /* a goods card: its picture, then its name, contents and price (fillGoodsCard, again in another language) */
 function goodsCard(g, i) {
@@ -25,7 +27,7 @@ function goodsCard(g, i) {
   a.dataset.d = `${(i % 3) * 0.1}s`;
   const box = el('span', 'g-img mask');
   const img = el('img');
-  img.src = `img/goods-${g.slug}.webp`; img.width = g.dims[0]; img.height = g.dims[1];
+  img.src = `img/goods-${g.slug}.webp`; [img.width, img.height] = GOODS_COVER;
   img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
   box.appendChild(img);
   a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
@@ -37,10 +39,16 @@ function fillGoodsCard(a, g) {
   a.querySelector('.g-meta').textContent = L(g.meta);
   a.querySelector('.price').replaceWith(price(g, false));
 }
+/* goods as cards, three to a row */
+function goodsGrid(items) {
+  const grid = el('div', 'g-grid');
+  grid.append(...items.map(goodsCard));
+  return grid;
+}
 
 /* the catalog's place in its event: three of its pages dealt as a hand of cards, as a collection's cover on the works
-   wall (a new pick on every page load, in page order, the last in front), then its name, how many pages, and an
-   arrow to its page */
+   wall (a new pick on every page load), in page order from left to right, the first on top and each next one under
+   it; then its name, how many pages, and an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
@@ -49,6 +57,7 @@ function catalogCover() {
   const fan = el('span', 'catalog-hand frame fan');
   fan.style.cssText = `--ar:${hand.r.toFixed(4)};--cw:${hand.cwp}`;
   fan.innerHTML = hand.cards;
+  fan.append(...[...fan.children].reverse());   // the first page last, so in front
   const caption = el('span', 'catalog-caption');
   const title = el('span', 'g-name', tr('goods.catalog'));
   title.dataset.i18n = 'goods.catalog';
@@ -77,12 +86,7 @@ function renderGoods() {
     button.dataset.y = code;
     goodsNav.append(button);
     if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
-    const items = GOODS.filter((g) => g.ev === code);
-    if (items.length) {
-      const grid = el('div', 'g-grid');
-      grid.append(...items.map(goodsCard));
-      section.append(grid);
-    }
+    else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
     return section;
   }));
   goodsText();
@@ -107,37 +111,100 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
   if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
   goodsYearsUpdate();
 });
-/* ---------- the FF47 catalog's page: its date, page count and tags, then its pages one under another, as on a work's
-   page; a page opens in a picture window ---------- */
-function renderCatalog() {
+/* ---------- the FF47 catalog's page: its date, page count and tags; its pages side by side, to be dragged left and
+   right; then the event's goods, the cards that open their item pages ---------- */
+const catalogPages = $('#catalog-pages');
+/* made once (its words then follow the language: catalogText, and the cards in js/lang-switch.js); `fresh`, not back
+   from one of its goods: from the first page */
+function renderCatalog(fresh) {
   const catalog = FF47_CATALOG;
-  $('#catalog-date').textContent = tr('wk.posted', { d: dot(catalog.d) });
-  $('#catalog-count').textContent = pagesText(catalog.dims.length);
-  $('#catalog-tags').replaceChildren(...catalog.tags.map((tag) => el('li', '', '#' + tag)));
-  $('#catalog-pages').replaceChildren(...catalog.dims.map(([width, height], i) => {
-    const img = el('img');
-    img.src = src(catalog.id, i);
-    img.width = width; img.height = height;
-    img.alt = tr('wk.imgAlt', { t: tr('goods.catalog'), n: i + 1, m: catalog.dims.length });
-    img.loading = i < 2 ? 'eager' : 'lazy';
-    img.decoding = 'async';
-    if (i) img.dataset.rv = 'up';
-    return img;
-  }));
+  if (!catalogPages.children.length) {
+    $('#catalog-tags').replaceChildren(...catalog.tags.map((tag) => el('li', '', '#' + tag)));
+    catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
+      const img = el('img');
+      img.src = src(catalog.id, i);
+      img.width = width; img.height = height;
+      img.loading = i < 3 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      img.draggable = false;
+      return img;
+    }));
+    $('#catalog-goods').replaceChildren(...GOODS.filter((g) => g.ev === catalog.ev).map(goodsCard));
+  }
+  if (fresh) catalogPages.scrollLeft = 0;
+  catalogText();
+  catalogAt();
 }
-$('#catalog-pages').addEventListener('click', (e) => {
-  if (e.target.matches('img')) zvOpen('catalog', [...e.currentTarget.children].indexOf(e.target), e.target);
+/* the words that change with the language: the date, the page count, each page's description */
+function catalogText() {
+  const catalog = FF47_CATALOG, m = catalog.dims.length;
+  $('#catalog-date').textContent = tr('wk.posted', { d: dot(catalog.d) });
+  $('#catalog-count').textContent = pagesText(m);
+  [...catalogPages.children].forEach((img, i) => { img.alt = tr('wk.imgAlt', { t: tr('goods.catalog'), n: i + 1, m }); });
+}
+/* the pages side by side: the mouse drags them left and right (a finger swipes them, a trackpad scrolls them), and
+   each comes to rest in the middle (scroll snap); a drag of a fifth of a page or more goes on to the next one. The
+   arrows under them turn a page, and the count between shows the page in the middle. A page clicked without being
+   dragged opens in a picture window */
+let catalogDrag = null;
+const catalogStep = () => { const [a, b] = catalogPages.children; return b ? b.offsetLeft - a.offsetLeft : 0; };
+function catalogAt() {
+  const step = catalogStep(), n = catalogPages.children.length;
+  const i = step ? Math.min(n - 1, Math.max(0, Math.round(catalogPages.scrollLeft / step))) : 0;
+  $('#catalog-at').textContent = `${i + 1} / ${n}`;
+  $('#catalog-prev').disabled = i === 0;
+  $('#catalog-next').disabled = i === n - 1;
+  return i;
+}
+function catalogGo(i) {
+  const n = catalogPages.children.length;
+  catalogPages.scrollTo({ left: Math.min(n - 1, Math.max(0, i)) * catalogStep(), behavior: CALM ? 'auto' : 'smooth' });
+}
+catalogPages.addEventListener('pointerdown', (e) => {
+  if (e.pointerType !== 'touch' && e.button === 0) catalogDrag = { x: e.clientX, left: catalogPages.scrollLeft, id: e.pointerId, moved: false };
+});
+catalogPages.addEventListener('pointermove', (e) => {
+  const d = catalogDrag;
+  if (!d || e.pointerId !== d.id || (!d.moved && Math.abs(e.clientX - d.x) < 6)) return;
+  if (!d.moved) {   // a drag, not a click: the pages follow the mouse, unsnapped
+    d.moved = true;
+    catalogPages.setPointerCapture(d.id);
+    catalogPages.classList.add('held');
+  }
+  catalogPages.scrollLeft = d.left - (e.clientX - d.x);
+});
+const catalogLetGo = (e) => {
+  const d = catalogDrag;
+  if (!d || e.pointerId !== d.id) return;
+  catalogDrag = null;
+  if (!d.moved) return;
+  const step = catalogStep(), went = catalogPages.scrollLeft - d.left;
+  let to = Math.round(catalogPages.scrollLeft / step);
+  if (to === Math.round(d.left / step) && Math.abs(went) >= step / 5) to += Math.sign(went);
+  catalogGo(to);
+  const snap = () => catalogPages.classList.remove('held');   // snapping again once it has come to rest
+  catalogPages.addEventListener('scrollend', snap, { once: true });
+  setTimeout(snap, 900);
+};
+catalogPages.addEventListener('pointerup', catalogLetGo);
+catalogPages.addEventListener('pointercancel', catalogLetGo);
+catalogPages.addEventListener('scroll', catalogAt, { passive: true });
+$('#catalog-prev').addEventListener('click', () => catalogGo(catalogAt() - 1));
+$('#catalog-next').addEventListener('click', () => catalogGo(catalogAt() + 1));
+catalogPages.addEventListener('click', (e) => {
+  if (e.target.matches('img')) zvOpen('catalog', [...catalogPages.children].indexOf(e.target), e.target);
 });
 
 /* ---------- goods item page ---------- */
-/* goods in pieces: a piece taken with the mouse (or a pen) follows it about the picture, lifted in front of the
-   others, and stays where it is let go, never past the picture's edges (onto the words beside it). A finger still
-   scrolls the page */
+/* the goods in pieces, whole, each where the ad has it: a piece taken with the mouse (or a pen) follows it about the
+   picture, lifted in front of the others, and stays where it is let go, never past the picture's edges (onto the
+   words beside it). A finger still scrolls the page; goods of one piece stay put. The picture is also what the page
+   morph lands on from the goods' card (js/router.js) */
 const itStage = $('#it-stage');
 let itTop = 0;
 itStage.addEventListener('pointerdown', (e) => {
   const p = e.target.closest('img');
-  if (!p || e.pointerType === 'touch' || e.button !== 0) return;
+  if (!p || !itStage.children[1] || e.pointerType === 'touch' || e.button !== 0) return;
   e.preventDefault();
   const box = itStage.getBoundingClientRect(), x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
   const pw = p.offsetWidth / box.width * 100, ph = p.offsetHeight / box.height * 100;
@@ -155,22 +222,16 @@ itStage.addEventListener('pointerdown', (e) => {
   };
   p.addEventListener('pointermove', move); p.addEventListener('pointerup', up); p.addEventListener('pointercancel', up);
 });
-/* the item's picture as the page shows it, for the morph from and to its card (js/router.js) */
-const itemPic = () => (itStage.hidden ? $('#it-img') : itStage);
 function renderItem(i) {
   const g = GOODS[i];
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* the picture: the goods laid together; or, for goods in pieces (parts), each piece where the ad has it, to be
-     taken with the mouse and moved about (below) */
-  const img = $('#it-img'), [W, H] = g.dims;
-  img.src = `img/goods-${g.slug}.webp`; img.width = W; img.height = H;
-  img.alt = tr('item.imgAlt', { t: L(g.name) });
-  img.hidden = !!g.parts; itStage.hidden = !g.parts;
-  itStage.setAttribute('aria-label', img.alt);
+  /* the picture: each piece (parts) where the ad has it, in the set's box (dims) */
+  const [W, H] = g.dims;
+  itStage.setAttribute('aria-label', tr('item.imgAlt', { t: L(g.name) }));
   itStage.style.setProperty('--ar', `${W} / ${H}`);
-  itStage.replaceChildren(...(g.parts || []).map(([x, y, w, h], n) => {
+  itStage.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
     const p = el('img');
     p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
     p.style.cssText = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;

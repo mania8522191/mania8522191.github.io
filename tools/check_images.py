@@ -71,7 +71,7 @@ def referenced():
         if b.get('foil'):
             refs.add(f'img/ab/{s}_foil.webp')
     for g in C.load('GOODS'):
-        refs.add(f'img/goods-{g["slug"]}.webp')
+        refs.add(f'img/goods-{g["slug"]}.webp')   # its card's picture
         refs |= {f'img/goods-{g["slug"]}-{n}.webp' for n in range(1, len(g.get('parts', [])) + 1)}   # its pieces (item page)
     game = js('game.js')
     art, cards, pairs = const(game, 'CHAR_ART'), const(game, 'CHAR_CARD'), const(game, 'PAIR_W')

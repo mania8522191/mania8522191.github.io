@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=1e610ecd">
+<link rel="stylesheet" href="site.css?v=2bbb8dcd">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -238,13 +238,20 @@ addEventListener('hashchange', function () {
         <h1 class="proj-title" data-i18n="goods.catalog">FF47 品書</h1>
         <ul class="proj-meta">
           <li id="catalog-date"></li><li id="catalog-count"></li>
-          <li><a href="#goods" data-i18n="wk.goodsLink">看周邊詳細介紹 →</a></li>
           <li><a href="https://www.pixiv.net/artworks/148499079" target="_blank" rel="noopener" data-i18n="wk.pixiv">在 pixiv 查看 ↗</a></li>
         </ul>
         <ul class="proj-tags" id="catalog-tags"></ul>
       </header>
-      <div class="proj-imgs" id="catalog-pages"></div>
-      <p class="proj-goods"><a href="#goods" data-i18n="wk.goodsLink">看周邊詳細介紹 →</a></p>
+      <div class="cat-strip" id="catalog-pages" tabindex="0" role="region" aria-label="品書：左右拖曳翻頁" data-i18n-aria="catalog.strip"></div>
+      <div class="cat-turn">
+        <button type="button" class="cat-btn" id="catalog-prev" aria-label="上一張" data-i18n-aria="catalog.prev">←</button>
+        <p class="cat-at" id="catalog-at"></p>
+        <button type="button" class="cat-btn" id="catalog-next" aria-label="下一張" data-i18n-aria="catalog.next">→</button>
+      </div>
+      <section class="cat-goods" aria-labelledby="catalog-goods-h">
+        <h2 class="gd-h" id="catalog-goods-h" data-i18n="goods.all">全部周邊</h2>
+        <div class="g-grid" id="catalog-goods"></div>
+      </section>
     </div>
   </article>
 
@@ -257,7 +264,7 @@ addEventListener('hashchange', function () {
         <p class="price gd-price" id="it-price"></p>
       </header>
       <div class="gd-body">
-        <figure class="gd-fig"><img id="it-img" alt=""><div class="gd-stage" id="it-stage" role="img" hidden></div></figure>
+        <figure class="gd-fig"><div class="gd-stage" id="it-stage" role="img"></div></figure>
         <div class="gd-info">
           <dl class="gd-spec" id="it-spec"></dl>
           <div class="gd-actions">
@@ -533,6 +540,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=bfb6c2da"></script>
+<script src="site.js?v=f9da9cba"></script>
 </body>
 </html>

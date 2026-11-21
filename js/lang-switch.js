@@ -117,8 +117,8 @@ function swapLang(l) {
   sndText();
   wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
   goodsText();
-  if (view === 'catalog') renderCatalog();
-  goodsList.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
+  catalogText();
+  document.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));   // on the goods list and the catalog's page
   charList.querySelectorAll('.char').forEach((li, k) => {
     const n = k + 1, btn = li.querySelector('.char-btn');
     if (btn) btn.setAttribute('aria-label', tr(CHAR_CARD.has(n) ? 'chars.viewPair' : 'chars.view', { n }));

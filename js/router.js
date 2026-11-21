@@ -81,10 +81,14 @@ function apply({ h, next, idx, cat, piece = -1 }) {
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
     abYearsUpdate();
   } else if (next === 'catalog') {
-    renderCatalog(); scrollTo(0, 0); els = prime(root);
+    /* back from one of its goods: the page as it was left, that goods' card in view (backTo) */
+    const back = from === 'item' && lastItem && GOODS[bySlug[lastItem]].ev === FF47_CATALOG.ev;
+    renderCatalog(!back);
+    const card = back && document.getElementById('gc-' + lastItem);
+    if (card) { backTo(card); els = pending(root); } else { scrollTo(0, 0); els = same ? pending(root) : prime(root); }
   } else if (next === 'goods') {
     if (!goodsHeadings.size) renderGoods();
-    const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && document.getElementById('gc-' + lastItem);
+    const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && goodsList.querySelector('#gc-' + lastItem);
     if (card) { backTo(card); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
   } else {
@@ -167,9 +171,9 @@ function route() {
       return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
     }
     if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
-    if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itemPic();
+    if ((from === 'catalog' || from === 'goods') && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itStage;
     if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
-    if (from === 'item' && r.next === 'goods') return fwd ? itemPic() : lastItem && document.querySelector(`#gc-${lastItem} img`);
+    if (from === 'item' && (r.next === 'catalog' || r.next === 'goods')) return fwd ? itStage : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
     return null;

@@ -31,7 +31,7 @@
 @media (max-width:560px){
   .g-grid{grid-template-columns:minmax(0,1fr)}
   .g-card:first-child .g-img{width:100%}
-  .catalog-cover{grid-template-columns:minmax(0,1fr);padding:24px 20px 28px}
+  .catalog-cover{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:720px){
   :root{--head:60px}

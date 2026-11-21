@@ -2,12 +2,14 @@
 keychains and the mini blocks the Melonbooks ads, ADs/melon/g.psd and e.psd): the goods alone, without the ad's
 background, words and header, transparent round them.
 
-usage: python tools/goods_pieces.py <slug> <ad.psd> [--save] [--out DIR]
+usage: python tools/goods_pieces.py <slug> <ad.psd> [--scale R] [--save] [--out DIR]
 
-  img/goods-<slug>.webp       the goods laid together as in the ad, 1400 px on the long side: the goods card, and the
-                              item page's picture when it is one piece
-  img/goods-<slug>-<n>.webp   each piece (n from the bottom) at the same scale: the item page lays them together, and
-                              each can be taken with the mouse and moved
+  img/goods-<slug>.webp       the goods card's picture, 1400 x 1050 (4:3, its frame's shape): the ad's canvas the
+                              picture's width, its goods where the ad has them, cut where the ad cuts them (a paper
+                              bag only peeks in, as on the catalog's page), so every card shows its goods at the
+                              catalog's one scale
+  img/goods-<slug>-<n>.webp   each piece (n from the bottom), whole, the set 1400 px on its long side: the item page
+                              lays them together, and each can be taken with the mouse and moved
 
 A piece is one picture layer of the ad's goods. A feathered black shadow kept as a layer of its own (the black layer
 just under its goods) is merged into its goods' piece; where the ad cut such a shadow off at the canvas edge but the
@@ -17,8 +19,10 @@ hidden layers. Each piece is cut to what shows: its goods with their soft edge a
 far off (one keychain layer has one, its full height above the goods), and rid of stray specks (the keychains' ring
 photos have white dust round them, unseen on the ads' light ground but plain on the site's dark one).
 
-  --save     write "dims" (and "parts": [[x, y, w, h], ...] in the card picture's pixels, where there are two pieces
-             or more) into the item in GOODS in js/data.js (the item must already be there)
+  --scale R  the ad draws its goods R times as big as the catalog's ads (the Melonbooks ads: 2.2, by the keychain
+             both have): the card shows them whole, at the catalog's scale, in the middle
+  --save     write "dims" (the set's size on the item page) and "parts" ([[x, y, w, h], ...]: each piece's place in
+             it) into the item in GOODS in js/data.js (the item must already be there)
   --out DIR  write under DIR instead of the site, to try it out
 
 Needs psd-tools and numpy (pip install psd-tools numpy).
@@ -34,7 +38,9 @@ from psd_tools import PSDImage
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common as C   # noqa: E402
 
-LONG = 1400   # the set's long side, as the goods pictures were
+LONG = 1400   # the set's long side on the item page, as the goods pictures were
+COVER = (1400, 1050)   # the card's picture, 4:3 like its frame
+REF = 6000    # the catalog's ads' canvas width: a cover is one of them wide
 Q = 88
 EDGE = 64     # a shadow this near the canvas edge was cut there
 REACH = 240   # how far past the goods (their solid part) a soft edge or shadow may reach
@@ -189,41 +195,75 @@ def box_mean(x, k):
     return (c[k:, k:] - c[:-k, k:] - c[k:, :-k] + c[:-k, :-k]) / (k * k)
 
 
+def cover(ps, psd, scale):
+    """the goods card's picture (COVER): the catalog's ads (scale 1) show their canvas the cover's width, the goods
+    where the ad has them and cut where it cuts them (a paper bag only peeks in, as on the catalog's page), a band of
+    the canvas as tall as the goods (from their top when they are taller: what is cut then is a bag at the bottom),
+    kept to the canvas's edge where the ad cuts at that edge. An ad drawing its goods `scale` times as big shows them
+    whole at the catalog's scale (REF px of their canvas the cover's width), in the middle"""
+    cw, ch = COVER
+    out = Image.new('RGBA', COVER, (0, 0, 0, 0))
+    if scale != 1:
+        c = cw / (REF * scale)
+        x0, y0 = min(b[0] for _, b in ps), min(b[1] for _, b in ps)
+        x1, y1 = max(b[2] for _, b in ps), max(b[3] for _, b in ps)
+        ox, oy = (cw - (x1 - x0) * c) / 2 - x0 * c, (ch - (y1 - y0) * c) / 2 - y0 * c
+        window = None
+    else:
+        W, H = psd.width, psd.height
+        c, wh = cw / W, ch * W / cw   # the band's height in the canvas
+        gy0 = max(0, min(b[1] for _, b in ps))
+        gy1 = min(H, max(b[3] for _, b in ps))
+        if gy1 - gy0 > wh or gy0 == 0:
+            top = gy0
+        elif gy1 == H:
+            top = H - wh
+        else:
+            top = (gy0 + gy1 - wh) / 2
+        window = (0, top, W, top + wh)
+        ox, oy = 0, -top * c
+    for im, b in ps:
+        if window:   # only what lies in the band
+            l, t = max(b[0], window[0]), max(b[1], window[1])
+            r, btm = min(b[2], window[2]), min(b[3], window[3])
+            if r <= l or btm <= t:
+                continue
+            im, b = im.crop((round(l - b[0]), round(t - b[1]), round(r - b[0]), round(btm - b[1]))), (l, t, r, btm)
+        x, y = round(b[0] * c + ox), round(b[1] * c + oy)
+        w, h = round(b[2] * c + ox) - x, round(b[3] * c + oy) - y
+        layer = Image.new('RGBA', COVER, (0, 0, 0, 0))
+        layer.paste(im.resize((max(1, w), max(1, h)), Image.LANCZOS), (x, y))
+        out = Image.alpha_composite(out, layer)
+    return out
+
+
 def main(argv):
     root = C.out_root(argv)
     save = C.flag(argv, '--save')
+    scale = float(C.option(argv, '--scale', 1))
     if len(argv) != 2:
         C.usage(__doc__)
     slug, path = argv
     if save and not C.find(C.load('GOODS'), 'slug', slug):
         sys.exit(f'{slug} is not in GOODS yet: add its line to js/data.js first, then run again with --save')
-    ps = pieces(PSDImage.open(path))
+    psd = PSDImage.open(path)
+    ps = pieces(psd)
+    size = C.save_webp(cover(ps, psd, scale), os.path.join(root, 'img', f'goods-{slug}.webp'), Q, alpha_quality=100)
+    print(f'img/goods-{slug}.webp {COVER[0]}x{COVER[1]} ({size // 1024} KB)')
+    # the pieces, whole, at the item page's scale: the set LONG px on its long side
     x0, y0 = min(b[0] for _, b in ps), min(b[1] for _, b in ps)
     x1, y1 = max(b[2] for _, b in ps), max(b[3] for _, b in ps)
     k = LONG / max(x1 - x0, y1 - y0)
-    W, H = round((x1 - x0) * k), round((y1 - y0) * k)
-    whole, parts = Image.new('RGBA', (W, H), (0, 0, 0, 0)), []
+    parts = []
     for n, (im, b) in enumerate(ps, 1):
-        x, y = round((b[0] - x0) * k), round((b[1] - y0) * k)
         small = im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS)
-        layer = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-        layer.paste(small, (x, y))
-        whole = Image.alpha_composite(whole, layer)
-        parts.append([x, y, small.width, small.height])
-        if len(ps) > 1:
-            C.save_webp(small, os.path.join(root, 'img', f'goods-{slug}-{n}.webp'), Q, alpha_quality=100)
-    size = C.save_webp(whole, os.path.join(root, 'img', f'goods-{slug}.webp'), Q, alpha_quality=100)
-    print(f'img/goods-{slug}.webp {W}x{H} ({size // 1024} KB), {len(ps)} piece{"s" if len(ps) > 1 else ""}')
-    item = {'dims': [W, H], **({'parts': parts} if len(ps) > 1 else {})}
-    print(json.dumps(item))
+        parts.append([round((b[0] - x0) * k), round((b[1] - y0) * k), small.width, small.height])
+        C.save_webp(small, os.path.join(root, 'img', f'goods-{slug}-{n}.webp'), Q, alpha_quality=100)
+    item = {'dims': [round((x1 - x0) * k), round((y1 - y0) * k)], 'parts': parts}
+    print(f'{len(ps)} piece{"s" if len(ps) > 1 else ""}', json.dumps(item))
     if save:
         items = C.load('GOODS')
-        g = C.find(items, 'slug', slug)
-        g['dims'] = item['dims']
-        if 'parts' in item:
-            g['parts'] = parts
-        else:
-            g.pop('parts', None)
+        C.find(items, 'slug', slug).update(item)
         C.save('GOODS', items)
 
 
