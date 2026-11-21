@@ -15,7 +15,7 @@ function price(g, label) {
 const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
 const goodsHeadings = new Map();   // each event's heading, in the order shown
 const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
-let goodsOrder = 'new';
+let goodsOrder = 'new', catalogCard = null;
 /* a goods card: its picture, then its name, contents and price (fillGoodsCard, again in another language) */
 function goodsCard(g, i) {
   const a = el('a', 'g-card');
@@ -38,24 +38,26 @@ function fillGoodsCard(a, g) {
   a.querySelector('.price').replaceWith(price(g, false));
 }
 
-/* the catalog's place in its event: its first page whole, its name and how many pages, an arrow to its page */
+/* the catalog's place in its event: three of its pages dealt as a hand of cards, as a collection's cover on the works
+   wall (a new pick on every page load, in page order, the last in front), then its name, how many pages, and an
+   arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
   a.href = '#g-ff47-catalog';
-  const img = el('img');
-  img.src = src(FF47_CATALOG.id, 0);
-  [img.width, img.height] = FF47_CATALOG.dims[0];
-  img.alt = '';
+  const hand = handOf(coverPieces(FF47_CATALOG).map((n) => [src(FF47_CATALOG.id, n), ...FF47_CATALOG.dims[n].slice(0, 2)]), true);
+  const fan = el('span', 'catalog-hand frame fan');
+  fan.style.cssText = `--ar:${hand.r.toFixed(4)};--cw:${hand.cwp}`;
+  fan.innerHTML = hand.cards;
   const caption = el('span', 'catalog-caption');
   const title = el('span', 'g-name', tr('goods.catalog'));
   title.dataset.i18n = 'goods.catalog';
   const count = el('span', 'g-meta', pagesText(FF47_CATALOG.dims.length));
   count.id = 'catalog-cover-count';
-  caption.append(title, count);
   const arrow = el('span', 'catalog-arrow', '→');
   arrow.setAttribute('aria-hidden', 'true');
-  a.append(img, caption, arrow);
+  caption.append(title, count, arrow);
+  a.append(fan, caption);
   return a;
 }
 /* the list in the order picked (the newest event first, or the oldest), and the bar's buttons to match */
@@ -74,7 +76,7 @@ function renderGoods() {
     button.type = 'button';
     button.dataset.y = code;
     goodsNav.append(button);
-    if (code === FF47_CATALOG.ev) section.append(catalogCover());
+    if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
     const items = GOODS.filter((g) => g.ev === code);
     if (items.length) {
       const grid = el('div', 'g-grid');

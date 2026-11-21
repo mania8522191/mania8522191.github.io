@@ -6,7 +6,7 @@ const wall = $('#wall');
    a direction of its own, new on every visit. The wall's works, and a collection's pieces on its work page.
    `pics`: [src, width, height] of one picture, or of three dealt as a hand of cards (a collection on the wall). */
 function makeCover(href, pics, pos, eager) {
-  const fan = pics.length > 1 && dealCards(pics.map(([, W, H]) => W / H));
+  const fan = pics.length > 1 && handOf(pics, eager);
   const r = fan ? fan.r : pics[0][1] / pics[0][2], a = el('a', 'cover');
   a.href = href;
   a.dataset.rv = 'fly';
@@ -18,13 +18,21 @@ function makeCover(href, pics, pos, eager) {
   a.style.setProperty('--fx', `${Math.round(Math.cos(ang) * dist)}px`);
   a.style.setProperty('--fy', `${Math.round(Math.sin(ang) * dist)}px`);
   a.style.setProperty('--fr', `${(Math.random() * 24 - 12).toFixed(1)}deg`);
-  const imgs = pics.map(([s, W, H]) => `<img src="${s}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`);
-  const pct = (v) => `${(v * 100).toFixed(2)}%`;
-  const art = fan
-    ? `<span class="frame mask fan" style="--cw:${pct(fan.cw)}">${imgs.map((p, k) => `<span class="fan-c" style="left:${pct(fan.cards[k].l)};top:${pct(fan.cards[k].t)};--r:${fan.cards[k].r.toFixed(1)}deg;--ca:${(pics[k][1] / pics[k][2]).toFixed(4)}">${p}</span>`).join('')}`
-    : `<span class="frame mask">${imgs[0]}`;
+  const art = fan ? `<span class="frame mask fan" style="--cw:${fan.cwp}">${fan.cards}` : `<span class="frame mask">${picTag(pics[0], eager)}`;
   a.innerHTML = `${art}<span class="ov" aria-hidden="true"><span class="ov-t"></span><span class="ov-m"></span></span></span><span class="cap" aria-hidden="true"><span class="cap-t"></span><span class="cap-m"></span></span>`;
   return a;
+}
+/* a picture [src, width, height] as an img tag */
+function picTag([s, W, H], eager) {
+  return `<img src="${s}" width="${W}" height="${H}" alt="" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+}
+/* pictures dealt as a hand of cards (dealCards), each on a card of its own shape: the cards (for a .frame.fan whose
+   --cw is cwp, a card's share of the hand's width), the hand's width / height (r) and that share as a number (cw).
+   A collection's cover on the works wall, a multi-picture post's on Home, the catalog's on the goods page */
+function handOf(pics, eager) {
+  const fan = dealCards(pics.map(([, W, H]) => W / H)), pct = (v) => `${(v * 100).toFixed(2)}%`;
+  const cards = pics.map((p, k) => `<span class="fan-c" style="left:${pct(fan.cards[k].l)};top:${pct(fan.cards[k].t)};--r:${fan.cards[k].r.toFixed(1)}deg;--ca:${(p[1] / p[2]).toFixed(4)}">${picTag(p, eager)}</span>`).join('');
+  return { r: fan.r, cw: fan.cw, cwp: pct(fan.cw), cards };
 }
 /* cards dealt loosely, from left to right and top to bottom: each a bit right of and below the one before and over
    it (the last in front), each at a slight turn of its own that grows from left to right, with a little chance in

@@ -20,26 +20,31 @@
 #g-events .years-row{display:flex;align-items:center;gap:8px}
 #g-events .years-in{flex:1;min-width:0;margin-right:0}
 #g-events .sortx{position:relative;top:auto;transform:none;flex:none}
-/* an event's catalog, first in its section: a picture, its name and page count, an arrow that nudges on hover */
-.catalog-cover{display:grid;grid-template-columns:minmax(0,40%) 1fr auto;align-items:center;gap:clamp(14px,3vw,44px);padding-right:clamp(16px,4vw,56px);border-block:1px solid var(--line);text-decoration:none}
-.catalog-cover img{display:block;width:100%;height:auto}
-.catalog-caption{display:grid;gap:6px}
+/* an event's catalog, first in its section, in a frame like the goods' below: three of its pages dealt as a hand of
+   cards (a collection's on the works wall, .frame.fan), each turning a little further on hover; beside them its
+   name, page count and an arrow that nudges on hover, in the middle of the room left (under the cards on phones) */
+.catalog-cover{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);align-items:center;gap:clamp(20px,3vw,44px);padding:clamp(28px,4vw,56px) clamp(24px,5vw,72px);border:1px solid var(--ring-line);text-decoration:none;transition:border-color .35s,box-shadow .35s}
+.catalog-hand{justify-self:center;width:min(100%,640px)}
+.catalog-cover:hover .fan-c,.catalog-cover:focus-visible .fan-c{transform:rotate(calc(1.5 * var(--r)))}
+.catalog-caption{display:grid;justify-items:center;gap:8px;text-align:center}
 .catalog-caption .g-name{font-size:clamp(19px,3vw,36px)}
-.catalog-arrow{color:var(--g-gold);transition:transform .4s var(--ease-out)}
+.catalog-arrow{margin-top:6px;color:var(--g-gold);transition:transform .4s var(--ease-out)}
 .catalog-cover:hover .catalog-arrow{transform:translateX(4px)}
 /* the catalog's own page: each page as big as the screen allows, like a work's pictures */
 #catalog-pages img{width:min(100%,1200px,calc(100svh - 100px));height:auto}
 .g-card{display:grid;align-content:start;justify-items:center;gap:6px;text-align:center;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 24px)}
 /* cards in one row share their rows, so names, descriptions and prices line up even when one name wraps */
 @supports (grid-template-rows:subgrid){.g-grid{row-gap:0;margin-bottom:calc(-1 * clamp(44px,5vw,72px))}.g-card{grid-row:span 4;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.g-card .g-name{align-self:end}.g-card .g-meta,.g-card .price{align-self:start}}
-/* a card's picture: the goods alone, cut out, whole in a 3:2 place, standing in a soft light like the art books' 3D
-   books, with a shadow that follows their outline; on hover they lift a little. The reveal's clip reaches past the
-   place, so it never cuts the shadow off */
-.g-img{position:relative;display:block;width:100%;aspect-ratio:3 / 2;margin-bottom:14px;background:radial-gradient(52% 50% at 50% 54%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%)}
-.g-img img{position:absolute;left:7%;top:7%;display:block;width:86%;height:86%;object-fit:contain;filter:drop-shadow(0 12px 16px rgba(0,0,0,.55))}
-[data-rv="clip"].g-card .mask{clip-path:inset(-12% -12% -18% -12%)}
+/* a card's picture: the goods alone, cut out, whole in a 4:3 frame, every card's the same, standing in a soft light
+   like the art books' 3D books, with a shadow that follows their outline. The frame is the event pill's and the
+   corner buttons' line (--ring-*): on hover it lights up with their halo, and the goods lift a little. The reveal's
+   clip reaches past the frame, so it never cuts the halo off */
+.g-img{position:relative;display:block;width:100%;aspect-ratio:4 / 3;margin-bottom:14px;border:1px solid var(--ring-line);background:radial-gradient(58% 54% at 50% 56%,rgba(255,255,255,.075),rgba(255,255,255,0) 74%)}
+.g-img img{position:absolute;left:8%;top:8%;display:block;width:84%;height:84%;object-fit:contain;filter:drop-shadow(0 12px 16px rgba(0,0,0,.55))}
+[data-rv="clip"].g-card .mask{clip-path:inset(-12% -12% -18% -12%);transition:clip-path 1.3s var(--ease-out) var(--d,0s),border-color .35s,box-shadow .35s}
 [data-rv="clip"].g-card.rv-pre:not(.rv-in) .mask{clip-path:inset(100% -12% -18% -12%)}
 [data-rv="clip"].g-card .mask img{transition:transform .6s var(--ease-out),filter .6s var(--ease-out)}
+.g-card:hover .g-img,.g-card:focus-visible .g-img,.catalog-cover:hover,.catalog-cover:focus-visible{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
 .g-card:hover .g-img img{transform:translateY(-6px);filter:drop-shadow(0 20px 24px rgba(0,0,0,.6))}
 .g-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}

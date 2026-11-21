@@ -2,6 +2,7 @@
 @media (max-width:960px){
   .g-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .g-card:first-child{grid-column:1 / -1}
+  .g-card:first-child .g-img{width:calc((100% - clamp(20px,3vw,40px)) / 2)}   /* across both columns, its frame stays the others' size */
   .gd-body{grid-template-columns:minmax(0,1fr)}
   .chars{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
@@ -29,6 +30,8 @@
 }
 @media (max-width:560px){
   .g-grid{grid-template-columns:minmax(0,1fr)}
+  .g-card:first-child .g-img{width:100%}
+  .catalog-cover{grid-template-columns:minmax(0,1fr);padding:24px 20px 28px}
 }
 @media (max-width:720px){
   :root{--head:60px}

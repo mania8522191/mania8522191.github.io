@@ -1,5 +1,6 @@
-"""Make a goods item's pictures for the site from its ad PSD (the FF47 ones: 202608/CMYK/ADs/<n>.psd): the goods
-alone, without the ad's background, words and header, transparent round them.
+"""Make a goods item's pictures for the site from its ad PSD (the FF47 ones: 202608/CMYK/ADs/<n>.psd, and for the
+keychains and the mini blocks the Melonbooks ads, ADs/melon/g.psd and e.psd): the goods alone, without the ad's
+background, words and header, transparent round them.
 
 usage: python tools/goods_pieces.py <slug> <ad.psd> [--save] [--out DIR]
 
@@ -11,7 +12,10 @@ usage: python tools/goods_pieces.py <slug> <ad.psd> [--save] [--out DIR]
 A piece is one picture layer of the ad's goods. A feathered black shadow kept as a layer of its own (the black layer
 just under its goods) is merged into its goods' piece; where the ad cut such a shadow off at the canvas edge but the
 goods go on past it, the shadow is made whole again (the goods' outline blurred, fitted to the part that is there).
-Left out: the full-canvas background, text layers, the header group (群組 2) and its dates, hidden layers.
+Left out: the background (a layer over the whole canvas), text layers, the header group (群組 2) and its dates,
+hidden layers. Each piece is cut to what shows: its goods with their soft edge and shadow, but not a stray faint mark
+far off (one keychain layer has one, its full height above the goods), and rid of stray specks (the keychains' ring
+photos have white dust round them, unseen on the ads' light ground but plain on the site's dark one).
 
   --save     write "dims" (and "parts": [[x, y, w, h], ...] in the card picture's pixels, where there are two pieces
              or more) into the item in GOODS in js/data.js (the item must already be there)
@@ -33,6 +37,10 @@ import common as C   # noqa: E402
 LONG = 1400   # the set's long side, as the goods pictures were
 Q = 88
 EDGE = 64     # a shadow this near the canvas edge was cut there
+REACH = 240   # how far past the goods (their solid part) a soft edge or shadow may reach
+SOLID = 96    # solid: less see-through than this (alpha)
+LONELY = 61   # a light solid pixel with less than SPECK of this square round it solid is a stray speck
+SPECK = 0.15
 
 
 def goods_layers(psd):
@@ -47,8 +55,8 @@ def goods_layers(psd):
                 continue
             if header or not l.visible or l.kind not in ('pixel', 'smartobject', 'shape'):
                 continue
-            if l.bbox == (0, 0, psd.width, psd.height) or l.name.startswith('(五)'):
-                continue   # the background; the header's dates
+            if (l.bbox[0] <= 0 and l.bbox[1] <= 0 and l.bbox[2] >= psd.width and l.bbox[3] >= psd.height) or l.name.startswith('(五)'):
+                continue   # the background (the whole canvas, or past it); the header's dates
             found.append(l)
     walk(psd, False)
     return found
@@ -132,11 +140,53 @@ def pieces(psd):
         else:
             out.append((l.composite().convert('RGBA'), l.bbox))
             i += 1
-    trimmed = []
-    for im, box in out:
-        b = im.getchannel('A').point(lambda a: 255 if a > 6 else 0).getbbox()
-        trimmed.append((im.crop(b), (box[0] + b[0], box[1] + b[1], box[0] + b[2], box[1] + b[3])))
-    return trimmed
+    return [cut(*cut(im, box, despeck=False)) for im, box in out]   # cut to what shows, then without stray specks
+
+
+def cut(im, box, despeck=True):
+    """a piece cut to what shows (shows), with its new box in the PSD; first rid of stray specks (despeck)"""
+    if despeck:
+        im = despecked(im)
+    b = shows(im)
+    return im.crop(b), (box[0] + b[0], box[1] + b[1], box[0] + b[2], box[1] + b[3])
+
+
+def shows(im):
+    """the box of what shows in a piece: everything not quite clear (a soft edge, a shadow's blur) within REACH of
+    its solid part; a faint mark farther off is left out"""
+    a = np.asarray(im.getchannel('A'))
+    ys, xs = np.nonzero(a > 40)
+    near = np.zeros(a.shape, dtype=bool)
+    near[max(0, ys.min() - REACH):ys.max() + 1 + REACH, max(0, xs.min() - REACH):xs.max() + 1 + REACH] = True
+    ys, xs = np.nonzero((a > 6) & near)
+    return int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1
+
+
+def despecked(im):
+    """the piece without stray specks, such as the white dust round the keychains' rings, often in the goods' own soft
+    shadow: unseen on the ads' light ground, plain on the site's dark one. A speck is solid (alpha over SOLID), light
+    (not a shadow's black) and alone: in the LONELY px square round it, less than SPECK of the pixels are solid (by
+    the goods, or along a ring or a chain, far more are). A speck, with its soft rim, becomes what is round it: black
+    (the shadow's colour), as see-through as its neighbours on average, so nothing where there is no shadow"""
+    a = np.asarray(im).astype(np.float64)
+    solid = a[..., 3] > SOLID
+    speck = solid & (a[..., :3].mean(axis=2) > 60) & (box_mean(solid.astype(np.float64), LONELY) < SPECK)
+    if not speck.any():
+        return im
+    speck = np.asarray(Image.fromarray(speck.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(5))) > 0
+    keep = (~speck).astype(np.float64)
+    round_it = box_mean(a[..., 3] * keep, 25) / np.maximum(box_mean(keep, 25), 1e-6)
+    a[speck, :3] = 0
+    a[speck, 3] = round_it[speck]
+    print(f'  stray specks taken out ({int(speck.sum())} px)')
+    return Image.fromarray(np.clip(a + .5, 0, 255).astype(np.uint8), 'RGBA')
+
+
+def box_mean(x, k):
+    """the mean of x over the k by k box round each pixel (k odd; past the edges, the edge goes on)"""
+    p = k // 2
+    c = np.pad(x, ((p + 1, p), (p + 1, p)), mode='edge').cumsum(0).cumsum(1)
+    return (c[k:, k:] - c[:-k, k:] - c[k:, :-k] + c[:-k, :-k]) / (k * k)
 
 
 def main(argv):
