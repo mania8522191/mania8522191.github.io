@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<!-- The picture a link to the site shows on other sites (its share preview), drawn by tools/share_images.py:
+     #og or #x, then the three works' picture names, the first on top: #og:111,222,333 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Figtree:wght@300;400&family=Noto+Sans+TC:wght@300;400&family=Noto+Sans+JP:wght@300;400&display=block">
+<style>
+:root{--bg:#0b0b0b;--fg:#f2efe9;--mute:#8f8a83;--gold:#d0a65a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
+body{position:relative;font-family:"Figtree","Noto Sans TC","Noto Sans JP",sans-serif;color:var(--fg)}
+/* a soft light behind the works, as on the goods' cards */
+.glow{position:absolute;inset:0;background:radial-gradient(44% 64% at var(--gx) 46%,rgba(255,255,255,.075),rgba(255,255,255,0) 74%)}
+/* the works as a hand of cards, as the works wall deals a collection: from left to right, each a little lower and
+   turned a little more, the first on top */
+.hand{position:absolute;left:var(--hx);top:var(--hy)}
+.card{position:absolute;width:var(--cw);aspect-ratio:3 / 2;overflow:hidden;background:#161514;box-shadow:0 18px 44px rgba(0,0,0,.65);outline:1px solid rgba(255,255,255,.06);outline-offset:-1px}
+.card img{display:block;width:100%;height:100%;object-fit:cover}
+.card:nth-child(1){z-index:3;left:0;top:calc(var(--cw) * .02);transform:rotate(-7deg)}
+.card:nth-child(2){z-index:2;left:calc(var(--cw) * .36);top:calc(var(--cw) * .07);transform:rotate(-1deg)}
+.card:nth-child(3){z-index:1;left:calc(var(--cw) * .72);top:calc(var(--cw) * .12);transform:rotate(6deg)}
+.name{margin:0;font-family:"Cinzel",serif;font-weight:400;letter-spacing:.14em;white-space:nowrap}
+.kind{margin:0;font-size:13px;letter-spacing:.42em;color:var(--gold);white-space:nowrap}
+.tags{margin:0;font-size:16px;font-weight:300;letter-spacing:.06em;color:var(--mute);white-space:nowrap}
+.rule{display:block;width:56px;height:1px;background:var(--gold)}
+/* Facebook and the like: they write the name and the words under the picture, and some crop it to a square in the
+   middle, so the works fill the middle and the name sits small under them */
+.og{--gx:50%;--cw:480px;--hx:calc(50% - 413px);--hy:44px}
+.og .words{position:absolute;left:0;right:0;bottom:38px;display:grid;justify-items:center;gap:10px}
+.og .name{font-size:30px}
+.og .rule,.og .tags{display:none}
+/* X: the picture alone, with the site's address over its bottom left, so the name goes large at the top left and
+   the works to the right */
+.x{--gx:68%;--cw:360px;--hx:540px;--hy:132px}
+.x .words{position:absolute;left:84px;top:168px;display:grid;justify-items:start;gap:18px}
+.x .name{font-size:44px}
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="hand"><div class="card"><img alt=""></div><div class="card"><img alt=""></div><div class="card"><img alt=""></div></div>
+<div class="words">
+  <p class="name">MANIA8522191</p>
+  <span class="rule"></span>
+  <p class="kind">ILLUSTRATION GALLERY</p>
+  <p class="tags">星街すいせい · hololive · BanG Dream! · アズールレーン</p>
+</div>
+<script>
+  const [kind, works] = location.hash.slice(1).split(':');
+  document.body.className = kind;
+  works.split(',').forEach((id, k) => { document.querySelectorAll('.card img')[k].src = `../img/${id}.webp`; });
+</script>
+</body>
+</html>

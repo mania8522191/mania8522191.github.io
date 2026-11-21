@@ -42,6 +42,7 @@
 | `img/nsfw/` | NSFW 區的三張模糊預覽 |
 | `img/cards/`、`img/char*.webp`、`img/shot*.webp` | 遊戲頁 |
 | `img/yt/` | 縮時影片的封面 |
+| `img/share-og.jpg`、`img/share-x.jpg` | 分享預覽圖：網址貼到其他社群時顯示的圖（見「分享預覽圖」） |
 
 ## 規則
 
@@ -303,6 +304,18 @@ Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊�
 `python -I tools/nsfw_preview.py <1|2|3> <圖>`：做成 600 px 寬、重度模糊的預覽。
 圖是從網路下載的話，記得用 `-I`，並把下載的檔案放在單獨的資料夾。
 
+## 分享預覽圖
+
+網址貼到其他社群時顯示的標題、說明和圖，寫在 `index.html` 最上面的 `og:`、`twitter:` 設定：
+- Facebook、Threads、LINE、Discord、Messenger、IG 私訊讀 `og:`，圖是 `img/share-og.jpg`（1200×630）：
+  圖下面平台會自己寫網站名稱和說明，有的還會把圖中間裁成正方形，所以作品放中間（三張疊成一手牌），名字小小放在下面
+- X 讀 `twitter:`，圖是 `img/share-x.jpg`（1200×600）：X 只顯示圖，左下角會蓋上網址，所以名字大大放在左上，作品在右邊
+- YouTube 不顯示連結預覽圖，頻道上的連結只會顯示網站的小圖示（`img/favicon.png`）
+- 網址 `#` 後面的部分社群看不到，貼哪一頁都是同一個預覽
+- 圖用 `tools/share_image.html` 畫（網站的字型和顏色），換作品改 `tools/share_images.py` 裡的 `WORKS`，再跑
+  `python tools/share_images.py`（要有 Chrome 和網路）
+- 換了圖之後，各社群可能還會顯示舊的圖一陣子；Facebook 可以用 Sharing Debugger 重新抓
+
 ## 本機預覽
 
 在網站資料夾執行 `python -m http.server 8765`，用瀏覽器打開 http://localhost:8765 。改了 `css/`、`js/` 先跑 `python tools/build.py`。
@@ -331,6 +344,7 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `foil_mask.py` | 燙箔遮罩，從封面 PSD 的圖層做 |
 | `nsfw_preview.py` | NSFW 區的模糊預覽 |
 | `goods_pieces.py` | 周邊圖：從廣告 PSD 去背，卡片的圖（4:3，1400×1050，跟品書同一個比例）和每一件（商品頁拖曳用，整組長邊 1400） |
+| `share_images.py` | 分享預覽圖（Facebook 等用的 1200×630、X 用的 1200×600），用 `share_image.html` 在 Chrome 裡畫 |
 | `build.py` | 把 `css/`、`js/` 合併成 `site.css`、`site.js`，更新版本戳記，再檢查殘留 |
 | `check_code.py` | 列出沒在用的程式、樣式、文字、資料欄位，和不會生效的樣式（`build.py` 每次都會跑） |
 | `check_images.py` | 列出沒用到的、缺少的圖片和音檔（`build.py` 每次都會跑） |
@@ -341,4 +355,4 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `common.py` | 共用的設定和函式（尺寸、品質、讀寫 `js/data.js`） |
 
 做圖的工具都可以加 `--out <資料夾>`，先把圖做到別的地方看看，不動到網站。
-需要 Python 3 和 Pillow；`foil_mask.py`、`goods_pieces.py` 另外需要 psd-tools（`goods_pieces.py` 還要 numpy）。
+需要 Python 3 和 Pillow；`foil_mask.py`、`goods_pieces.py` 另外需要 psd-tools（`goods_pieces.py` 還要 numpy）；`share_images.py` 要有 Google Chrome。
