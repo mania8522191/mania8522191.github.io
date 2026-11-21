@@ -107,17 +107,18 @@ const HOME_SLIDES = [
 /* the FF47 catalog (お品書き): with the goods, on a page of its own (#g-ff47-catalog), not on the works wall; its old
    address (#w-148499079) still leads there. ev: the event it is listed under on the goods page */
 const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","tags":["バーチャルYouTuber","星街すいせい","さくらみこ","宝鐘マリン","一伊那尓栖","仲町あられ"],"dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]]};
-/* goods, the newest event first (ev: the event, its section on the goods page) */
+/* goods, the newest event first (ev: the event, its section on the goods page), each event in its catalog's
+   order (FF47: as in its お品書き) */
 const GOODS = [
-  {"ev":"FF47","slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1215,810]},
-  {"ev":"FF47","slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1215,810]},
-  {"ev":"FF47","slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1305,870]},
-  {"ev":"FF47","slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1396,930]},
-  {"ev":"FF47","slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1290,860]},
-  {"ev":"FF47","slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1350,900]},
-  {"ev":"FF47","slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1350,900]},
+  {"ev":"FF47","slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1400,1349],"parts":[[0,0,523,423],[356,61,573,426],[584,327,816,1022]]},
+  {"ev":"FF47","slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1400,1353],"parts":[[0,0,605,489],[90,342,663,493],[530,228,466,341],[581,522,461,324],[915,240,175,279],[783,443,617,910]]},
+  {"ev":"FF47","slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1400,712],"parts":[[0,0,594,427],[168,149,598,425],[403,241,625,470],[744,151,656,530]]},
+  {"ev":"FF47","slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1400,806],"parts":[[122,0,650,508],[0,318,667,487],[739,291,661,451]]},
   {"ev":"FF47","slug":"keychain","name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1170,780]},
-  {"ev":"FF47","slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1395,930]}
+  {"ev":"FF47","slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1400,813]},
+  {"ev":"FF47","slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1396,930]},
+  {"ev":"FF47","slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1400,1006],"parts":[[0,39,644,520],[422,0,458,313],[600,124,800,882]]},
+  {"ev":"FF47","slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1400,950],"parts":[[511,210,889,741],[218,112,603,657],[2,0,394,394],[0,226,354,354],[10,539,331,324]]}
 ];
 
 /* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
@@ -1662,14 +1663,14 @@ function fillGoodsCard(a, g) {
   a.querySelector('.price').replaceWith(price(g, false));
 }
 
-/* the catalog's place in its event: a picture of the goods, its name and how many pages, an arrow to its page */
+/* the catalog's place in its event: its first page whole, its name and how many pages, an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
   a.href = '#g-ff47-catalog';
   const img = el('img');
-  img.src = 'img/goods-set-a.webp';
-  [img.width, img.height] = GOODS[bySlug['set-a']].dims;
+  img.src = src(FF47_CATALOG.id, 0);
+  [img.width, img.height] = FF47_CATALOG.dims[0];
   img.alt = '';
   const caption = el('span', 'catalog-caption');
   const title = el('span', 'g-name', tr('goods.catalog'));
@@ -1752,14 +1753,52 @@ $('#catalog-pages').addEventListener('click', (e) => {
 });
 
 /* ---------- goods item page ---------- */
+/* goods in pieces: a piece taken with the mouse (or a pen) follows it about the picture, lifted in front of the
+   others, and stays where it is let go, never past the picture's edges (onto the words beside it). A finger still
+   scrolls the page */
+const itStage = $('#it-stage');
+let itTop = 0;
+itStage.addEventListener('pointerdown', (e) => {
+  const p = e.target.closest('img');
+  if (!p || e.pointerType === 'touch' || e.button !== 0) return;
+  e.preventDefault();
+  const box = itStage.getBoundingClientRect(), x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
+  const pw = p.offsetWidth / box.width * 100, ph = p.offsetHeight / box.height * 100;
+  p.style.zIndex = ++itTop;
+  p.classList.add('held');
+  p.setPointerCapture(e.pointerId);
+  const move = (m) => {
+    const x = x0 + (m.clientX - e.clientX) / box.width * 100, y = y0 + (m.clientY - e.clientY) / box.height * 100;
+    p.style.left = `${Math.min(100 - pw, Math.max(0, x)).toFixed(3)}%`;
+    p.style.top = `${Math.min(100 - ph, Math.max(0, y)).toFixed(3)}%`;
+  };
+  const up = () => {
+    p.classList.remove('held');
+    p.removeEventListener('pointermove', move); p.removeEventListener('pointerup', up); p.removeEventListener('pointercancel', up);
+  };
+  p.addEventListener('pointermove', move); p.addEventListener('pointerup', up); p.addEventListener('pointercancel', up);
+});
+/* the item's picture as the page shows it, for the morph from and to its card (js/router.js) */
+const itemPic = () => (itStage.hidden ? $('#it-img') : itStage);
 function renderItem(i) {
   const g = GOODS[i];
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  const img = $('#it-img');
-  img.src = `img/goods-${g.slug}.webp`; img.width = g.dims[0]; img.height = g.dims[1];
+  /* the picture: the goods laid together; or, for goods in pieces (parts), each piece where the ad has it, to be
+     taken with the mouse and moved about (below) */
+  const img = $('#it-img'), [W, H] = g.dims;
+  img.src = `img/goods-${g.slug}.webp`; img.width = W; img.height = H;
   img.alt = tr('item.imgAlt', { t: L(g.name) });
+  img.hidden = !!g.parts; itStage.hidden = !g.parts;
+  itStage.setAttribute('aria-label', img.alt);
+  itStage.style.setProperty('--ar', `${W} / ${H}`);
+  itStage.replaceChildren(...(g.parts || []).map(([x, y, w, h], n) => {
+    const p = el('img');
+    p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
+    p.style.cssText = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
+    return p;
+  }));
 
   const rows = [];
   if (g.size) rows.push([tr('spec.size'), L(g.size)]);
@@ -3641,9 +3680,9 @@ function route() {
       return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
     }
     if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
-    if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
+    if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itemPic();
     if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
-    if (from === 'item' && r.next === 'goods') return fwd ? $('#it-img') : lastItem && document.querySelector(`#gc-${lastItem} img`);
+    if (from === 'item' && r.next === 'goods') return fwd ? itemPic() : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
     return null;
@@ -3658,7 +3697,8 @@ function route() {
     const b = pick(false);
     if (onScreen(b)) {
       b.style.viewTransitionName = 'shared'; named.push(b); showNow(b);
-      try { await Promise.race([b.decode ? b.decode() : b3Load(b), sleep(450)]); } catch (_) { /* show it as is */ }
+      const ready = b.decode ? b.decode() : b.matches('.b3') ? b3Load(b) : Promise.all([...b.querySelectorAll('img')].map((i) => i.decode()));   // a picture, a 3D book, or goods in pieces
+      try { await Promise.race([ready, sleep(450)]); } catch (_) { /* show it as is */ }
     }
   });
   t.ready.catch(() => {});   // a newer page change can cut this one short; that is fine

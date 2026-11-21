@@ -48,7 +48,7 @@
 .ov{transition:opacity .5s var(--ease-out)}
 .ov-t,.ov-m{transform:translateY(14px);transition:transform .7s var(--ease-out)}
 .cover:hover .ov-t,.cover:hover .ov-m,.cover:focus-visible .ov-t,.cover:focus-visible .ov-m{transform:none}
-.cover:hover .frame img,.g-card:hover .g-img img{transform:scale(1.05);transition:transform 1.4s var(--ease-out)}
+.cover:hover .frame img{transform:scale(1.05);transition:transform 1.4s var(--ease-out)}   /* goods lift instead (css/goods.css) */
 .proj-nav .lbl{display:inline-block;transition:color .3s,transform .5s var(--ease-out)}
 .proj-nav a:not(.next):hover .lbl{transform:translateX(-8px)}
 .proj-nav a.next:hover .lbl{transform:translateX(8px)}

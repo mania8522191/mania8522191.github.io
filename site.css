@@ -529,9 +529,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .g-card{display:grid;align-content:start;justify-items:center;gap:6px;text-align:center;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 24px)}
 /* cards in one row share their rows, so names, descriptions and prices line up even when one name wraps */
 @supports (grid-template-rows:subgrid){.g-grid{row-gap:0;margin-bottom:calc(-1 * clamp(44px,5vw,72px))}.g-card{grid-row:span 4;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.g-card .g-name{align-self:end}.g-card .g-meta,.g-card .price{align-self:start}}
-.g-img{display:block;width:100%;aspect-ratio:3 / 2;overflow:hidden;background:var(--bg-2);margin-bottom:14px}
-.g-img img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
-.g-card:hover .g-img img{transform:scale(1.035)}
+/* a card's picture: the goods alone, cut out, whole in a 3:2 place, standing in a soft light like the art books' 3D
+   books, with a shadow that follows their outline; on hover they lift a little. The reveal's clip reaches past the
+   place, so it never cuts the shadow off */
+.g-img{position:relative;display:block;width:100%;aspect-ratio:3 / 2;margin-bottom:14px;background:radial-gradient(52% 50% at 50% 54%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%)}
+.g-img img{position:absolute;left:7%;top:7%;display:block;width:86%;height:86%;object-fit:contain;filter:drop-shadow(0 12px 16px rgba(0,0,0,.55))}
+[data-rv="clip"].g-card .mask{clip-path:inset(-12% -12% -18% -12%)}
+[data-rv="clip"].g-card.rv-pre:not(.rv-in) .mask{clip-path:inset(100% -12% -18% -12%)}
+[data-rv="clip"].g-card .mask img{transition:transform .6s var(--ease-out),filter .6s var(--ease-out)}
+.g-card:hover .g-img img{transform:translateY(-6px);filter:drop-shadow(0 20px 24px rgba(0,0,0,.6))}
 .g-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
 .g-meta{font-size:13px;color:var(--mute);line-height:1.6}
@@ -554,8 +560,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .gd{max-width:1200px;margin:0 auto;padding-block:clamp(56px,8vw,112px) clamp(64px,8vw,110px)}
 .gd-price{margin:2px 0 0;font-size:clamp(19px,2vw,24px)}
 .gd-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,60px);align-items:start}
-.gd-fig{margin:0}
-.gd-fig img{display:block;width:100%;height:auto;background:var(--bg-2)}
+/* an item's picture: the same cut-out goods in the same soft light, larger */
+.gd-fig{margin:0;padding:clamp(12px,3vw,36px) 0;background:radial-gradient(52% 50% at 50% 54%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%)}
+.gd-fig > img{display:block;width:100%;height:auto;filter:drop-shadow(0 16px 22px rgba(0,0,0,.55))}
+.gd-fig > [hidden]{display:none}
+/* goods in pieces (js/goods.js): each piece where the ad has it; with the mouse each can be taken and moved about,
+   the one held lifted in front with a deeper shadow */
+.gd-stage{position:relative;width:100%;aspect-ratio:var(--ar)}
+.gd-stage img{position:absolute;display:block;height:auto;max-width:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 12px 16px rgba(0,0,0,.45));transition:transform .3s var(--ease-out),filter .3s var(--ease-out)}
+.gd-stage img.held{cursor:grabbing;transform:scale(1.04);filter:drop-shadow(0 26px 30px rgba(0,0,0,.6))}
+@media (hover:none){.gd-stage img{cursor:auto}}
 .gd-spec{margin:0;border-top:1px solid var(--line)}
 .gd-spec > div{display:grid;grid-template-columns:4.6em minmax(0,1fr);gap:16px;padding-block:15px;border-bottom:1px solid var(--line)}
 .gd-spec dt{font-size:13px;letter-spacing:.12em;color:var(--mute);padding-top:2px}
@@ -988,7 +1002,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ov{transition:opacity .5s var(--ease-out)}
 .ov-t,.ov-m{transform:translateY(14px);transition:transform .7s var(--ease-out)}
 .cover:hover .ov-t,.cover:hover .ov-m,.cover:focus-visible .ov-t,.cover:focus-visible .ov-m{transform:none}
-.cover:hover .frame img,.g-card:hover .g-img img{transform:scale(1.05);transition:transform 1.4s var(--ease-out)}
+.cover:hover .frame img{transform:scale(1.05);transition:transform 1.4s var(--ease-out)}   /* goods lift instead (css/goods.css) */
 .proj-nav .lbl{display:inline-block;transition:color .3s,transform .5s var(--ease-out)}
 .proj-nav a:not(.next):hover .lbl{transform:translateX(-8px)}
 .proj-nav a.next:hover .lbl{transform:translateX(8px)}

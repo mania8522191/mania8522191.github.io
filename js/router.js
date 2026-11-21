@@ -167,9 +167,9 @@ function route() {
       return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
     }
     if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
-    if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : $('#it-img');
+    if (from === 'goods' && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itemPic();
     if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
-    if (from === 'item' && r.next === 'goods') return fwd ? $('#it-img') : lastItem && document.querySelector(`#gc-${lastItem} img`);
+    if (from === 'item' && r.next === 'goods') return fwd ? itemPic() : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
     return null;
@@ -184,7 +184,8 @@ function route() {
     const b = pick(false);
     if (onScreen(b)) {
       b.style.viewTransitionName = 'shared'; named.push(b); showNow(b);
-      try { await Promise.race([b.decode ? b.decode() : b3Load(b), sleep(450)]); } catch (_) { /* show it as is */ }
+      const ready = b.decode ? b.decode() : b.matches('.b3') ? b3Load(b) : Promise.all([...b.querySelectorAll('img')].map((i) => i.decode()));   // a picture, a 3D book, or goods in pieces
+      try { await Promise.race([ready, sleep(450)]); } catch (_) { /* show it as is */ }
     }
   });
   t.ready.catch(() => {});   // a newer page change can cut this one short; that is fine

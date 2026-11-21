@@ -38,14 +38,14 @@ function fillGoodsCard(a, g) {
   a.querySelector('.price').replaceWith(price(g, false));
 }
 
-/* the catalog's place in its event: a picture of the goods, its name and how many pages, an arrow to its page */
+/* the catalog's place in its event: its first page whole, its name and how many pages, an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
   a.href = '#g-ff47-catalog';
   const img = el('img');
-  img.src = 'img/goods-set-a.webp';
-  [img.width, img.height] = GOODS[bySlug['set-a']].dims;
+  img.src = src(FF47_CATALOG.id, 0);
+  [img.width, img.height] = FF47_CATALOG.dims[0];
   img.alt = '';
   const caption = el('span', 'catalog-caption');
   const title = el('span', 'g-name', tr('goods.catalog'));
@@ -128,14 +128,52 @@ $('#catalog-pages').addEventListener('click', (e) => {
 });
 
 /* ---------- goods item page ---------- */
+/* goods in pieces: a piece taken with the mouse (or a pen) follows it about the picture, lifted in front of the
+   others, and stays where it is let go, never past the picture's edges (onto the words beside it). A finger still
+   scrolls the page */
+const itStage = $('#it-stage');
+let itTop = 0;
+itStage.addEventListener('pointerdown', (e) => {
+  const p = e.target.closest('img');
+  if (!p || e.pointerType === 'touch' || e.button !== 0) return;
+  e.preventDefault();
+  const box = itStage.getBoundingClientRect(), x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
+  const pw = p.offsetWidth / box.width * 100, ph = p.offsetHeight / box.height * 100;
+  p.style.zIndex = ++itTop;
+  p.classList.add('held');
+  p.setPointerCapture(e.pointerId);
+  const move = (m) => {
+    const x = x0 + (m.clientX - e.clientX) / box.width * 100, y = y0 + (m.clientY - e.clientY) / box.height * 100;
+    p.style.left = `${Math.min(100 - pw, Math.max(0, x)).toFixed(3)}%`;
+    p.style.top = `${Math.min(100 - ph, Math.max(0, y)).toFixed(3)}%`;
+  };
+  const up = () => {
+    p.classList.remove('held');
+    p.removeEventListener('pointermove', move); p.removeEventListener('pointerup', up); p.removeEventListener('pointercancel', up);
+  };
+  p.addEventListener('pointermove', move); p.addEventListener('pointerup', up); p.addEventListener('pointercancel', up);
+});
+/* the item's picture as the page shows it, for the morph from and to its card (js/router.js) */
+const itemPic = () => (itStage.hidden ? $('#it-img') : itStage);
 function renderItem(i) {
   const g = GOODS[i];
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  const img = $('#it-img');
-  img.src = `img/goods-${g.slug}.webp`; img.width = g.dims[0]; img.height = g.dims[1];
+  /* the picture: the goods laid together; or, for goods in pieces (parts), each piece where the ad has it, to be
+     taken with the mouse and moved about (below) */
+  const img = $('#it-img'), [W, H] = g.dims;
+  img.src = `img/goods-${g.slug}.webp`; img.width = W; img.height = H;
   img.alt = tr('item.imgAlt', { t: L(g.name) });
+  img.hidden = !!g.parts; itStage.hidden = !g.parts;
+  itStage.setAttribute('aria-label', img.alt);
+  itStage.style.setProperty('--ar', `${W} / ${H}`);
+  itStage.replaceChildren(...(g.parts || []).map(([x, y, w, h], n) => {
+    const p = el('img');
+    p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
+    p.style.cssText = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
+    return p;
+  }));
 
   const rows = [];
   if (g.size) rows.push([tr('spec.size'), L(g.size)]);

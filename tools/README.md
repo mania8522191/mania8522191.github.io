@@ -117,6 +117,13 @@
   同一個 `ev` 的周邊排在同一段，第一次出現的新場次會自動多一顆按鈕
 - FF47 的お品書き是 `FF47_CATALOG`（`ev: "FF47"`），不放在作品牆，有自己的一頁 `#g-ff47-catalog`：
   10 張依序往下排，點圖會開看圖的視窗。舊的作品網址 `#w-148499079` 也會轉到這一頁
+- 品書的封面是お品書き的第一頁整張；周邊照品書的順序排（`GOODS` 裡的順序）
+- 周邊的圖是去背的，只有商品：從那件周邊的廣告 PSD 做（FF47 的在 `202608/CMYK/ADs/`，1、2、2.5、3、5、5.5、6.psd）：
+  `python tools/goods_pieces.py <slug> <廣告.psd> --save`
+  只取商品的圖層（不要背景、文字、標頭）；商品下面另外一層的羽化黑影會跟那件商品合在一起，
+  廣告畫布邊緣切掉的黑影會照原本的模糊程度補齊。做出整組的圖（卡片用），和每一件的圖與位置（`parts`）
+- 商品頁上，有好幾件的周邊可以用滑鼠按住拖曳每一件，拖到的那件會到最上面，不會拖出圖的範圍；
+  手機上手指照常捲動頁面。壓克力吊飾和飯友套組還沒有 PSD，所以還是原本的照片
 - 頁面最下面是三個賣場（買動漫「Mania Art」、買動漫「宅即門」馬尼 MANIA 專區、Melonbooks），各有標誌和按鈕
 
 改完跑 `python tools/build.py`。
@@ -312,6 +319,7 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `book_images.py` | 畫冊圖：跨頁（寬 1400）、3D 書封面（2560）、原尺寸、R18 模糊頁 |
 | `foil_mask.py` | 燙箔遮罩，從封面 PSD 的圖層做 |
 | `nsfw_preview.py` | NSFW 區的模糊預覽 |
+| `goods_pieces.py` | 周邊圖：從廣告 PSD 去背，整組（卡片用，長邊 1400）和每一件（商品頁拖曳用） |
 | `build.py` | 把 `css/`、`js/` 合併成 `site.css`、`site.js`，更新版本戳記，再檢查殘留 |
 | `check_code.py` | 列出沒在用的程式、樣式、文字、資料欄位，和不會生效的樣式（`build.py` 每次都會跑） |
 | `check_images.py` | 列出沒用到的、缺少的圖片和音檔（`build.py` 每次都會跑） |
@@ -322,4 +330,4 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `common.py` | 共用的設定和函式（尺寸、品質、讀寫 `js/data.js`） |
 
 做圖的工具都可以加 `--out <資料夾>`，先把圖做到別的地方看看，不動到網站。
-需要 Python 3 和 Pillow；`foil_mask.py` 另外需要 psd-tools。
+需要 Python 3 和 Pillow；`foil_mask.py`、`goods_pieces.py` 另外需要 psd-tools（`goods_pieces.py` 還要 numpy）。
