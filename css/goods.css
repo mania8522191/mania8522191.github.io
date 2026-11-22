@@ -1,12 +1,9 @@
 /* Buttons and prices (used across the site), the goods list, goods item pages */
-/* buttons */
-.btn{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 24px;border:1px solid var(--fg);text-decoration:none;font-size:14px;letter-spacing:.06em;transition:color .45s var(--ease-out),border-color .3s}
-.btn::before{content:"";position:absolute;inset:0;z-index:-1;background:var(--fg);transform:scaleX(0);transform-origin:right center;transition:transform .6s var(--ease-out)}
-.btn:hover{color:var(--bg)}
-.btn:hover::before{transform:scaleX(1);transform-origin:left center}
-.btn.ghost{border-color:var(--line)}
-.btn.ghost::before{background:var(--bg-2)}
-.btn.ghost:hover{color:var(--fg);border-color:var(--fg)}
+/* buttons: the event pill's ring (the --ring-* look in base.css), a pill of dim gold line, lit gold with its faint
+   halo on hover; a main button's words are gold, a ghost's white */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 26px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);box-shadow:var(--ring-shadow);color:var(--g-gold);text-decoration:none;font-size:14px;letter-spacing:.06em;transition:border-color .35s,box-shadow .35s}
+.btn:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
+.btn.ghost{color:var(--fg)}
 .price{font-variant-numeric:tabular-nums;letter-spacing:.03em}
 .price s{color:var(--mute);margin-right:10px;font-size:.86em}
 .price small{color:var(--mute);font-size:.72em;margin-left:6px;letter-spacing:.08em}
