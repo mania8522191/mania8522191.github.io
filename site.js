@@ -1837,13 +1837,22 @@ catalogPages.addEventListener('click', (e) => {
 
 /* ---------- goods item page ---------- */
 /* the picture: the item's page of the catalog, which the page morph lands on from the goods' card (js/router.js).
-   A click (or Enter) takes the goods out: the picture grows to the right across the page, its words going under it
-   (a View Transition morphs the page into its new place), then the page fades away from round the goods, the
+   A click (or Enter) takes the goods out, a step at a time: the page grows to the right, still a square, its words
+   going under it (a View Transition morphs the page into its new place); then the picture widens to the right over
+   the background until it fills the frame, the goods that lie past the page's edge (a bag's right side) showing with
+   it; then the page and the background fade away from round the goods, the
    cut-out pieces (tools/goods_pieces.py) in the very places the page has them. Then a piece taken with the mouse (or
    a pen) follows it about the room, lifted in front of the others, its middle never past the room's edges; a finger
-   still scrolls the page. ✕ puts them back: the pieces go home, the page fades in, the picture shrinks back */
+   still scrolls the page. ✕ goes back the same steps: the pieces go home as the page and the background fade in, the
+   picture narrows to the page, the page shrinks back */
 const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
-let itTop = 0;
+const WIDEN = 700;   // ms: the picture widening or narrowing (.gd.open .gd-stage's clip-path in css/goods.css)
+let itTop = 0, itStep = 0;   // the pieces' stacking; the steps under way (a newer open or close calls off the older)
+/* the picture's next step after ms, unless an open or a close has begun since */
+function itemLater(ms, step) {
+  const s = itStep;
+  setTimeout(() => { if (s === itStep) step(); }, ms);
+}
 const itemPic = () => (itGd.classList.contains('open') ? null : itPage);   // what the page morph lands on, while it is the page
 /* a change of the picture's layout, morphing the page into its new place (no morph: at once) */
 function itemSwap(change, then) {
@@ -1858,17 +1867,31 @@ function itemSwap(change, then) {
 }
 function itemOpen() {
   if (itGd.classList.contains('open')) return;
-  itemSwap(() => { itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1; },
-    () => itGd.classList.add('cut'));
+  const s = ++itStep;
+  itemSwap(() => {
+    itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1;
+    /* the grown picture in view: where it was if it fits there, else as near as the screen lets it, never under the header */
+    const r = itStage.getBoundingClientRect(), top = $('.site-head').getBoundingClientRect().bottom + 16;
+    scrollBy(0, r.top - Math.max(top, Math.min(r.top, innerHeight - 16 - r.height)));
+  }, () => {
+    if (s !== itStep) return;
+    itGd.classList.add('wide');   // the picture widens to the right over the background
+    itemLater(CALM || itStage.offsetWidth - itPage.offsetWidth < 2 ? 0 : WIDEN, () => itGd.classList.add('cut'));   // (a phone's is as wide already)
+  });
 }
 function itemClose(now) {
   if (!itGd.classList.contains('open')) return;
-  const shut = () => { itGd.classList.remove('open'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
-  if (!now && !CALM) itGoods.classList.add('home');   // the pieces glide home while the page fades back in over them
+  ++itStep;
+  const shut = () => { itGd.classList.remove('open', 'wide'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
+  if (!now && !CALM) itGoods.classList.add('home');   // the pieces glide home while the page and the background fade back in over them
   itGoods.querySelectorAll('img').forEach((p) => { p.style.cssText = p.dataset.home; });
   itGd.classList.remove('cut');
   if (now || !VT) { itGoods.classList.remove('home'); shut(); return; }
-  setTimeout(() => { itGoods.classList.remove('home'); itemSwap(shut, () => {}); }, 800);   // then the picture shrinks
+  itemLater(800, () => {   // then the picture narrows to the page, and the page shrinks
+    itGoods.classList.remove('home');
+    itGd.classList.remove('wide');
+    itemLater(itStage.offsetWidth - itPage.offsetWidth < 2 ? 0 : WIDEN, () => itemSwap(shut, () => {}));
+  });
 }
 itStage.addEventListener('click', () => itemOpen());
 itStage.addEventListener('keydown', (e) => {
