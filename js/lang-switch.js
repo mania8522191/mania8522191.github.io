@@ -1,6 +1,6 @@
 /* Switching language: everything on screen is redrawn in place, with a short tween */
 /* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
-const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : { n: WORKS.length });
+const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : e.id === 'tag-sub' ? tagVars() : { n: WORKS.length });
 /* a link with a logo in front (the footer's .sns) keeps the logo: only the text after it changes, so the link
    stays one piece of text and the language tween fades the logo with its name */
 function setText(e, s) {
@@ -131,4 +131,6 @@ function swapLang(l) {
   abText();
   if (view === 'book') bookText(byBook[lastBook]);
   layoutWall();
+  tagText();   // a tag's page: its count and its covers' words
+  layoutTag();
 }

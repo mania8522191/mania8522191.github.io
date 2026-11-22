@@ -12,8 +12,8 @@ function renderWork(i, piece = -1) {
   $('#wk-all-li').hidden = !one;   // a piece's page: back to the whole collection
   $('#wk-all').href = '#w-' + w.id;
 
-  const tags = $('#wk-tags');
-  tags.replaceChildren(...w.tags.map((t) => { const li = document.createElement('li'); li.textContent = '#' + t; return li; }));
+  const tags = $('#wk-tags');   // each opens its tag's page: every work with it (js/tag.js)
+  tags.replaceChildren(...w.tags.map((t) => { const li = el('li'), a = el('a', '', '#' + t); a.href = tagHref(t); li.append(a); return li; }));
 
   const box = $('#wk-imgs');
   box.removeAttribute('style');   // a collage's height, a piece page's columns

@@ -1,4 +1,4 @@
-/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, artbook, book3d, motion, home, router, about, lang-switch, sound, main. Edit those files, not this one. */
+/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, lang-switch, sound, main. Edit those files, not this one. */
 
 /* ==================== js/data.js ==================== */
 /* Site data. One item per line; the scripts in tools/ read and write this file (keep each list valid JSON).
@@ -106,7 +106,7 @@ const HOME_SLIDES = [
 
 /* the FF47 catalog (お品書き): with the goods, on a page of its own (#g-ff47-catalog), not on the works wall; its old
    address (#w-148499079) still leads there. ev: the event it is listed under on the goods page */
-const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","tags":["バーチャルYouTuber","星街すいせい","さくらみこ","宝鐘マリン","一伊那尓栖","仲町あられ"],"dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]]};
+const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]]};
 /* goods, the newest event first (ev: the event, its section on the goods page), each event in its catalog's
    order (FF47: as in its お品書き) */
 const GOODS = [
@@ -158,7 +158,7 @@ const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), tag: $('#v-tag'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
 
 /* a url() for a CSS custom property, made absolute so it points at the same file whichever stylesheet uses it */
 const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
@@ -174,6 +174,9 @@ const I18N = {
     "home.dot": "第 {n} 張：{t}",
     "snd.label": "背景音樂",
     "works.sub": "{a} — {b} · {n} 件作品 · 點選封面看完整作品",
+    "tag.sub": "{y} · {n} 件作品",
+    "tag.sub1": "{y} · 1 件作品",
+    "tag.all": "← 全部作品",
     "cover.pages": "{n} 張",
     "cover.video": "▶ 過程影片",
     "wk.posted": "{d} 發表",
@@ -404,6 +407,9 @@ const I18N = {
     "home.dot": "Slide {n}: {t}",
     "snd.label": "Background music",
     "works.sub": "{a} — {b} · {n} works · Click a cover to see the full piece",
+    "tag.sub": "{y} · {n} works",
+    "tag.sub1": "{y} · 1 work",
+    "tag.all": "← All works",
     "cover.pages": "{n} images",
     "cover.video": "▶ Timelapse",
     "wk.posted": "Posted {d}",
@@ -634,6 +640,9 @@ const I18N = {
     "home.dot": "{n}枚目：{t}",
     "snd.label": "BGM",
     "works.sub": "{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます",
+    "tag.sub": "{y} · 全{n}作品",
+    "tag.sub1": "{y} · 1作品",
+    "tag.all": "← 作品一覧",
     "cover.pages": "{n}枚",
     "cover.video": "▶ メイキング",
     "wk.posted": "{d} 投稿",
@@ -1686,14 +1695,14 @@ function goodsGrid(items) {
   return grid;
 }
 
-/* the catalog's place in its event: three of its pages dealt as a hand of cards, as a collection's cover on the works
-   wall (a new pick on every page load), in page order from left to right, the first on top and each next one under
-   it; then its name, how many pages, and an arrow to its page */
+/* the catalog's place in its event: its first three pages dealt as a hand of cards, as a collection's cover on the
+   works wall, in page order from left to right, the first on top and each next one under it; then its name, how many
+   pages, and an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
   a.href = '#g-ff47-catalog';
-  const hand = handOf(coverPieces(FF47_CATALOG).map((n) => [src(FF47_CATALOG.id, n), ...FF47_CATALOG.dims[n].slice(0, 2)]), true);
+  const hand = handOf(FF47_CATALOG.dims.slice(0, 3).map(([W, H], n) => [src(FF47_CATALOG.id, n), W, H]), true);
   const fan = el('span', 'catalog-hand frame fan');
   fan.style.cssText = `--ar:${hand.r.toFixed(4)};--cw:${hand.cwp}`;
   fan.innerHTML = hand.cards;
@@ -1751,15 +1760,14 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
   if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
   goodsYearsUpdate();
 });
-/* ---------- the FF47 catalog's page: its date, page count and tags; its pages side by side, to be dragged left and
-   right; then the event's goods, the cards that open their item pages ---------- */
+/* ---------- the FF47 catalog's page: its date and page count; its pages side by side, to be dragged left and right;
+   then the event's goods, the cards that open their item pages ---------- */
 const catalogPages = $('#catalog-pages');
 /* made once (its words then follow the language: catalogText, and the cards in js/lang-switch.js); `fresh`, not back
    from one of its goods: from the first page */
 function renderCatalog(fresh) {
   const catalog = FF47_CATALOG;
   if (!catalogPages.children.length) {
-    $('#catalog-tags').replaceChildren(...catalog.tags.map((tag) => el('li', '', '#' + tag)));
     catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
       const img = el('img');
       img.src = src(catalog.id, i);
@@ -1808,23 +1816,39 @@ catalogPages.addEventListener('pointermove', (e) => {
   if (!d || e.pointerId !== d.id || (!d.moved && Math.abs(e.clientX - d.x) < 6)) return;
   if (!d.moved) {   // a drag, not a click: the pages follow the mouse, unsnapped
     d.moved = true;
+    catalogTo = null;   // (taken again while still gliding)
     catalogPages.setPointerCapture(d.id);
     catalogPages.classList.add('held');
   }
   catalogPages.scrollLeft = d.left - (e.clientX - d.x);
 });
+/* let go, the pages glide to the page in the middle with snapping off, and it comes back once they are there: not at
+   the first scrollend, which can be the drag's own last move, so that snapping came back as the glide began and the
+   pages jumped instead (it depended on how the mouse was let go) */
+let catalogTo = null;   // where the pages are gliding to (scrollLeft)
+function catalogRest() {
+  if (catalogTo === null || (catalogDrag && catalogDrag.moved) || Math.abs(catalogPages.scrollLeft - catalogTo) > 1) return;
+  catalogTo = null;
+  catalogPages.classList.remove('held');
+}
+catalogPages.addEventListener('scrollend', catalogRest);
 const catalogLetGo = (e) => {
   const d = catalogDrag;
   if (!d || e.pointerId !== d.id) return;
   catalogDrag = null;
   if (!d.moved) return;
-  const step = catalogStep(), went = catalogPages.scrollLeft - d.left;
+  const step = catalogStep(), n = catalogPages.children.length, went = catalogPages.scrollLeft - d.left;
   let to = Math.round(catalogPages.scrollLeft / step);
   if (to === Math.round(d.left / step) && Math.abs(went) >= step / 5) to += Math.sign(went);
+  to = Math.min(n - 1, Math.max(0, to));
+  const target = catalogTo = to * step;
   catalogGo(to);
-  const snap = () => catalogPages.classList.remove('held');   // snapping again once it has come to rest
-  catalogPages.addEventListener('scrollend', snap, { once: true });
-  setTimeout(snap, 900);
+  catalogRest();   // already there: no glide, no scrollend
+  setTimeout(() => {   // a glide cut short by another scroll: snapping comes back all the same
+    if (catalogTo !== target || (catalogDrag && catalogDrag.moved)) return;
+    catalogTo = null;
+    catalogPages.classList.remove('held');
+  }, 1500);
 };
 catalogPages.addEventListener('pointerup', catalogLetGo);
 catalogPages.addEventListener('pointercancel', catalogLetGo);
@@ -2466,8 +2490,8 @@ function renderWork(i, piece = -1) {
   $('#wk-all-li').hidden = !one;   // a piece's page: back to the whole collection
   $('#wk-all').href = '#w-' + w.id;
 
-  const tags = $('#wk-tags');
-  tags.replaceChildren(...w.tags.map((t) => { const li = document.createElement('li'); li.textContent = '#' + t; return li; }));
+  const tags = $('#wk-tags');   // each opens its tag's page: every work with it (js/tag.js)
+  tags.replaceChildren(...w.tags.map((t) => { const li = el('li'), a = el('a', '', '#' + t); a.href = tagHref(t); li.append(a); return li; }));
 
   const box = $('#wk-imgs');
   box.removeAttribute('style');   // a collage's height, a piece page's columns
@@ -2632,6 +2656,53 @@ function ytInline(card, id, t) {
   });
 }
 addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });
+
+/* ==================== js/tag.js ==================== */
+/* Tag page */
+/* ---------- a tag's page (#t-<tag>, from the tags on a work page): every work with that tag, as covers on the works
+   wall's collage, in the wall's order (newest or oldest first). A cover opens its work, morphing as on the wall, and
+   Back comes to it again. Made anew for another tag; its words follow the language (tagText) ---------- */
+const tagWall = $('#tag-wall');
+const TAG_SEED = (WALL_SEED ^ 0x85ebca6b) >>> 0;   // an arrangement of its own, kept while browsing like the wall's
+let tagNow = null;   // the tag on the page
+const tagWorks = (tag) => WORKS.filter((w) => w.tags.includes(tag));
+const tagHref = (tag) => '#t-' + encodeURIComponent(tag);
+function renderTag(tag) {
+  tagNow = tag;
+  const works = tagWorks(tag).sort(byMade);
+  if (wallSort === 'old') works.reverse();
+  tagWall.replaceChildren(...works.map((w, i) => {
+    const picks = w.pieces ? coverPieces(w) : [0];   // a collection: three of its pieces, as on the wall
+    const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, i < 4);
+    a.id = 'tc-' + w.id;
+    a.dataset.n = picks[picks.length - 1];   // the picture in front: the page morph lands on its piece (js/router.js)
+    a.dataset.date = madeOn(w);
+    return a;
+  }));
+  tagText();
+}
+/* {n} works between {y} (one year, or the first — the last) */
+function tagVars() {
+  if (tagNow === null) return { n: 0, y: '' };
+  const ys = tagWorks(tagNow).map((w) => madeOn(w).slice(0, 4)).sort(), a = ys[0], b = ys[ys.length - 1];
+  return { n: ys.length, y: a === b ? a : `${a} — ${b}` };
+}
+/* the words that change with the language */
+function tagText() {
+  if (tagNow === null) return;
+  $('#tag-h').textContent = '#' + tagNow;
+  const sub = $('#tag-sub'), vars = tagVars();
+  sub.dataset.i18n = vars.n === 1 ? 'tag.sub1' : 'tag.sub';
+  sub.textContent = tr(sub.dataset.i18n, vars);
+  tagWall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(3)]]));
+}
+function layoutTag() {
+  if (VIEWS.tag.hidden || !tagWall.clientWidth) return;
+  const order = [...tagWall.querySelectorAll('.cover')];
+  collage(tagWall, order, buildUnits(order), TAG_SEED, null);
+}
+addEventListener('resize', () => requestAnimationFrame(layoutTag));
+if (document.fonts) document.fonts.ready.then(layoutTag);
 
 /* ==================== js/artbook.js ==================== */
 /* Art books: the list and the book page */
@@ -3660,7 +3731,7 @@ function snsShow(on) {
 
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #t-<tag> (every work with it) #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 /* where each page was scrolled when it was left (by its address), to come back to it there. The site places the page
    itself on every change, so the browser's own scroll restoration is off: on Back it scrolled the page being left
@@ -3694,6 +3765,7 @@ function parse() {
       return { h, next: 'work', idx: byId[id], piece: w.pieces && Number.isInteger(n) && n >= 1 && n <= w.dims.length ? n - 1 : -1 };
     }
   }
+  if (h.startsWith('t-') && tagWorks(h.slice(2)).length) return { h, next: 'tag', idx: -1, tag: h.slice(2) };
   if (h.startsWith('g-') && h.slice(2) in bySlug) return { h, next: 'item', idx: bySlug[h.slice(2)] };
   if (h === 'artbook') return { h, next: 'artbook', idx: -1 };
   if (h.startsWith('ab-') && h.slice(3) in byBook) return { h, next: 'book', idx: byBook[h.slice(3)] };
@@ -3701,7 +3773,7 @@ function parse() {
 }
 
 /* swap the DOM to the requested view, then start watching its reveal elements */
-function apply({ h, next, idx, cat, piece = -1 }) {
+function apply({ h, next, idx, cat, piece = -1, tag }) {
   const from = view, fromPiece = lastPiece;
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
@@ -3721,6 +3793,14 @@ function apply({ h, next, idx, cat, piece = -1 }) {
     renderWork(idx, piece); lastWork = WORKS[idx].id; lastPiece = piece;
     const tile = back && $(`#wk-imgs [data-n="${fromPiece}"]`);
     if (tile) { backTo(tile); els = [...pending(root), ...prime($('#wk-imgs'))]; } else { scrollTo(0, 0); els = prime(root); }
+  } else if (next === 'tag') {
+    /* back from one of its works: the page as it was left, that work's cover in view (backTo); another tag (from a
+       work page's tags): a new page, from the top */
+    const again = tag === tagNow;
+    if (!again) renderTag(tag);
+    layoutTag();
+    const cover = again && from === 'work' && lastWork && document.getElementById('tc-' + lastWork);
+    if (cover) { backTo(cover); els = pending(root); } else { scrollTo(0, 0); els = same ? pending(root) : prime(root); }
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
@@ -3817,15 +3897,15 @@ function route() {
   const r = parse();
   shownAt = location.hash;   // (parse may have rewritten an old address)
   const from = view;
-  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
+  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !((from === 'work' || from === 'tag') && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   /* inside a collection: between its grid and a piece's page, the picture morphs too */
   const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
   const fromPiece = lastPiece;
   if (from === null || (from === r.next && !hop) || !VT) { apply(r); return; }
   /* the picture a work page shares with its wall cover: the cover's picture in front (a collection's cover deals a
      random three, the last on top), and on the page its first one, or on a collection's page that same piece */
-  const coverPic = (id) => [...document.querySelectorAll(`#c-${id} img`)].pop();
-  const pagePic = (id) => $(`#wk-imgs [data-n="${$('#c-' + id).dataset.n}"] img`) || $('#wk-imgs img');
+  const coverPic = (id, on = 'c') => [...document.querySelectorAll(`#${on}-${id} img`)].pop();   // on the wall, or a tag's page (tc)
+  const pagePic = (id, on = 'c') => $(`#wk-imgs [data-n="${$(`#${on}-${id}`).dataset.n}"] img`) || $('#wk-imgs img');
   const pick = (fwd) => {
     if (hop) {
       const tile = $(`#wk-imgs [data-n="${r.piece < 0 ? fromPiece : r.piece}"] img`), big = $('#wk-imgs .pc-fig img');
@@ -3834,6 +3914,8 @@ function route() {
     if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
     if ((from === 'catalog' || from === 'goods') && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itemPic();
     if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
+    if (from === 'tag' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id, 'tc') : pagePic(WORKS[r.idx].id, 'tc');
+    if (from === 'work' && r.next === 'tag') return fwd ? pagePic(lastWork, $('#tc-' + lastWork) ? 'tc' : 'c') : coverPic(lastWork, 'tc');   // (a tag's page not made yet: the wall's cover says which piece)
     if (from === 'item' && (r.next === 'catalog' || r.next === 'goods')) return fwd ? itemPic() : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
@@ -3916,7 +3998,7 @@ aboutSwap.addEventListener('click', () => {
 /* ==================== js/lang-switch.js ==================== */
 /* Switching language: everything on screen is redrawn in place, with a short tween */
 /* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
-const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : { n: WORKS.length });
+const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : e.id === 'tag-sub' ? tagVars() : { n: WORKS.length });
 /* a link with a logo in front (the footer's .sns) keeps the logo: only the text after it changes, so the link
    stays one piece of text and the language tween fades the logo with its name */
 function setText(e, s) {
@@ -4047,6 +4129,8 @@ function swapLang(l) {
   abText();
   if (view === 'book') bookText(byBook[lastBook]);
   layoutWall();
+  tagText();   // a tag's page: its count and its covers' words
+  layoutTag();
 }
 
 /* ==================== js/sound.js ==================== */

@@ -1,6 +1,10 @@
 /* Works: the cover wall with its year bar and sort menu, the work page, process videos */
 /* cover wall (template 1 browsing) */
 .works{padding-block:clamp(64px,9vw,128px) clamp(88px,10vw,150px)}
+/* a tag's page (js/tag.js): a gold TAG over the tag as the title, how many works, the way back to the whole wall */
+.tag-k{margin:0 0 10px;text-align:center;font-size:12px;letter-spacing:.32em;color:var(--g-gold)}
+.tag-title{letter-spacing:.02em;overflow-wrap:anywhere}
+.tag-all{margin:12px 0 0;text-align:center;font-size:14px}
 #works{scroll-margin-top:calc(var(--head) + 24px)}
 /* the wall is also the timeline: each year opens with its number, a rule and how many works it holds */
 .wall-year{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:clamp(12px,2vw,24px);pointer-events:none}
@@ -99,9 +103,11 @@
 @media (max-width:640px){.bk-spec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.bk-spec div:nth-child(odd){border-left:0}}
 .proj-ym{margin:0;font-family:var(--f-display);font-size:clamp(15px,1.5vw,19px);letter-spacing:.24em;color:var(--mute)}
 .proj-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 22px;margin:6px 0 0;padding:0;list-style:none;font-size:14px;color:var(--mute)}
-.proj-meta a{color:var(--fg);text-underline-offset:5px;text-decoration-thickness:1px}
-.proj-meta a:hover{color:var(--mute)}
+.proj-meta a,.tag-all a{color:var(--fg);text-underline-offset:5px;text-decoration-thickness:1px}
+.proj-meta a:hover,.tag-all a:hover{color:var(--mute)}
 .proj-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--mute);max-width:46em}
+.proj-tags a{color:inherit;text-decoration:none;transition:color .3s}   /* each opens its tag's page */
+.proj-tags a:hover,.proj-tags a:focus-visible{color:var(--g-gold)}
 .proj-imgs{display:grid;justify-items:center;gap:clamp(16px,3vw,44px)}
 .proj-imgs img{display:block;height:auto;max-width:100%;background:var(--bg-2)}
 /* a collection's piece on its own page: the finished picture, its other versions and its sketch, two to a row (one

@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=8c482dab">
+<link rel="stylesheet" href="site.css?v=63dedc77">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -66,7 +66,7 @@ addEventListener('hashchange', function () {
     <a class="logo" href="#home">MANIA8522191</a>
     <nav class="nav" aria-label="主選單" data-i18n-aria="nav.main">
       <a href="#home" data-v="home">Home</a>
-      <a href="#work" data-v="works work">Work</a>
+      <a href="#work" data-v="works work tag">Work</a>
       <a href="#artbook" data-v="artbook book">Art Book</a>
       <a href="#goods" data-v="goods item catalog">Goods</a>
       <a href="#event" data-v="event">Event</a>
@@ -81,7 +81,7 @@ addEventListener('hashchange', function () {
 </header>
 <nav class="m-nav" id="m-nav" aria-label="主選單" data-i18n-aria="nav.main">
   <a href="#home" data-v="home">Home</a>
-  <a href="#work" data-v="works work">Work</a>
+  <a href="#work" data-v="works work tag">Work</a>
   <a href="#artbook" data-v="artbook book">Art Book</a>
   <a href="#goods" data-v="goods item catalog">Goods</a>
   <a href="#event" data-v="event">Event</a>
@@ -136,6 +136,17 @@ addEventListener('hashchange', function () {
         <p class="nsfw-note" data-i18n="nsfw.note" data-rv="up" data-d=".25s">成人向作品不直接放在網站上。點圖片或下方按鈕，到 Google 雲端相簿看完整作品。</p>
         <a class="nsfw-go" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".35s"><span data-i18n="nsfw.go">前往 Google 雲端相簿</span><span aria-hidden="true">↗</span></a>
       </div>
+    </section>
+  </div>
+
+  <!-- a tag: every work with it, on the wall's collage (js/tag.js) -->
+  <div class="view" id="v-tag" hidden>
+    <section class="works in" aria-labelledby="tag-h">
+      <p class="tag-k">TAG</p>
+      <h2 class="sec-title tag-title" id="tag-h"></h2>
+      <p class="sec-sub" id="tag-sub" data-i18n="tag.sub"></p>
+      <p class="tag-all"><a href="#work" data-i18n="tag.all">← 全部作品</a></p>
+      <div class="wall" id="tag-wall"></div>
     </section>
   </div>
 
@@ -256,7 +267,6 @@ addEventListener('hashchange', function () {
           <li id="catalog-date"></li><li id="catalog-count"></li>
           <li><a href="https://www.pixiv.net/artworks/148499079" target="_blank" rel="noopener" data-i18n="wk.pixiv">在 pixiv 查看 ↗</a></li>
         </ul>
-        <ul class="proj-tags" id="catalog-tags"></ul>
       </header>
       <div class="cat-strip" id="catalog-pages" tabindex="0" role="region" aria-label="品書：左右拖曳翻頁" data-i18n-aria="catalog.strip"></div>
       <div class="cat-turn">
@@ -560,6 +570,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=a8530b2a"></script>
+<script src="site.js?v=49cb8e49"></script>
 </body>
 </html>

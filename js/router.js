@@ -1,5 +1,5 @@
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #t-<tag> (every work with it) #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 /* where each page was scrolled when it was left (by its address), to come back to it there. The site places the page
    itself on every change, so the browser's own scroll restoration is off: on Back it scrolled the page being left
@@ -33,6 +33,7 @@ function parse() {
       return { h, next: 'work', idx: byId[id], piece: w.pieces && Number.isInteger(n) && n >= 1 && n <= w.dims.length ? n - 1 : -1 };
     }
   }
+  if (h.startsWith('t-') && tagWorks(h.slice(2)).length) return { h, next: 'tag', idx: -1, tag: h.slice(2) };
   if (h.startsWith('g-') && h.slice(2) in bySlug) return { h, next: 'item', idx: bySlug[h.slice(2)] };
   if (h === 'artbook') return { h, next: 'artbook', idx: -1 };
   if (h.startsWith('ab-') && h.slice(3) in byBook) return { h, next: 'book', idx: byBook[h.slice(3)] };
@@ -40,7 +41,7 @@ function parse() {
 }
 
 /* swap the DOM to the requested view, then start watching its reveal elements */
-function apply({ h, next, idx, cat, piece = -1 }) {
+function apply({ h, next, idx, cat, piece = -1, tag }) {
   const from = view, fromPiece = lastPiece;
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
@@ -60,6 +61,14 @@ function apply({ h, next, idx, cat, piece = -1 }) {
     renderWork(idx, piece); lastWork = WORKS[idx].id; lastPiece = piece;
     const tile = back && $(`#wk-imgs [data-n="${fromPiece}"]`);
     if (tile) { backTo(tile); els = [...pending(root), ...prime($('#wk-imgs'))]; } else { scrollTo(0, 0); els = prime(root); }
+  } else if (next === 'tag') {
+    /* back from one of its works: the page as it was left, that work's cover in view (backTo); another tag (from a
+       work page's tags): a new page, from the top */
+    const again = tag === tagNow;
+    if (!again) renderTag(tag);
+    layoutTag();
+    const cover = again && from === 'work' && lastWork && document.getElementById('tc-' + lastWork);
+    if (cover) { backTo(cover); els = pending(root); } else { scrollTo(0, 0); els = same ? pending(root) : prime(root); }
   } else if (next === 'item') {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
@@ -156,15 +165,15 @@ function route() {
   const r = parse();
   shownAt = location.hash;   // (parse may have rewritten an old address)
   const from = view;
-  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !(from === 'work' && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
+  if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !((from === 'work' || from === 'tag') && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
   /* inside a collection: between its grid and a piece's page, the picture morphs too */
   const hop = from === 'work' && r.next === 'work' && WORKS[r.idx].id === lastWork && (r.piece < 0) !== (lastPiece < 0);
   const fromPiece = lastPiece;
   if (from === null || (from === r.next && !hop) || !VT) { apply(r); return; }
   /* the picture a work page shares with its wall cover: the cover's picture in front (a collection's cover deals a
      random three, the last on top), and on the page its first one, or on a collection's page that same piece */
-  const coverPic = (id) => [...document.querySelectorAll(`#c-${id} img`)].pop();
-  const pagePic = (id) => $(`#wk-imgs [data-n="${$('#c-' + id).dataset.n}"] img`) || $('#wk-imgs img');
+  const coverPic = (id, on = 'c') => [...document.querySelectorAll(`#${on}-${id} img`)].pop();   // on the wall, or a tag's page (tc)
+  const pagePic = (id, on = 'c') => $(`#wk-imgs [data-n="${$(`#${on}-${id}`).dataset.n}"] img`) || $('#wk-imgs img');
   const pick = (fwd) => {
     if (hop) {
       const tile = $(`#wk-imgs [data-n="${r.piece < 0 ? fromPiece : r.piece}"] img`), big = $('#wk-imgs .pc-fig img');
@@ -173,6 +182,8 @@ function route() {
     if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
     if ((from === 'catalog' || from === 'goods') && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itemPic();
     if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
+    if (from === 'tag' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id, 'tc') : pagePic(WORKS[r.idx].id, 'tc');
+    if (from === 'work' && r.next === 'tag') return fwd ? pagePic(lastWork, $('#tc-' + lastWork) ? 'tc' : 'c') : coverPic(lastWork, 'tc');   // (a tag's page not made yet: the wall's cover says which piece)
     if (from === 'item' && (r.next === 'catalog' || r.next === 'goods')) return fwd ? itemPic() : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);

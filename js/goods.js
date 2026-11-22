@@ -46,14 +46,14 @@ function goodsGrid(items) {
   return grid;
 }
 
-/* the catalog's place in its event: three of its pages dealt as a hand of cards, as a collection's cover on the works
-   wall (a new pick on every page load), in page order from left to right, the first on top and each next one under
-   it; then its name, how many pages, and an arrow to its page */
+/* the catalog's place in its event: its first three pages dealt as a hand of cards, as a collection's cover on the
+   works wall, in page order from left to right, the first on top and each next one under it; then its name, how many
+   pages, and an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
   a.href = '#g-ff47-catalog';
-  const hand = handOf(coverPieces(FF47_CATALOG).map((n) => [src(FF47_CATALOG.id, n), ...FF47_CATALOG.dims[n].slice(0, 2)]), true);
+  const hand = handOf(FF47_CATALOG.dims.slice(0, 3).map(([W, H], n) => [src(FF47_CATALOG.id, n), W, H]), true);
   const fan = el('span', 'catalog-hand frame fan');
   fan.style.cssText = `--ar:${hand.r.toFixed(4)};--cw:${hand.cwp}`;
   fan.innerHTML = hand.cards;
@@ -111,15 +111,14 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
   if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
   goodsYearsUpdate();
 });
-/* ---------- the FF47 catalog's page: its date, page count and tags; its pages side by side, to be dragged left and
-   right; then the event's goods, the cards that open their item pages ---------- */
+/* ---------- the FF47 catalog's page: its date and page count; its pages side by side, to be dragged left and right;
+   then the event's goods, the cards that open their item pages ---------- */
 const catalogPages = $('#catalog-pages');
 /* made once (its words then follow the language: catalogText, and the cards in js/lang-switch.js); `fresh`, not back
    from one of its goods: from the first page */
 function renderCatalog(fresh) {
   const catalog = FF47_CATALOG;
   if (!catalogPages.children.length) {
-    $('#catalog-tags').replaceChildren(...catalog.tags.map((tag) => el('li', '', '#' + tag)));
     catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
       const img = el('img');
       img.src = src(catalog.id, i);
@@ -168,23 +167,39 @@ catalogPages.addEventListener('pointermove', (e) => {
   if (!d || e.pointerId !== d.id || (!d.moved && Math.abs(e.clientX - d.x) < 6)) return;
   if (!d.moved) {   // a drag, not a click: the pages follow the mouse, unsnapped
     d.moved = true;
+    catalogTo = null;   // (taken again while still gliding)
     catalogPages.setPointerCapture(d.id);
     catalogPages.classList.add('held');
   }
   catalogPages.scrollLeft = d.left - (e.clientX - d.x);
 });
+/* let go, the pages glide to the page in the middle with snapping off, and it comes back once they are there: not at
+   the first scrollend, which can be the drag's own last move, so that snapping came back as the glide began and the
+   pages jumped instead (it depended on how the mouse was let go) */
+let catalogTo = null;   // where the pages are gliding to (scrollLeft)
+function catalogRest() {
+  if (catalogTo === null || (catalogDrag && catalogDrag.moved) || Math.abs(catalogPages.scrollLeft - catalogTo) > 1) return;
+  catalogTo = null;
+  catalogPages.classList.remove('held');
+}
+catalogPages.addEventListener('scrollend', catalogRest);
 const catalogLetGo = (e) => {
   const d = catalogDrag;
   if (!d || e.pointerId !== d.id) return;
   catalogDrag = null;
   if (!d.moved) return;
-  const step = catalogStep(), went = catalogPages.scrollLeft - d.left;
+  const step = catalogStep(), n = catalogPages.children.length, went = catalogPages.scrollLeft - d.left;
   let to = Math.round(catalogPages.scrollLeft / step);
   if (to === Math.round(d.left / step) && Math.abs(went) >= step / 5) to += Math.sign(went);
+  to = Math.min(n - 1, Math.max(0, to));
+  const target = catalogTo = to * step;
   catalogGo(to);
-  const snap = () => catalogPages.classList.remove('held');   // snapping again once it has come to rest
-  catalogPages.addEventListener('scrollend', snap, { once: true });
-  setTimeout(snap, 900);
+  catalogRest();   // already there: no glide, no scrollend
+  setTimeout(() => {   // a glide cut short by another scroll: snapping comes back all the same
+    if (catalogTo !== target || (catalogDrag && catalogDrag.moved)) return;
+    catalogTo = null;
+    catalogPages.classList.remove('held');
+  }, 1500);
 };
 catalogPages.addEventListener('pointerup', catalogLetGo);
 catalogPages.addEventListener('pointercancel', catalogLetGo);
