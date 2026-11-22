@@ -85,27 +85,30 @@
    3:2, the background's shape), in the cards' soft light, hidden at first (the clip). Next (.wide) the picture widens
    to the right over the background (img/goods-bg.webp, the pages' own background picture at the page's height, from
    its top left, so it carries on from the page with no seam: tools/catalog_bg.py) until it fills the frame. The
-   pieces lie between the background and the page: within the page it covers them (it draws them itself), and what
-   lies past its edge (a bag's right side) shows on the background as the picture widens, carrying on from the page's
-   drawing. Then (.cut) the page and the background fade away from round the goods as a dim gold frame shows the
-   room's edge, the pieces take their own shadow, and each can be taken and moved about the room, the one held lifted
-   in front with a deeper shadow. Its ✕ (the corner buttons' look) puts them back */
+   background, a still copy of the pieces (#it-copy) and the page make one sheet (.gd-sheet): within the page it covers
+   the copy (it draws them itself), and what lies past its edge (a bag's right side) shows on the background as the
+   picture widens, carrying on from the page's drawing. Then (.cut) the sheet fades as one from over the pieces that
+   move (#it-goods, under it), so nothing shows twice as it goes, and a dim gold frame shows the room's edge; the
+   pieces take their own shadow, and each can be taken and moved about the room, the one held lifted in front with a
+   deeper shadow. Its ✕ (the corner buttons' look) puts them back */
 .gd-fig{position:relative;margin:0;container-type:inline-size}
 .gd-stage{--s:100%;position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:14px;cursor:pointer;outline-offset:4px}
 .gd-stage::before{content:"";position:absolute;inset:0;border:1px solid var(--ring-line);border-radius:inherit;opacity:0;transition:opacity .8s var(--ease-io);pointer-events:none}
 .gd.cut .gd-stage::before{opacity:1}
-.gd-page,.gd-goods{position:absolute;left:0;top:0;width:var(--s);aspect-ratio:1}
-.gd-page{display:block;height:auto;z-index:2;transition:opacity .8s var(--ease-io)}
-.gd-goods{z-index:1}
-.gd-bg{position:absolute;left:0;top:0;display:block;width:auto;max-width:none;height:100%;pointer-events:none;transition:opacity .8s var(--ease-io)}
-.gd:not(.open) .gd-bg,.gd:not(.open) .gd-goods,.gd-swap .gd-bg,.gd-swap .gd-goods{visibility:hidden}   /* while closed the page covers them all, and the morphs move the page alone: they would show round it */
-.gd-goods img{position:absolute;display:block;height:auto;max-width:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;transition:transform .3s var(--ease-out),filter .3s var(--ease-out)}
+.gd-page,.gd-goods,.gd-copy{position:absolute;left:0;top:0;width:var(--s);aspect-ratio:1}
+.gd-page{display:block;height:auto}
+.gd-goods{z-index:0}   /* its own layer: a piece brought to the front stays under the sheet */
+.gd-sheet{position:absolute;inset:0;z-index:1;transition:opacity .8s var(--ease-io)}
+.gd-bg{position:absolute;left:0;top:0;display:block;width:auto;max-width:none;height:100%;pointer-events:none}
+.gd:not(.open) .gd-bg,.gd:not(.open) .gd-copy,.gd:not(.open) .gd-goods,.gd-swap .gd-bg,.gd-swap .gd-copy,.gd-swap .gd-goods{visibility:hidden}   /* while closed the page covers them all, and the morphs move the page alone: they would show round it */
+.gd-goods img,.gd-copy img{position:absolute;display:block;height:auto;max-width:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+.gd-goods img{transition:transform .3s var(--ease-out),filter .3s var(--ease-out)}
 .gd-hint{margin-top:12px;font-size:12px;letter-spacing:.2em;color:var(--mute);text-align:center}
 .gd.open .gd-fig{grid-column:1 / -1}
 .gd.open .gd-stage{--s:max((100cqw - var(--gap)) * 1.3 / 2.3 * 1.2,min(100svh - var(--head) - 32px,75cqw));width:min(100%,var(--s) * 1.5);aspect-ratio:auto;height:var(--s);cursor:auto;background:radial-gradient(34% 56% at 30% 52%,rgba(255,255,255,.075),rgba(255,255,255,0) 76%);clip-path:inset(0 calc(100% - var(--s)) 0 0 round 14px);transition:clip-path .7s var(--ease-io)}
 .gd.wide .gd-stage{clip-path:inset(0 round 14px)}
 .gd.open .gd-hint{display:none}
-.gd.cut .gd-page,.gd.cut .gd-bg{opacity:0;pointer-events:none}
+.gd.cut .gd-sheet{opacity:0;pointer-events:none}
 .gd.cut .gd-goods img{cursor:grab;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45))}   /* before, past the page's edge, they match its drawing */
 .gd-goods.home img{transition:left .6s var(--ease-out),top .6s var(--ease-out),transform .3s var(--ease-out),filter .3s var(--ease-out)}   /* going back to their places */
 .gd.cut .gd-goods img.held{cursor:grabbing;transform:scale(1.04);filter:drop-shadow(0 26px 30px rgba(0,0,0,.6))}

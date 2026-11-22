@@ -1840,12 +1840,12 @@ catalogPages.addEventListener('click', (e) => {
    A click (or Enter) takes the goods out, a step at a time: the page grows to the right, still a square, its words
    going under it (a View Transition morphs the page into its new place); then the picture widens to the right over
    the background until it fills the frame, the goods that lie past the page's edge (a bag's right side) showing with
-   it; then the page and the background fade away from round the goods, the
-   cut-out pieces (tools/goods_pieces.py) in the very places the page has them. Then a piece taken with the mouse (or
-   a pen) follows it about the room, lifted in front of the others, its middle never past the room's edges; a finger
-   still scrolls the page. ✕ goes back the same steps: the pieces go home as the page and the background fade in, the
-   picture narrows to the page, the page shrinks back */
-const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
+   it (a still copy of the pieces, between the background and the page); then that whole picture fades away from
+   round the goods, the cut-out pieces (tools/goods_pieces.py) under it in the very places the page has them. Then a
+   piece taken with the mouse (or a pen) follows it about the room, lifted in front of the others, its middle never
+   past the room's edges; a finger still scrolls the page. ✕ goes back the same steps: the pieces go home as the
+   picture fades in over them, it narrows to the page, the page shrinks back */
+const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods'), itCopy = $('#it-copy');
 const WIDEN = 700;   // ms: the picture widening or narrowing (.gd.open .gd-stage's clip-path in css/goods.css)
 let itTop = 0, itStep = 0;   // the pieces' stacking; the steps under way (a newer open or close calls off the older)
 /* the picture's next step after ms, unless an open or a close has begun since */
@@ -1926,7 +1926,8 @@ function renderItem(i) {
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* the picture: its page of the catalog, and over it the cut-out pieces (parts), in the page's pixels */
+  /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels, with their
+     still copy in the sheet the page fades with */
   const [W, H] = FF47_CATALOG.dims[g.pg];
   itemClose(true);
   itPage.src = src(FF47_CATALOG.id, g.pg); itPage.width = W; itPage.height = H;
@@ -1937,6 +1938,7 @@ function renderItem(i) {
     p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
   }));
+  itCopy.replaceChildren(...[...itGoods.children].map((p) => p.cloneNode()));
 
   const rows = [];
   if (g.size) rows.push([tr('spec.size'), L(g.size)]);
