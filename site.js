@@ -110,15 +110,15 @@ const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","tags":["バ
 /* goods, the newest event first (ev: the event, its section on the goods page), each event in its catalog's
    order (FF47: as in its お品書き) */
 const GOODS = [
-  {"ev":"FF47","slug":"set-a","name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"dims":[1400,1349],"parts":[[0,0,523,423],[356,61,573,426],[584,327,816,1022]]},
-  {"ev":"FF47","slug":"set-b","name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"dims":[1400,1353],"parts":[[0,0,605,489],[90,342,663,493],[530,228,466,341],[581,522,461,324],[915,240,175,279],[783,443,617,910]]},
-  {"ev":"FF47","slug":"sign-board","name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"dims":[1400,712],"parts":[[0,0,594,427],[168,149,598,425],[403,241,625,470],[744,151,656,530]]},
-  {"ev":"FF47","slug":"acrylic-board","name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"dims":[1400,806],"parts":[[122,0,650,508],[0,318,667,487],[739,291,661,451]]},
-  {"ev":"FF47","slug":"keychain","name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"dims":[1286,1400],"parts":[[723,493,563,907],[369,0,598,941],[0,284,601,935]]},
-  {"ev":"FF47","slug":"playmat","name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"dims":[1400,813],"parts":[[0,0,1400,813]]},
-  {"ev":"FF47","slug":"stand","name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"dims":[1386,1400],"parts":[[895,563,492,541],[497,539,326,590],[936,0,411,545],[458,121,460,517],[123,306,384,543],[0,871,374,529]]},
-  {"ev":"FF47","slug":"anosoyo","name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"dims":[1400,1006],"parts":[[0,39,644,520],[422,0,458,313],[600,124,800,882]]},
-  {"ev":"FF47","slug":"kikan","name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"dims":[1400,950],"parts":[[511,210,889,741],[218,112,603,657],[2,0,394,394],[0,226,354,354],[10,539,331,324]]}
+  {"ev":"FF47","slug":"set-a","pg":0,"name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"parts":[[-34,220,667,540],[421,298,732,544],[712,637,1042,1305]]},
+  {"ev":"FF47","slug":"set-b","pg":1,"name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"parts":[[-145,-43,667,540],[-45,335,732,544],[441,209,514,376],[496,533,508,358],[865,222,194,308],[720,447,680,1004]]},
+  {"ev":"FF47","slug":"sign-board","pg":2,"name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"parts":[[-91,210,649,466],[92,373,653,464],[349,474,682,513],[721,374,717,579]]},
+  {"ev":"FF47","slug":"acrylic-board","pg":3,"name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"parts":[[154,289,501,392],[60,535,514,376],[630,514,510,348]]},
+  {"ev":"FF47","slug":"keychain","pg":4,"name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"parts":[[682,536,183,295],[442,294,195,307],[335,606,195,303]]},
+  {"ev":"FF47","slug":"playmat","pg":5,"name":{"zh":"「Chatter Chatter」桌遊滑鼠墊","en":"「Chatter Chatter」 Playmat","ja":"「Chatter Chatter」プレイマット"},"eyebrow":"星街すいせい × 宝鐘マリン","price":600,"meta":"70 × 40 cm","size":"70 × 40 cm","note":{"zh":"比舊款長 10 cm。","en":"10 cm longer than the previous version.","ja":"旧版より10cm長くなりました。"},"works":["146954644"],"parts":[[69,292,1062,617]]},
+  {"ev":"FF47","slug":"stand","pg":6,"name":{"zh":"「起点‧終点」壓克力飯友套組","en":"「起点‧終点」 Mini Acrylic Stand Set","ja":"「起点‧終点」ミニアクリルスタンドセット"},"eyebrow":"星街すいせい","price":500,"was":600,"meta":{"zh":"高 6 cm・厚 8 mm・炫彩雙面印刷","en":"6 cm tall · 8 mm thick · holographic, double-sided print","ja":"高さ6cm・厚さ8mm・オーロラ両面印刷"},"size":{"zh":"高 6 cm、厚 8 mm","en":"6 cm tall, 8 mm thick","ja":"高さ6cm・厚さ8mm"},"spec":{"zh":"炫彩、雙面印刷","en":"Holographic, double-sided print","ja":"オーロラ・両面印刷"},"works":["140064972"],"parts":[[875,455,303,319],[734,451,176,301],[506,452,285,324],[314,447,327,337],[190,462,245,306],[7,458,276,317]]},
+  {"ev":"FF47","slug":"anosoyo","pg":7,"name":{"zh":"あのそよ套組","en":"AnoSoyo Set","ja":"あのそよセット"},"eyebrow":"BanG Dream!","price":400,"was":500,"meta":{"zh":"彩印簽繪板 ＋ 壓克力畫板 ＋ 紙袋","en":"Printed shikishi + acrylic board + paper bag","ja":"カラー色紙＋アクリルパネル＋紙袋"},"list_title":"contents","items":{"zh":["あのそよ「ブレンドの香る窓辺で」彩印簽繪板 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」壓克力畫板 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」紙袋 27 × 20 cm"],"en":["あのそよ「ブレンドの香る窓辺で」 printed shikishi, 21 × 15 cm","あのそよ「ブレンドの香る窓辺で」 acrylic board, 15 × 10 cm","あのそよ「ブレンドの香る窓辺で」 paper bag, 27 × 20 cm"],"ja":["あのそよ「ブレンドの香る窓辺で」カラー色紙 21×15cm","あのそよ「ブレンドの香る窓辺で」アクリルパネル 15×10cm","あのそよ「ブレンドの香る窓辺で」紙袋 27×20cm"]},"works":["148068024"],"parts":[[-109,298,717,579],[360,254,510,348],[558,393,890,981]]},
+  {"ev":"FF47","slug":"kikan","pg":8,"name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"parts":[[436,282,865,721],[151,187,587,639],[-59,78,384,384],[-61,298,344,345],[-51,603,322,316]]}
 ];
 
 /* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
@@ -219,6 +219,8 @@ const I18N = {
     "goods.shopBtn": "前往賣場 ↗",
     "item.buy": "到買動漫賣場購買 ↗",
     "item.menu": "看 FF47 完整品書",
+    "item.takeOut": "點圖片拿出商品",
+    "item.putBack": "放回品書",
     "item.used": "使用插畫",
     "item.others": "其他周邊",
     "item.imgAlt": "{t}實品示意圖",
@@ -447,6 +449,8 @@ const I18N = {
     "goods.shopBtn": "Visit the shop ↗",
     "item.buy": "Buy at the MyACG shop ↗",
     "item.menu": "Full FF47 catalog",
+    "item.takeOut": "Click the picture to take the goods out",
+    "item.putBack": "Put them back",
     "item.used": "Artwork used",
     "item.others": "Other goods",
     "item.imgAlt": "{t} product shot",
@@ -675,6 +679,8 @@ const I18N = {
     "goods.shopBtn": "ショップへ ↗",
     "item.buy": "買動漫ショップで購入 ↗",
     "item.menu": "FF47 お品書きを見る",
+    "item.takeOut": "画像をクリックしてグッズを取り出す",
+    "item.putBack": "お品書きに戻す",
     "item.used": "使用イラスト",
     "item.others": "ほかのグッズ",
     "item.imgAlt": "{t}の商品イメージ",
@@ -1650,9 +1656,9 @@ function price(g, label) {
 const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
 const goodsHeadings = new Map();   // each event's heading, in the order shown
 const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
-const GOODS_COVER = [1400, 1050];   // a card's picture (tools/goods_pieces.py): 4:3, its frame's shape
 let goodsOrder = 'new', catalogCard = null;
-/* a goods card: its picture, then its name, contents and price (fillGoodsCard, again in another language) */
+/* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
+   language) */
 function goodsCard(g, i) {
   const a = el('a', 'g-card');
   a.href = '#g-' + g.slug;
@@ -1661,7 +1667,7 @@ function goodsCard(g, i) {
   a.dataset.d = `${(i % 3) * 0.1}s`;
   const box = el('span', 'g-img mask');
   const img = el('img');
-  img.src = `img/goods-${g.slug}.webp`; [img.width, img.height] = GOODS_COVER;
+  img.src = src(FF47_CATALOG.id, g.pg); [img.width, img.height] = FF47_CATALOG.dims[g.pg];
   img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
   box.appendChild(img);
   a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
@@ -1830,25 +1836,61 @@ catalogPages.addEventListener('click', (e) => {
 });
 
 /* ---------- goods item page ---------- */
-/* the goods in pieces, whole, each where the ad has it: a piece taken with the mouse (or a pen) follows it about the
-   picture, lifted in front of the others, and stays where it is let go, never past the picture's edges (onto the
-   words beside it). A finger still scrolls the page; goods of one piece stay put. The picture is also what the page
-   morph lands on from the goods' card (js/router.js) */
-const itStage = $('#it-stage');
+/* the picture: the item's page of the catalog, which the page morph lands on from the goods' card (js/router.js).
+   A click (or Enter) takes the goods out: the picture grows to the right across the page, its words going under it
+   (a View Transition morphs the page into its new place), then the page fades away from round the goods, the
+   cut-out pieces (tools/goods_pieces.py) in the very places the page has them. Then a piece taken with the mouse (or
+   a pen) follows it about the room, lifted in front of the others, its middle never past the room's edges; a finger
+   still scrolls the page. ✕ puts them back: the pieces go home, the page fades in, the picture shrinks back */
+const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
 let itTop = 0;
-itStage.addEventListener('pointerdown', (e) => {
+const itemPic = () => (itGd.classList.contains('open') ? null : itPage);   // what the page morph lands on, while it is the page
+/* a change of the picture's layout, morphing the page into its new place (no morph: at once) */
+function itemSwap(change, then) {
+  if (!VT) { change(); then(); return; }
+  itPage.style.viewTransitionName = 'gd-page';
+  document.documentElement.classList.add('gd-swap');
+  document.startViewTransition(change).finished.catch(() => {}).finally(() => {
+    itPage.style.viewTransitionName = '';
+    document.documentElement.classList.remove('gd-swap');
+    then();
+  });
+}
+function itemOpen() {
+  if (itGd.classList.contains('open')) return;
+  itemSwap(() => { itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1; },
+    () => itGd.classList.add('cut'));
+}
+function itemClose(now) {
+  if (!itGd.classList.contains('open')) return;
+  const shut = () => { itGd.classList.remove('open'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
+  if (!now && !CALM) itGoods.classList.add('home');   // the pieces glide home while the page fades back in over them
+  itGoods.querySelectorAll('img').forEach((p) => { p.style.cssText = p.dataset.home; });
+  itGd.classList.remove('cut');
+  if (now || !VT) { itGoods.classList.remove('home'); shut(); return; }
+  setTimeout(() => { itGoods.classList.remove('home'); itemSwap(shut, () => {}); }, 800);   // then the picture shrinks
+}
+itStage.addEventListener('click', () => itemOpen());
+itStage.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && !itGd.classList.contains('open')) { e.preventDefault(); itemOpen(); }
+});
+$('#it-out').addEventListener('click', () => itemClose());
+itGoods.addEventListener('pointerdown', (e) => {
   const p = e.target.closest('img');
-  if (!p || !itStage.children[1] || e.pointerType === 'touch' || e.button !== 0) return;
+  if (!p || !itGd.classList.contains('cut') || e.pointerType === 'touch' || e.button !== 0) return;
   e.preventDefault();
-  const box = itStage.getBoundingClientRect(), x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
-  const pw = p.offsetWidth / box.width * 100, ph = p.offsetHeight / box.height * 100;
+  /* places in % of the page's square; the room is the whole picture, the square at its left */
+  const sq = itGoods.getBoundingClientRect(), room = itStage.getBoundingClientRect();
+  const x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
+  const pw = p.offsetWidth / sq.width * 100, ph = p.offsetHeight / sq.height * 100;
+  const xMax = room.width / sq.width * 100 - pw / 2, yMax = room.height / sq.height * 100 - ph / 2;
   p.style.zIndex = ++itTop;
   p.classList.add('held');
   p.setPointerCapture(e.pointerId);
   const move = (m) => {
-    const x = x0 + (m.clientX - e.clientX) / box.width * 100, y = y0 + (m.clientY - e.clientY) / box.height * 100;
-    p.style.left = `${Math.min(100 - pw, Math.max(0, x)).toFixed(3)}%`;
-    p.style.top = `${Math.min(100 - ph, Math.max(0, y)).toFixed(3)}%`;
+    const x = x0 + (m.clientX - e.clientX) / sq.width * 100, y = y0 + (m.clientY - e.clientY) / sq.height * 100;
+    p.style.left = `${Math.min(xMax, Math.max(-pw / 2, x)).toFixed(3)}%`;
+    p.style.top = `${Math.min(yMax, Math.max(-ph / 2, y)).toFixed(3)}%`;
   };
   const up = () => {
     p.classList.remove('held');
@@ -1861,14 +1903,15 @@ function renderItem(i) {
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* the picture: each piece (parts) where the ad has it, in the set's box (dims) */
-  const [W, H] = g.dims;
-  itStage.setAttribute('aria-label', tr('item.imgAlt', { t: L(g.name) }));
-  itStage.style.setProperty('--ar', `${W} / ${H}`);
-  itStage.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
+  /* the picture: its page of the catalog, and over it the cut-out pieces (parts), in the page's pixels */
+  const [W, H] = FF47_CATALOG.dims[g.pg];
+  itemClose(true);
+  itPage.src = src(FF47_CATALOG.id, g.pg); itPage.width = W; itPage.height = H;
+  itPage.alt = tr('item.imgAlt', { t: L(g.name) });
+  itGoods.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
     const p = el('img');
     p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
-    p.style.cssText = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
+    p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
   }));
 
@@ -3764,9 +3807,9 @@ function route() {
       return r.piece >= 0 === fwd ? tile : big;   // to a piece: from its tile to its picture; back: the other way
     }
     if (from === 'works' && r.next === 'work') return fwd ? coverPic(WORKS[r.idx].id) : pagePic(WORKS[r.idx].id);
-    if ((from === 'catalog' || from === 'goods') && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itStage;
+    if ((from === 'catalog' || from === 'goods') && r.next === 'item') return fwd ? document.querySelector(`#gc-${GOODS[r.idx].slug} img`) : itemPic();
     if (from === 'work' && r.next === 'works') return fwd ? pagePic(lastWork) : lastWork && coverPic(lastWork);
-    if (from === 'item' && (r.next === 'catalog' || r.next === 'goods')) return fwd ? itStage : lastItem && document.querySelector(`#gc-${lastItem} img`);
+    if (from === 'item' && (r.next === 'catalog' || r.next === 'goods')) return fwd ? itemPic() : lastItem && document.querySelector(`#gc-${lastItem} img`);
     if (from === 'artbook' && r.next === 'book') return fwd ? document.querySelector(`#abc-${BOOKS[r.idx].slug} .b3`) : document.querySelector('#bk-cover .b3');
     if (from === 'book' && r.next === 'artbook') return fwd ? document.querySelector('#bk-cover .b3') : lastBook && document.querySelector(`#abc-${lastBook} .b3`);
     return null;
@@ -3781,7 +3824,7 @@ function route() {
     const b = pick(false);
     if (onScreen(b)) {
       b.style.viewTransitionName = 'shared'; named.push(b); showNow(b);
-      const ready = b.decode ? b.decode() : b.matches('.b3') ? b3Load(b) : Promise.all([...b.querySelectorAll('img')].map((i) => i.decode()));   // a picture, a 3D book, or goods in pieces
+      const ready = b.decode ? b.decode() : b3Load(b);   // a picture, or a 3D book
       try { await Promise.race([ready, sleep(450)]); } catch (_) { /* show it as is */ }
     }
   });

@@ -16,9 +16,9 @@ function price(g, label) {
 const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
 const goodsHeadings = new Map();   // each event's heading, in the order shown
 const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
-const GOODS_COVER = [1400, 1050];   // a card's picture (tools/goods_pieces.py): 4:3, its frame's shape
 let goodsOrder = 'new', catalogCard = null;
-/* a goods card: its picture, then its name, contents and price (fillGoodsCard, again in another language) */
+/* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
+   language) */
 function goodsCard(g, i) {
   const a = el('a', 'g-card');
   a.href = '#g-' + g.slug;
@@ -27,7 +27,7 @@ function goodsCard(g, i) {
   a.dataset.d = `${(i % 3) * 0.1}s`;
   const box = el('span', 'g-img mask');
   const img = el('img');
-  img.src = `img/goods-${g.slug}.webp`; [img.width, img.height] = GOODS_COVER;
+  img.src = src(FF47_CATALOG.id, g.pg); [img.width, img.height] = FF47_CATALOG.dims[g.pg];
   img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
   box.appendChild(img);
   a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
@@ -196,25 +196,61 @@ catalogPages.addEventListener('click', (e) => {
 });
 
 /* ---------- goods item page ---------- */
-/* the goods in pieces, whole, each where the ad has it: a piece taken with the mouse (or a pen) follows it about the
-   picture, lifted in front of the others, and stays where it is let go, never past the picture's edges (onto the
-   words beside it). A finger still scrolls the page; goods of one piece stay put. The picture is also what the page
-   morph lands on from the goods' card (js/router.js) */
-const itStage = $('#it-stage');
+/* the picture: the item's page of the catalog, which the page morph lands on from the goods' card (js/router.js).
+   A click (or Enter) takes the goods out: the picture grows to the right across the page, its words going under it
+   (a View Transition morphs the page into its new place), then the page fades away from round the goods, the
+   cut-out pieces (tools/goods_pieces.py) in the very places the page has them. Then a piece taken with the mouse (or
+   a pen) follows it about the room, lifted in front of the others, its middle never past the room's edges; a finger
+   still scrolls the page. ✕ puts them back: the pieces go home, the page fades in, the picture shrinks back */
+const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
 let itTop = 0;
-itStage.addEventListener('pointerdown', (e) => {
+const itemPic = () => (itGd.classList.contains('open') ? null : itPage);   // what the page morph lands on, while it is the page
+/* a change of the picture's layout, morphing the page into its new place (no morph: at once) */
+function itemSwap(change, then) {
+  if (!VT) { change(); then(); return; }
+  itPage.style.viewTransitionName = 'gd-page';
+  document.documentElement.classList.add('gd-swap');
+  document.startViewTransition(change).finished.catch(() => {}).finally(() => {
+    itPage.style.viewTransitionName = '';
+    document.documentElement.classList.remove('gd-swap');
+    then();
+  });
+}
+function itemOpen() {
+  if (itGd.classList.contains('open')) return;
+  itemSwap(() => { itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1; },
+    () => itGd.classList.add('cut'));
+}
+function itemClose(now) {
+  if (!itGd.classList.contains('open')) return;
+  const shut = () => { itGd.classList.remove('open'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
+  if (!now && !CALM) itGoods.classList.add('home');   // the pieces glide home while the page fades back in over them
+  itGoods.querySelectorAll('img').forEach((p) => { p.style.cssText = p.dataset.home; });
+  itGd.classList.remove('cut');
+  if (now || !VT) { itGoods.classList.remove('home'); shut(); return; }
+  setTimeout(() => { itGoods.classList.remove('home'); itemSwap(shut, () => {}); }, 800);   // then the picture shrinks
+}
+itStage.addEventListener('click', () => itemOpen());
+itStage.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && !itGd.classList.contains('open')) { e.preventDefault(); itemOpen(); }
+});
+$('#it-out').addEventListener('click', () => itemClose());
+itGoods.addEventListener('pointerdown', (e) => {
   const p = e.target.closest('img');
-  if (!p || !itStage.children[1] || e.pointerType === 'touch' || e.button !== 0) return;
+  if (!p || !itGd.classList.contains('cut') || e.pointerType === 'touch' || e.button !== 0) return;
   e.preventDefault();
-  const box = itStage.getBoundingClientRect(), x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
-  const pw = p.offsetWidth / box.width * 100, ph = p.offsetHeight / box.height * 100;
+  /* places in % of the page's square; the room is the whole picture, the square at its left */
+  const sq = itGoods.getBoundingClientRect(), room = itStage.getBoundingClientRect();
+  const x0 = parseFloat(p.style.left), y0 = parseFloat(p.style.top);
+  const pw = p.offsetWidth / sq.width * 100, ph = p.offsetHeight / sq.height * 100;
+  const xMax = room.width / sq.width * 100 - pw / 2, yMax = room.height / sq.height * 100 - ph / 2;
   p.style.zIndex = ++itTop;
   p.classList.add('held');
   p.setPointerCapture(e.pointerId);
   const move = (m) => {
-    const x = x0 + (m.clientX - e.clientX) / box.width * 100, y = y0 + (m.clientY - e.clientY) / box.height * 100;
-    p.style.left = `${Math.min(100 - pw, Math.max(0, x)).toFixed(3)}%`;
-    p.style.top = `${Math.min(100 - ph, Math.max(0, y)).toFixed(3)}%`;
+    const x = x0 + (m.clientX - e.clientX) / sq.width * 100, y = y0 + (m.clientY - e.clientY) / sq.height * 100;
+    p.style.left = `${Math.min(xMax, Math.max(-pw / 2, x)).toFixed(3)}%`;
+    p.style.top = `${Math.min(yMax, Math.max(-ph / 2, y)).toFixed(3)}%`;
   };
   const up = () => {
     p.classList.remove('held');
@@ -227,14 +263,15 @@ function renderItem(i) {
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* the picture: each piece (parts) where the ad has it, in the set's box (dims) */
-  const [W, H] = g.dims;
-  itStage.setAttribute('aria-label', tr('item.imgAlt', { t: L(g.name) }));
-  itStage.style.setProperty('--ar', `${W} / ${H}`);
-  itStage.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
+  /* the picture: its page of the catalog, and over it the cut-out pieces (parts), in the page's pixels */
+  const [W, H] = FF47_CATALOG.dims[g.pg];
+  itemClose(true);
+  itPage.src = src(FF47_CATALOG.id, g.pg); itPage.width = W; itPage.height = H;
+  itPage.alt = tr('item.imgAlt', { t: L(g.name) });
+  itGoods.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
     const p = el('img');
     p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
-    p.style.cssText = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
+    p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
   }));
 

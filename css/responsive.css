@@ -4,6 +4,7 @@
   .g-card:first-child{grid-column:1 / -1}
   .g-card:first-child .g-img{width:calc((100% - clamp(20px,3vw,40px)) / 2)}   /* across both columns, its frame stays the others' size */
   .gd-body{grid-template-columns:minmax(0,1fr)}
+  .gd.open .gd-stage{--s:100%;aspect-ratio:1;height:auto}   /* one column: no room beside the page, so it stays its size */
   .chars{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (max-width:640px){

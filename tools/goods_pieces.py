@@ -1,15 +1,11 @@
-"""Make a goods item's pictures for the site from its ad PSD (the FF47 ones: 202608/CMYK/ADs/<n>.psd, and for the
+"""Make a goods item's pieces for its item page from its ad PSD (the FF47 ones: 202608/CMYK/ADs/<n>.psd, and for the
 keychains and the mini blocks the Melonbooks ads, ADs/melon/g.psd and e.psd): the goods alone, without the ad's
-background, words and header, transparent round them.
+background, words and header, transparent round them, each where the goods are on the item's page of the FF47
+catalog, so the page can fade away from round them (js/goods.js).
 
-usage: python tools/goods_pieces.py <slug> <ad.psd> [--scale R] [--save] [--out DIR]
+usage: python tools/goods_pieces.py <slug> <ad.psd> [--page IMG] [--save] [--out DIR]
 
-  img/goods-<slug>.webp       the goods card's picture, 1400 x 1050 (4:3, its frame's shape): the ad's canvas the
-                              picture's width, its goods where the ad has them, cut where the ad cuts them (a paper
-                              bag only peeks in, as on the catalog's page), so every card shows its goods at the
-                              catalog's one scale
-  img/goods-<slug>-<n>.webp   each piece (n from the bottom), whole, the set 1400 px on its long side: the item page
-                              lays them together, and each can be taken with the mouse and moved
+  img/goods-<slug>-<n>.webp   each piece (n from the bottom), whole, at the catalog page's scale (PAGE px wide)
 
 A piece is one picture layer of the ad's goods. A feathered black shadow kept as a layer of its own (the black layer
 just under its goods) is merged into its goods' piece; where the ad cut such a shadow off at the canvas edge but the
@@ -19,10 +15,11 @@ hidden layers. Each piece is cut to what shows: its goods with their soft edge a
 far off (one keychain layer has one, its full height above the goods), and rid of stray specks (the keychains' ring
 photos have white dust round them, unseen on the ads' light ground but plain on the site's dark one).
 
-  --scale R  the ad draws its goods R times as big as the catalog's ads (the Melonbooks ads: 2.2, by the keychain
-             both have): the card shows them whole, at the catalog's scale, in the middle
-  --save     write "dims" (the set's size on the item page) and "parts" ([[x, y, w, h], ...]: each piece's place in
-             it) into the item in GOODS in js/data.js (the item must already be there)
+  --page IMG  the catalog page, for an ad laid out otherwise (the Melonbooks ones): each piece is found on the page
+              (its scale, turn and place, by matching) and made to lie as there. Without it, the ad is laid out as its
+              page: the page is the ad's canvas (the FF47 ads: 6000 px, the pages 1200)
+  --save      write "parts" ([[x, y, w, h], ...]: each piece's place on the page, in its pixels, PAGE wide) into the
+              item in GOODS in js/data.js (the item must already be there)
   --out DIR  write under DIR instead of the site, to try it out
 
 Needs psd-tools and numpy (pip install psd-tools numpy).
@@ -38,9 +35,7 @@ from psd_tools import PSDImage
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common as C   # noqa: E402
 
-LONG = 1400   # the set's long side on the item page, as the goods pictures were
-COVER = (1400, 1050)   # the card's picture, 4:3 like its frame
-REF = 6000    # the catalog's ads' canvas width: a cover is one of them wide
+PAGE = 1200   # a catalog page's width in px: the pieces' scale, and the unit of their places
 Q = 88
 EDGE = 64     # a shadow this near the canvas edge was cut there
 REACH = 240   # how far past the goods (their solid part) a soft edge or shadow may reach
@@ -195,75 +190,87 @@ def box_mean(x, k):
     return (c[k:, k:] - c[:-k, k:] - c[k:, :-k] + c[:-k, :-k]) / (k * k)
 
 
-def cover(ps, psd, scale):
-    """the goods card's picture (COVER): the catalog's ads (scale 1) show their canvas the cover's width, the goods
-    where the ad has them and cut where it cuts them (a paper bag only peeks in, as on the catalog's page), a band of
-    the canvas as tall as the goods (from their top when they are taller: what is cut then is a bag at the bottom),
-    kept to the canvas's edge where the ad cuts at that edge. An ad drawing its goods `scale` times as big shows them
-    whole at the catalog's scale (REF px of their canvas the cover's width), in the middle"""
-    cw, ch = COVER
-    out = Image.new('RGBA', COVER, (0, 0, 0, 0))
-    if scale != 1:
-        c = cw / (REF * scale)
-        x0, y0 = min(b[0] for _, b in ps), min(b[1] for _, b in ps)
-        x1, y1 = max(b[2] for _, b in ps), max(b[3] for _, b in ps)
-        ox, oy = (cw - (x1 - x0) * c) / 2 - x0 * c, (ch - (y1 - y0) * c) / 2 - y0 * c
-        window = None
-    else:
-        W, H = psd.width, psd.height
-        c, wh = cw / W, ch * W / cw   # the band's height in the canvas
-        gy0 = max(0, min(b[1] for _, b in ps))
-        gy1 = min(H, max(b[3] for _, b in ps))
-        if gy1 - gy0 > wh or gy0 == 0:
-            top = gy0
-        elif gy1 == H:
-            top = H - wh
-        else:
-            top = (gy0 + gy1 - wh) / 2
-        window = (0, top, W, top + wh)
-        ox, oy = 0, -top * c
-    for im, b in ps:
-        if window:   # only what lies in the band
-            l, t = max(b[0], window[0]), max(b[1], window[1])
-            r, btm = min(b[2], window[2]), min(b[3], window[3])
-            if r <= l or btm <= t:
-                continue
-            im, b = im.crop((round(l - b[0]), round(t - b[1]), round(r - b[0]), round(btm - b[1]))), (l, t, r, btm)
-        x, y = round(b[0] * c + ox), round(b[1] * c + oy)
-        w, h = round(b[2] * c + ox) - x, round(b[3] * c + oy) - y
-        layer = Image.new('RGBA', COVER, (0, 0, 0, 0))
-        layer.paste(im.resize((max(1, w), max(1, h)), Image.LANCZOS), (x, y))
-        out = Image.alpha_composite(out, layer)
-    return out
+def ncc(f, t, m):
+    """masked normalized cross-correlation of template t (where mask m) over image f, at every offset where it lies
+    inside f (numpy FFT)"""
+    H, W = f.shape
+    h, w = t.shape
+    pad = lambda k: np.fft.rfft2(np.pad(k, ((0, H - h), (0, W - w))))
+    corr = lambda X, K: np.fft.irfft2(X * np.conj(K), s=(H, W))[:H - h + 1, :W - w + 1]
+    M, n = pad(m), m.sum()
+    sF, sF2, sFT = corr(np.fft.rfft2(f), M), corr(np.fft.rfft2(f * f), M), corr(np.fft.rfft2(f), pad(t * m))
+    mt = (t * m).sum() / n
+    den = np.sqrt(np.maximum(sF2 - sF * sF / n, 1e-6) * (m * (t - mt) ** 2).sum())
+    return (sFT - mt * sF) / den
+
+
+def gray(a):
+    return a[..., :3] @ np.array([.299, .587, .114])
+
+
+def turned(piece, s, a):
+    """the piece at scale s, turned a degrees (counter-clockwise), its box grown to hold it"""
+    return piece.resize((max(1, round(piece.width * s)), max(1, round(piece.height * s))), Image.LANCZOS).rotate(a, Image.BICUBIC, expand=True)
+
+
+def best(piece, page, k, scales, turns):
+    """the best (score, scale, turn, x, y) of the piece on the page made k times its size"""
+    f = gray(np.asarray(page.resize((round(page.width * k), round(page.height * k)), Image.LANCZOS) if k != 1 else page, dtype=np.float64))
+    top = None
+    for s in scales:
+        for a in turns:
+            arr = np.asarray(turned(piece, s * k, a), dtype=np.float64)
+            if not (8 <= arr.shape[0] <= f.shape[0] and 8 <= arr.shape[1] <= f.shape[1]):
+                continue   # too small to tell, or larger than the page
+            r = ncc(f, gray(arr), (arr[..., 3] > 160).astype(np.float64))
+            i = np.unravel_index(np.argmax(r), r.shape)
+            if top is None or r[i] > top[0]:
+                top = (float(r[i]), float(s), float(a), int(i[1] / k), int(i[0] / k))
+    return top
+
+
+def find(piece, page, scale=None):
+    """where the piece is on the page: its scale, turn and place, coarse to fine (a quarter, half and the whole page);
+    `scale`, one found for another piece of the same ad, narrows the search"""
+    rng = lambda c, d, step: np.arange(c - d, c + d + step / 2, step)
+    scales = np.exp(rng(np.log(scale), .06, .02)) if scale else np.exp(np.arange(np.log(.04), np.log(.4), .06))
+    _, s, a, _, _ = best(piece, page, .25, scales, rng(0, 36, 4))
+    _, s, a, _, _ = best(piece, page, .5, s * np.exp(rng(0, .06, .02)), rng(a, 4, 1))
+    return best(piece, page, 1, s * np.exp(rng(0, .02, .005)), rng(a, 1, .25))
 
 
 def main(argv):
     root = C.out_root(argv)
     save = C.flag(argv, '--save')
-    scale = float(C.option(argv, '--scale', 1))
+    page_path = C.option(argv, '--page')
     if len(argv) != 2:
         C.usage(__doc__)
     slug, path = argv
     if save and not C.find(C.load('GOODS'), 'slug', slug):
         sys.exit(f'{slug} is not in GOODS yet: add its line to js/data.js first, then run again with --save')
     psd = PSDImage.open(path)
-    ps = pieces(psd)
-    size = C.save_webp(cover(ps, psd, scale), os.path.join(root, 'img', f'goods-{slug}.webp'), Q, alpha_quality=100)
-    print(f'img/goods-{slug}.webp {COVER[0]}x{COVER[1]} ({size // 1024} KB)')
-    # the pieces, whole, at the item page's scale: the set LONG px on its long side
-    x0, y0 = min(b[0] for _, b in ps), min(b[1] for _, b in ps)
-    x1, y1 = max(b[2] for _, b in ps), max(b[3] for _, b in ps)
-    k = LONG / max(x1 - x0, y1 - y0)
-    parts = []
+    ps, parts, scale = pieces(psd), [], None
+    page = Image.open(page_path).convert('RGB') if page_path else None
+    if page is not None and page.width != PAGE:
+        page = page.resize((PAGE, round(page.height * PAGE / page.width)), Image.LANCZOS)
     for n, (im, b) in enumerate(ps, 1):
-        small = im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS)
-        parts.append([round((b[0] - x0) * k), round((b[1] - y0) * k), small.width, small.height])
+        if page is None:   # laid out as its page
+            k = PAGE / psd.width
+            small, x, y = im.resize((max(1, round(im.width * k)), max(1, round(im.height * k))), Image.LANCZOS), round(b[0] * k), round(b[1] * k)
+        else:              # found on its page
+            score, scale, turn, x, y = find(im, page, scale)
+            small = turned(im, scale, turn)
+            print(f'  piece {n}: on the page at ({x}, {y}), scale {scale:.4f}, turned {turn:+.2f} (match {score:.3f})')
+            if score < .8:
+                print('  ...a weak match: check this piece')
+        parts.append([x, y, small.width, small.height])
         C.save_webp(small, os.path.join(root, 'img', f'goods-{slug}-{n}.webp'), Q, alpha_quality=100)
-    item = {'dims': [round((x1 - x0) * k), round((y1 - y0) * k)], 'parts': parts}
-    print(f'{len(ps)} piece{"s" if len(ps) > 1 else ""}', json.dumps(item))
+    print(f'{len(ps)} piece{"s" if len(ps) > 1 else ""}', json.dumps({'parts': parts}))
     if save:
         items = C.load('GOODS')
-        C.find(items, 'slug', slug).update(item)
+        g = C.find(items, 'slug', slug)
+        g.pop('dims', None)
+        g['parts'] = parts
         C.save('GOODS', items)
 
 

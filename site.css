@@ -546,18 +546,16 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .g-card{display:grid;align-content:start;justify-items:center;gap:6px;text-align:center;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 24px)}
 /* cards in one row share their rows, so names, descriptions and prices line up even when one name wraps */
 @supports (grid-template-rows:subgrid){.g-grid{row-gap:0;margin-bottom:calc(-1 * clamp(44px,5vw,72px))}.g-card{grid-row:span 4;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.g-card .g-name{align-self:end}.g-card .g-meta,.g-card .price{align-self:start}}
-/* a card's picture (tools/goods_pieces.py): its ad's goods without the ad, at the catalog's one scale, cut where the
-   ad cuts them (a paper bag only peeks in), in a 4:3 frame with round corners, every card's the same, in a soft
-   light like the art books' 3D books, with a shadow that follows the goods' outline. The frame is the event pill's
-   and the corner buttons' line (--ring-*): on hover it lights up with their halo, and the goods come a little
+/* a card's picture: the goods' page of the catalog, in a square frame with round corners. The frame is the event
+   pill's and the corner buttons' line (--ring-*): on hover it lights up with their halo, and the page comes a little
    closer. The reveal's clip reaches past the frame, so it never cuts the halo off */
-.g-img{position:relative;display:block;width:100%;aspect-ratio:4 / 3;margin-bottom:14px;overflow:hidden;border:1px solid var(--ring-line);border-radius:14px;background:radial-gradient(58% 54% at 50% 56%,rgba(255,255,255,.075),rgba(255,255,255,0) 74%)}
-.g-img img{position:absolute;inset:0;display:block;width:100%;height:100%;filter:drop-shadow(0 12px 16px rgba(0,0,0,.55))}
+.g-img{position:relative;display:block;width:100%;aspect-ratio:1;margin-bottom:14px;overflow:hidden;border:1px solid var(--ring-line);border-radius:14px;background:var(--bg-2)}
+.g-img img{position:absolute;inset:0;display:block;width:100%;height:100%}
 [data-rv="clip"].g-card .mask{clip-path:inset(-12% -12% -18% -12%);transition:clip-path 1.3s var(--ease-out) var(--d,0s),border-color .35s,box-shadow .35s}
 [data-rv="clip"].g-card.rv-pre:not(.rv-in) .mask{clip-path:inset(100% -12% -18% -12%)}
-[data-rv="clip"].g-card .mask img{transition:transform .6s var(--ease-out),filter .6s var(--ease-out)}
+[data-rv="clip"].g-card .mask img{transition:transform .6s var(--ease-out)}
 .g-card:hover .g-img,.g-card:focus-visible .g-img{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
-.g-card:hover .g-img img{transform:scale(1.04);filter:drop-shadow(0 18px 22px rgba(0,0,0,.6))}
+.g-card:hover .g-img img{transform:scale(1.04)}
 .g-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
 .g-meta{font-size:13px;color:var(--mute);line-height:1.6}
@@ -580,20 +578,43 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .gd{max-width:1200px;margin:0 auto;padding-block:clamp(56px,8vw,112px) clamp(64px,8vw,110px)}
 .gd-price{margin:2px 0 0;font-size:clamp(19px,2vw,24px)}
 .gd-body{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,4vw,60px);align-items:start}
-/* an item's picture: the goods cut out, whole, in the cards' soft light, larger */
-.gd-fig{margin:0;padding:clamp(12px,3vw,36px) 0;background:radial-gradient(52% 50% at 50% 54%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%)}
-/* goods in pieces (js/goods.js): each piece where the ad has it; with the mouse each can be taken and moved about,
-   the one held lifted in front with a deeper shadow */
-.gd-stage{position:relative;width:100%;aspect-ratio:var(--ar)}
-.gd-stage img{position:absolute;display:block;height:auto;max-width:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 12px 16px rgba(0,0,0,.45));transition:transform .3s var(--ease-out),filter .3s var(--ease-out)}
-.gd-stage img.held{cursor:grabbing;transform:scale(1.04);filter:drop-shadow(0 26px 30px rgba(0,0,0,.6))}
-@media (hover:none){.gd-stage img{cursor:auto}}
-.gd-stage img:only-child{cursor:auto}   /* goods of one piece stay put */
+/* an item's picture (js/goods.js): its page of the catalog, in the cards' round frame, over the cut-out goods. Open
+   (.open), the picture goes across both columns as tall as the screen allows: the page a square at its left (--s),
+   the room for the goods to its right, in the cards' soft light; then (.cut) the page fades away from round the
+   goods, and each can be taken and moved about the room, the one held lifted in front with a deeper shadow. Its ✕
+   (the corner buttons' look) puts them back */
+.gd-fig{position:relative;margin:0}
+.gd-stage{--s:100%;position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:14px;cursor:pointer;outline-offset:4px}
+.gd-page,.gd-goods{position:absolute;left:0;top:0;width:var(--s);aspect-ratio:1}
+.gd-page{display:block;height:auto;z-index:1;transition:opacity .8s var(--ease-io)}
+.gd-goods img{position:absolute;display:block;height:auto;max-width:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.45));transition:transform .3s var(--ease-out),filter .3s var(--ease-out)}
+.gd-hint{margin-top:12px;font-size:12px;letter-spacing:.2em;color:var(--mute);text-align:center}
+.gd.open .gd-fig{grid-column:1 / -1}
+.gd.open .gd-stage{--s:min(72svh,760px,62vw);aspect-ratio:auto;height:var(--s);cursor:auto;background:radial-gradient(34% 56% at 30% 52%,rgba(255,255,255,.075),rgba(255,255,255,0) 76%)}
+.gd.open .gd-hint{display:none}
+.gd.cut .gd-page{opacity:0;pointer-events:none}
+.gd.cut .gd-goods img{cursor:grab}
+.gd-goods.home img{transition:left .6s var(--ease-out),top .6s var(--ease-out),transform .3s var(--ease-out),filter .3s var(--ease-out)}   /* going back to their places */
+.gd.cut .gd-goods img.held{cursor:grabbing;transform:scale(1.04);filter:drop-shadow(0 26px 30px rgba(0,0,0,.6))}
+@media (hover:none){.gd.cut .gd-goods img{cursor:auto}}
+.gd-out{position:absolute;top:14px;right:14px;z-index:2;display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:15px;cursor:pointer;opacity:0;transition:border-color .35s,box-shadow .35s,opacity .4s}
+.gd.cut .gd-out{opacity:1}
+.gd-out:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
+.gd:not(.open) .gd-out{display:none}
+/* the morph as the picture opens or closes: the page moves into its new place, the rest changes in a short fade */
+.gd-swap::view-transition-group(gd-page){animation-duration:.7s;animation-timing-function:var(--ease-out)}
+.gd-swap::view-transition-old(root){animation:gd-out .3s var(--ease-io) both}
+.gd-swap::view-transition-new(root){animation:gd-in .45s var(--ease-out) .1s both}
+@keyframes gd-out{to{opacity:0}}
+@keyframes gd-in{from{opacity:0}}
 .gd-spec{margin:0;border-top:1px solid var(--line)}
 .gd-spec > div{display:grid;grid-template-columns:4.6em minmax(0,1fr);gap:16px;padding-block:15px;border-bottom:1px solid var(--line)}
 .gd-spec dt{font-size:13px;letter-spacing:.12em;color:var(--mute);padding-top:2px}
 .gd-spec dd{margin:0;font-size:15px;line-height:1.75;overflow-wrap:anywhere}
-.gd-spec ol{margin:0;padding-left:1.25em;display:grid;gap:4px}
+/* a set's contents, numbered in small gold rings (➀ ➁ ➂, the corner buttons' line): light on the dark ground */
+.gd-spec ol{margin:0;padding:0;list-style:none;counter-reset:n;display:grid;gap:6px}
+.gd-spec ol li{counter-increment:n;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
+.gd-spec ol li::before{content:counter(n);display:grid;place-items:center;width:20px;height:20px;margin-top:.22em;border:1px solid var(--ring-line);border-radius:50%;font-size:11px;line-height:1;color:var(--g-gold);font-variant-numeric:tabular-nums}
 .gd-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
 .gd-works{margin-top:clamp(56px,7vw,100px)}
 .gd-h{margin:0 0 20px;font-size:12px;font-weight:400;letter-spacing:.3em;color:var(--mute)}
@@ -1049,6 +1070,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .g-card:first-child{grid-column:1 / -1}
   .g-card:first-child .g-img{width:calc((100% - clamp(20px,3vw,40px)) / 2)}   /* across both columns, its frame stays the others' size */
   .gd-body{grid-template-columns:minmax(0,1fr)}
+  .gd.open .gd-stage{--s:100%;aspect-ratio:1;height:auto}   /* one column: no room beside the page, so it stays its size */
   .chars{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media (max-width:640px){
