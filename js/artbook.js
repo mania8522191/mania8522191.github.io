@@ -15,6 +15,7 @@ function fitLine(el) {
   const w = el.clientWidth, sw = el.scrollWidth;
   el._fitW = w;
   if (w && sw > w + 1) el.style.fontSize = `${Math.max(el._fitMin || 9, parseFloat(getComputedStyle(el).fontSize) * w / sw * 0.985).toFixed(2)}px`;
+  if (el.parentElement && el.parentElement.classList.contains('ttl')) backFit();   // a page's title: the back button keeps to its words (a card's name may not be in the page yet)
 }
 const fitRO = 'ResizeObserver' in window
   ? new ResizeObserver((es) => es.forEach((e) => { if (e.target.clientWidth !== e.target._fitW) fitLine(e.target); }))   // a new width, not just a new font

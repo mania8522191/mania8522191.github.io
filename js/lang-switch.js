@@ -105,7 +105,7 @@ function swapLang(l) {
   try { localStorage.setItem('lang', l); } catch (e) { /* private mode: still switches for this visit */ }
   document.documentElement.lang = HTML_LANG[l];
   if (/[?&]lang=/.test(location.search)) {
-    try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
+    try { history.replaceState(history.state, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
   applyStatic();
   zvLang();
@@ -133,4 +133,5 @@ function swapLang(l) {
   layoutWall();
   tagText();   // a tag's page: its count and its covers' words
   layoutTag();
+  backFit();   // the back button keeps to the title's words in the new language
 }

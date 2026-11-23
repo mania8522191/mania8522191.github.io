@@ -169,6 +169,7 @@ const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
 const I18N = {
   "zh": {
     "nav.main": "主選單",
+    "nav.back": "上一頁",
     "home.featured": "精選作品",
     "home.dots": "切換作品",
     "home.dot": "第 {n} 張：{t}",
@@ -176,7 +177,6 @@ const I18N = {
     "works.sub": "{a} — {b} · {n} 件作品 · 點選封面看完整作品",
     "tag.sub": "{y} · {n} 件作品",
     "tag.sub1": "{y} · 1 件作品",
-    "tag.all": "← 全部作品",
     "cover.pages": "{n} 張",
     "cover.video": "▶ 過程影片",
     "wk.posted": "{d} 發表",
@@ -221,7 +221,6 @@ const I18N = {
     "goods.shopMelon": "Melonbooks 社團「Mania」",
     "goods.shopBtn": "前往賣場 ↗",
     "item.buy": "到買動漫賣場購買 ↗",
-    "item.menu": "看 FF47 完整品書",
     "item.takeOut": "點圖片拿出商品",
     "item.putBack": "放回品書",
     "item.used": "使用插畫",
@@ -402,6 +401,7 @@ const I18N = {
   },
   "en": {
     "nav.main": "Main menu",
+    "nav.back": "Back",
     "home.featured": "Featured works",
     "home.dots": "Choose a work",
     "home.dot": "Slide {n}: {t}",
@@ -409,7 +409,6 @@ const I18N = {
     "works.sub": "{a} — {b} · {n} works · Click a cover to see the full piece",
     "tag.sub": "{y} · {n} works",
     "tag.sub1": "{y} · 1 work",
-    "tag.all": "← All works",
     "cover.pages": "{n} images",
     "cover.video": "▶ Timelapse",
     "wk.posted": "Posted {d}",
@@ -454,7 +453,6 @@ const I18N = {
     "goods.shopMelon": "Melonbooks circle “Mania”",
     "goods.shopBtn": "Visit the shop ↗",
     "item.buy": "Buy at the MyACG shop ↗",
-    "item.menu": "Full FF47 catalog",
     "item.takeOut": "Click the picture to take the goods out",
     "item.putBack": "Put them back",
     "item.used": "Artwork used",
@@ -635,6 +633,7 @@ const I18N = {
   },
   "ja": {
     "nav.main": "メインメニュー",
+    "nav.back": "戻る",
     "home.featured": "ピックアップ作品",
     "home.dots": "作品を切り替える",
     "home.dot": "{n}枚目：{t}",
@@ -642,7 +641,6 @@ const I18N = {
     "works.sub": "{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます",
     "tag.sub": "{y} · 全{n}作品",
     "tag.sub1": "{y} · 1作品",
-    "tag.all": "← 作品一覧",
     "cover.pages": "{n}枚",
     "cover.video": "▶ メイキング",
     "wk.posted": "{d} 投稿",
@@ -687,7 +685,6 @@ const I18N = {
     "goods.shopMelon": "メロンブックス サークル「Mania」",
     "goods.shopBtn": "ショップへ ↗",
     "item.buy": "買動漫ショップで購入 ↗",
-    "item.menu": "FF47 お品書きを見る",
     "item.takeOut": "画像をクリックしてグッズを取り出す",
     "item.putBack": "お品書きに戻す",
     "item.used": "使用イラスト",
@@ -2430,7 +2427,9 @@ function collage(box, order, units, seed, heads) {
       const d = laneH[1] - laneH[0];
       L = d < -60 ? 1 : 0;   // the shorter lane, the left one when they are level, so the order reads left to right
     }
-    const lone = lanes === 2 && perYear.get(yr) === 1;   // the only unit of its year: centre it rather than leave a lane empty
+    /* the only unit of its year: centre it rather than leave a lane empty. Only under a year header, which levels the
+       lanes first: without one (a tag's page) a centred cover reached into the other lane, over what was there */
+    const lone = heads && lanes === 2 && perYear.get(yr) === 1;
     const x0 = lone ? (W - laneW) / 2 + (rand() - 0.5) * gap * 3 : L * (laneW + gap);
     const tuck = !touch && !fresh[L] && laneH[L] > 0 && rand() < 0.25 ? 8 + rand() * 14 : 0;   // never into a year header
     const y0 = laneH[L] === 0 ? rand() * gap : laneH[L] + (tuck ? -tuck : gap * (0.55 + rand() * 0.9));
@@ -2722,6 +2721,7 @@ function fitLine(el) {
   const w = el.clientWidth, sw = el.scrollWidth;
   el._fitW = w;
   if (w && sw > w + 1) el.style.fontSize = `${Math.max(el._fitMin || 9, parseFloat(getComputedStyle(el).fontSize) * w / sw * 0.985).toFixed(2)}px`;
+  if (el.parentElement && el.parentElement.classList.contains('ttl')) backFit();   // a page's title: the back button keeps to its words (a card's name may not be in the page yet)
 }
 const fitRO = 'ResizeObserver' in window
   ? new ResizeObserver((es) => es.forEach((e) => { if (e.target.clientWidth !== e.target._fitW) fitLine(e.target); }))   // a new width, not just a new font
@@ -3750,7 +3750,7 @@ function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
   if (h === 'w-' + FF47_CATALOG.id) {
-    history.replaceState(null, '', '#g-ff47-catalog');
+    history.replaceState(history.state, '', '#g-ff47-catalog');
     h = 'g-ff47-catalog';
   }
   if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
@@ -3758,7 +3758,7 @@ function parse() {
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-')) {
-    if (h.slice(2) in MOVED) { history.replaceState(null, '', '#w-' + MOVED[h.slice(2)]); return parse(); }   // now a collection's piece
+    if (h.slice(2) in MOVED) { history.replaceState(history.state, '', '#w-' + MOVED[h.slice(2)]); return parse(); }   // now a collection's piece
     const [id, pn] = h.slice(2).split('/'), n = Number(pn);
     if (id in byId) {
       const w = WORKS[byId[id]];
@@ -3772,11 +3772,27 @@ function parse() {
   return { h, next: 'home', idx: -1 };
 }
 
+/* the parts of the site, as the menu has them: moving inside one (a list, its pages, and back) keeps it as it is; come
+   to it from another part, or on arriving, it starts as at first: Fan Art, newest first, the first screenshot, the
+   photo (the user asked for this). An address that names a category (#original) still opens on it */
+const PART = { work: 'works', tag: 'works', book: 'artbook', catalog: 'goods', item: 'goods' };
+const partOf = (v) => PART[v] || v;
+function startOver(next) {
+  const p = partOf(next);
+  if (p === 'works') setSort('new');   // (the category: in apply)
+  else if (p === 'artbook' && abSort !== 'new') { abSort = 'new'; if (abBuilt) renderBooks(); }
+  else if (p === 'goods' && goodsOrder !== 'new') { goodsOrder = 'new'; if (goodsHeadings.size) renderGoods(); }
+  else if (p === 'game') { if (shotAt) showShot(0, false); deckTrack.scrollLeft = 0; }
+  else if (p === 'about' && aboutPlush) { aboutPlush = false; paintAbout(); }
+}
+
 /* swap the DOM to the requested view, then start watching its reveal elements */
 function apply({ h, next, idx, cat, piece = -1, tag }) {
   const from = view, fromPiece = lastPiece;
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
+  const anew = from === null || partOf(from) !== partOf(next);
+  if (anew) startOver(next);
   for (const [k, v] of Object.entries(VIEWS)) v.hidden = k !== next;
   document.querySelectorAll('.nav a, .m-nav a').forEach((a) => {
     a.toggleAttribute('aria-current', a.dataset.v.split(' ').includes(next));
@@ -3805,7 +3821,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
     /* #fanart / #original pick the category; back from a work page shows that work's category */
-    const switched = setCat(cat || (from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
+    const switched = setCat(cat || (anew ? 'fan' : from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
     layoutWall();
     const cover = from === 'work' && lastWork && document.getElementById('c-' + lastWork);
     if (cover && !cover.hidden) { backTo(cover); els = pending(root); }
@@ -3844,6 +3860,11 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
   parallax();
+  if (next !== 'home') titleBox.get(next).prepend(backBtn);
+  backBtn.hidden = next === 'home';
+  backBtn.title = tr('nav.back');   // (its words, in case the language changed while it was out of the page)
+  backBtn.setAttribute('aria-label', backBtn.title);
+  backFit();
 }
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
@@ -3890,11 +3911,71 @@ function moveInk(instant) {
 addEventListener('resize', () => moveInk(true));
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moveInk(true));
 
+/* ---------- the back button, at the top left of the page's title: the page before, as the browser's Back, while
+   there is one in this visit (each page's place in the visit is kept in its history entry, so a reload keeps it too);
+   arrived straight on a page (a shared link), the page above it instead, in its place (a work: its category on the
+   wall; a collection's piece: the collection; a tag: the wall; an item: its catalog, or the goods; a catalog: the
+   goods; an art book: the art books; any other part: Home). Home has none ---------- */
+const backBtn = el('button', 'back');
+backBtn.type = 'button';
+backBtn.dataset.i18nAria = backBtn.dataset.i18nTitle = 'nav.back';
+backBtn.setAttribute('aria-label', tr('nav.back'));
+backBtn.title = tr('nav.back');
+backBtn.innerHTML = '<svg viewBox="0 0 30 24" aria-hidden="true"><path d="M8.5 2.5 3 7.5l5.5 5M3 7.5h23.5v15"/></svg>';
+/* each page's title (its first heading) in a box as wide as its words; the one button moves into the shown page's.
+   Not on Home: above it there is nowhere to go back to */
+const titleBox = new Map();
+for (const [k, v] of Object.entries(VIEWS)) {
+  if (k === 'home') continue;
+  const t = v.querySelector('h1, h2'), box = el('div', 'ttl');
+  t.before(box);
+  box.append(t);
+  titleBox.set(k, box);
+}
+/* the button keeps to where the title's words start: its first line's (a title that wraps, or that fills the line
+   and shrinks to fit, is wider than its words); no room left of them (a long title on a phone): above them instead */
+function backFit() {
+  const box = backBtn.parentElement;
+  if (!box || !box.offsetWidth) return;
+  const words = document.createRange();
+  words.selectNodeContents(box.querySelector('h1, h2'));
+  const line = [...words.getClientRects()].find((r) => r.width), left = box.getBoundingClientRect().left;
+  const x = line ? Math.max(0, line.left - left) : 0;
+  box.style.setProperty('--back-x', `${x.toFixed(1)}px`);
+  const tight = left + x < backBtn.offsetWidth + 14;   // (it sits that far left of the words)
+  box.classList.toggle('tight', tight);
+  /* above the words, but not over a label right above them that starts there too (Game's "INDIE GAME"): above that */
+  const label = tight && box.previousElementSibling, l = label && label.getBoundingClientRect();
+  box.style.setProperty('--back-up', `${l && l.width && l.left < left + x + backBtn.offsetWidth ? Math.round(box.getBoundingClientRect().top - l.top) : 0}px`);
+}
+addEventListener('resize', backFit);
+if (window.ResizeObserver) new ResizeObserver(backFit).observe(document.body);
+let visitAt = -1, goingUp = false;   // this page's place in the visit (0: the first)
+function upFrom() {
+  const r = parse();
+  if (r.next === 'work') return r.piece >= 0 ? '#w-' + WORKS[r.idx].id : WORKS[r.idx].cat === 'original' ? '#original' : '#fanart';
+  if (r.next === 'tag') return '#work';
+  if (r.next === 'item') return GOODS[r.idx].ev === FF47_CATALOG.ev ? '#g-ff47-catalog' : '#goods';
+  if (r.next === 'catalog') return '#goods';
+  if (r.next === 'book') return '#artbook';
+  return '#home';
+}
+backBtn.addEventListener('click', () => {
+  if (visitAt > 0) { history.back(); return; }
+  goingUp = true;   // in place of this entry: going on pressing it climbs, and never back down
+  location.replace(location.pathname + location.search + upFrom());
+});
+
 /* page change: cross-fade with the View Transitions API, and morph the clicked image into the next page */
 function route() {
   if (curtainBusy) return;
+  const st = history.state;
   if (shownAt !== null && shownAt !== location.hash) leftAt.set(shownAt, scrollY);   // the page being left
   const r = parse();
+  /* a new entry has no place yet: one after the page before (going up: the same place) */
+  visitAt = st && Number.isInteger(st.at) ? st.at : goingUp ? Math.max(0, visitAt) : visitAt + 1;
+  goingUp = false;
+  if (!history.state || history.state.at !== visitAt) history.replaceState({ ...(history.state || {}), at: visitAt }, '');
   shownAt = location.hash;   // (parse may have rewritten an old address)
   const from = view;
   if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !((from === 'work' || from === 'tag') && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
@@ -4103,7 +4184,7 @@ function swapLang(l) {
   try { localStorage.setItem('lang', l); } catch (e) { /* private mode: still switches for this visit */ }
   document.documentElement.lang = HTML_LANG[l];
   if (/[?&]lang=/.test(location.search)) {
-    try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
+    try { history.replaceState(history.state, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
   applyStatic();
   zvLang();
@@ -4131,6 +4212,7 @@ function swapLang(l) {
   layoutWall();
   tagText();   // a tag's page: its count and its covers' words
   layoutTag();
+  backFit();   // the back button keeps to the title's words in the new language
 }
 
 /* ==================== js/sound.js ==================== */

@@ -397,7 +397,9 @@ function collage(box, order, units, seed, heads) {
       const d = laneH[1] - laneH[0];
       L = d < -60 ? 1 : 0;   // the shorter lane, the left one when they are level, so the order reads left to right
     }
-    const lone = lanes === 2 && perYear.get(yr) === 1;   // the only unit of its year: centre it rather than leave a lane empty
+    /* the only unit of its year: centre it rather than leave a lane empty. Only under a year header, which levels the
+       lanes first: without one (a tag's page) a centred cover reached into the other lane, over what was there */
+    const lone = heads && lanes === 2 && perYear.get(yr) === 1;
     const x0 = lone ? (W - laneW) / 2 + (rand() - 0.5) * gap * 3 : L * (laneW + gap);
     const tuck = !touch && !fresh[L] && laneH[L] > 0 && rand() < 0.25 ? 8 + rand() * 14 : 0;   // never into a year header
     const y0 = laneH[L] === 0 ? rand() * gap : laneH[L] + (tuck ? -tuck : gap * (0.55 + rand() * 0.9));

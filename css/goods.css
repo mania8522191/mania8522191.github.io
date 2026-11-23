@@ -39,8 +39,8 @@
 @media (hover:none){.cat-strip{cursor:auto}}
 .cat-turn{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:8px}
 .cat-at{margin:0;min-width:4.5em;text-align:center;font-size:13px;letter-spacing:.2em;color:var(--mute);font-variant-numeric:tabular-nums}
-.cat-btn{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:15px;cursor:pointer;transition:border-color .35s,box-shadow .35s,opacity .3s}
-.cat-btn:hover:not(:disabled){border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
+.cat-btn,.back{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:15px;cursor:pointer;transition:border-color .35s,box-shadow .35s,opacity .3s}
+.cat-btn:hover:not(:disabled),.back:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
 .cat-btn:disabled{opacity:.3;cursor:default}
 .cat-goods{margin-top:clamp(56px,7vw,96px)}
 .g-card{display:grid;align-content:start;justify-items:center;gap:6px;text-align:center;text-decoration:none;min-width:0;scroll-margin-top:calc(var(--head) + 24px)}

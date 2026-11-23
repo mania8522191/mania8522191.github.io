@@ -18,7 +18,7 @@ function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
   if (h === 'w-' + FF47_CATALOG.id) {
-    history.replaceState(null, '', '#g-ff47-catalog');
+    history.replaceState(history.state, '', '#g-ff47-catalog');
     h = 'g-ff47-catalog';
   }
   if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
@@ -26,7 +26,7 @@ function parse() {
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-')) {
-    if (h.slice(2) in MOVED) { history.replaceState(null, '', '#w-' + MOVED[h.slice(2)]); return parse(); }   // now a collection's piece
+    if (h.slice(2) in MOVED) { history.replaceState(history.state, '', '#w-' + MOVED[h.slice(2)]); return parse(); }   // now a collection's piece
     const [id, pn] = h.slice(2).split('/'), n = Number(pn);
     if (id in byId) {
       const w = WORKS[byId[id]];
@@ -40,11 +40,27 @@ function parse() {
   return { h, next: 'home', idx: -1 };
 }
 
+/* the parts of the site, as the menu has them: moving inside one (a list, its pages, and back) keeps it as it is; come
+   to it from another part, or on arriving, it starts as at first: Fan Art, newest first, the first screenshot, the
+   photo (the user asked for this). An address that names a category (#original) still opens on it */
+const PART = { work: 'works', tag: 'works', book: 'artbook', catalog: 'goods', item: 'goods' };
+const partOf = (v) => PART[v] || v;
+function startOver(next) {
+  const p = partOf(next);
+  if (p === 'works') setSort('new');   // (the category: in apply)
+  else if (p === 'artbook' && abSort !== 'new') { abSort = 'new'; if (abBuilt) renderBooks(); }
+  else if (p === 'goods' && goodsOrder !== 'new') { goodsOrder = 'new'; if (goodsHeadings.size) renderGoods(); }
+  else if (p === 'game') { if (shotAt) showShot(0, false); deckTrack.scrollLeft = 0; }
+  else if (p === 'about' && aboutPlush) { aboutPlush = false; paintAbout(); }
+}
+
 /* swap the DOM to the requested view, then start watching its reveal elements */
 function apply({ h, next, idx, cat, piece = -1, tag }) {
   const from = view, fromPiece = lastPiece;
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
+  const anew = from === null || partOf(from) !== partOf(next);
+  if (anew) startOver(next);
   for (const [k, v] of Object.entries(VIEWS)) v.hidden = k !== next;
   document.querySelectorAll('.nav a, .m-nav a').forEach((a) => {
     a.toggleAttribute('aria-current', a.dataset.v.split(' ').includes(next));
@@ -73,7 +89,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
     renderItem(idx); lastItem = GOODS[idx].slug; scrollTo(0, 0); els = prime(root);
   } else if (next === 'works') {
     /* #fanart / #original pick the category; back from a work page shows that work's category */
-    const switched = setCat(cat || (from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
+    const switched = setCat(cat || (anew ? 'fan' : from === 'work' && lastWork ? WORKS[byId[lastWork]].cat : wallCat));
     layoutWall();
     const cover = from === 'work' && lastWork && document.getElementById('c-' + lastWork);
     if (cover && !cover.hidden) { backTo(cover); els = pending(root); }
@@ -112,6 +128,11 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
   parallax();
+  if (next !== 'home') titleBox.get(next).prepend(backBtn);
+  backBtn.hidden = next === 'home';
+  backBtn.title = tr('nav.back');   // (its words, in case the language changed while it was out of the page)
+  backBtn.setAttribute('aria-label', backBtn.title);
+  backFit();
 }
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
@@ -158,11 +179,71 @@ function moveInk(instant) {
 addEventListener('resize', () => moveInk(true));
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moveInk(true));
 
+/* ---------- the back button, at the top left of the page's title: the page before, as the browser's Back, while
+   there is one in this visit (each page's place in the visit is kept in its history entry, so a reload keeps it too);
+   arrived straight on a page (a shared link), the page above it instead, in its place (a work: its category on the
+   wall; a collection's piece: the collection; a tag: the wall; an item: its catalog, or the goods; a catalog: the
+   goods; an art book: the art books; any other part: Home). Home has none ---------- */
+const backBtn = el('button', 'back');
+backBtn.type = 'button';
+backBtn.dataset.i18nAria = backBtn.dataset.i18nTitle = 'nav.back';
+backBtn.setAttribute('aria-label', tr('nav.back'));
+backBtn.title = tr('nav.back');
+backBtn.innerHTML = '<svg viewBox="0 0 30 24" aria-hidden="true"><path d="M8.5 2.5 3 7.5l5.5 5M3 7.5h23.5v15"/></svg>';
+/* each page's title (its first heading) in a box as wide as its words; the one button moves into the shown page's.
+   Not on Home: above it there is nowhere to go back to */
+const titleBox = new Map();
+for (const [k, v] of Object.entries(VIEWS)) {
+  if (k === 'home') continue;
+  const t = v.querySelector('h1, h2'), box = el('div', 'ttl');
+  t.before(box);
+  box.append(t);
+  titleBox.set(k, box);
+}
+/* the button keeps to where the title's words start: its first line's (a title that wraps, or that fills the line
+   and shrinks to fit, is wider than its words); no room left of them (a long title on a phone): above them instead */
+function backFit() {
+  const box = backBtn.parentElement;
+  if (!box || !box.offsetWidth) return;
+  const words = document.createRange();
+  words.selectNodeContents(box.querySelector('h1, h2'));
+  const line = [...words.getClientRects()].find((r) => r.width), left = box.getBoundingClientRect().left;
+  const x = line ? Math.max(0, line.left - left) : 0;
+  box.style.setProperty('--back-x', `${x.toFixed(1)}px`);
+  const tight = left + x < backBtn.offsetWidth + 14;   // (it sits that far left of the words)
+  box.classList.toggle('tight', tight);
+  /* above the words, but not over a label right above them that starts there too (Game's "INDIE GAME"): above that */
+  const label = tight && box.previousElementSibling, l = label && label.getBoundingClientRect();
+  box.style.setProperty('--back-up', `${l && l.width && l.left < left + x + backBtn.offsetWidth ? Math.round(box.getBoundingClientRect().top - l.top) : 0}px`);
+}
+addEventListener('resize', backFit);
+if (window.ResizeObserver) new ResizeObserver(backFit).observe(document.body);
+let visitAt = -1, goingUp = false;   // this page's place in the visit (0: the first)
+function upFrom() {
+  const r = parse();
+  if (r.next === 'work') return r.piece >= 0 ? '#w-' + WORKS[r.idx].id : WORKS[r.idx].cat === 'original' ? '#original' : '#fanart';
+  if (r.next === 'tag') return '#work';
+  if (r.next === 'item') return GOODS[r.idx].ev === FF47_CATALOG.ev ? '#g-ff47-catalog' : '#goods';
+  if (r.next === 'catalog') return '#goods';
+  if (r.next === 'book') return '#artbook';
+  return '#home';
+}
+backBtn.addEventListener('click', () => {
+  if (visitAt > 0) { history.back(); return; }
+  goingUp = true;   // in place of this entry: going on pressing it climbs, and never back down
+  location.replace(location.pathname + location.search + upFrom());
+});
+
 /* page change: cross-fade with the View Transitions API, and morph the clicked image into the next page */
 function route() {
   if (curtainBusy) return;
+  const st = history.state;
   if (shownAt !== null && shownAt !== location.hash) leftAt.set(shownAt, scrollY);   // the page being left
   const r = parse();
+  /* a new entry has no place yet: one after the page before (going up: the same place) */
+  visitAt = st && Number.isInteger(st.at) ? st.at : goingUp ? Math.max(0, visitAt) : visitAt + 1;
+  goingUp = false;
+  if (!history.state || history.state.at !== visitAt) history.replaceState({ ...(history.state || {}), at: visitAt }, '');
   shownAt = location.hash;   // (parse may have rewritten an old address)
   const from = view;
   if (from !== null && from !== r.next && !CALM && TOP_VIEWS.has(r.next) && !((from === 'work' || from === 'tag') && r.next === 'works') && !((from === 'item' || from === 'catalog') && r.next === 'goods') && !(from === 'book' && r.next === 'artbook')) { curtainTo(r); return; }
