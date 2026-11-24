@@ -9,13 +9,15 @@ function price(g, label) {
   return p;
 }
 
-/* ---------- goods list: by event, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
-   `ev`, "FF47") is a section under its heading: its catalog (FF47_CATALOG), which opens its own page
-   (#g-ff47-catalog) with the event's goods under its pages; an event without a catalog lists its goods here. Only
-   events that have goods or a catalog are listed ---------- */
-const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
-const goodsHeadings = new Map();   // each event's heading, in the order shown
+/* ---------- goods list: by year, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
+   `ev`, "FF47") is under its year's heading: its catalog (FF47_CATALOG), which opens its own page (#g-ff47-catalog)
+   with the event's goods under its pages; an event without a catalog lists its goods there. Only events that have
+   goods or a catalog are listed ---------- */
+const goodsList = $('#g-list'), goodsBar = $('#g-years'), goodsNav = $('#g-years-in');
+const goodsHeadings = new Map();   // each year's heading, in the order shown
 const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
+const evYear = (ev) => (ev === FF47_CATALOG.ev ? FF47_CATALOG.d : (BOOKS.find((b) => b.ev === ev) || { ym: ev }).ym).slice(0, 4);   // its catalog's year, else its art book's
+const goodsYears = [...new Set(goodsEditions.map(evYear))];
 let goodsOrder = 'new', catalogCard = null;
 /* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
    language) */
@@ -46,9 +48,9 @@ function goodsGrid(items) {
   return grid;
 }
 
-/* the catalog's place in its event: its first three pages dealt as a hand of cards, as a collection's cover on the
-   works wall, in page order from left to right, the first on top and each next one under it; then its name, how many
-   pages, and an arrow to its page */
+/* the catalog's place in its year: its first three pages dealt as a hand of cards, as a collection's cover on the
+   works wall, in page order from left to right, the first on top and each next one under it; then its event's full
+   name (as big as an art book's event under its name), its own name, how many pages, and an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
@@ -65,39 +67,44 @@ function catalogCover() {
   count.id = 'catalog-cover-count';
   const arrow = el('span', 'catalog-arrow', '→');
   arrow.setAttribute('aria-hidden', 'true');
-  caption.append(title, count, arrow);
+  caption.append(el('span', 'catalog-ev', evName(FF47_CATALOG.ev)), title, count, arrow);
   a.append(fan, caption);
   return a;
 }
-/* the list in the order picked (the newest event first, or the oldest), and the bar's buttons to match */
+/* the list in the order picked (the newest year first, or the oldest; its events the same way), and the bar's
+   buttons to match */
 function renderGoods() {
-  const editions = goodsOrder === 'new' ? goodsEditions : [...goodsEditions].reverse();
+  const years = goodsOrder === 'new' ? goodsYears : [...goodsYears].reverse();
   goodsHeadings.clear();
   goodsNav.replaceChildren();
-  goodsList.replaceChildren(...editions.map((code) => {
+  goodsList.replaceChildren(...years.map((y) => {
     const section = el('section', 'ab-year');
     const heading = el('h2', 'wall-year');
     heading.dataset.rv = 'year';
-    heading.append(el('span', 'wy-n', code), el('span', 'wy-line'));
-    goodsHeadings.set(code, heading);
+    heading.append(el('span', 'wy-n', y), el('span', 'wy-line'));
+    goodsHeadings.set(y, heading);
     section.append(heading);
-    const button = el('button', '', code);
+    const button = el('button', '', y);
     button.type = 'button';
-    button.dataset.y = code;
+    button.dataset.y = y;
     goodsNav.append(button);
-    if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
-    else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
+    const events = goodsEditions.filter((code) => evYear(code) === y);
+    (goodsOrder === 'new' ? events : events.reverse()).forEach((code) => {
+      if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
+      else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
+    });
     return section;
   }));
   goodsText();
 }
-/* the words that change with the language: the sort menu's, and the catalog's page count */
+/* the words that change with the language: the sort menu's, the bar's buttons, and the catalog's page count */
 function goodsText() {
-  goodsSortText(goodsOrder, goodsEditions[goodsEditions.length - 1], goodsEditions[0]);
+  goodsSortText(goodsOrder, goodsYears[goodsYears.length - 1], goodsYears[0]);
+  goodsNav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-label', tr('years.go', { y: b.dataset.y })));
   const count = $('#catalog-cover-count');
   if (count) count.textContent = pagesText(FF47_CATALOG.dims.length);
 }
-/* the bar: a button goes to its event, the one in view lights up; another order lays the list out again, and the
+/* the bar: a button goes to its year, the one in view lights up; another order lays the list out again, and the
    buttons slide to their new places */
 const goodsYearsUpdate = timelineNavigation(goodsBar, goodsList, goodsHeadings);
 const goodsSortText = sortControl($('#g-sort'), (dir) => {
@@ -356,6 +363,8 @@ function renderItem(i) {
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
+  /* cross-link: the art books in it (books: their slugs) */
+  linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
   /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
   const [W, H] = FF47_CATALOG.dims[g.pg];
   itemClose(true);

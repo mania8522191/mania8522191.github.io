@@ -144,17 +144,7 @@ function workText(i, piece = -1) {
     box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
   }
   /* cross-link: the goods made from this piece */
-  const gl = $('#wk-goods');
-  const made = GOODS.filter((g) => g.works.includes(w.id));
-  gl.replaceChildren();
-  if (made.length) {
-    gl.append(document.createTextNode(tr('wk.madeGoods')));
-    made.forEach((g, k) => {
-      if (k) gl.append(document.createTextNode(tr('list.sep')));
-      const a = el('a', '', L(g.name)); a.href = '#g-' + g.slug; gl.append(a);
-    });
-  }
-  gl.hidden = !gl.childNodes.length;
+  linkLine($('#wk-goods'), tr('wk.madeGoods'), GOODS.filter((g) => g.works.includes(w.id)).map((g) => [L(g.name), '#g-' + g.slug]));
 
   const procs = $('#wk-proc-box').querySelectorAll('img');
   procs.forEach((im, n) => { im.alt = tr('proc.alt', { t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });

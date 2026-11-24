@@ -264,7 +264,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ab-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,23px);letter-spacing:.04em;line-height:calc(clamp(17px,1.7vw,23px) * 1.35);white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name; the line keeps its height, so the lines under the names stay level */
 .ab-card:hover .ab-t{color:var(--g-gold)}
 .ab-cap{display:flex;align-items:baseline;gap:14px}
-.ab-ev{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;color:var(--fg-2)}
+.ab-ev,.catalog-ev{font-family:var(--f-display);font-size:clamp(13px,1.15vw,15px);letter-spacing:.16em}   /* an event: under a book's name, and over a catalog's on the goods list (css/goods.css); as big as the years in the bar */
+.ab-ev{color:var(--fg-2)}
 .ab-line{flex:1;height:1px;align-self:center;background:linear-gradient(90deg,var(--line),rgba(255,255,255,0))}
 .ab-ym{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;color:var(--mute);font-variant-numeric:tabular-nums}
 .ab-r18{font-size:11px;letter-spacing:.08em;color:#c4655a;border:1px solid rgba(196,101,90,.55);padding:1px 6px;align-self:center}
@@ -332,8 +333,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .bk-stage{position:relative;display:grid;place-items:center;width:100%;padding:clamp(26px,4.5vw,60px) 0 clamp(44px,6vw,80px);border:0;background:radial-gradient(40% 48% at 50% 48%,rgba(255,255,255,.07),rgba(255,255,255,0) 72%);color:inherit;font:inherit;cursor:zoom-in}
 .bk-stage .b3{width:min(84vw,700px,calc(56vh * var(--arn)))}
 .bk-stage:focus-visible{outline:1px solid var(--fg);outline-offset:-1px}
-.bk-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}
-.bk-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.bk-hint,.gd-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}   /* (a goods item's hint too: css/goods.css) */
+.bk-hint svg,.gd-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 /* the 3D viewer's stage, in a window (css/lightbox.css): drag to turn the book, wheel or pinch to zoom */
 .b3v-stage{position:relative;overflow:hidden;container-type:size;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .b3v-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(36% 44% at 50% 50%,rgba(255,255,255,.075),rgba(255,255,255,0) 72%);pointer-events:none}
@@ -513,20 +514,22 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* goods list (template 2 "selected work" captions) */
 .goods{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
 .g-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(44px,5vw,72px) clamp(20px,3vw,40px);margin-top:0}
-/* by event (js/goods.js): the art books' timeline, each event under its heading, and their bar with the sort menu
-   at its end */
+/* by year (js/goods.js): the art books' timeline, each event under its year's heading, and their bar with the sort
+   menu at its end */
 #g-list h2{margin:0;font-weight:400}
-#g-events .years-row{display:flex;align-items:center;gap:8px}
-#g-events .years-in{flex:1;min-width:0;margin-right:0}
-#g-events .sortx{position:relative;top:auto;transform:none;flex:none}
-/* an event's catalog, first in its section: three of its pages dealt as a hand of cards (a collection's on the works
-   wall, .frame.fan), each turning a little further on hover; beside them its name, page count and an arrow that
-   nudges on hover, in the middle of the room left (under the cards on phones) */
+#g-years .years-row{display:flex;align-items:center;gap:8px}
+#g-years .years-in{flex:1;min-width:0;margin-right:0}
+#g-years .sortx{position:relative;top:auto;transform:none;flex:none}
+/* an event's catalog, in its year's section: three of its pages dealt as a hand of cards (a collection's on the works
+   wall, .frame.fan), each turning a little further on hover; beside them its event's full name in gold (as big as an
+   art book's event: css/artbook.css), its name, page count and an arrow that nudges on hover, in the middle of the
+   room left (under the cards on phones) */
 .catalog-cover{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);align-items:center;gap:clamp(20px,3vw,44px);padding-block:clamp(8px,2vw,24px);text-decoration:none}
 .catalog-hand{justify-self:center;width:min(100%,640px)}
 .catalog-cover:hover .fan-c,.catalog-cover:focus-visible .fan-c{transform:rotate(calc(1.5 * var(--r)))}
 .catalog-caption{display:grid;justify-items:center;gap:8px;text-align:center}
 .catalog-caption .g-name{font-size:clamp(19px,3vw,36px)}
+.catalog-ev{color:var(--g-gold)}
 .catalog-arrow{margin-top:6px;color:var(--g-gold);transition:transform .4s var(--ease-out)}
 .catalog-cover:hover .catalog-arrow{transform:translateX(4px)}
 /* the catalog's own page: its pages side by side, each a square as big as the screen allows (at most 680 px), the one
@@ -602,9 +605,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .gd-bg{position:absolute;left:0;top:0;display:block;width:auto;max-width:none;height:100%;pointer-events:none;transition:opacity .8s var(--ease-io)}
 .gd:not(.open) .gd-bg,.gd:not(.open) .gd-goods,.gd-swap .gd-bg,.gd-swap .gd-goods{visibility:hidden}   /* while closed the page covers them all, and the morphs move the page alone: they would show round it */
 .gd-goods img{position:absolute;display:block;height:auto;max-width:none;-webkit-user-select:none;user-select:none;-webkit-user-drag:none;transition:transform .3s var(--ease-out),filter .3s var(--ease-out)}
-.gd-hint{margin-top:12px;font-size:12px;letter-spacing:.2em;color:var(--mute);text-align:center}
+.gd-hint{display:flex;justify-content:center;margin-top:12px}   /* the art book's hint (css/artbook.css), its gold mark an X of four arrows out to the corners; centred under the picture */
 .gd.open .gd-fig{grid-column:1 / -1;--s:max((100cqw - var(--gap)) * 1.3 / 2.3 * 1.2,min(100svh - var(--head) - 32px,75cqw))}
-.gd.open .gd-stage{width:min(100%,var(--s) * 1.5);aspect-ratio:auto;height:var(--s);cursor:auto;background:radial-gradient(34% 56% at 30% 52%,rgba(255,255,255,.075),rgba(255,255,255,0) 76%);clip-path:inset(0 calc(100% - var(--s)) 0 0 round 14px);transition:clip-path .7s var(--ease-io)}
+.gd.open .gd-stage{width:min(100%,var(--s) * 1.5);aspect-ratio:auto;height:var(--s);cursor:auto;background:radial-gradient(34% 56% at 50% 52%,rgba(255,255,255,.1),rgba(255,255,255,0) 76%);clip-path:inset(0 calc(100% - var(--s)) 0 0 round 14px);transition:clip-path .7s var(--ease-io)}   /* its soft light, in the middle of the widened frame with the goods (it shows once the background fades) */
 .gd.wide .gd-stage{clip-path:inset(0 round 14px)}
 .gd.open .gd-hint{display:none}
 .gd.plain .gd-page{opacity:0;pointer-events:none}

@@ -167,8 +167,8 @@ function sortControl(box, onPick) {
     btn.setAttribute('aria-label', tr('sort.label', { v }));
   };
 }
-/* a timeline's bar (the art books', the goods'): a button scrolls to its year or event; the one in view lights up in
-   the bar, and the gold line shows how far down the list you are. headings: each button's key to its heading, in
+/* a timeline's bar (the art books', the goods'): a button scrolls to its year; the one in view lights up in the
+   bar, and the gold line shows how far down the list you are. headings: each button's key to its heading, in
    the order shown. Returns the update, to call when the list is shown or laid out again */
 function timelineNavigation(bar, list, headings) {
   const nav = bar.querySelector('.years-in');

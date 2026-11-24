@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=74389bd2">
+<link rel="stylesheet" href="site.css?v=6a382535">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -217,6 +217,7 @@ addEventListener('hashchange', function () {
           <li id="bk-pages"></li>
         </ul>
         <dl class="bk-spec" id="bk-spec"></dl>
+        <p class="proj-goods" id="bk-goods" hidden></p>
         <p class="proj-goods" id="bk-r18" hidden><span data-i18n="bk.r18">這本是成人向作品，內頁已模糊處理。</span> <a href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener"><span data-i18n="nsfw.go">前往 Google 雲端相簿</span> ↗</a></p>
       </header>
       <div class="bk-cover" id="bk-cover"></div>
@@ -233,9 +234,9 @@ addEventListener('hashchange', function () {
   <section class="view goods in" id="v-goods" hidden>
     <h1 class="sec-title">GOODS</h1>
     <p class="sec-sub" data-i18n="goods.sub">依場次瀏覽周邊與品書。標示為場次價格，通販價格及庫存請以各賣場為準。</p>
-    <div class="years" id="g-events">
+    <div class="years" id="g-years">
       <div class="years-row">
-        <nav class="years-in" id="g-events-in" aria-label="依場次瀏覽" data-i18n-aria="goods.events"></nav>
+        <nav class="years-in" id="g-years-in" aria-label="依年份瀏覽" data-i18n-aria="years.nav"></nav>
         <div class="sortx" id="g-sort" data-dir="new">
           <button type="button" class="sortx-btn" aria-haspopup="true" aria-expanded="false" aria-controls="g-sort-menu"><svg class="sortx-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.5v11M3.8 9.3 8 13.5l4.2-4.2"/></svg><span class="sortx-k">SORT</span><span class="sortx-v">由新到舊</span><svg class="sortx-chev" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg></button>
           <div class="sortx-menu" id="g-sort-menu" role="menu" aria-label="排序" data-i18n-aria="works.sort">
@@ -244,7 +245,7 @@ addEventListener('hashchange', function () {
           </div>
         </div>
       </div>
-      <span class="years-prog" aria-hidden="true"><i id="g-events-prog"></i></span>
+      <span class="years-prog" aria-hidden="true"><i id="g-years-prog"></i></span>
     </div>
     <div class="ab-list" id="g-list"></div>
     <div class="g-shop">
@@ -287,12 +288,13 @@ addEventListener('hashchange', function () {
         <p class="eyebrow" id="it-lab"></p>
         <h1 class="proj-title" id="it-title"></h1>
         <p class="price gd-price" id="it-price"></p>
+        <p class="proj-goods" id="it-books" hidden></p>
       </header>
       <div class="gd-body">
         <figure class="gd-fig">
           <div class="gd-stage" id="it-stage" role="button" tabindex="0" aria-label="點圖片拿出商品" data-i18n-aria="item.takeOut"><img class="gd-bg" src="img/goods-bg.webp" width="1800" height="1200" alt="" loading="lazy" decoding="async"><div class="gd-goods" id="it-goods"></div><img class="gd-page" id="it-page" alt=""></div>
           <button type="button" class="gd-out" id="it-out" aria-label="放回品書" data-i18n-aria="item.putBack">✕</button>
-          <figcaption class="gd-hint" data-i18n="item.takeOut">點圖片拿出商品</figcaption>
+          <figcaption class="gd-hint" data-i18n="item.takeOut"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13"/><path d="M4.6 9.1V4.6h4.5M14.9 4.6h4.5v4.5M19.4 14.9v4.5h-4.5M9.1 19.4H4.6v-4.5"/></svg>點圖片拿出商品</figcaption>
         </figure>
         <div class="gd-info">
           <dl class="gd-spec" id="it-spec"></dl>
@@ -568,6 +570,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=a83715be"></script>
+<script src="site.js?v=0523916a"></script>
 </body>
 </html>

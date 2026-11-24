@@ -110,8 +110,8 @@ const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","dims":[[120
 /* goods, the newest event first (ev: the event, its section on the goods page), each event in its catalog's
    order (FF47: as in its お品書き) */
 const GOODS = [
-  {"ev":"FF47","slug":"set-a","pg":0,"name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"parts":[[-34,220,667,540],[421,298,732,544],[712,637,1042,1305]]},
-  {"ev":"FF47","slug":"set-b","pg":1,"name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"parts":[[-145,-43,667,540],[-45,335,732,544],[441,209,514,376],[496,533,508,358],[865,222,194,308],[720,447,680,1004]]},
+  {"ev":"FF47","slug":"set-a","pg":0,"name":{"zh":"新刊套組 A","en":"New Release Set A","ja":"新刊セットA"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":100,"meta":{"zh":"fanart book ＋ 明信片組 ＋ 紙袋","en":"Fan art book + postcard set + paper bag","ja":"ファンアートブック＋ポストカードセット＋紙袋"},"list_title":"contents","items":{"zh":["202602–202608 mania8522191 fanart book（A5 橫式、全彩、12 頁）","明信片組（冰白珠光紙）","紙袋（舊款，擇一）"],"en":["202602–202608 mania8522191 fan art book (A5 landscape, full color, 12 pages)","Postcard set (ice-white pearl paper)","Paper bag (previous design, choose one)"],"ja":["202602–202608 mania8522191 ファンアートブック（A5横・フルカラー・12P）","ポストカードセット（アイスホワイトパール紙）","紙袋（旧デザイン・1種選択）"]},"works":[],"books":["ff47"],"parts":[[-34,220,667,540],[421,298,732,544],[712,637,1042,1305]]},
+  {"ev":"FF47","slug":"set-b","pg":1,"name":{"zh":"新刊套組 B","en":"New Release Set B","ja":"新刊セットB"},"eyebrow":{"zh":"2026 新刊","en":"2026 New Release","ja":"2026 新刊"},"price":600,"was":800,"meta":{"zh":"新刊套組 A ＋ 壓克力畫板 2 款 ＋ 吊飾 ＋ 紙袋","en":"Set A + 2 acrylic boards + keychain + paper bag","ja":"新刊セットA＋アクリルパネル2種＋キーホルダー＋紙袋"},"list_title":"contents","items":{"zh":["新刊套組 A（fanart book、明信片組、紙袋）","miComet「シュガーラッシュ」「Lollipop」壓克力畫板 15 × 10 cm","星街すいせい「ビビデバ」壓克力畫板 15 × 10 cm","星街すいせい「星をみる少女」壓克力吊飾 6 cm","紙袋（新款，擇一）27 × 20 cm"],"en":["New Release Set A (fan art book, postcard set, paper bag)","miComet「シュガーラッシュ」「Lollipop」 acrylic board, 15 × 10 cm","星街すいせい「ビビデバ」 acrylic board, 15 × 10 cm","星街すいせい「星をみる少女」 acrylic keychain, 6 cm","Paper bag (new design, choose one), 27 × 20 cm"],"ja":["新刊セットA（ファンアートブック・ポストカードセット・紙袋）","miComet「シュガーラッシュ」「Lollipop」アクリルパネル 15×10cm","星街すいせい「ビビデバ」アクリルパネル 15×10cm","星街すいせい「星をみる少女」アクリルキーホルダー 6cm","紙袋（新デザイン・1種選択）27×20cm"]},"note":{"zh":"購買新刊套組 B，彩印簽繪板可再折 NT$50。","en":"With Set B, printed shikishi boards are NT$50 off.","ja":"新刊セットBと同時購入で、カラー色紙がNT$50引き。"},"works":["147595537","142549210","148313240"],"books":["ff47"],"parts":[[-145,-43,667,540],[-45,335,732,544],[441,209,514,376],[496,533,508,358],[865,222,194,308],[720,447,680,1004]]},
   {"ev":"FF47","slug":"sign-board","pg":2,"name":{"zh":"彩印簽繪板","en":"Printed Shikishi Board","ja":"カラー色紙"},"eyebrow":"星街すいせい・miComet・あのそよ","price":150,"unit":true,"meta":{"zh":"21 × 15 cm・4 款","en":"21 × 15 cm · 4 designs","ja":"21×15cm・全4種"},"size":"21 × 15 cm","list_title":"designs","items":["星街すいせい × 宝鐘マリン「Chatter Chatter」","miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"note":{"zh":"購買新刊套組 B，可再折 NT$50。","en":"NT$50 off with New Release Set B.","ja":"新刊セットBと同時購入でNT$50引き。"},"works":["146954644","147595537","142549210","148068024"],"parts":[[-91,210,649,466],[92,373,653,464],[349,474,682,513],[721,374,717,579]]},
   {"ev":"FF47","slug":"acrylic-board","pg":3,"name":{"zh":"壓克力畫板","en":"Acrylic Board","ja":"アクリルパネル"},"eyebrow":"miComet・星街すいせい・あのそよ","price":300,"unit":true,"meta":{"zh":"15 × 10 cm・3 款","en":"15 × 10 cm · 3 designs","ja":"15×10cm・全3種"},"size":"15 × 10 cm","list_title":"designs","items":["miComet「シュガーラッシュ」「Lollipop」","星街すいせい「ビビデバ」","あのそよ「ブレンドの香る窓辺で」"],"works":["147595537","142549210","148068024"],"parts":[[154,289,501,392],[60,535,514,376],[630,514,510,348]]},
   {"ev":"FF47","slug":"keychain","pg":4,"name":{"zh":"壓克力吊飾","en":"Acrylic Keychain","ja":"アクリルキーホルダー"},"eyebrow":"星街すいせい・一伊那尓栖・仲町あられ","price":100,"unit":true,"meta":{"zh":"6 cm・3 款","en":"6 cm · 3 designs","ja":"6cm・全3種"},"size":"6 cm","list_title":"designs","items":["星街すいせい「星をみる少女」","厨二イナちゃん","仲町あられ"],"works":["148313240"],"parts":[[682,536,183,295],[442,294,195,307],[335,606,195,303]]},
@@ -154,11 +154,24 @@ const byMade = (a, b) => madeOn(b).localeCompare(madeOn(a)) || b.d.localeCompare
 const CAT_LIST = { fan: WORKS.filter((w) => w.cat === 'fan').sort(byMade), original: WORKS.filter((w) => w.cat === 'original').sort(byMade) };   // Fan Art (pixiv fan works) / Original Art
 const bySlug = Object.fromEntries(GOODS.map((g, i) => [g.slug, i]));
 const byBook = Object.fromEntries(BOOKS.map((b, i) => [b.slug, i]));
+const evName = (ev) => `Fancy Frontier ${ev.slice(2)}`;   // an event's full name ("FF47")
 const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), tag: $('#v-tag'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
+
+/* a page's cross-links, a line of them after its words ("這張插畫做成了周邊：A、B"); hidden when there are none.
+   links: [words, address] */
+function linkLine(box, words, links) {
+  box.replaceChildren();
+  links.forEach(([t, href], k) => {
+    const a = el('a', '', t);
+    a.href = href;
+    box.append(k ? tr('list.sep') : words, a);
+  });
+  box.hidden = !links.length;
+}
 
 /* a url() for a CSS custom property, made absolute so it points at the same file whichever stylesheet uses it */
 const cssUrl = (path) => `url("${new URL(path, location.href).href}")`;
@@ -210,7 +223,6 @@ const I18N = {
     "x.stats": "{rt} 次轉推，{like} 個喜歡",
     "yt.stats": "{v} 次觀看，{l} 個讚",
     "goods.sub": "依場次瀏覽周邊與品書。標示為場次價格，通販價格及庫存請以各賣場為準。",
-    "goods.events": "依場次瀏覽",
     "goods.catalog": "FF47 品書",
     "goods.all": "全部周邊",
     "catalog.strip": "品書：左右拖曳翻頁",
@@ -224,6 +236,7 @@ const I18N = {
     "item.takeOut": "點圖片拿出商品",
     "item.putBack": "放回品書",
     "item.used": "使用插畫",
+    "item.books": "內含畫冊：",
     "item.others": "其他周邊",
     "item.imgAlt": "{t}實品示意圖",
     "price.event": "場次價",
@@ -371,6 +384,7 @@ const I18N = {
     "ab.count": "{n} 本",
     "ab.card": "{t} 畫冊（{d}）",
     "bk.date": "{d} 發行",
+    "bk.goods": "這本畫冊收錄在周邊：",
     "bk.pageAlt": "{t} 內頁（第 {n} 張）",
     "bk.coverAlt": "{t} 封面與封底",
     "bk.blurAlt": "{t} 內頁（成人向，已模糊處理）",
@@ -442,7 +456,6 @@ const I18N = {
     "x.stats": "{rt} reposts, {like} likes",
     "yt.stats": "{v} views, {l} likes",
     "goods.sub": "Browse goods and catalogs by event. Prices are from the event. See each shop for current prices and stock.",
-    "goods.events": "Browse by event",
     "goods.catalog": "FF47 Catalog",
     "goods.all": "All goods",
     "catalog.strip": "Catalog: drag sideways to turn the pages",
@@ -456,6 +469,7 @@ const I18N = {
     "item.takeOut": "Click the picture to take the goods out",
     "item.putBack": "Put them back",
     "item.used": "Artwork used",
+    "item.books": "Art book inside: ",
     "item.others": "Other goods",
     "item.imgAlt": "{t} product shot",
     "price.event": "event price",
@@ -603,6 +617,7 @@ const I18N = {
     "ab.count": "{n} books",
     "ab.card": "{t} art book ({d})",
     "bk.date": "Released {d}",
+    "bk.goods": "Included in: ",
     "bk.pageAlt": "{t}: inside pages ({n})",
     "bk.coverAlt": "{t}: front and back cover",
     "bk.blurAlt": "{t}: inside pages (adult content, blurred)",
@@ -674,7 +689,6 @@ const I18N = {
     "x.stats": "リポスト {rt}・いいね {like}",
     "yt.stats": "{v} 回視聴・高評価 {l}",
     "goods.sub": "イベント別のグッズとお品書き。表示はイベント頒布価格です。通販価格と在庫は各ショップでご確認ください。",
-    "goods.events": "イベント別に見る",
     "goods.catalog": "FF47 お品書き",
     "goods.all": "グッズ一覧",
     "catalog.strip": "お品書き：左右にドラッグしてめくる",
@@ -688,6 +702,7 @@ const I18N = {
     "item.takeOut": "画像をクリックしてグッズを取り出す",
     "item.putBack": "お品書きに戻す",
     "item.used": "使用イラスト",
+    "item.books": "収録アートブック：",
     "item.others": "ほかのグッズ",
     "item.imgAlt": "{t}の商品イメージ",
     "price.event": "イベント価格",
@@ -835,6 +850,7 @@ const I18N = {
     "ab.count": "{n}冊",
     "ab.card": "{t} 画集（{d}）",
     "bk.date": "{d} 発行",
+    "bk.goods": "収録グッズ：",
     "bk.pageAlt": "{t} 本文（{n}枚目）",
     "bk.coverAlt": "{t} 表紙と裏表紙",
     "bk.blurAlt": "{t} 本文（成人向け・ぼかし加工）",
@@ -1655,13 +1671,15 @@ function price(g, label) {
   return p;
 }
 
-/* ---------- goods list: by event, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
-   `ev`, "FF47") is a section under its heading: its catalog (FF47_CATALOG), which opens its own page
-   (#g-ff47-catalog) with the event's goods under its pages; an event without a catalog lists its goods here. Only
-   events that have goods or a catalog are listed ---------- */
-const goodsList = $('#g-list'), goodsBar = $('#g-events'), goodsNav = $('#g-events-in');
-const goodsHeadings = new Map();   // each event's heading, in the order shown
+/* ---------- goods list: by year, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
+   `ev`, "FF47") is under its year's heading: its catalog (FF47_CATALOG), which opens its own page (#g-ff47-catalog)
+   with the event's goods under its pages; an event without a catalog lists its goods there. Only events that have
+   goods or a catalog are listed ---------- */
+const goodsList = $('#g-list'), goodsBar = $('#g-years'), goodsNav = $('#g-years-in');
+const goodsHeadings = new Map();   // each year's heading, in the order shown
 const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
+const evYear = (ev) => (ev === FF47_CATALOG.ev ? FF47_CATALOG.d : (BOOKS.find((b) => b.ev === ev) || { ym: ev }).ym).slice(0, 4);   // its catalog's year, else its art book's
+const goodsYears = [...new Set(goodsEditions.map(evYear))];
 let goodsOrder = 'new', catalogCard = null;
 /* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
    language) */
@@ -1692,9 +1710,9 @@ function goodsGrid(items) {
   return grid;
 }
 
-/* the catalog's place in its event: its first three pages dealt as a hand of cards, as a collection's cover on the
-   works wall, in page order from left to right, the first on top and each next one under it; then its name, how many
-   pages, and an arrow to its page */
+/* the catalog's place in its year: its first three pages dealt as a hand of cards, as a collection's cover on the
+   works wall, in page order from left to right, the first on top and each next one under it; then its event's full
+   name (as big as an art book's event under its name), its own name, how many pages, and an arrow to its page */
 function catalogCover() {
   const a = el('a', 'catalog-cover');
   a.id = 'gc-ff47-catalog';
@@ -1711,39 +1729,44 @@ function catalogCover() {
   count.id = 'catalog-cover-count';
   const arrow = el('span', 'catalog-arrow', '→');
   arrow.setAttribute('aria-hidden', 'true');
-  caption.append(title, count, arrow);
+  caption.append(el('span', 'catalog-ev', evName(FF47_CATALOG.ev)), title, count, arrow);
   a.append(fan, caption);
   return a;
 }
-/* the list in the order picked (the newest event first, or the oldest), and the bar's buttons to match */
+/* the list in the order picked (the newest year first, or the oldest; its events the same way), and the bar's
+   buttons to match */
 function renderGoods() {
-  const editions = goodsOrder === 'new' ? goodsEditions : [...goodsEditions].reverse();
+  const years = goodsOrder === 'new' ? goodsYears : [...goodsYears].reverse();
   goodsHeadings.clear();
   goodsNav.replaceChildren();
-  goodsList.replaceChildren(...editions.map((code) => {
+  goodsList.replaceChildren(...years.map((y) => {
     const section = el('section', 'ab-year');
     const heading = el('h2', 'wall-year');
     heading.dataset.rv = 'year';
-    heading.append(el('span', 'wy-n', code), el('span', 'wy-line'));
-    goodsHeadings.set(code, heading);
+    heading.append(el('span', 'wy-n', y), el('span', 'wy-line'));
+    goodsHeadings.set(y, heading);
     section.append(heading);
-    const button = el('button', '', code);
+    const button = el('button', '', y);
     button.type = 'button';
-    button.dataset.y = code;
+    button.dataset.y = y;
     goodsNav.append(button);
-    if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
-    else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
+    const events = goodsEditions.filter((code) => evYear(code) === y);
+    (goodsOrder === 'new' ? events : events.reverse()).forEach((code) => {
+      if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
+      else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
+    });
     return section;
   }));
   goodsText();
 }
-/* the words that change with the language: the sort menu's, and the catalog's page count */
+/* the words that change with the language: the sort menu's, the bar's buttons, and the catalog's page count */
 function goodsText() {
-  goodsSortText(goodsOrder, goodsEditions[goodsEditions.length - 1], goodsEditions[0]);
+  goodsSortText(goodsOrder, goodsYears[goodsYears.length - 1], goodsYears[0]);
+  goodsNav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-label', tr('years.go', { y: b.dataset.y })));
   const count = $('#catalog-cover-count');
   if (count) count.textContent = pagesText(FF47_CATALOG.dims.length);
 }
-/* the bar: a button goes to its event, the one in view lights up; another order lays the list out again, and the
+/* the bar: a button goes to its year, the one in view lights up; another order lays the list out again, and the
    buttons slide to their new places */
 const goodsYearsUpdate = timelineNavigation(goodsBar, goodsList, goodsHeadings);
 const goodsSortText = sortControl($('#g-sort'), (dir) => {
@@ -2002,6 +2025,8 @@ function renderItem(i) {
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
+  /* cross-link: the art books in it (books: their slugs) */
+  linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
   /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
   const [W, H] = FF47_CATALOG.dims[g.pg];
   itemClose(true);
@@ -2252,8 +2277,8 @@ function sortControl(box, onPick) {
     btn.setAttribute('aria-label', tr('sort.label', { v }));
   };
 }
-/* a timeline's bar (the art books', the goods'): a button scrolls to its year or event; the one in view lights up in
-   the bar, and the gold line shows how far down the list you are. headings: each button's key to its heading, in
+/* a timeline's bar (the art books', the goods'): a button scrolls to its year; the one in view lights up in the
+   bar, and the gold line shows how far down the list you are. headings: each button's key to its heading, in
    the order shown. Returns the update, to call when the list is shown or laid out again */
 function timelineNavigation(bar, list, headings) {
   const nav = bar.querySelector('.years-in');
@@ -2676,17 +2701,7 @@ function workText(i, piece = -1) {
     box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
   }
   /* cross-link: the goods made from this piece */
-  const gl = $('#wk-goods');
-  const made = GOODS.filter((g) => g.works.includes(w.id));
-  gl.replaceChildren();
-  if (made.length) {
-    gl.append(document.createTextNode(tr('wk.madeGoods')));
-    made.forEach((g, k) => {
-      if (k) gl.append(document.createTextNode(tr('list.sep')));
-      const a = el('a', '', L(g.name)); a.href = '#g-' + g.slug; gl.append(a);
-    });
-  }
-  gl.hidden = !gl.childNodes.length;
+  linkLine($('#wk-goods'), tr('wk.madeGoods'), GOODS.filter((g) => g.works.includes(w.id)).map((g) => [L(g.name), '#g-' + g.slug]));
 
   const procs = $('#wk-proc-box').querySelectorAll('img');
   procs.forEach((im, n) => { im.alt = tr('proc.alt', { t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
@@ -2875,7 +2890,7 @@ function renderBook(i) {
 function bookText(i) {
   const b = BOOKS[i], blur = b.blur || [];
   $('#bk-date').textContent = tr('bk.date', { d: b.ym });
-  $('#bk-ev').textContent = `Fancy Frontier ${b.ev.slice(2)}`;
+  $('#bk-ev').textContent = evName(b.ev);
   $('#bk-pages').textContent = pagesText(b.pages.length);
   const spec = (k, v) => { const d = el('div'); d.append(el('dt', '', tr('bk.spec.' + k)), el('dd', '', v)); return d; };
   $('#bk-spec').replaceChildren(   // size, pages, printing from the book's 品書; the cover paper is its material
@@ -2885,6 +2900,8 @@ function bookText(i) {
     spec('cover', tr('bk.mat.' + (b.mat || 'gloss')) + (b.foil ? tr('bk.foil.' + b.foil) : '')),
   );
   $('#bk-spec').setAttribute('aria-label', tr('bk.spec'));
+  /* cross-link: the goods it comes in */
+  linkLine($('#bk-goods'), tr('bk.goods'), GOODS.filter((g) => (g.books || []).includes(b.slug)).map((g) => [L(g.name), '#g-' + g.slug]));
   $('#bk-imgs').querySelectorAll('img').forEach((img) => {
     const n = +img.dataset.n;
     img.alt = tr(n === 0 ? 'bk.coverAlt' : blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: bkName(b), n });

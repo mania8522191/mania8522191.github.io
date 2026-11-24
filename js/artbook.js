@@ -114,7 +114,7 @@ function renderBook(i) {
 function bookText(i) {
   const b = BOOKS[i], blur = b.blur || [];
   $('#bk-date').textContent = tr('bk.date', { d: b.ym });
-  $('#bk-ev').textContent = `Fancy Frontier ${b.ev.slice(2)}`;
+  $('#bk-ev').textContent = evName(b.ev);
   $('#bk-pages').textContent = pagesText(b.pages.length);
   const spec = (k, v) => { const d = el('div'); d.append(el('dt', '', tr('bk.spec.' + k)), el('dd', '', v)); return d; };
   $('#bk-spec').replaceChildren(   // size, pages, printing from the book's 品書; the cover paper is its material
@@ -124,6 +124,8 @@ function bookText(i) {
     spec('cover', tr('bk.mat.' + (b.mat || 'gloss')) + (b.foil ? tr('bk.foil.' + b.foil) : '')),
   );
   $('#bk-spec').setAttribute('aria-label', tr('bk.spec'));
+  /* cross-link: the goods it comes in */
+  linkLine($('#bk-goods'), tr('bk.goods'), GOODS.filter((g) => (g.books || []).includes(b.slug)).map((g) => [L(g.name), '#g-' + g.slug]));
   $('#bk-imgs').querySelectorAll('img').forEach((img) => {
     const n = +img.dataset.n;
     img.alt = tr(n === 0 ? 'bk.coverAlt' : blur.includes(n) ? 'bk.blurAlt' : 'bk.pageAlt', { t: bkName(b), n });
