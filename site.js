@@ -1859,15 +1859,15 @@ catalogPages.addEventListener('click', (e) => {
 /* ---------- goods item page ---------- */
 /* the picture: the item's page of the catalog, which the page morph lands on from the goods' card (js/router.js).
    A click (or Enter) takes the goods out, a step at a time: the page grows to the right, still a square, its words
-   going under it (a View Transition morphs the page into its new place); then the picture widens to the right over
-   the background until it fills the frame, the goods that lie past the page's edge (a bag's right side) showing with
-   it (a still copy of the pieces, between the background and the page); then that whole picture fades away from
-   round the goods, the cut-out pieces (tools/goods_pieces.py) under it in the very places the page has them. Then a
-   piece taken with the mouse (or a pen) follows it about the room, lifted in front of the others, its middle never
-   past the room's edges; a finger still scrolls the page. ✕ goes back the same steps: the pieces go home as the
-   picture fades in over them, it narrows to the page, the page shrinks back */
-const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods'), itCopy = $('#it-copy');
-const WIDEN = 700;   // ms: the picture widening or narrowing (.gd.open .gd-stage's clip-path in css/goods.css)
+   going under it (a View Transition morphs the page into its new place); then the page fades from over the cut-out
+   goods (tools/goods_pieces.py) and the background, which lie just as it draws them, so only its words go; then the
+   picture widens to the right over the background as the goods move together to its middle across (each keeps its
+   place in the group; what is centred is the part of them inside the frame); then the background fades from round them. Then a piece taken with the mouse (or a pen)
+   follows it about the room, lifted in front of the others, its middle never past the room's edges; a finger still
+   scrolls the page. ✕ goes back the same steps: the pieces go home as the background fades in, the picture narrows to
+   the page, the page fades in over them, the page shrinks back */
+const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
+const FADE = 600, WIDEN = 700, BG = 800;   // ms (css/goods.css): the page's fade, the widening (and the goods' move), the background's fade
 let itTop = 0, itStep = 0;   // the pieces' stacking; the steps under way (a newer open or close calls off the older)
 /* the picture's next step after ms, unless an open or a close has begun since */
 function itemLater(ms, step) {
@@ -1896,22 +1896,77 @@ function itemOpen() {
     scrollBy(0, r.top - Math.max(top, Math.min(r.top, innerHeight - 16 - r.height)));
   }, () => {
     if (s !== itStep) return;
-    itGd.classList.add('wide');   // the picture widens to the right over the background
-    itemLater(CALM || itStage.offsetWidth - itPage.offsetWidth < 2 ? 0 : WIDEN, () => itGd.classList.add('cut'));   // (a phone's is as wide already)
+    itGd.classList.add('plain');   // the page's words fade; the goods and the background stay
+    itemLater(CALM ? 0 : FADE, () => {
+      itGd.classList.add('wide');   // the picture widens to the right over the background, the goods move to its middle
+      itemCentre();
+      itemLater(CALM ? 0 : WIDEN, () => { itGoods.classList.remove('glide'); itGd.classList.add('cut'); });
+    });
   });
+}
+/* a piece's shape, row by row: where it is at least half opaque, as [left, right] in its own width (0–1), null for a
+   clear row; read once from its picture (the site's own, so a canvas may read it) */
+const itInk = new Map();
+const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 3000 }) : setTimeout(f, 400));
+function itemInk(p) {
+  if (itInk.has(p.src)) return itInk.get(p.src);
+  if (!p.complete || !p.naturalWidth) return null;
+  const w = Math.min(256, p.naturalWidth), h = Math.max(1, Math.round(w * p.naturalHeight / p.naturalWidth)), c = el('canvas');
+  c.width = w; c.height = h;
+  const g = c.getContext('2d', { willReadFrequently: true });
+  g.drawImage(p, 0, 0, w, h);
+  let px;
+  try { px = g.getImageData(0, 0, w, h).data; } catch (_) { return null; }
+  const rows = [];
+  for (let y = 0; y < h; y++) {
+    let a = -1, b = -1;
+    for (let x = 0; x < w; x++) if (px[(y * w + x) * 4 + 3] >= 128) { if (a < 0) a = x; b = x; }
+    rows.push(a < 0 ? null : [a / w, (b + 1) / w]);
+  }
+  itInk.set(p.src, rows);
+  return rows;
+}
+/* the goods together to the middle of the frame across, each keeping its place in the group (the room: the frame's
+   whole width already, the clip only shows it). What is centred is what of them lies within the frame's height, by
+   their shapes: a piece reaching out under it (the big bag) still moves whole, to be dragged in, but its unseen part
+   doesn't pull the group off the middle */
+function itemCentre() {
+  const ps = [...itGoods.children], sq = itGoods.getBoundingClientRect(), room = itStage.getBoundingClientRect();
+  if (!ps.length || !sq.width) return;
+  let a = Infinity, b = -Infinity;
+  ps.forEach((p) => {
+    const r = p.getBoundingClientRect(), rows = itemInk(p) || [[0, 1]], n = rows.length;
+    const to = Math.min(n, Math.ceil((room.bottom - r.top) / r.height * n));
+    for (let y = Math.max(0, Math.floor((room.top - r.top) / r.height * n)); y < to; y++) {
+      if (rows[y]) { a = Math.min(a, r.left + rows[y][0] * r.width); b = Math.max(b, r.left + rows[y][1] * r.width); }
+    }
+  });
+  if (a > b) return;   // none of them in the frame
+  const d = ((room.left + room.right) / 2 - (a + b) / 2) / sq.width * 100;
+  if (!CALM) itGoods.classList.add('glide');
+  ps.forEach((p) => { p.style.left = `${(parseFloat(p.style.left) + d).toFixed(3)}%`; p.dataset.mid = p.style.cssText; });   // (where ✕ gathers them first)
 }
 function itemClose(now) {
   if (!itGd.classList.contains('open')) return;
   ++itStep;
-  const shut = () => { itGd.classList.remove('open', 'wide'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
-  if (!now && !CALM) itGoods.classList.add('home');   // the pieces glide home while the page and the background fade back in over them
-  itGoods.querySelectorAll('img').forEach((p) => { p.style.cssText = p.dataset.home; });
+  const shut = () => { itGd.classList.remove('open', 'wide', 'plain'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
+  const ps = [...itGoods.querySelectorAll('img')];
+  itGoods.classList.remove('glide', 'home');   // (a close cut short leaves its class)
   itGd.classList.remove('cut');
-  if (now || !VT) { itGoods.classList.remove('home'); shut(); return; }
-  itemLater(800, () => {   // then the picture narrows to the page, and the page shrinks
-    itGoods.classList.remove('home');
+  if (now || !VT || CALM) { ps.forEach((p) => { p.style.cssText = p.dataset.home; }); shut(); return; }
+  /* the other way: the pieces gather into their group in the middle as the background fades back in; the picture
+     narrows to the page as they move home with it; the page fades in over them; it shrinks */
+  itGoods.classList.add('home');
+  ps.forEach((p) => { p.style.cssText = p.dataset.mid || p.dataset.home; });
+  itemLater(BG, () => {
+    itGoods.classList.replace('home', 'glide');
+    ps.forEach((p) => { p.style.cssText = p.dataset.home; });
     itGd.classList.remove('wide');
-    itemLater(itStage.offsetWidth - itPage.offsetWidth < 2 ? 0 : WIDEN, () => itemSwap(shut, () => {}));
+    itemLater(WIDEN, () => {
+      itGoods.classList.remove('glide');
+      itGd.classList.remove('plain');
+      itemLater(FADE, () => itemSwap(shut, () => {}));
+    });
   });
 }
 itStage.addEventListener('click', () => itemOpen());
@@ -1947,8 +2002,7 @@ function renderItem(i) {
   $('#it-lab').textContent = L(g.eyebrow);
   $('#it-title').textContent = L(g.name);
   $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels, with their
-     still copy in the sheet the page fades with */
+  /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
   const [W, H] = FF47_CATALOG.dims[g.pg];
   itemClose(true);
   itPage.src = src(FF47_CATALOG.id, g.pg); itPage.width = W; itPage.height = H;
@@ -1959,7 +2013,8 @@ function renderItem(i) {
     p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
   }));
-  itCopy.replaceChildren(...[...itGoods.children].map((p) => p.cloneNode()));
+  /* their shapes read ahead while nothing moves, so the widening doesn't wait on them (itemCentre) */
+  for (const p of itGoods.children) p.decode().then(() => idle(() => itemInk(p)), () => {});
 
   const rows = [];
   if (g.size) rows.push([tr('spec.size'), L(g.size)]);
@@ -3860,8 +3915,8 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
   parallax();
-  if (next !== 'home') titleBox.get(next).prepend(backBtn);
-  backBtn.hidden = next === 'home';
+  if (titleBox.has(next)) titleBox.get(next).prepend(backBtn);
+  backBtn.hidden = !titleBox.has(next);
   backBtn.title = tr('nav.back');   // (its words, in case the language changed while it was out of the page)
   backBtn.setAttribute('aria-label', backBtn.title);
   backFit();
@@ -3915,19 +3970,20 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => move
    there is one in this visit (each page's place in the visit is kept in its history entry, so a reload keeps it too);
    arrived straight on a page (a shared link), the page above it instead, in its place (a work: its category on the
    wall; a collection's piece: the collection; a tag: the wall; an item: its catalog, or the goods; a catalog: the
-   goods; an art book: the art books; any other part: Home). Home has none ---------- */
+   goods; an art book: the art books). Only on the pages inside a part ---------- */
 const backBtn = el('button', 'back');
 backBtn.type = 'button';
 backBtn.dataset.i18nAria = backBtn.dataset.i18nTitle = 'nav.back';
 backBtn.setAttribute('aria-label', tr('nav.back'));
 backBtn.title = tr('nav.back');
 backBtn.innerHTML = '<svg viewBox="0 0 30 24" aria-hidden="true"><path d="M8.5 2.5 3 7.5l5.5 5M3 7.5h23.5v15"/></svg>';
-/* each page's title (its first heading) in a box as wide as its words; the one button moves into the shown page's.
-   Not on Home: above it there is nowhere to go back to */
+/* the pages inside a part have it (a work, a tag, an art book, the catalog, an item), not the parts the menu opens
+   (the user asked): their title (first heading) in a box as wide as its words, and the one button moves into the shown
+   page's */
+const BACK_ON = ['work', 'tag', 'book', 'catalog', 'item'];
 const titleBox = new Map();
-for (const [k, v] of Object.entries(VIEWS)) {
-  if (k === 'home') continue;
-  const t = v.querySelector('h1, h2'), box = el('div', 'ttl');
+for (const k of BACK_ON) {
+  const t = VIEWS[k].querySelector('h1, h2'), box = el('div', 'ttl');
   t.before(box);
   box.append(t);
   titleBox.set(k, box);
@@ -3942,11 +3998,7 @@ function backFit() {
   const line = [...words.getClientRects()].find((r) => r.width), left = box.getBoundingClientRect().left;
   const x = line ? Math.max(0, line.left - left) : 0;
   box.style.setProperty('--back-x', `${x.toFixed(1)}px`);
-  const tight = left + x < backBtn.offsetWidth + 14;   // (it sits that far left of the words)
-  box.classList.toggle('tight', tight);
-  /* above the words, but not over a label right above them that starts there too (Game's "INDIE GAME"): above that */
-  const label = tight && box.previousElementSibling, l = label && label.getBoundingClientRect();
-  box.style.setProperty('--back-up', `${l && l.width && l.left < left + x + backBtn.offsetWidth ? Math.round(box.getBoundingClientRect().top - l.top) : 0}px`);
+  box.classList.toggle('tight', left + x < backBtn.offsetWidth + 24);   // (it sits that far left of the words)
 }
 addEventListener('resize', backFit);
 if (window.ResizeObserver) new ResizeObserver(backFit).observe(document.body);
@@ -3958,7 +4010,7 @@ function upFrom() {
   if (r.next === 'item') return GOODS[r.idx].ev === FF47_CATALOG.ev ? '#g-ff47-catalog' : '#goods';
   if (r.next === 'catalog') return '#goods';
   if (r.next === 'book') return '#artbook';
-  return '#home';
+  return '#home';   // (not reached: the button is only on the pages inside a part)
 }
 backBtn.addEventListener('click', () => {
   if (visitAt > 0) { history.back(); return; }

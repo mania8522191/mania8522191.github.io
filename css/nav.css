@@ -2,15 +2,15 @@
 /* language: Japanese pages use Japanese glyph shapes; English pages show Japanese titles the same way */
 :root:lang(ja),:root:lang(en){--f-body:"Figtree","Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif}
 .site-head .in{justify-content:flex-start}
-/* the back button (js/router.js) at the top left of the page's title (not on Home): the title sits in a box as wide as
+/* the back button (js/router.js) at the top left of the title of a page inside a part: the title sits in a box as wide as
    its words (.ttl), so the button keeps as far from the title whatever its length, off the top left corner of its first
    line (--back-x: where that line starts in the box, js/router.js). The round buttons' ring (.cat-btn, css/goods.css),
    with a thin arrow inside whose tail turns down at a right angle (↰). Where there is no room at the words' left (a
-   long title on a phone), it goes above the first letter (and above a label there: --back-up) */
-.ttl{position:relative;width:fit-content;max-width:100%;margin-inline:auto}   /* (in a grid it is the item now: the game's title box keeps to the left) */
-.back{position:absolute;left:calc(var(--back-x,0px) - 46px);bottom:calc(100% - 6px);width:36px;height:36px}
+   long title on a phone), it goes above the first letter */
+.ttl{position:relative;width:fit-content;max-width:100%;margin-inline:auto}
+.back{position:absolute;left:calc(var(--back-x,0px) - 58px);bottom:calc(100% + 2px);width:36px;height:36px}
 .back svg{width:18px;height:15px;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.ttl.tight .back{left:var(--back-x,0px);bottom:calc(100% + 8px + var(--back-up,0px))}
+.ttl.tight .back{left:var(--back-x,0px);bottom:calc(100% + 10px)}
 .ttl:has(> .fit){justify-self:stretch;width:auto;min-width:0}   /* a book's name shrinks to fit the line, so it keeps the whole line */
 .nav{margin-left:auto}
 .lang{display:flex;align-items:center;gap:2px}

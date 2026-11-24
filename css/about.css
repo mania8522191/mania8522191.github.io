@@ -31,7 +31,7 @@
 /* contact */
 .contact{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
 .groups{max-width:820px;margin:clamp(40px,6vw,72px) auto 0;display:grid;gap:clamp(40px,5vw,60px)}
-.group-t{margin:0 0 10px;font-weight:400;font-size:12px;letter-spacing:.32em;color:var(--mute)}
+.group-t{margin:0 0 10px;font-weight:400;font-size:12px;letter-spacing:.32em;color:var(--g-gold)}
 .channels{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}
 .channels a{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:baseline;gap:18px;padding:19px 4px;border-bottom:1px solid var(--line);text-decoration:none}
 .channels a:hover{padding-left:16px;color:var(--mute)}

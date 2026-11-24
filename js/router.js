@@ -128,8 +128,8 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
   parallax();
-  if (next !== 'home') titleBox.get(next).prepend(backBtn);
-  backBtn.hidden = next === 'home';
+  if (titleBox.has(next)) titleBox.get(next).prepend(backBtn);
+  backBtn.hidden = !titleBox.has(next);
   backBtn.title = tr('nav.back');   // (its words, in case the language changed while it was out of the page)
   backBtn.setAttribute('aria-label', backBtn.title);
   backFit();
@@ -183,19 +183,20 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => move
    there is one in this visit (each page's place in the visit is kept in its history entry, so a reload keeps it too);
    arrived straight on a page (a shared link), the page above it instead, in its place (a work: its category on the
    wall; a collection's piece: the collection; a tag: the wall; an item: its catalog, or the goods; a catalog: the
-   goods; an art book: the art books; any other part: Home). Home has none ---------- */
+   goods; an art book: the art books). Only on the pages inside a part ---------- */
 const backBtn = el('button', 'back');
 backBtn.type = 'button';
 backBtn.dataset.i18nAria = backBtn.dataset.i18nTitle = 'nav.back';
 backBtn.setAttribute('aria-label', tr('nav.back'));
 backBtn.title = tr('nav.back');
 backBtn.innerHTML = '<svg viewBox="0 0 30 24" aria-hidden="true"><path d="M8.5 2.5 3 7.5l5.5 5M3 7.5h23.5v15"/></svg>';
-/* each page's title (its first heading) in a box as wide as its words; the one button moves into the shown page's.
-   Not on Home: above it there is nowhere to go back to */
+/* the pages inside a part have it (a work, a tag, an art book, the catalog, an item), not the parts the menu opens
+   (the user asked): their title (first heading) in a box as wide as its words, and the one button moves into the shown
+   page's */
+const BACK_ON = ['work', 'tag', 'book', 'catalog', 'item'];
 const titleBox = new Map();
-for (const [k, v] of Object.entries(VIEWS)) {
-  if (k === 'home') continue;
-  const t = v.querySelector('h1, h2'), box = el('div', 'ttl');
+for (const k of BACK_ON) {
+  const t = VIEWS[k].querySelector('h1, h2'), box = el('div', 'ttl');
   t.before(box);
   box.append(t);
   titleBox.set(k, box);
@@ -210,11 +211,7 @@ function backFit() {
   const line = [...words.getClientRects()].find((r) => r.width), left = box.getBoundingClientRect().left;
   const x = line ? Math.max(0, line.left - left) : 0;
   box.style.setProperty('--back-x', `${x.toFixed(1)}px`);
-  const tight = left + x < backBtn.offsetWidth + 14;   // (it sits that far left of the words)
-  box.classList.toggle('tight', tight);
-  /* above the words, but not over a label right above them that starts there too (Game's "INDIE GAME"): above that */
-  const label = tight && box.previousElementSibling, l = label && label.getBoundingClientRect();
-  box.style.setProperty('--back-up', `${l && l.width && l.left < left + x + backBtn.offsetWidth ? Math.round(box.getBoundingClientRect().top - l.top) : 0}px`);
+  box.classList.toggle('tight', left + x < backBtn.offsetWidth + 24);   // (it sits that far left of the words)
 }
 addEventListener('resize', backFit);
 if (window.ResizeObserver) new ResizeObserver(backFit).observe(document.body);
@@ -226,7 +223,7 @@ function upFrom() {
   if (r.next === 'item') return GOODS[r.idx].ev === FF47_CATALOG.ev ? '#g-ff47-catalog' : '#goods';
   if (r.next === 'catalog') return '#goods';
   if (r.next === 'book') return '#artbook';
-  return '#home';
+  return '#home';   // (not reached: the button is only on the pages inside a part)
 }
 backBtn.addEventListener('click', () => {
   if (visitAt > 0) { history.back(); return; }
