@@ -19,7 +19,7 @@
 .site-head .in{--hd-gap:clamp(24px,2.6vw,36px)}
 .site-head .lang{margin-left:calc(var(--hd-gap) - 16px);padding-left:calc(var(--hd-gap) - 7px);border-left:1px solid var(--line)}
 .site-head .snd{margin-left:calc(var(--hd-gap) - 23px);padding-left:var(--hd-gap)}
-.lang button{padding:6px 7px;border:0;background:none;color:var(--mute);font:inherit;font-size:12px;letter-spacing:.06em;cursor:pointer;transition:color .3s}
+.lang button{padding:6px 7px;border:0;background:none;color:var(--mute);font:inherit;font-size:var(--fs-label);letter-spacing:.06em;white-space:nowrap;cursor:pointer;transition:color .3s}
 .lang button:hover,.lang button[aria-pressed="true"]{color:var(--fg)}
 .lang button[aria-pressed="true"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:1px}
 .lang button:focus-visible{outline:1px solid var(--fg);outline-offset:2px}
@@ -42,10 +42,10 @@
 .snd[aria-pressed="true"] .snd-bars i:nth-child(4){height:10px;animation-delay:-.5s}
 @keyframes snd-bar{from{height:3px}to{height:12px}}
 .m-tools{display:flex;align-items:center;gap:6px;margin:clamp(14px,3vh,26px) 0 0}
-.m-nav .lang button{font-family:var(--f-body);font-size:15px;padding:8px 12px;opacity:1;transform:none}
+.m-nav .lang button{font-family:var(--f-body);font-size:var(--fs-body);padding:8px 12px;opacity:1;transform:none}
 
 /* mobile menu */
-.menu-btn{display:none;margin-left:auto;align-items:center;gap:10px;padding:8px 0;border:0;background:none;color:var(--fg);font:inherit;font-size:12px;letter-spacing:.2em;cursor:pointer}
+.menu-btn{display:none;margin-left:auto;align-items:center;gap:10px;padding:8px 0;border:0;background:none;color:var(--fg);font:inherit;font-size:var(--fs-label);letter-spacing:.2em;cursor:pointer}
 .menu-btn:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .menu-ic{position:relative;width:22px;height:9px}
 .menu-ic::before,.menu-ic::after{content:"";position:absolute;left:0;right:0;height:1px;background:currentColor;transition:transform .5s var(--ease-out),top .5s var(--ease-out)}

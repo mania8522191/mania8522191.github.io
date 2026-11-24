@@ -46,9 +46,9 @@
 /* the bar along the top; its buttons are pills like the SORT button (css/works.css), a gold icon and a word.
    Minimize, maximize and close (and the arrows) are the icon only: their names show on hover. */
 .zv-bar{display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
-.zv-cap{flex:1;min-width:0;margin:0;font-family:var(--f-display);font-size:14px;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zv-cap{flex:1;min-width:0;margin:0;font-family:var(--f-display);font-size:var(--fs-small);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .zv-cap span{margin-right:10px;color:var(--g-gold);font-variant-numeric:tabular-nums}
-.zv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;height:34px;min-width:34px;padding:0 14px 0 11px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg-2);font:inherit;font-size:12.5px;letter-spacing:.06em;white-space:nowrap;cursor:pointer;transition:border-color .35s,color .35s,box-shadow .35s}
+.zv-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;height:34px;min-width:34px;padding:0 14px 0 11px;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg-2);font:inherit;font-size:var(--fs-small);letter-spacing:.06em;white-space:nowrap;cursor:pointer;transition:border-color .35s,color .35s,box-shadow .35s}
 .zv-btn:hover{border-color:rgba(208,166,90,.6);color:var(--fg);box-shadow:0 0 0 3px rgba(208,166,90,.08)}
 .zv-btn:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
 .zv-btn[hidden]{display:none}
@@ -76,7 +76,7 @@
   .zw.multi .zv-canvas{padding-inline:12px}
   .zv-prev,.zv-next{top:auto;bottom:12px}
 }
-.zv-tags{display:grid;font-size:12px;letter-spacing:.14em;color:var(--fg-2);text-align:center;white-space:nowrap}
+.zv-tags{display:grid;font-size:var(--fs-label);letter-spacing:.14em;color:var(--fg-2);text-align:center;white-space:nowrap}
 .zv-tags[hidden]{display:none}
 .zv-tags span:last-child{grid-column:3}
 .zv-tags span::before{content:"";display:inline-block;width:5px;height:5px;margin:0 9px 2px 0;border-radius:50%;background:var(--g-gold);vertical-align:middle}
@@ -85,7 +85,7 @@
 .zv-img.swap{animation:lb-swap .5s var(--ease-out)}
 @keyframes lb-swap{from{opacity:0;transform:scale(.97)}}
 .zv-ghost{position:fixed;z-index:40;margin:0;max-width:none;transform-origin:0 0;pointer-events:none;background:var(--bg-2)}   /* the copy that flies (js/lightbox.js) */
-.zv-hint,.zv-load{position:absolute;left:50%;bottom:14px;z-index:1;width:max-content;max-width:calc(100% - 24px);transform:translateX(-50%);margin:0;padding:8px 14px;border:1px solid var(--line);background:rgba(11,11,11,.85);font-size:12px;letter-spacing:.08em;color:var(--fg-2);text-align:center;pointer-events:none}
+.zv-hint,.zv-load{position:absolute;left:50%;bottom:14px;z-index:1;width:max-content;max-width:calc(100% - 24px);transform:translateX(-50%);margin:0;padding:8px 14px;border:1px solid var(--line);background:rgba(11,11,11,.85);font-size:var(--fs-label);letter-spacing:.08em;color:var(--fg-2);text-align:center;pointer-events:none}
 .zv-hint{animation:hint 3.4s var(--ease-out) both}
 .zv-stage.nozoom ~ .zv-hint{display:none}   /* nothing to zoom */
 @keyframes hint{0%,70%{opacity:1}100%{opacity:0}}
@@ -112,7 +112,7 @@
 .zv-dock{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:max(14px,env(safe-area-inset-bottom,0px));z-index:41;display:flex;flex-wrap:wrap-reverse;gap:8px;max-width:calc(100% - 28px);pointer-events:none}
 .zv-chip{display:flex;align-items:center;height:42px;border:1px solid var(--line);border-radius:999px;background:var(--bg);box-shadow:0 12px 28px rgba(0,0,0,.55);pointer-events:auto;transition:border-color .35s,box-shadow .35s;animation:lb-in .35s var(--ease-out) both}
 .zv-chip:hover{border-color:rgba(208,166,90,.6);box-shadow:0 12px 28px rgba(0,0,0,.55),0 0 0 3px rgba(208,166,90,.08)}
-.zv-chip-b{display:flex;align-items:center;gap:10px;height:100%;min-width:0;padding:0 4px 0 5px;border:0;border-radius:999px;background:none;color:var(--fg-2);font:inherit;font-size:12.5px;letter-spacing:.06em;cursor:pointer;transition:color .35s}
+.zv-chip-b{display:flex;align-items:center;gap:10px;height:100%;min-width:0;padding:0 4px 0 5px;border:0;border-radius:999px;background:none;color:var(--fg-2);font:inherit;font-size:var(--fs-small);letter-spacing:.06em;cursor:pointer;transition:color .35s}
 .zv-chip:hover .zv-chip-b{color:var(--fg)}
 .zv-chip-b img{width:30px;height:30px;flex:none;border-radius:50%;object-fit:cover;background:var(--bg-2)}
 .zv-chip-t{max-width:160px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}

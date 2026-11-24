@@ -14,21 +14,21 @@
 .ab-card:hover .ab-stage .b3,.ab-card:focus-visible .ab-stage .b3{translate:0 -8px}
 .ab-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
 .ab-info{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;padding-inline:2px}
-.ab-t{font-family:var(--f-display);font-size:clamp(17px,1.7vw,23px);letter-spacing:.04em;line-height:calc(clamp(17px,1.7vw,23px) * 1.35);white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name; the line keeps its height, so the lines under the names stay level */
+.ab-t{font-family:var(--f-display);font-size:var(--fs-name);letter-spacing:.04em;line-height:calc(var(--fs-name) * 1.35);white-space:nowrap;overflow:hidden;transition:color .3s}   /* one line: JS shrinks a long name; the line keeps its height, so the lines under the names stay level */
 .ab-card:hover .ab-t{color:var(--g-gold)}
 .ab-cap{display:flex;align-items:baseline;gap:14px}
-.ab-ev,.catalog-ev{font-family:var(--f-display);font-size:clamp(13px,1.15vw,15px);letter-spacing:.16em}   /* an event: under a book's name, and over a catalog's on the goods list (css/goods.css); as big as the years in the bar */
+.ab-ev,.catalog-ev{font-family:var(--f-display);font-size:var(--fs-bar);letter-spacing:.16em}   /* an event: under a book's name, and over a catalog's on the goods list (css/goods.css); as big as the years in the bar */
 .ab-ev{color:var(--fg-2)}
 .ab-line{flex:1;height:1px;align-self:center;background:linear-gradient(90deg,var(--line),rgba(255,255,255,0))}
-.ab-ym{font-family:var(--f-display);font-size:13px;letter-spacing:.16em;color:var(--mute);font-variant-numeric:tabular-nums}
-.ab-r18{font-size:11px;letter-spacing:.08em;color:#c4655a;border:1px solid rgba(196,101,90,.55);padding:1px 6px;align-self:center}
+.ab-ym{font-family:var(--f-display);font-size:var(--fs-small);letter-spacing:.16em;color:var(--mute);font-variant-numeric:tabular-nums}
+.ab-r18{font-size:var(--fs-label);letter-spacing:.08em;color:#c4655a;border:1px solid rgba(196,101,90,.55);padding:1px 6px;align-self:center}
 @media (max-width:700px){.ab-grid{grid-template-columns:minmax(0,1fr)}.ab-card:only-child{width:100%}}
 /* single art book: spreads stacked full width; blurred adult pages carry 18+ and lead to the album */
 .tl.bk-pv{margin:0 0 clamp(16px,2.2vw,28px)}   /* PREVIEW over the spreads, as PROCESS on a work's page (css/works.css) */
 #bk-imgs img{width:min(100%,1400px)}
 .bk-blur{position:relative;display:block;width:min(100%,1400px);text-decoration:none}
 .bk-blur img{width:100%;cursor:pointer}
-.bk-blur .nsfw-tag{font-size:clamp(26px,4vw,48px)}
+.bk-blur .nsfw-tag{font-size:var(--fs-title)}
 /* a closed book in CSS 3D. The cover spread wraps it: right half front, left half back, a sliver of the middle the spine (left-bound).
    The page block shows on the other three edges. JS sets the angle (--rx, --ry) and how dark each face is for a light above and in front. */
 .b3{position:relative;display:block;aspect-ratio:var(--ar);container-type:size}
@@ -86,7 +86,7 @@
 .bk-stage{position:relative;display:grid;place-items:center;width:100%;padding:clamp(26px,4.5vw,60px) 0 clamp(44px,6vw,80px);border:0;background:radial-gradient(40% 48% at 50% 48%,rgba(255,255,255,.07),rgba(255,255,255,0) 72%);color:inherit;font:inherit;cursor:zoom-in}
 .bk-stage .b3{width:min(84vw,700px,calc(56vh * var(--arn)))}
 .bk-stage:focus-visible{outline:1px solid var(--fg);outline-offset:-1px}
-.bk-hint,.gd-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:12.5px;letter-spacing:.14em;color:var(--mute)}   /* (a goods item's hint too: css/goods.css) */
+.bk-hint,.gd-hint{display:inline-flex;align-items:center;gap:10px;margin:0;font-size:var(--fs-small);letter-spacing:.14em;color:var(--mute)}   /* (a goods item's hint too: css/goods.css) */
 .bk-hint svg,.gd-hint svg{flex:none;width:17px;height:17px;fill:none;stroke:var(--g-gold);stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 /* the 3D viewer's stage, in a window (css/lightbox.css): drag to turn the book, wheel or pinch to zoom */
 .b3v-stage{position:relative;overflow:hidden;container-type:size;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}

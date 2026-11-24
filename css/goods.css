@@ -1,12 +1,12 @@
 /* Buttons and prices (used across the site), the goods list, goods item pages */
 /* buttons: the event pill's ring (the --ring-* look in base.css), a pill of dim gold line, lit gold with its faint
    halo on hover; a main button's words are gold, a ghost's white */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 26px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);box-shadow:var(--ring-shadow);color:var(--g-gold);text-decoration:none;font-size:14px;letter-spacing:.06em;transition:border-color .35s,box-shadow .35s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:13px 26px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);box-shadow:var(--ring-shadow);color:var(--g-gold);text-decoration:none;font-size:var(--fs-small);letter-spacing:.06em;transition:border-color .35s,box-shadow .35s}
 .btn:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
 .btn.ghost{color:var(--fg)}
 .price{font-variant-numeric:tabular-nums;letter-spacing:.03em}
-.price s{color:var(--mute);margin-right:10px;font-size:.86em}
-.price small{color:var(--mute);font-size:.72em;margin-left:6px;letter-spacing:.08em}
+.price s{color:var(--mute);margin-right:10px;font-size:var(--fs-small)}
+.price small{color:var(--mute);font-size:var(--fs-label);margin-left:6px;letter-spacing:.08em}
 
 /* goods list (template 2 "selected work" captions) */
 .goods{padding-block:clamp(64px,9vw,128px) clamp(80px,10vw,150px)}
@@ -25,7 +25,7 @@
 .catalog-hand{justify-self:center;width:min(100%,640px)}
 .catalog-cover:hover .fan-c,.catalog-cover:focus-visible .fan-c{transform:rotate(calc(1.5 * var(--r)))}
 .catalog-caption{display:grid;justify-items:center;gap:8px;text-align:center}
-.catalog-caption .g-name{font-size:clamp(19px,3vw,36px)}
+.catalog-caption .g-name{font-size:var(--fs-head)}
 .catalog-ev{color:var(--g-gold)}
 .catalog-arrow{margin-top:6px;color:var(--g-gold);transition:transform .4s var(--ease-out)}
 .catalog-cover:hover .catalog-arrow{transform:translateX(4px)}
@@ -40,8 +40,8 @@
 .cat-strip img{flex:none;width:var(--p);height:auto;scroll-snap-align:center;box-shadow:0 14px 36px rgba(0,0,0,.55);-webkit-user-select:none;user-select:none}
 @media (hover:none){.cat-strip{cursor:auto}}
 .cat-turn{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:8px}
-.cat-at{margin:0;min-width:4.5em;text-align:center;font-size:13px;letter-spacing:.2em;color:var(--mute);font-variant-numeric:tabular-nums}
-.cat-btn,.back{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:15px;cursor:pointer;transition:border-color .35s,box-shadow .35s,opacity .3s}
+.cat-at{margin:0;min-width:4.5em;text-align:center;font-size:var(--fs-small);letter-spacing:.2em;color:var(--mute);font-variant-numeric:tabular-nums}
+.cat-btn,.back{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:var(--fs-body);cursor:pointer;transition:border-color .35s,box-shadow .35s,opacity .3s}
 .cat-btn:hover:not(:disabled),.back:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
 .cat-btn:disabled{opacity:.3;cursor:default}
 .cat-goods{margin-top:clamp(56px,7vw,96px)}
@@ -59,26 +59,28 @@
 .g-card:hover .g-img,.g-card:focus-visible .g-img{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
 .g-card:hover .g-img img{transform:scale(1.04)}
 .g-card:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
-.g-name{font-family:var(--f-display);font-size:clamp(17px,1.6vw,21px);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
-.g-meta{font-size:13px;color:var(--mute);line-height:1.6}
-.g-card .price{font-size:15px;margin-top:2px}
+.g-name{font-family:var(--f-display);font-size:var(--fs-name);letter-spacing:.05em;line-height:1.45;text-wrap:balance;overflow-wrap:anywhere}
+.g-meta{font-size:var(--fs-small);color:var(--mute);line-height:1.6}
+.g-card .price{font-size:var(--fs-body);margin-top:2px}
 /* the shops online, one to a line, each with its logo (the Contact page's badge), its name and its button: the first
    under the heading, the others below a rule. A long name takes a second line before its button goes under it (on
    phones, every button goes under its name; the logo stays beside the name) */
 .g-shop{max-width:860px;margin:clamp(72px,9vw,128px) auto 0;padding-top:28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .g-shop p{margin:0}
-.g-shop-k{font-size:12px;letter-spacing:.3em;color:var(--g-gold)}
+.g-shop-k{font-size:var(--fs-label);letter-spacing:.3em;color:var(--g-gold)}
 .g-shops{margin:0;padding:0;list-style:none}
 .g-shops li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 32px;padding-block:14px 22px}
 .g-shops li+li{padding-top:22px;border-top:1px solid var(--line)}
 .g-shops .btn{flex:none}
-.g-shop-l{flex:1 1 18em;display:flex;align-items:center;gap:clamp(14px,1.6vw,20px);min-width:0;font-size:clamp(20px,2.4vw,28px)}
+.g-shop-l{flex:1 1 18em;display:flex;align-items:center;gap:clamp(14px,1.6vw,20px);min-width:0;font-size:var(--fs-name)}
 .g-shop-l .sns-badge{flex:none}
 .g-shop-n{flex:1 1 auto;min-width:0;font-family:var(--f-display);letter-spacing:.04em;line-height:1.5}
 
 /* goods item */
 .gd{max-width:1200px;margin:0 auto;padding-block:clamp(56px,8vw,112px) clamp(64px,8vw,110px)}
-.gd-price{margin:2px 0 0;font-size:clamp(19px,2vw,24px)}
+.gd-price{margin:2px 0 0;font-size:var(--fs-name)}
+.gd-price s{font-size:var(--fs-lead)}
+.gd-price small{font-size:var(--fs-small)}   /* an item page's price: its old price and its words a step smaller than it */
 .gd-body{--gap:clamp(28px,4vw,60px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:var(--gap);align-items:start}
 /* an item's picture (js/goods.js): its page of the catalog, in the cards' round frame, over the cut-out goods (each
    just where the page draws it), over the background (img/goods-bg.webp: the pages' own background picture at the
@@ -114,7 +116,7 @@
 .gd-goods.home img{transition:left .6s var(--ease-out),top .6s var(--ease-out),transform .3s var(--ease-out),filter .3s var(--ease-out)}   /* going back to their places */
 .gd.cut .gd-goods img.held{cursor:grabbing;transform:scale(1.04);filter:drop-shadow(0 26px 30px rgba(0,0,0,.6))}
 @media (hover:none){.gd.cut .gd-goods img{cursor:auto}}
-.gd-out{position:absolute;top:14px;right:calc(100% - min(100%,var(--s) * 1.5) + 14px);z-index:2;display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:15px;cursor:pointer;opacity:0;pointer-events:none;transition:border-color .35s,box-shadow .35s,opacity .4s}
+.gd-out{position:absolute;top:14px;right:calc(100% - min(100%,var(--s) * 1.5) + 14px);z-index:2;display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid var(--ring-line);border-radius:50%;background:var(--ring-bg);color:var(--g-gold);font-size:var(--fs-body);cursor:pointer;opacity:0;pointer-events:none;transition:border-color .35s,box-shadow .35s,opacity .4s}
 .gd.cut .gd-out{opacity:1;pointer-events:auto}
 .gd-out:hover{border-color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo)}
 .gd:not(.open) .gd-out{display:none}   /* (right: the frame's corner, which is narrower than the figure when the screen is low) */
@@ -126,18 +128,18 @@
 @keyframes gd-in{from{opacity:0}}
 .gd-spec{margin:0;border-top:1px solid var(--line)}
 .gd-spec > div{display:grid;grid-template-columns:4.6em minmax(0,1fr);gap:16px;padding-block:15px;border-bottom:1px solid var(--line)}
-.gd-spec dt{font-size:13px;letter-spacing:.12em;color:var(--g-gold);padding-top:2px}
-.gd-spec dd{margin:0;font-size:15px;line-height:1.75;overflow-wrap:anywhere}
+.gd-spec dt{font-size:var(--fs-label);letter-spacing:.12em;color:var(--g-gold);padding-top:2px}
+.gd-spec dd{margin:0;font-size:var(--fs-body);line-height:1.75;overflow-wrap:anywhere}
 /* a set's contents, numbered in small gold rings (➀ ➁ ➂, the corner buttons' line): light on the dark ground */
 .gd-spec ol{margin:0;padding:0;list-style:none;counter-reset:n;display:grid;gap:6px}
 .gd-spec ol li{counter-increment:n;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start}
-.gd-spec ol li::before{content:counter(n);display:grid;place-items:center;width:20px;height:20px;margin-top:.22em;border:1px solid var(--ring-line);border-radius:50%;font-size:11px;line-height:1;color:var(--g-gold);font-variant-numeric:tabular-nums}
+.gd-spec ol li::before{content:counter(n);display:grid;place-items:center;width:20px;height:20px;margin-top:.22em;border:1px solid var(--ring-line);border-radius:50%;font-size:var(--fs-label);line-height:1;color:var(--g-gold);font-variant-numeric:tabular-nums}
 .gd-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
 .gd-works{margin-top:clamp(56px,7vw,100px)}
-.gd-h{margin:0 0 20px;font-size:12px;font-weight:400;letter-spacing:.3em;color:var(--g-gold)}
+.gd-h{margin:0 0 20px;font-size:var(--fs-label);font-weight:400;letter-spacing:.3em;color:var(--g-gold)}
 .mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
 @media (max-width:560px){.mini{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
 .mini a{display:grid;gap:10px;align-content:start;text-decoration:none;min-width:0}
 .mini img{display:block;width:100%;aspect-ratio:4 / 3;object-fit:contain;background:var(--bg-2);transition:opacity .25s}
 .mini a:hover img{opacity:.8}
-.mini span{font-family:var(--f-display);font-size:14px;letter-spacing:.03em;line-height:1.5;overflow-wrap:anywhere}
+.mini span{font-family:var(--f-display);font-size:var(--fs-small);letter-spacing:.03em;line-height:1.5;overflow-wrap:anywhere}

@@ -10,6 +10,16 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
   --veil:rgba(6,6,6,.52);
   --f-display:"Cinzel","Shippori Mincho","Noto Serif JP",serif;
   --f-body:"Figtree","Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  /* text sizes: every text on the site takes one of these nine (a phone's size, growing with the screen to a 1440 px wide one's) */
+  --fs-hero:clamp(32px,7.25vw,104px);   /* the biggest words: the name on Home, the curtain's word, a year in a list, the game's name */
+  --fs-title:clamp(32px,3.9vw,56px);    /* a page's title: a part's (WORKS) or an inner page's (a work, a book, an item); the phone menu */
+  --fs-head:clamp(22px,2.23vw,32px);    /* a heading inside a page; a catalog's, an event's, a channel's name; About's numbers */
+  --fs-name:clamp(18px,1.67vw,24px);    /* a name in a list (a work, a book, an item, a shop); the game's small headings; an item's price */
+  --fs-lead:clamp(16px,1.39vw,20px);    /* lead words: the wordmark, "Illustrations by", the categories, a page's date, the game's intro */
+  --fs-bar:clamp(14px,1.12vw,16px);     /* the menu and the year bar, and the events matched to the bar: body size on a big screen, small on a phone */
+  --fs-body:16px;                       /* reading text and values */
+  --fs-small:14px;                      /* captions, a page's details, buttons */
+  --fs-label:12px;                      /* gold small headings, marks, dates and notes, the footer, the header's small buttons */
   --pad-l:max(clamp(16px,5vw,72px),env(safe-area-inset-left,0px));
   --pad-r:max(clamp(16px,5vw,72px),env(safe-area-inset-right,0px));
   --head:76px;
@@ -28,7 +38,7 @@ body{margin:0}[hidden]{display:none!important}img{max-width:100%;-webkit-user-dr
 }
 *{box-sizing:border-box}
 html{background:var(--bg);scrollbar-gutter:stable;-webkit-tap-highlight-color:transparent}   /* the scrollbar's room stays when a viewer locks the page, so the page behind does not shift; and no box flashes over what a finger taps on a phone (the site has its own feedback; keyboard focus rings stay) */
-body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:var(--fs-body);line-height:1.7;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 a:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .in{max-width:1400px;margin:0 auto;padding-left:var(--pad-l);padding-right:var(--pad-r)}
@@ -37,9 +47,9 @@ a:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 .site-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg)}
 .site-head .in{height:var(--head);display:flex;align-items:center;gap:16px}
-.logo{font-family:var(--f-display);font-size:clamp(14px,1.6vw,20px);letter-spacing:.14em;text-decoration:none;white-space:nowrap}
-.nav{display:flex;gap:clamp(14px,2.4vw,32px)}
-.nav a{position:relative;text-decoration:none;font-size:clamp(13px,1.2vw,15px);letter-spacing:.02em;transition:color .3s}
+.logo{font-family:var(--f-display);font-size:var(--fs-lead);letter-spacing:.14em;text-decoration:none;white-space:nowrap}
+.nav{display:flex;gap:clamp(16px,4.2vw - 24px,32px)}   /* closer together on a narrow screen, so the menu stays on one line by the wordmark */
+.nav a{position:relative;text-decoration:none;font-size:var(--fs-bar);letter-spacing:.02em;white-space:nowrap;transition:color .3s}
 .nav a::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right center;transition:transform .55s var(--ease-out)}
 .nav a:hover::after,.nav a[aria-current="page"]::after{transform:scaleX(1);transform-origin:left center}
 .nav a[aria-current="page"]{color:var(--mute)}
@@ -59,11 +69,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .curtain.cur-out .ln-a{opacity:0;transition:opacity .18s}
 .curtain.cur-out .ln-b{top:0;opacity:1;transition:top .62s cubic-bezier(.76,0,.24,1),opacity .08s}
 .curtain-label{position:absolute;inset:0;z-index:1;display:grid;place-content:center;justify-items:center;gap:12px;padding:0 16px;text-align:center}
-.curtain-t{display:flex;overflow:hidden;font-family:var(--f-display);font-size:clamp(38px,8vw,116px);line-height:1.15;letter-spacing:.14em;padding-left:.14em}
+.curtain-t{display:flex;overflow:hidden;font-family:var(--f-display);font-size:var(--fs-hero);line-height:1.15;letter-spacing:.14em;padding-left:.14em}
 .curtain-t span{display:inline-block;transform:translateY(108%);transition:transform .5s var(--ease-out) calc(var(--i) * 24ms + .12s)}
 .curtain.cur-in .curtain-t span{transform:none}
 .curtain.cur-out .curtain-t span{transform:translateY(-108%);transition:transform .38s cubic-bezier(.76,0,.24,1) calc(var(--i) * 14ms)}
-.curtain-s{font-size:12.5px;letter-spacing:.3em;color:var(--g-gold);opacity:0;transform:translateY(8px);transition:opacity .4s .32s,transform .5s var(--ease-out) .32s}
+.curtain-s{font-size:var(--fs-label);letter-spacing:.3em;color:var(--g-gold);opacity:0;transform:translateY(8px);transition:opacity .4s .32s,transform .5s var(--ease-out) .32s}
 .curtain.cur-in .curtain-s{opacity:1;transform:none}
 .curtain.cur-out .curtain-s{opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .3s}
 
