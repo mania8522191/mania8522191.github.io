@@ -53,11 +53,11 @@
   並更新 `index.html` 裡的版本戳記（`?v=`），回訪的人才會拿到新檔案。沒跑的話，網頁上看不到修改。
   會寫資料的工具（加了 `--save` 時）會自動跑。
 - **直接改原本那條，不要在後面另外加一條蓋過去。** 樣式、程式、文字都一樣：照上面的說明找到它在哪個檔案，就在那裡改。
-- **字的大小只用 `css/base.css` 的 9 級（`--fs-*`）**，不另外寫 px，見「文字大小」。
+- **字的大小只用 `css/base.css` 的 9 級（`--fs-*`）**，不另外寫 px，見「文字大小」。`build.py --check` 會列出沒照做的地方。
 - **拿掉或換掉一個功能時，它的文字（`js/i18n.js` 三種語言）、樣式和圖片要一起刪。**
 - **上線前跑 `python tools/build.py --check`，看到 `no leftovers` 才上線。**
-  `build.py` 每次合併完都會檢查殘留：沒在用的程式、樣式、文字、資料欄位、圖片和音檔，還有一定會被蓋掉、不會生效的樣式，
-  有的話會一條條列出來，先刪乾淨。如果它列的東西其實有在用（工具看不懂的寫法），就改進 `tools/check_code.py`，不要放著不管。
+  `build.py` 每次合併完都會檢查殘留：沒在用的程式、樣式、文字、資料欄位、圖片和音檔，還有一定會被蓋掉、不會生效的樣式，以及不在 9 級裡的字的大小，
+  有的話會一條條列出來，先刪乾淨（字的大小就改成 9 級之一）。如果它列的東西其實有在用（工具看不懂的寫法），就改進 `tools/check_code.py`，不要放著不管。
 
 ## 加一件作品
 
@@ -361,6 +361,11 @@ Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊�
 - 很窄的手機上，左上網站名和作品分類改用說明的 14（`css/responsive.css`、`css/home.css`），才排得下
 - 會自動縮小的兩個例外：太長的書名縮到剛好一行（`js/artbook.js` 的 `fitLine`）；
   首頁大名在窄手機上照螢幕寬度縮成一行（`css/home.css` 的 `.hero-name`：`min(var(--fs-hero), 8.2vw)`）
+- `python tools/build.py --check` 會列出不在這 9 級裡的字：
+  - 樣式的 `font-size` 只能寫 `var(--fs-…)`、`inherit`，或配合螢幕縮小的 `min(var(--fs-…), …)`（只會比那一級小）
+  - `--fs-*` 只能在 `css/base.css` 的 `:root` 設定，而且只能是這 9 個
+  - 程式和 `index.html` 裡不能寫死字的大小；像 `fitLine` 那樣照畫面算出來的可以
+- 真的要加新的一級時，`css/base.css`、`tools/check_code.py` 的 `SIZES` 和上面這張表要一起改
 
 ## NSFW 預覽
 
@@ -410,7 +415,7 @@ GitHub 那邊部署逾時的話，推一個空的 commit 重試：`git commit --
 | `catalog_bg.py` | 品書換背景：品書每一頁的背景換成一張新圖，同時做出商品頁往右展開用的同一張背景 |
 | `share_images.py` | 分享預覽圖（Facebook 等用的 1200×630、X 用的 1200×600），用 `share_image.html` 在 Chrome 裡畫 |
 | `build.py` | 把 `css/`、`js/` 合併成 `site.css`、`site.js`，更新版本戳記，再檢查殘留 |
-| `check_code.py` | 列出沒在用的程式、樣式、文字、資料欄位，和不會生效的樣式（`build.py` 每次都會跑） |
+| `check_code.py` | 列出沒在用的程式、樣式、文字、資料欄位，不會生效的樣式，和不在 9 級裡的字的大小（`build.py` 每次都會跑） |
 | `check_images.py` | 列出沒用到的、缺少的圖片和音檔（`build.py` 每次都會跑） |
 | `check_deploy.py` | 等部署完成，比對線上檔案 |
 | `yt_latest.py` | 首頁最新影片的清單 `yt-latest.json`（GitHub 每小時自動跑） |

@@ -11,6 +11,8 @@ change instead of piling up. It reports:
   - custom properties (--name) set but never read, or read but never set; @keyframes nothing plays
   - texts in js/i18n.js missing in a language, written twice, never used, or asked for but not there
   - fields in js/data.js (WORKS, GOODS, BOOKS, EVENTS) that no script reads, and HOME_SLIDES entries that are not works
+  - text sizes outside the nine (SIZES, set in css/base.css :root): a font size in css/ that is not var(--fs-...),
+    a fixed font size in js/ or index.html, and a --fs-* size set anywhere else or not one of the nine
 A name put together while the page runs, such as 'bk.size.' + b.size or `b3-${face}`, counts as used when its
 prefix is put together that way somewhere. The tool only reports. If it lists something that is in fact used
 (a way of using it that the tool does not know), teach the tool instead of leaving the warning.
@@ -25,6 +27,12 @@ import build   # noqa: E402  (where the site is, and the order of css/ and js/)
 
 ROOT = build.ROOT
 DECL = re.compile(r'(?<![\w$.])(?:function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(|(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=|class\s+([A-Za-z_$][\w$]*))')
+# the nine text sizes (tools/README.md, 文字大小); a new one only with the site owner's OK, added here and in the README
+SIZES = ['--fs-' + s for s in ('hero', 'title', 'head', 'name', 'lead', 'bar', 'body', 'small', 'label')]
+# a font size in css/: one of them; the smaller of one and something else (a fit to the screen, never bigger); the parent's
+SIZE = re.compile(r'inherit|unset|var\(--fs-[\w-]+\)|min\(\s*var\(--fs-[\w-]+\)\s*,.*\)|min\(.*,\s*var\(--fs-[\w-]+\)\s*\)')
+# a fixed font size written in js/ or index.html (a size worked out while the page runs, like fitLine's, is fine)
+FIXED = re.compile(r'''(?:fontSize|font-size)['"`]?\s*[:=,]\s*['"`]?\s*((?:[\d.]|(?:x{1,3}-)?(?:small|large)\b|medium\b|smaller\b|larger\b)[^'"`;}\s>]*)''')
 
 
 def read(path):
@@ -78,7 +86,7 @@ def rules(css):
 
 
 def declarations(body):
-    """(property, !important?) of each declaration; semicolons inside url(...) or quotes do not split."""
+    """(property, value, !important?) of each declaration; semicolons inside url(...) or quotes do not split."""
     parts, depth, quote, cur = [], 0, None, ''
     for ch in body:
         if quote:
@@ -95,7 +103,35 @@ def declarations(body):
             continue
         cur += ch
     parts.append(cur)
-    return [(p.split(':', 1)[0].strip().lower(), '!important' in p) for p in parts if ':' in p]
+    out = []
+    for p in parts:
+        if ':' in p:
+            prop, value = p.split(':', 1)
+            out.append((prop.strip().lower(), ' '.join(value.replace('!important', '').split()), '!important' in p))
+    return out
+
+
+def sizes(css, js, html):
+    """Text sizes outside the nine, one line each. css and js map a file's name to its text (comments blanked out)."""
+    out = []
+    for n, s in css.items():
+        for ctx, sel, body, at in rules(s):
+            where, sel = f'css/{n}.css:{line(s, at)}', ' '.join(sel.split())
+            for prop, value, _ in declarations(body):
+                if prop.startswith('--fs-'):
+                    if n != 'base' or ctx or sel != ':root':
+                        out.append(f'{where}: {sel} sets {prop}: the text sizes are set only in css/base.css :root')
+                    elif prop not in SIZES:
+                        out.append(f'{where}: {prop} is not one of the nine text sizes (SIZES in tools/check_code.py)')
+                elif (prop == 'font-size' and not SIZE.fullmatch(value) or prop == 'font' and value not in ('inherit', 'unset')
+                      and not re.search(r'(?<![\w(-])var\(--fs-[\w-]+\)(?=/|\s|$)', value)):   # the shorthand's size
+                    out.append(f'{where}: {sel} {{{prop}:{value}}} is not one of the nine text sizes: use var(--fs-...)')
+    for f, s in [(f'js/{n}.js', t) for n, t in js.items()] + [('index.html', html)]:
+        for m in FIXED.finditer(s):
+            out.append(f'{f}:{line(s, m.start())}: a fixed font size ({m.group(1)}): use one of the nine text sizes, var(--fs-...)')
+        for m in re.finditer(r'''setProperty\(\s*['"`](--fs-[\w-]*)|(?<![\w-])(--fs-[\w-]*)\s*:''', s):
+            out.append(f'{f}:{line(s, m.start())}: sets {m.group(1) or m.group(2)}: the text sizes are set only in css/base.css :root')
+    return out
 
 
 def findings():
@@ -131,7 +167,7 @@ def findings():
             for x in re.findall(r'([.#])(-?[A-Za-z_][\w-]*)', bare):
                 names.setdefault(''.join(x), where)
             sel = re.sub(r'\s*([,>+~])\s*', r'\1', ' '.join(sel.split()))
-            for prop, important in dict(declarations(body)).items():   # twice in one rule = a fallback, e.g. vh then svh
+            for prop, important in {p: i for p, _, i in declarations(body)}.items():   # twice in one rule = a fallback, e.g. vh then svh
                 key = (ctx, sel, prop)
                 if key in last:
                     was, was_important = last[key]
@@ -175,6 +211,7 @@ def findings():
         for m in re.finditer(r'@keyframes\s+([\w-]+)', css[n]):
             if len(re.findall(r'(?<![\w-])' + re.escape(m.group(1)) + r'(?![\w-])', every)) < 2:
                 out.append(f'css/{n}.css:{line(css[n], m.start())}: @keyframes {m.group(1)} is never played')
+    out += sizes(css, js, html)
 
     # texts: I18N = { "zh": { "key": "text", ... }, "en": {...}, ... }, one key per line
     src = js['i18n']

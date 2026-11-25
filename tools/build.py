@@ -8,8 +8,9 @@ Loaded as separate files, those could run between two files, before the page has
     python tools/build.py           build site.css and site.js, then update their version stamps in index.html
     python tools/build.py --check   only check that both are up to date (exit code 1 if not)
 
-Both then list leftovers: code, styles, texts, data fields and pictures that nothing uses, and styles that never
-apply (tools/check_code.py and tools/check_images.py). With --check, leftovers also give exit code 1.
+Both then list leftovers: code, styles, texts, data fields and pictures that nothing uses, styles that never
+apply, and text sizes outside the nine (tools/check_code.py and tools/check_images.py). With --check, leftovers
+also give exit code 1.
 Run it after changing anything in css/ or js/; the tools that write js/data.js (with --save) run it themselves.
 Never edit site.css or site.js by hand: they are rebuilt from the sources. The version stamp (?v=) makes a returning
 visitor's browser fetch the new copy instead of a cached old one.
@@ -71,7 +72,7 @@ def report():
     import check_images
     found = check_code.findings() + check_images.findings()
     if not found:
-        print('no leftovers: every function, style, text, data field, picture and sound is in use')
+        print('no leftovers: every function, style, text, data field, picture and sound is in use; every text size is one of the nine')
         return 0
     print(f'leftovers ({len(found)}): clean them up before going live (if one is in fact used, improve tools/check_code.py)')
     for f in found:
