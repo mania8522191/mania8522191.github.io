@@ -1,5 +1,5 @@
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #t-<tag> (every work with it) #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #board (#board-admin: its review page) #w-<work id> (#w-<id>/<n>: piece n of a collection) #t-<tag> (every work with it) #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 /* where each page was scrolled when it was left (by its address), to come back to it there. The site places the page
    itself on every change, so the browser's own scroll restoration is off: on Back it scrolled the page being left
@@ -23,6 +23,7 @@ function parse() {
   }
   if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
+  if (h === 'board' || h === 'board-admin') return { h, next: 'board', idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-')) {
@@ -123,6 +124,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
+  if (next === 'board') boardShow(h === 'board-admin');
   if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
   heroPlay();   // the carousel moves on only while the home page is shown
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
@@ -137,8 +139,8 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', event: 'EVENT', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
-const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'event', 'game', 'about', 'contact']);
+const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', event: 'EVENT', game: 'GAME', about: 'ABOUT', contact: 'CONTACT', board: 'BOARD' };
+const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'event', 'game', 'about', 'contact', 'board']);
 let curtainBusy = false;
 function curtainTo(r) {
   curtainBusy = true;

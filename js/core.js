@@ -12,7 +12,7 @@ const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), tag: $('#v-tag'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), tag: $('#v-tag'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact'), board: $('#v-board') };
 
 /* a page's cross-links, a line of them after its words ("這張插畫做成了周邊：A、B"); hidden when there are none.
    links: [words, address] */

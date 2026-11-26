@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=e188ae72">
+<link rel="stylesheet" href="site.css?v=8da19980">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -73,6 +73,7 @@ addEventListener('hashchange', function () {
       <a href="#game" data-v="game">Game</a>
       <a href="#about" data-v="about">About</a>
       <a href="#contact" data-v="contact">Contact</a>
+      <a href="#board" data-v="board">Board</a>
     </nav>
     <div class="lang" role="group" aria-label="Language / 語言 / 言語"><button type="button" data-lang="zh" lang="zh-Hant">中文</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="ja" lang="ja">日本語</button></div>
     <button class="snd" type="button" aria-pressed="false" aria-label="背景音樂" data-i18n-aria="snd.label"><span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
@@ -88,6 +89,7 @@ addEventListener('hashchange', function () {
   <a href="#game" data-v="game">Game</a>
   <a href="#about" data-v="about">About</a>
   <a href="#contact" data-v="contact">Contact</a>
+  <a href="#board" data-v="board">Board</a>
   <div class="m-tools"><div class="lang" role="group" aria-label="Language / 語言 / 言語"><button type="button" data-lang="zh" lang="zh-Hant">中文</button><button type="button" data-lang="en" lang="en">EN</button><button type="button" data-lang="ja" lang="ja">日本語</button></div><button class="snd" type="button" aria-pressed="false" aria-label="背景音樂" data-i18n-aria="snd.label"><span class="snd-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button></div>
 </nav>
 
@@ -470,6 +472,61 @@ addEventListener('hashchange', function () {
       </section>
     </div>
   </section>
+
+  <!-- board: visitors' posts, each shown only once accepted on the review page (#board-admin), and the form to send
+       one (js/board.js; the back end is worker/, tools/README.md: 留言板) -->
+  <section class="view board in" id="v-board" hidden>
+    <h1 class="sec-title">BOARD</h1>
+    <p class="sec-sub" data-i18n="board.sub">留下想說的話，或貼上你畫的圖讓我幫你改圖。每則留言都會先經過我審核，通過後才會公開在這裡。</p>
+    <div class="bd-grid" id="bd-grid">
+      <form class="bd-form" id="bd-form" novalidate>
+        <h2 class="group-t" data-i18n="board.write">寫留言</h2>
+        <label class="bd-field"><span data-i18n="board.name">暱稱</span><input id="bd-name" maxlength="40" autocomplete="nickname"></label>
+        <label class="bd-field"><span data-i18n="board.text">留言</span><textarea id="bd-text" rows="5" maxlength="2000"></textarea></label>
+        <div class="bd-drop" id="bd-drop">
+          <input type="file" id="bd-file" accept="image/*" multiple hidden>
+          <button class="bd-add" id="bd-add" type="button"><span aria-hidden="true">＋</span><span data-i18n="board.addPic">加入圖片</span></button>
+          <span class="bd-hint" data-i18n="board.picHint">最多 4 張，也可以直接拖進來或貼上</span>
+          <ul class="bd-thumbs" id="bd-thumbs"></ul>
+        </div>
+        <ul class="bd-rules">
+          <li data-i18n="board.rule1">送出後要先經過我審核，通過才會公開。</li>
+          <li data-i18n="board.rule2">只上傳你自己畫的圖。</li>
+          <li data-i18n="board.rule3">上傳圖片，就表示同意它公開在這裡，也同意我在回覆裡修改示範。</li>
+        </ul>
+        <div class="bd-ts" id="bd-ts"></div>
+        <button class="btn" id="bd-send" type="submit" data-i18n="board.send">送出</button>
+        <p class="bd-status" id="bd-status" role="status" aria-live="polite"></p>
+      </form>
+      <div class="bd-feed">
+        <h2 class="group-t" data-i18n="board.posts">留言</h2>
+        <ol class="bd-posts" id="bd-posts"></ol>
+        <p class="bd-empty" id="bd-empty" data-i18n="board.empty" hidden>還沒有公開的留言。</p>
+        <button class="btn ghost bd-more" id="bd-more" type="button" data-i18n="board.more" hidden>看更早的留言</button>
+      </div>
+    </div>
+    <!-- the review page: the owner's password once (the key it gives is kept in this browser for 30 days), then the
+         posts waiting, to accept, answer (words and pictures) or delete, and the ones shown -->
+    <div class="bd-admin" id="bd-admin" hidden>
+      <form class="bd-login" id="bd-login">
+        <h2 class="group-t" data-i18n="board.review">審核留言</h2>
+        <label class="bd-field"><span data-i18n="board.pw">審核密碼</span><input id="bd-pw" type="password" autocomplete="current-password"></label>
+        <button class="btn" type="submit" data-i18n="board.login">登入</button>
+        <p class="bd-status" id="bd-login-st" role="status" aria-live="polite"></p>
+      </form>
+      <div class="bd-review" id="bd-review" hidden>
+        <div class="bd-tabs" role="tablist">
+          <button type="button" role="tab" data-state="wait" aria-selected="true"><span data-i18n="board.waiting">待審核</span><b id="bd-wait-n">0</b></button>
+          <button type="button" role="tab" data-state="shown" aria-selected="false" data-i18n="board.shown">已公開</button>
+          <button class="bd-out" id="bd-logout" type="button" data-i18n="board.logout">登出</button>
+        </div>
+        <p class="bd-status" id="bd-rv-st" role="status" aria-live="polite"></p>
+        <ol class="bd-posts" id="bd-rv-posts"></ol>
+        <p class="bd-empty" id="bd-rv-empty" data-i18n="board.none" hidden>這裡沒有留言。</p>
+        <button class="btn ghost bd-more" id="bd-rv-more" type="button" data-i18n="board.more" hidden>看更早的留言</button>
+      </div>
+    </div>
+  </section>
 </main>
 
 <div class="curtain" id="curtain" aria-hidden="true" hidden><div class="c2"><div class="curtain-label"><span class="curtain-t" id="curtain-t"></span><span class="curtain-s" id="curtain-s"></span></div></div><i class="ln ln-a"></i><i class="ln ln-b"></i></div>
@@ -570,6 +627,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=0523916a"></script>
+<script src="site.js?v=d05c905c"></script>
 </body>
 </html>

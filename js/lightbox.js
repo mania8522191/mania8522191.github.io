@@ -60,6 +60,7 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
       alt: tr(n ? 'bk.pageAlt' : 'bk.coverAlt', { t: bkName(b), n }),
     }));
   },
+  board: (id) => bdItems(id),   // a post's pictures on the board (js/board.js)
   cards: () => DECK.map((f, i) => {
     const c = tr('cat.' + CAT(f)), name = CARD_NAMES[f] || c;
     return { src: `img/cards/${f}.webp`, w: 336, h: 960, zw: 420, no: `${no2(i + 1)} / ${no2(DECK.length)}`, cap: `${c} · ${name}`, alt: tr('cards.alt', { c, name }) };
@@ -541,7 +542,7 @@ function zvMake(kind, key, set, from) {
 }
 /* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
 function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : '';
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : kind === 'board' ? bdKeyNow : '';
   const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
   const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
   if (same) { same.from = from; same.at0 = at; zvBack(same); return; }

@@ -1,0 +1,22 @@
+# The message board's back end (tools/README.md: 留言板). The secrets are not in here: they are set with
+# `npx wrangler secret put <NAME>` (ADMIN_PASSWORD, TURNSTILE_SECRET, RESEND_API_KEY, NOTIFY_EMAIL), and for
+# `npm run dev` in .dev.vars, which is not committed.
+name = "board"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+SITE = "https://mania8522191.github.io"
+ORIGINS = "https://mania8522191.github.io http://localhost:8765"   # the pages that may use it (the local preview too)
+
+[[d1_databases]]
+binding = "DB"
+database_name = "board"
+database_id = "b1b88483-1f9c-4226-9edc-ae57b2c2f876"   # from `npx wrangler d1 create board`
+
+[[kv_namespaces]]
+binding = "PICS"
+id = "0a97e91e483e4427b9a94eb78e1bbc20"   # from `npx wrangler kv namespace create PICS`
+
+[observability]
+enabled = true

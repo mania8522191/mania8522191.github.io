@@ -1,4 +1,4 @@
-/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, lang-switch, sound, main. Edit those files, not this one. */
+/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, board, lang-switch, sound, main. Edit those files, not this one. */
 
 /* ==================== js/data.js ==================== */
 /* Site data. One item per line; the scripts in tools/ read and write this file (keep each list valid JSON).
@@ -159,7 +159,7 @@ const $ = (s) => document.querySelector(s);
 const dot = (d) => d.replaceAll('-', '.');
 const src = (id, n) => `img/${id}${n ? '_p' + n : ''}.webp`;
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
-const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), tag: $('#v-tag'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact') };
+const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), tag: $('#v-tag'), goods: $('#v-goods'), catalog: $('#v-catalog'), item: $('#v-item'), artbook: $('#v-artbook'), book: $('#v-book'), game: $('#v-game'), event: $('#v-event'), about: $('#v-about'), contact: $('#v-contact'), board: $('#v-board') };
 
 /* a page's cross-links, a line of them after its words ("這張插畫做成了周邊：A、B"); hidden when there are none.
    links: [words, address] */
@@ -365,6 +365,58 @@ const I18N = {
     "cur.game": "獨立遊戲",
     "cur.about": "關於我",
     "cur.contact": "聯絡方式",
+    "cur.board": "留言板",
+    "board.sub": "留下想說的話，或貼上你畫的圖讓我幫你改圖。每則留言都會先經過我審核，通過後才會公開在這裡。",
+    "board.write": "寫留言",
+    "board.name": "暱稱",
+    "board.text": "留言",
+    "board.addPic": "加入圖片",
+    "board.picHint": "最多 4 張，也可以直接拖進來或貼上",
+    "board.rule1": "送出後要先經過我審核，通過才會公開。",
+    "board.rule2": "只上傳你自己畫的圖。",
+    "board.rule3": "上傳圖片，就表示同意它公開在這裡，也同意我在回覆裡修改示範。",
+    "board.send": "送出",
+    "board.sending": "傳送中… {p}%",
+    "board.sent": "已送出！審核通過後就會出現在這裡。",
+    "board.posts": "留言",
+    "board.empty": "還沒有公開的留言。",
+    "board.more": "看更早的留言",
+    "board.reply": "站主回覆",
+    "board.before": "原圖",
+    "board.after": "改圖",
+    "board.cmp": "原圖和改圖的分界：左右拖曳或按方向鍵移動",
+    "board.zoom": "放大看改圖",
+    "board.remove": "移除這張圖",
+    "board.orig": "下載原檔",
+    "board.review": "審核留言",
+    "board.pw": "審核密碼",
+    "board.login": "登入",
+    "board.waiting": "待審核",
+    "board.shown": "已公開",
+    "board.logout": "登出",
+    "board.none": "這裡沒有留言。",
+    "board.accept": "接受並公開",
+    "board.delete": "刪除",
+    "board.sure": "確定要刪除這則留言和它的圖片嗎？刪除後無法復原。",
+    "board.replyEdit": "回覆／改圖",
+    "board.save": "儲存回覆",
+    "board.saved": "已儲存。",
+    "board.e.name": "請填暱稱。",
+    "board.e.empty": "請寫點什麼，或加入圖片。",
+    "board.e.long": "文字太長了。",
+    "board.e.pics": "圖片最多 4 張。",
+    "board.e.pic": "有一張圖打不開，請換一張試試。",
+    "board.e.big": "圖片太大了。",
+    "board.e.human": "驗證沒有通過，請再試一次。",
+    "board.e.wait": "請等驗證完成再送出。",
+    "board.e.slow": "短時間內送太多則了，請過一陣子再試。",
+    "board.e.full": "待審核的留言太多了，請過幾天再來。",
+    "board.e.net": "連不上留言板，請稍後再試。",
+    "board.e.password": "密碼不對。",
+    "board.e.auth": "請重新登入。",
+    "board.e.setup": "後台還沒設定審核密碼。",
+    "board.e.gone": "這則留言已經不在了。",
+    "board.e.server": "出了點問題，請稍後再試。",
     "cur.event": "參加展場",
     "years.nav": "依年份瀏覽",
     "years.go": "跳到 {y} 年",
@@ -598,6 +650,58 @@ const I18N = {
     "cur.game": "Indie card game",
     "cur.about": "About the artist",
     "cur.contact": "Get in touch",
+    "cur.board": "Message board",
+    "board.sub": "Leave a message, or post a drawing of yours for me to paint over and give feedback on. Every post is reviewed first and shows up here once approved.",
+    "board.write": "Write a post",
+    "board.name": "Name",
+    "board.text": "Message",
+    "board.addPic": "Add pictures",
+    "board.picHint": "Up to 4. You can also drop or paste them here.",
+    "board.rule1": "Posts appear only after I have reviewed and approved them.",
+    "board.rule2": "Only post drawings you made yourself.",
+    "board.rule3": "By posting a picture, you agree to it being shown here and to me painting over it in my reply.",
+    "board.send": "Send",
+    "board.sending": "Sending… {p}%",
+    "board.sent": "Sent! It will appear here once approved.",
+    "board.posts": "Posts",
+    "board.empty": "No posts yet.",
+    "board.more": "Older posts",
+    "board.reply": "Reply",
+    "board.before": "Original",
+    "board.after": "Paintover",
+    "board.cmp": "Divider between the original and the paintover: drag sideways or use the arrow keys",
+    "board.zoom": "View the paintover larger",
+    "board.remove": "Remove this picture",
+    "board.orig": "Download the file",
+    "board.review": "Review posts",
+    "board.pw": "Review password",
+    "board.login": "Log in",
+    "board.waiting": "Waiting",
+    "board.shown": "Shown",
+    "board.logout": "Log out",
+    "board.none": "Nothing here.",
+    "board.accept": "Accept and show",
+    "board.delete": "Delete",
+    "board.sure": "Delete this post and its pictures? This can't be undone.",
+    "board.replyEdit": "Reply / paintover",
+    "board.save": "Save reply",
+    "board.saved": "Saved.",
+    "board.e.name": "Please enter a name.",
+    "board.e.empty": "Write something or add a picture.",
+    "board.e.long": "That's too long.",
+    "board.e.pics": "4 pictures at most.",
+    "board.e.pic": "One of the pictures can't be opened. Try another.",
+    "board.e.big": "A picture is too large.",
+    "board.e.human": "The check didn't pass. Please try again.",
+    "board.e.wait": "Please wait for the check to finish, then send.",
+    "board.e.slow": "Too many posts in a short time. Please try again later.",
+    "board.e.full": "Too many posts are waiting for review. Please come back in a few days.",
+    "board.e.net": "Can't reach the board. Please try again later.",
+    "board.e.password": "Wrong password.",
+    "board.e.auth": "Please log in again.",
+    "board.e.setup": "The review password hasn't been set up yet.",
+    "board.e.gone": "This post is gone.",
+    "board.e.server": "Something went wrong. Please try again later.",
     "cur.event": "Conventions",
     "years.nav": "Browse by year",
     "years.go": "Jump to {y}",
@@ -831,6 +935,58 @@ const I18N = {
     "cur.game": "インディーゲーム",
     "cur.about": "プロフィール",
     "cur.contact": "コンタクト",
+    "cur.board": "掲示板",
+    "board.sub": "メッセージや、添削してほしいイラストを投稿できます。投稿は確認のうえ、承認されるとここに公開されます。",
+    "board.write": "投稿する",
+    "board.name": "ニックネーム",
+    "board.text": "メッセージ",
+    "board.addPic": "画像を追加",
+    "board.picHint": "4枚まで。ドラッグ＆ドロップや貼り付けもできます",
+    "board.rule1": "投稿は確認後、承認されてから公開されます。",
+    "board.rule2": "ご自身で描いたイラストのみ投稿してください。",
+    "board.rule3": "画像を投稿すると、ここでの公開と、返信での添削（加筆）に同意したものとみなします。",
+    "board.send": "送信",
+    "board.sending": "送信中… {p}%",
+    "board.sent": "送信しました。承認後にここに表示されます。",
+    "board.posts": "投稿",
+    "board.empty": "まだ投稿はありません。",
+    "board.more": "以前の投稿",
+    "board.reply": "返信",
+    "board.before": "元の絵",
+    "board.after": "添削",
+    "board.cmp": "元の絵と添削の境目：左右にドラッグするか矢印キーで動かせます",
+    "board.zoom": "添削を拡大して見る",
+    "board.remove": "この画像を外す",
+    "board.orig": "元ファイルを保存",
+    "board.review": "投稿の確認",
+    "board.pw": "管理パスワード",
+    "board.login": "ログイン",
+    "board.waiting": "確認待ち",
+    "board.shown": "公開中",
+    "board.logout": "ログアウト",
+    "board.none": "ここには投稿がありません。",
+    "board.accept": "承認して公開",
+    "board.delete": "削除",
+    "board.sure": "この投稿と画像を削除しますか？元に戻せません。",
+    "board.replyEdit": "返信・添削",
+    "board.save": "返信を保存",
+    "board.saved": "保存しました。",
+    "board.e.name": "ニックネームを入力してください。",
+    "board.e.empty": "メッセージを書くか、画像を追加してください。",
+    "board.e.long": "文章が長すぎます。",
+    "board.e.pics": "画像は4枚までです。",
+    "board.e.pic": "開けない画像があります。別の画像でお試しください。",
+    "board.e.big": "画像が大きすぎます。",
+    "board.e.human": "確認に失敗しました。もう一度お試しください。",
+    "board.e.wait": "確認が終わるまでお待ちください。",
+    "board.e.slow": "短時間に投稿が多すぎます。しばらくしてからお試しください。",
+    "board.e.full": "確認待ちの投稿が多すぎます。数日後にお試しください。",
+    "board.e.net": "掲示板に接続できません。しばらくしてからお試しください。",
+    "board.e.password": "パスワードが違います。",
+    "board.e.auth": "もう一度ログインしてください。",
+    "board.e.setup": "管理パスワードがまだ設定されていません。",
+    "board.e.gone": "この投稿は削除されています。",
+    "board.e.server": "エラーが発生しました。しばらくしてからお試しください。",
     "cur.event": "参加イベント",
     "years.nav": "年ごとに見る",
     "years.go": "{y}年へ移動",
@@ -1135,6 +1291,7 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
       alt: tr(n ? 'bk.pageAlt' : 'bk.coverAlt', { t: bkName(b), n }),
     }));
   },
+  board: (id) => bdItems(id),   // a post's pictures on the board (js/board.js)
   cards: () => DECK.map((f, i) => {
     const c = tr('cat.' + CAT(f)), name = CARD_NAMES[f] || c;
     return { src: `img/cards/${f}.webp`, w: 336, h: 960, zw: 420, no: `${no2(i + 1)} / ${no2(DECK.length)}`, cap: `${c} · ${name}`, alt: tr('cards.alt', { c, name }) };
@@ -1616,7 +1773,7 @@ function zvMake(kind, key, set, from) {
 }
 /* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
 function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : '';
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : kind === 'board' ? bdKeyNow : '';
   const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
   const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
   if (same) { same.from = from; same.at0 = at; zvBack(same); return; }
@@ -1657,7 +1814,7 @@ function setMenu(open) {
 menuBtn.addEventListener('click', () => setMenu(!document.documentElement.classList.contains('menu-open')));
 $('#m-nav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
 addEventListener('keydown', (e) => { if (e.key === 'Escape') setMenu(false); });
-matchMedia('(min-width: 1000px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+matchMedia('(max-width: 1119px)').addEventListener('change', (e) => { if (!e.matches) setMenu(false); });
 
 /* ==================== js/goods.js ==================== */
 /* Goods: prices, the goods list, goods item pages */
@@ -3803,7 +3960,7 @@ function snsShow(on) {
 
 /* ==================== js/router.js ==================== */
 /* Page changes: hash routing, the category curtain, page morphs, the nav underline */
-/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #w-<work id> (#w-<id>/<n>: piece n of a collection) #t-<tag> (every work with it) #g-<goods slug> ---------- */
+/* ---------- hash routing: #home (the carousel), #work #fanart #original #nsfw (the wall), #artbook #ab-<book> #goods #event #about #contact #board (#board-admin: its review page) #w-<work id> (#w-<id>/<n>: piece n of a collection) #t-<tag> (every work with it) #g-<goods slug> ---------- */
 let view = null, lastWork = null, lastPiece = -1, lastItem = null;
 /* where each page was scrolled when it was left (by its address), to come back to it there. The site places the page
    itself on every change, so the browser's own scroll restoration is off: on Back it scrolled the page being left
@@ -3827,6 +3984,7 @@ function parse() {
   }
   if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
+  if (h === 'board' || h === 'board-admin') return { h, next: 'board', idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
   if (h === 'fanart' || h === 'original' || h === 'nsfw') return { h, next: 'works', idx: -1, cat: h === 'fanart' ? 'fan' : h };
   if (h.startsWith('w-')) {
@@ -3927,6 +4085,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   view = next;
   evenIntros();
   if (next === 'about') preloadAbout();
+  if (next === 'board') boardShow(h === 'board-admin');
   if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
   heroPlay();   // the carousel moves on only while the home page is shown
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
@@ -3941,8 +4100,8 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
 
 /* category switch: the curtain covers the page, the new page is put in place underneath, the curtain lifts */
 const curtainEl = $('#curtain');
-const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', event: 'EVENT', game: 'GAME', about: 'ABOUT', contact: 'CONTACT' };
-const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'event', 'game', 'about', 'contact']);
+const CUR_NAME = { home: 'HOME', works: 'WORK', artbook: 'ART BOOK', goods: 'GOODS', event: 'EVENT', game: 'GAME', about: 'ABOUT', contact: 'CONTACT', board: 'BOARD' };
+const TOP_VIEWS = new Set(['home', 'works', 'artbook', 'goods', 'event', 'game', 'about', 'contact', 'board']);
 let curtainBusy = false;
 function curtainTo(r) {
   curtainBusy = true;
@@ -4144,6 +4303,509 @@ aboutSwap.addEventListener('click', () => {
     [aboutMain, aboutBadge, aboutIc].forEach((e) => { e.style.viewTransitionName = ''; });
   });
 });
+
+/* ==================== js/board.js ==================== */
+/* Board (#board): visitors' posts, and the form to send one; the review page (#board-admin), where the site's owner
+   accepts, answers or deletes them. The back end is worker/ (a Cloudflare Worker; tools/README.md: 留言板): a post
+   waits there unseen until it is accepted. A visitor's picture is drawn again in their browser before it is sent, at
+   most 4096 px on its long side (so a photo's hidden details, such as where it was taken, never leave it), with a small
+   copy for the board; the owner's own pictures in a reply go as they are, with a small copy */
+const BD_LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);   // the local preview: the back end of `npm run dev`
+const BD_API = BD_LOCAL ? 'http://127.0.0.1:8787' : 'https://board.mania8522191.workers.dev';
+const BD_TS_KEY = BD_LOCAL ? '1x00000000000000000000AA' : '0x4AAAAAAGT-3-bQwD_zvJc5';   // Turnstile's site key, widget "board" (locally Cloudflare's test key: always passes)
+const BD_PICS = 4, BD_SENT = 8 << 20, BD_OWN = 24 << 20, BD_SMALL = 1 << 20;   // what the back end takes
+const BD_ERRS = new Set(['name', 'empty', 'long', 'pics', 'pic', 'big', 'human', 'wait', 'slow', 'full', 'net', 'password', 'auth', 'setup', 'gone']);
+const bdForm = $('#bd-form'), bdPosts = $('#bd-posts'), bdRvPosts = $('#bd-rv-posts'), bdThumbsEl = $('#bd-thumbs'), bdDrop = $('#bd-drop');
+const bdById = new Map();   // every post drawn, for its pictures' windows (js/lightbox.js: ZV_SETS.board)
+let bdShown = [], bdRv = [], bdLoaded = 0, bdBusy = false, bdTs = null, bdTsToken = '', bdKeyNow = '', bdState = 'wait', bdKey = '';
+try { bdKey = localStorage.getItem('bdKey') || ''; } catch (e) { /* no storage: the password each visit */ }
+const bdPicked = [];   // the form's pictures: { url (to show it), ready (the copies to send) }
+
+/* a line under a form: what happened, or what went wrong (in red) */
+function bdSay(box, key, vars) {
+  box.textContent = key ? tr(key, vars) : '';
+  box.classList.toggle('err', !!key && key.startsWith('board.e.'));
+}
+const bdErr = (e) => 'board.e.' + (BD_ERRS.has(e && e.message) ? e.message : 'server');
+const bdDate = (ms, time) => {
+  const d = new Date(ms), p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}.${p(d.getMonth() + 1)}.${p(d.getDate())}${time ? ` ${p(d.getHours())}:${p(d.getMinutes())}` : ''}`;
+};
+async function bdCall(path, opt = {}) {
+  const headers = { ...(opt.headers || {}) };
+  if (path.startsWith('/admin/') && bdKey) headers.Authorization = 'Bearer ' + bdKey;
+  let r;
+  try { r = await fetch(BD_API + path, { ...opt, headers }); } catch (e) { throw new Error('net'); }
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401 && path !== '/admin/login') bdLogout();
+  if (!r.ok) throw new Error(d.error || 'server');
+  return d;
+}
+/* a form with pictures, saying how much of it has gone */
+function bdSend(path, fd, progress) {
+  return new Promise((ok, no) => {
+    const x = new XMLHttpRequest();
+    x.open('POST', BD_API + path);
+    if (path.startsWith('/admin/')) x.setRequestHeader('Authorization', 'Bearer ' + bdKey);
+    x.upload.addEventListener('progress', (e) => { if (e.lengthComputable) progress(Math.round((e.loaded / e.total) * 100)); });
+    x.addEventListener('load', () => {
+      let d = {};
+      try { d = JSON.parse(x.responseText); } catch (e) { /* not an answer: an error */ }
+      if (x.status === 401) bdLogout();
+      if (x.status >= 200 && x.status < 300) ok(d); else no(new Error(d.error || 'server'));
+    });
+    x.addEventListener('error', () => no(new Error('net')));
+    x.send(fd);
+  });
+}
+
+/* ---------- a post ---------- */
+const bdUrl = (q, size) => `${BD_API}/pic/${q.id}/${size}`;
+function bdSrc(img, q, admin) {   // its small copy; the review page's come with the key (a waiting post's are not public)
+  if (!admin) { img.src = bdUrl(q, 's'); return; }
+  if (q.blob) { img.src = q.blob; return; }
+  fetch(`${BD_API}/admin/pic/${q.id}/s`, { headers: { Authorization: 'Bearer ' + bdKey } })
+    .then((r) => (r.ok ? r.blob() : Promise.reject(new Error('gone'))))
+    .then((b) => { q.blob = URL.createObjectURL(b); img.src = q.blob; })
+    .catch(() => { /* gone: the list shows it on its next load */ });
+}
+const bdOrder = (p) => [...p.pics.filter((q) => q.who === 'guest'), ...p.pics.filter((q) => q.who === 'reply')];
+function bdItems(id) {   // a post's pictures in a window: the visitor's, then the reply's
+  const p = bdById.get(id), list = p ? bdOrder(p) : [];
+  return list.map((q, k) => ({
+    src: q.blob || bdUrl(q, 's'), zsrc: q.blob ? null : bdUrl(q, 'o'), eager: true,
+    w: q.sw, h: q.sh, zw: q.blob ? q.sw : q.w,
+    no: `${k + 1} / ${list.length}`, cap: q.who === 'reply' ? `${tr('board.after')} · ${p.name}` : p.name,
+    alt: `${p.name} · ${k + 1}`,
+  }));
+}
+function bdOpen(id, at, from) { bdKeyNow = id; zvOpen('board', at, from); }
+function bdPic(p, q, at, admin) {
+  const b = el('button', 'bd-pic'), img = el('img');
+  b.type = 'button';
+  img.alt = `${p.name} · ${at + 1}`;
+  img.width = q.sw;
+  img.height = q.sh;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  bdSrc(img, q, admin);
+  b.append(img);
+  b.addEventListener('click', () => bdOpen(p.id, at, img));
+  if (!admin) return b;
+  const box = el('div', 'bd-pw'), save = el('button', 'bd-orig', tr('board.orig'));   // the review page: save it as it was sent, to paint over it
+  save.type = 'button';
+  save.dataset.i18n = 'board.orig';
+  save.addEventListener('click', () => bdSaveOrig(p, q, at));
+  box.append(b, save);
+  return box;
+}
+function bdRow(p, list, from, admin) {
+  const row = el('div', 'bd-pics');
+  row.dataset.n = list.length;
+  list.forEach((q, k) => row.append(bdPic(p, q, from + k, admin)));
+  return row;
+}
+/* the visitor's picture with the owner's paintover over it: drag across it (or press the arrow keys) to move the line */
+function bdCompare(p, a, b, at, admin) {
+  const fig = el('figure', 'bd-cmp'), pa = el('img', 'bd-a'), pb = el('img', 'bd-b');
+  fig.style.aspectRatio = `${a.sw} / ${a.sh}`;
+  fig.style.width = `min(100%, calc(min(72vh, 680px) * ${(a.sw / a.sh).toFixed(4)}))`;   // a tall one no taller than the screen
+  bdSrc(pa, a, admin);
+  bdSrc(pb, b, admin);
+  const line = el('span', 'bd-line'), la = el('span', 'bd-la', tr('board.before')), lb = el('span', 'bd-lb', tr('board.after'));
+  line.setAttribute('aria-hidden', 'true');
+  line.innerHTML = '<i><svg viewBox="0 0 24 24"><path d="M9 7l-5 5 5 5M15 7l5 5-5 5"/></svg></i>';
+  la.dataset.i18n = pa.dataset.i18nAlt = 'board.before';
+  lb.dataset.i18n = pb.dataset.i18nAlt = 'board.after';
+  pa.alt = la.textContent;
+  pb.alt = lb.textContent;
+  const range = el('input');
+  Object.assign(range, { type: 'range', min: 0, max: 100, step: 1, value: 50 });
+  range.dataset.i18nAria = 'board.cmp';
+  range.setAttribute('aria-label', tr('board.cmp'));
+  const zoom = el('button', 'bd-zoom');
+  zoom.type = 'button';
+  zoom.dataset.i18nAria = zoom.dataset.i18nTitle = 'board.zoom';
+  zoom.title = tr('board.zoom');
+  zoom.setAttribute('aria-label', zoom.title);
+  zoom.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3.5a7 7 0 1 0 0 14a7 7 0 1 0 0-14ZM15.5 15.5 20.5 20.5M10.5 7.5v6M7.5 10.5h6"/></svg>';
+  zoom.addEventListener('click', () => bdOpen(p.id, at, pb));
+  const put = (v) => { const x = Math.max(0, Math.min(100, v)); fig.style.setProperty('--x', `${x}%`); range.value = x; };
+  const toward = (e) => { const r = fig.getBoundingClientRect(); put(((e.clientX - r.left) / r.width) * 100); };
+  range.addEventListener('input', () => put(+range.value));
+  fig.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || e.target.closest('.bd-zoom')) return;
+    toward(e);
+    fig.setPointerCapture(e.pointerId);
+    fig.classList.add('drag');
+  });
+  fig.addEventListener('pointermove', (e) => { if (fig.hasPointerCapture(e.pointerId)) toward(e); });
+  const end = () => fig.classList.remove('drag');
+  fig.addEventListener('pointerup', end);
+  fig.addEventListener('pointercancel', end);   // (a swipe up or down: the page scrolls)
+  fig.append(pa, pb, line, la, lb, range, zoom);
+  return fig;
+}
+function bdReplyBox(p, admin) {
+  const guest = p.pics.filter((q) => q.who === 'guest'), mine = p.pics.filter((q) => q.who === 'reply');
+  const box = el('div', 'bd-reply'), k = el('p', 'bd-rk'), who = el('span', '', tr('board.reply'));
+  who.dataset.i18n = 'board.reply';
+  k.append(who);
+  if (p.reply_at) k.append(el('time', 'bd-date', bdDate(p.reply_at)));
+  box.append(k);
+  if (p.reply) box.append(el('p', 'bd-words', p.reply));
+  const a = guest[0], b = mine[0];
+  const pair = a && b && Math.abs(a.sw / a.sh - b.sw / b.sh) <= 0.04 * (a.sw / a.sh);   // the same picture painted over: one over the other
+  if (pair) box.append(bdCompare(p, a, b, guest.length, admin));
+  const rest = pair ? mine.slice(1) : mine;
+  if (rest.length) box.append(bdRow(p, rest, guest.length + mine.length - rest.length, admin));
+  return box;
+}
+function bdCard(p, admin) {
+  bdById.set(p.id, p);
+  const li = el('li', 'bd-post'), head = el('div', 'bd-head');
+  head.append(el('span', 'bd-who', p.name), el('time', 'bd-date', bdDate(p.at, admin)));
+  li.append(head);
+  if (p.text) li.append(el('p', 'bd-words', p.text));
+  const guest = p.pics.filter((q) => q.who === 'guest');
+  if (guest.length) li.append(bdRow(p, guest, 0, admin));
+  if (p.reply || p.pics.some((q) => q.who === 'reply')) li.append(bdReplyBox(p, admin));
+  if (admin) li.append(...bdTools(p, li));
+  return li;
+}
+function bdReveal(els) {   // new posts tween in as they scroll into view, as the rest of the page does (js/motion.js)
+  if (!io) return;
+  els.forEach((e) => { e.dataset.rv = 'up'; e.classList.add('rv-pre'); });
+  watch(els);
+}
+
+/* ---------- the board ---------- */
+async function bdLoad(more) {
+  const last = more && bdShown[bdShown.length - 1], note = $('#bd-empty');
+  try {
+    const d = await bdCall('/posts' + (last ? `?before=${last.at}` : ''));
+    if (!more) { bdShown = []; bdPosts.replaceChildren(); }
+    bdShown.push(...d.posts);
+    const cards = d.posts.map((p) => bdCard(p, false));
+    bdPosts.append(...cards);
+    bdReveal(cards);
+    $('#bd-more').hidden = !d.more;
+    note.dataset.i18n = 'board.empty';
+    note.hidden = bdShown.length > 0;
+    bdLoaded = Date.now();
+  } catch (e) {
+    note.dataset.i18n = bdErr(e);
+    note.hidden = false;
+  }
+  note.textContent = tr(note.dataset.i18n);
+}
+$('#bd-more').addEventListener('click', () => bdLoad(true));
+function boardShow(admin) {   // js/router.js: apply (#board-admin: the review page)
+  $('#bd-grid').hidden = admin;
+  $('#bd-admin').hidden = !admin;
+  if (admin) { bdAdminView(); return; }
+  bdTsLoad();
+  if (Date.now() - bdLoaded > 60000) bdLoad(false);
+}
+
+/* the spam check (Cloudflare Turnstile), loaded the first time the board is opened */
+function bdTsLoad() {
+  if (bdTs || !BD_TS_KEY) return;
+  bdTs = 'loading';
+  window.bdTsReady = () => {
+    bdTs = turnstile.render('#bd-ts', {
+      sitekey: BD_TS_KEY, theme: 'dark', size: 'flexible', language: { zh: 'zh-tw', en: 'en', ja: 'ja' }[LANG],
+      callback: (t) => { bdTsToken = t; },
+      'expired-callback': () => { bdTsToken = ''; },
+      'error-callback': () => { bdTsToken = ''; },
+    });
+  };
+  const s = el('script');
+  s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=bdTsReady';
+  s.async = true;
+  document.head.append(s);
+}
+function bdTsReset() {   // a token is good for one post
+  bdTsToken = '';
+  if (bdTs && bdTs !== 'loading' && window.turnstile) turnstile.reset(bdTs);
+}
+
+/* ---------- the form ---------- */
+/* a picture drawn again, at most side px on its long side, as WebP (JPEG on white where the browser cannot write it),
+   made smaller till it is under max bytes */
+async function bdDraw(bmp, side, q, max) {
+  let k = Math.min(1, side / Math.max(bmp.width, bmp.height));
+  for (;;) {
+    const w = Math.max(1, Math.round(bmp.width * k)), h = Math.max(1, Math.round(bmp.height * k)), c = el('canvas');
+    c.width = w;
+    c.height = h;
+    const g = c.getContext('2d');
+    g.drawImage(bmp, 0, 0, w, h);
+    let blob = await new Promise((r) => c.toBlob(r, 'image/webp', q));
+    if (!blob || blob.type !== 'image/webp') {
+      g.globalCompositeOperation = 'destination-over';
+      g.fillStyle = '#fff';
+      g.fillRect(0, 0, w, h);
+      blob = await new Promise((r) => c.toBlob(r, 'image/jpeg', q));
+    }
+    if (!blob) throw new Error('pic');
+    if (blob.size <= max || k < 0.1) return { blob };
+    if (q > 0.65) q -= 0.1; else k *= 0.8;
+  }
+}
+async function bdPrep(file, max, own) {   // the two copies to send: as sent (o) and small (s)
+  const bmp = await createImageBitmap(file);
+  try {
+    const s = await bdDraw(bmp, 1200, 0.85, BD_SMALL);
+    const asIs = own && file.size <= max && /^image\/(jpeg|png|webp|gif)$/.test(file.type);   // the owner's own picture, untouched
+    return { o: asIs ? { blob: file } : await bdDraw(bmp, own ? 1e5 : 4096, 0.92, max), s };
+  } finally {
+    bmp.close();
+  }
+}
+function bdThumb(url, label, drop) {   // a picture picked, with its × to take it out
+  const li = el('li'), img = el('img'), x = el('button', 'bd-x', '×');
+  img.src = url;
+  img.alt = '';
+  x.type = 'button';
+  x.dataset.i18nAria = 'board.remove';
+  x.setAttribute('aria-label', label);
+  x.addEventListener('click', drop);
+  li.append(img, x);
+  return li;
+}
+function bdThumbs() {
+  bdThumbsEl.replaceChildren(...bdPicked.map((q) => bdThumb(q.url, tr('board.remove'), () => bdUnpick(q))));
+  $('#bd-add').hidden = bdPicked.length >= BD_PICS;
+}
+function bdUnpick(q) {
+  const i = bdPicked.indexOf(q);
+  if (i < 0) return;
+  bdPicked.splice(i, 1);
+  URL.revokeObjectURL(q.url);
+  bdThumbs();
+}
+function bdPick(files) {
+  const st = $('#bd-status');
+  for (const f of files) {
+    if (!/^image\//.test(f.type)) continue;
+    if (bdPicked.length >= BD_PICS) { bdSay(st, 'board.e.pics'); break; }
+    const q = { url: URL.createObjectURL(f), ready: bdPrep(f, BD_SENT, false) };
+    q.ready.catch(() => { bdUnpick(q); bdSay(st, 'board.e.pic'); });
+    bdPicked.push(q);
+  }
+  bdThumbs();
+}
+const bdFile = $('#bd-file'), bdName = $('#bd-name');
+$('#bd-add').addEventListener('click', () => bdFile.click());
+bdFile.addEventListener('change', () => { bdPick([...bdFile.files]); bdFile.value = ''; });
+bdForm.addEventListener('paste', (e) => {
+  const files = [...(e.clipboardData ? e.clipboardData.files : [])];
+  if (files.length) { e.preventDefault(); bdPick(files); }
+});
+/* a file dragged anywhere over the board: the picture box lights up, and dropped, it is added (never opened in place of the page) */
+VIEWS.board.addEventListener('dragover', (e) => {
+  if (!e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault();
+  bdDrop.classList.toggle('over', !$('#bd-grid').hidden);
+});
+VIEWS.board.addEventListener('dragleave', (e) => { if (!VIEWS.board.contains(e.relatedTarget)) bdDrop.classList.remove('over'); });
+VIEWS.board.addEventListener('drop', (e) => {
+  if (!e.dataTransfer.types.includes('Files')) return;
+  e.preventDefault();
+  bdDrop.classList.remove('over');
+  if (!$('#bd-grid').hidden) bdPick([...e.dataTransfer.files]);
+});
+try { bdName.value = localStorage.getItem('bdName') || ''; } catch (e) { /* not kept */ }
+bdName.addEventListener('change', () => { try { localStorage.setItem('bdName', bdName.value.trim()); } catch (e) { /* not kept */ } });
+[bdName, $('#bd-text')].forEach((f) => f.addEventListener('input', () => { if ($('#bd-status').classList.contains('err')) bdSay($('#bd-status'), ''); }));   // typing again: the error goes
+bdForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (bdBusy) return;
+  const st = $('#bd-status'), send = $('#bd-send'), name = bdName.value.trim(), text = $('#bd-text').value.trim();
+  if (!name) { bdSay(st, 'board.e.name'); bdName.focus(); return; }
+  if (!text && !bdPicked.length) { bdSay(st, 'board.e.empty'); return; }
+  if (!bdTsToken) { bdSay(st, 'board.e.wait'); return; }
+  bdBusy = true;
+  send.disabled = true;
+  bdSay(st, 'board.sending', { p: 0 });
+  try {
+    const fd = new FormData();
+    fd.append('name', name);
+    fd.append('text', text);
+    fd.append('lang', LANG);
+    fd.append('ts', bdTsToken);
+    (await Promise.all(bdPicked.map((q) => q.ready))).forEach((m, n) => { fd.append('o' + n, m.o.blob, 'o' + n); fd.append('s' + n, m.s.blob, 's' + n); });
+    await bdSend('/posts', fd, (p) => bdSay(st, 'board.sending', { p }));
+    $('#bd-text').value = '';
+    bdPicked.splice(0).forEach((q) => URL.revokeObjectURL(q.url));
+    bdThumbs();
+    bdSay(st, 'board.sent');
+  } catch (err) {
+    bdSay(st, bdErr(err));
+  } finally {
+    bdBusy = false;
+    send.disabled = false;
+    bdTsReset();
+  }
+});
+
+/* ---------- the review page ---------- */
+function bdLogout() {
+  bdKey = '';
+  try { localStorage.removeItem('bdKey'); } catch (e) { /* nothing kept */ }
+  bdAdminView();
+}
+function bdAdminView() {   // the password, or the posts
+  $('#bd-login').hidden = !!bdKey;
+  $('#bd-review').hidden = !bdKey;
+  if (bdKey) bdReview(false);
+}
+$('#bd-login').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const st = $('#bd-login-st'), pw = $('#bd-pw');
+  bdSay(st, '');
+  try {
+    const d = await bdCall('/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw.value }) });
+    bdKey = d.token;
+    try { localStorage.setItem('bdKey', bdKey); } catch (err) { /* kept for this visit only */ }
+    pw.value = '';
+    bdAdminView();
+  } catch (err) {
+    bdSay(st, bdErr(err));
+  }
+});
+$('#bd-logout').addEventListener('click', bdLogout);
+const bdTabs = document.querySelectorAll('.bd-tabs [role="tab"]');
+bdTabs.forEach((t) => t.addEventListener('click', () => {
+  bdState = t.dataset.state;
+  bdTabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+  bdReview(false);
+}));
+async function bdReview(more) {
+  const st = $('#bd-rv-st'), last = more && bdRv[bdRv.length - 1];
+  try {
+    const d = await bdCall(`/admin/posts?state=${bdState}${last ? `&before=${last.at}` : ''}`);
+    if (!more) {
+      bdRv.forEach((p) => p.pics.forEach((q) => { if (q.blob) URL.revokeObjectURL(q.blob); }));
+      bdRv = [];
+      bdRvPosts.replaceChildren();
+    }
+    bdRv.push(...d.posts);
+    bdRvPosts.append(...d.posts.map((p) => bdCard(p, true)));
+    $('#bd-wait-n').textContent = d.wait;
+    $('#bd-rv-more').hidden = !d.more;
+    $('#bd-rv-empty').hidden = bdRv.length > 0;
+    bdSay(st, '');
+  } catch (err) {
+    bdSay(st, bdErr(err));
+  }
+}
+$('#bd-rv-more').addEventListener('click', () => bdReview(true));
+function bdBtn(key, cls, fn) {
+  const b = el('button', 'btn' + (cls ? ' ' + cls : ''), tr(key));
+  b.type = 'button';
+  b.dataset.i18n = key;
+  b.addEventListener('click', fn);
+  return b;
+}
+function bdGone(p, li) {   // accepted or deleted: off this list (and the board loads again when it is next opened)
+  li.remove();
+  bdRv = bdRv.filter((x) => x !== p);
+  if (bdState === 'wait') $('#bd-wait-n').textContent = Math.max(0, +$('#bd-wait-n').textContent - 1);
+  $('#bd-rv-empty').hidden = bdRv.length > 0;
+  bdLoaded = 0;
+}
+function bdTools(p, li) {   // accept, delete, and the reply
+  const bar = el('div', 'bd-tools'), st = el('p', 'bd-status');
+  st.setAttribute('role', 'status');
+  if (bdState === 'wait') {
+    bar.append(bdBtn('board.accept', '', async () => {
+      try { await bdCall(`/admin/posts/${p.id}/accept`, { method: 'POST' }); bdGone(p, li); } catch (e) { bdSay(st, bdErr(e)); }
+    }));
+  }
+  bar.append(bdBtn('board.delete', 'ghost', async () => {
+    if (!confirm(tr('board.sure'))) return;
+    try { await bdCall(`/admin/posts/${p.id}`, { method: 'DELETE' }); bdGone(p, li); } catch (e) { bdSay(st, bdErr(e)); }
+  }));
+  return [bar, bdEditor(p), st];
+}
+/* the owner's reply: words, and pictures (a paintover first: it goes over the visitor's first picture, to compare) */
+function bdEditor(p) {
+  const box = el('details', 'bd-edit'), sum = el('summary', '', tr('board.replyEdit')), inside = el('div', 'bd-edit-in');
+  sum.dataset.i18n = 'board.replyEdit';
+  const ta = el('textarea'), thumbs = el('ul', 'bd-thumbs'), file = el('input'), add = el('button', 'bd-add'), st = el('p', 'bd-status');
+  ta.rows = 4;
+  ta.maxLength = 4000;
+  ta.value = p.reply || '';
+  ta.dataset.i18nAria = 'board.replyEdit';
+  ta.setAttribute('aria-label', tr('board.replyEdit'));
+  Object.assign(file, { type: 'file', accept: 'image/*', multiple: true, hidden: true });
+  add.type = 'button';
+  const addT = el('span', '', tr('board.addPic'));
+  addT.dataset.i18n = 'board.addPic';
+  add.append(el('span', '', '＋'), addT);
+  const drop = new Set(), fresh = [], mine = p.pics.filter((q) => q.who === 'reply');
+  const draw = () => {
+    thumbs.replaceChildren(
+      ...mine.map((q) => {
+        const li = bdThumb('', tr('board.remove'), () => { if (!drop.delete(q.id)) drop.add(q.id); draw(); });
+        bdSrc(li.querySelector('img'), q, true);
+        li.classList.toggle('off', drop.has(q.id));
+        return li;
+      }),
+      ...fresh.map((q) => {
+        const li = bdThumb(q.url, tr('board.remove'), () => { fresh.splice(fresh.indexOf(q), 1); URL.revokeObjectURL(q.url); draw(); });
+        li.classList.add('new');
+        return li;
+      }),
+    );
+    add.hidden = mine.length - drop.size + fresh.length >= BD_PICS;
+  };
+  add.addEventListener('click', () => file.click());
+  file.addEventListener('change', () => {
+    for (const f of file.files) {
+      if (!/^image\//.test(f.type) || mine.length - drop.size + fresh.length >= BD_PICS) continue;
+      const q = { url: URL.createObjectURL(f), ready: bdPrep(f, BD_OWN, true) };
+      q.ready.catch(() => { fresh.splice(fresh.indexOf(q), 1); draw(); bdSay(st, 'board.e.pic'); });
+      fresh.push(q);
+    }
+    file.value = '';
+    draw();
+  });
+  const save = bdBtn('board.save', '', async () => {
+    save.disabled = true;
+    try {
+      const fd = new FormData();
+      fd.append('text', ta.value.trim());
+      fd.append('drop', [...drop].join(','));
+      (await Promise.all(fresh.map((q) => q.ready))).forEach((m, n) => { fd.append('o' + n, m.o.blob, 'o' + n); fd.append('s' + n, m.s.blob, 's' + n); });
+      await bdSend(`/admin/posts/${p.id}/reply`, fd, (pc) => bdSay(st, 'board.sending', { p: pc }));
+      bdSay(st, 'board.saved');
+      bdLoaded = 0;
+      setTimeout(() => bdReview(false), 700);   // the post again, with its reply as the board shows it
+    } catch (e) {
+      bdSay(st, bdErr(e));
+    } finally {
+      save.disabled = false;
+    }
+  });
+  draw();
+  inside.append(ta, thumbs, add, file, save, st);
+  box.append(sum, inside);
+  return box;
+}
+async function bdSaveOrig(p, q, at) {   // a picture as it was sent, saved (to paint over it)
+  try {
+    const r = await fetch(`${BD_API}/admin/pic/${q.id}/o`, { headers: { Authorization: 'Bearer ' + bdKey } });
+    if (!r.ok) throw new Error('gone');
+    const b = await r.blob(), a = el('a');
+    a.href = URL.createObjectURL(b);
+    a.download = `${p.name}-${at + 1}.${(b.type.split('/')[1] || 'jpg').replace('jpeg', 'jpg')}`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  } catch (e) { /* gone: the list shows it on its next load */ }
+}
 
 /* ==================== js/lang-switch.js ==================== */
 /* Switching language: everything on screen is redrawn in place, with a short tween */

@@ -14,17 +14,18 @@
 | `img/` | 圖片（見下方） |
 | `audio/` | 背景音樂 `bgm.mp3`、按鈕點擊音效 `click.mp3`（見「音樂和音效」） |
 | `tools/` | 這裡的工具 |
+| `worker/` | 留言板的後台（見「留言板」） |
 
 **樣式**（`css/`）照這個順序合併，順序會影響哪一條規則優先，不要隨意調換：
 `base` 基本設定、頁首、選單 → `home` 首頁輪播，以及作品牆的標題、分類切換、NSFW → `artbook` 畫冊、3D 書、材質、3D 檢視 →
 `works` 作品牆、作品頁 → `goods` 按鈕、價格、周邊 → `nav` 語言切換、手機選單 → `game` 遊戲頁 →
-`lightbox` 看圖的視窗 → `about` 關於、聯絡、頁尾 → `event` 展場 → `motion` 動畫 → `responsive` 窄螢幕、減少動態。
+`lightbox` 看圖的視窗 → `about` 關於、聯絡、頁尾 → `event` 展場 → `board` 留言板 → `motion` 動畫 → `responsive` 窄螢幕、減少動態。
 
 **程式**（`js/`）照這個順序合併成一個 `site.js`，前面檔案定義的東西後面的檔案可以直接用：
 `data` 資料 → `core` 共用小工具 → `i18n` 三種語言的文字 → `game` 遊戲頁 → `lightbox` 看圖的視窗 →
 `menu` 手機選單 → `goods` 周邊 → `event` 展場 → `wall` 作品牆 → `work` 作品頁 → `tag` 標籤頁 → `artbook` 畫冊列表、畫冊頁 →
-`book3d` 3D 書和 3D 檢視 → `motion` 捲動動畫 → `home` 首頁輪播 → `router` 換頁 → `about` 關於頁 →
-`lang-switch` 切換語言 → `main` 啟動（最後一個）。
+`book3d` 3D 書和 3D 檢視 → `motion` 捲動動畫 → `home` 首頁輪播 → `router` 換頁 → `about` 關於頁 → `board` 留言板 →
+`lang-switch` 切換語言 → `sound` 音樂和音效 → `main` 啟動（最後一個）。
 順序寫在 `tools/build.py` 裡；新增檔案的話也要加進那裡。
 合成一個檔案載入，是為了讓開頁時的執行順序跟拆檔前完全一樣（分開載入的話，有些等字型載入完才做的動作會在檔案之間提早執行）。
 
@@ -334,6 +335,52 @@ Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊�
 - 同一個大分類裡換頁、換語言都不會關；點頁首的其他大分類（例如從 Work 到 Art Book）就全部關閉
 - Game 頁的角色、卡牌、截圖不用視窗：一次一張，蓋住頁首以下的畫面，點圖旁邊或 ✕ 關閉
 - 樣子寫在 `index.html` 的 `<template>`：`zv-tpl` 外框、`zv-pic-tpl` 看圖、`b3v-tpl` 3D 書、`zv-chip-tpl` 左下角的小膠囊
+
+## 留言板（Board）
+
+訪客在 Board 頁可以寫留言、附上最多 4 張圖（例如請你改圖）。留言先送到後台等你審核，你按「接受並公開」之後才會出現在網站上。
+- 網站這邊：`js/board.js`、`css/board.css`，以及 `index.html` 的 `#v-board`
+- 後台：`worker/` 是放在 Cloudflare 上的小程式（Worker）。留言存在 Cloudflare 的 D1 資料庫，圖片存在 KV。
+  它有哪些網址、各做什麼，寫在 `worker/src/index.js` 的開頭
+- 網站連到後台的網址（`BD_API`）和驗證框的 Site Key（`BD_TS_KEY`）寫在 `js/board.js` 開頭，兩個都可以公開
+
+**審核**：打開 `https://mania8522191.github.io/#board-admin`（網站上沒有連結過去），輸入審核密碼。登入會記住 30 天；換了審核密碼，舊的登入就失效。
+- 待審核：每則可以「接受並公開」或「刪除」。刪除會先問一次，刪了就救不回來，圖片也一起刪掉。
+  圖片下面的「下載原檔」可以存下訪客傳的圖，拿去改
+- 回覆／改圖：寫回覆、加圖，按「儲存回覆」。第一張改圖跟訪客第一張圖的長寬比例一樣時，網站上兩張會疊在一起，可以左右拖曳比對
+- 已公開：公開了的留言，也可以再改回覆或刪除
+
+**通知**：每則新留言都會寄信到你的信箱，附上圖片和審核頁的連結（用 Resend 寄）。
+
+**擋垃圾留言**：
+- 送出前要通過 Cloudflare 的 Turnstile 驗證框
+- 同一個人 10 分鐘最多 3 則、一天最多 10 則
+- 待審核的超過 200 則就先不收新的
+- 審核密碼錯 5 次，要等 15 分鐘才能再試
+
+**圖片**：
+- 訪客的圖會在他的瀏覽器裡重畫一次再送出，最長邊最多 4096px。照片裡的拍攝地點、相機資訊不會送出
+- 你的改圖照原檔上傳，不縮小，最大 24MB
+- 兩種都會另外做一張 1200px 的小圖，網站列表用小圖，放大檢視才載入原圖
+
+**密碼和金鑰**不寫在任何檔案裡。在 `worker` 資料夾執行 `npx wrangler secret put <名稱>`，照提示貼上或輸入：
+
+| 名稱 | 是什麼 |
+|---|---|
+| `ADMIN_PASSWORD` | 審核密碼 |
+| `TURNSTILE_SECRET` | Turnstile 驗證框的 Secret Key（Cloudflare 左邊選單 Application security → Turnstile → `board` 那列的 ⋯ → Edit Widget，最下面） |
+| `RESEND_API_KEY` | Resend 的 API key（resend.com → API Keys，權限選 Sending access） |
+| `NOTIFY_EMAIL` | 收通知的信箱，要跟註冊 Resend 的信箱一樣 |
+
+**改後台程式**：需要 Node.js。在 `worker` 資料夾執行 `npm install`，會裝回 `wrangler`（`node_modules` 不上傳）。
+- 本機測試：在 `worker` 資料夾放一個 `.dev.vars`（不上傳），寫上 `ADMIN_PASSWORD=`（自己定一個測試用的）和
+  `TURNSTILE_SECRET=1x0000000000000000000000000000000AA`（Cloudflare 的測試金鑰，一定通過）。
+  第一次先跑 `npx wrangler d1 execute board --local --file schema.sql` 建資料表，再跑 `npm run dev`。
+  本機的網站（`localhost:8765`）會自動連到這個本機後台
+- 登入 Cloudflare（一台電腦一次）：`npx wrangler login --scopes account:read user:read workers:write workers_kv:write workers_routes:write workers_scripts:write workers_tail:read d1:write`。
+  只給 Workers、KV、D1 的權限；不加 `--scopes` 的話，連帳單之類用不到的權限都會一起給
+- 上線：`npx wrangler deploy`。改了 `schema.sql` 的話，再跑 `npx wrangler d1 execute board --remote --file schema.sql`
+- 都在 Cloudflare 和 Resend 的免費額度內：Workers 每天 10 萬次、D1 5GB、KV 1GB，Resend 每天 100 封
 
 ## 改文字
 

@@ -1,0 +1,13 @@
+{
+  "name": "board",
+  "private": true,
+  "type": "module",
+  "description": "The message board's back end, a Cloudflare Worker (tools/README.md: 留言板)",
+  "scripts": {
+    "dev": "wrangler dev --port 8787",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.168.0"
+  }
+}
