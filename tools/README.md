@@ -309,7 +309,7 @@ Contact 頁每個平台前面的金色圓圈，和頁尾每個連結前面的小
 ## 頁首選單
 
 - 頁首：Home、Work、Event、Game、About。Work 和 About 旁邊有小箭頭，各管三頁：
-  Work → Illustrations（作品牆 `#work`）、Illust Book（畫冊 `#artbook`）、Goods（周邊 `#goods`）；
+  Work → Illustrations（作品牆 `#work`）、Art Books（畫冊 `#artbook`）、Goods（周邊 `#goods`）；
   About → Profile（`#about`）、Contact（`#contact`）、Board（`#board`）
 - 電腦：滑鼠移到 Work 或 About 上，頁首往下延伸出一條（沒有框），三頁橫排在名字正下方；點一下、
   或用鍵盤（Enter 打開、Esc 關閉）也可以。正在看其中一頁時，底線停在 Work 或 About 下面，
@@ -318,7 +318,7 @@ Contact 頁每個平台前面的金色圓圈，和頁尾每個連結前面的小
   打開選單時，正在看的那一頁所在的那組會先展開
 - 程式在 `index.html` 的 `.nav`（頁首）和 `.m-nav`（手機選單）、`css/base.css`（頁首往下延伸的那一條）、
   `css/responsive.css`（手機選單）、`js/menu.js`（打開、關閉）、`js/router.js`（哪個名字亮、底線）
-- 頁面上的大標題沒有跟著改名：Illust Book 的頁面標題還是 ART BOOK，Illustrations 是 WORKS，Profile 是 ABOUT
+- 頁面上的大標題沒有跟著改名：Art Books 的頁面標題還是 ART BOOK，Illustrations 是 WORKS，Profile 是 ABOUT
 
 ## 換頁：上一頁按鈕、回到初始狀態
 
@@ -329,15 +329,15 @@ Contact 頁每個平台前面的金色圓圈，和頁尾每個連結前面的小
   - 這次瀏覽中有上一頁時，跟瀏覽器的上一頁一樣
   - 從別人分享的連結直接打開某一頁時，回到它的上一層。作品回到它分類的作品牆，合集的單張回到合集，tag 頁回到作品牆，
     商品回到品書（沒有品書的回到周邊頁），品書回到周邊頁，畫冊回到畫冊列表。往上一層不會多一筆上一頁紀錄
-- 大分類（選單裡的每一頁：Illustrations、Illust Book、Goods……）：在同一個大分類裡換頁（作品牆 → 作品 → 上一頁）會保持原樣，
-  圖片回到原本的位置；從別的大分類點回來，就回到初始狀態：Illustrations 是 Fan Art、由新到舊，Illust Book 和 Goods 是由新到舊，
+- 大分類（選單裡的每一頁：Illustrations、Art Books、Goods……）：在同一個大分類裡換頁（作品牆 → 作品 → 上一頁）會保持原樣，
+  圖片回到原本的位置；從別的大分類點回來，就回到初始狀態：Illustrations 是 Fan Art、由新到舊，Art Books 和 Goods 是由新到舊，
   Game 的截圖回到第 1 張，About 回到照片，都從頁面最上面開始。網址有寫分類的（例如 `#original`）照網址
 - 作品牆和 tag 頁的拼貼（`js/wall.js` 的 `collage`）：某一年只有一件作品時，只有在作品牆（有年份標題）才會置中；
   tag 頁沒有年份標題，置中會疊到另一欄的作品上
 
 ## 看圖的視窗
 
-Illustrations 和 Illust Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊的 3D 封面，會開在一個視窗裡
+Illustrations 和 Art Books 裡點圖（作品、製作過程、畫冊跨頁）或畫冊的 3D 封面，會開在一個視窗裡
 （`js/lightbox.js`、`js/book3d.js`、`css/lightbox.css`），網頁照樣可以捲、可以換頁：
 - 拖標題列移動，拖邊緣或角落調整大小；雙擊標題列等於按最大化
 - 圖片上滾輪放大縮小（以游標為中心，從符合視窗到實際尺寸的 3 倍，倍數是 `js/lightbox.js` 的 `ZV_TOP`），
@@ -346,7 +346,7 @@ Illustrations 和 Illust Book 裡點圖（作品、製作過程、畫冊跨頁�
   這三個只有圖示，滑鼠停上去會出現名稱。視窗窄的時候前面那顆也只剩圖示
 - 縮到最小會收進左下角，點一下回到原本的位置和大小；同一張圖再點一次，會叫回已經開著的那個視窗
 - 只開著一個視窗（而且沒被拖過）時再開第二個，兩個會自動左右並排；之後的放在最不擋到其他視窗的地方
-- 同一個大分類裡換頁、換語言都不會關；換到其他大分類（例如從 Illustrations 到 Illust Book）就全部關閉
+- 同一個大分類裡換頁、換語言都不會關；換到其他大分類（例如從 Illustrations 到 Art Books）就全部關閉
 - Game 頁的角色、卡牌、截圖不用視窗：一次一張，蓋住頁首以下的畫面，點圖旁邊或 ✕ 關閉
 - 樣子寫在 `index.html` 的 `<template>`：`zv-tpl` 外框、`zv-pic-tpl` 看圖、`b3v-tpl` 3D 書、`zv-chip-tpl` 左下角的小膠囊
 
