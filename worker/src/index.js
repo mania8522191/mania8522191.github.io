@@ -85,7 +85,9 @@ async function human(req, env, token) {
   const ip = req.headers.get('CF-Connecting-IP');
   if (ip) body.append('remoteip', ip);
   const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body });
-  return (await r.json().catch(() => ({}))).success === true;
+  const d = await r.json().catch(() => ({}));
+  if (d.success !== true) console.log('turnstile refused', JSON.stringify(d['error-codes'] || []), d.hostname || '');   // (the Workers logs)
+  return d.success === true;
 }
 
 /* what a picture is and its size, read from the file itself: a JPEG, PNG, WebP or GIF; anything else is null */
