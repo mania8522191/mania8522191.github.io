@@ -342,7 +342,7 @@ Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊�
 - 網站這邊：`js/board.js`、`css/board.css`，以及 `index.html` 的 `#v-board`
 - 後台：`worker/` 是放在 Cloudflare 上的小程式（Worker）。留言存在 Cloudflare 的 D1 資料庫，圖片存在 KV。
   它有哪些網址、各做什麼，寫在 `worker/src/index.js` 的開頭
-- 網站連到後台的網址（`BD_API`）和驗證框的 Site Key（`BD_TS_KEY`）寫在 `js/board.js` 開頭，兩個都可以公開
+- 網站連到後台的網址（`BD_API`）和驗證框的 Site Key（`BD_TS_KEY`，空的就是不驗證）寫在 `js/board.js` 開頭，兩個都可以公開
 
 **審核**：打開 `https://mania8522191.github.io/#board-admin`（網站上沒有連結過去），輸入審核密碼。登入會記住 30 天；換了審核密碼，舊的登入就失效。
 - 待審核：每則可以「接受並公開」或「刪除」。刪除會先問一次，刪了就救不回來，圖片也一起刪掉。
@@ -353,7 +353,7 @@ Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊�
 **通知**：每則新留言都會寄信到你的信箱，附上圖片和審核頁的連結（用 Resend 寄）。
 
 **擋垃圾留言**：
-- 送出前要通過 Cloudflare 的 Turnstile 驗證框
+- Cloudflare 的 Turnstile 驗證框：**目前關閉**（2026-11-26 起，因為三星瀏覽器過不了）。要再打開，見下面「重開驗證」
 - 同一個人 10 分鐘最多 3 則、一天最多 10 則
 - 待審核的超過 200 則就先不收新的
 - 審核密碼錯 5 次，要等 15 分鐘才能再試
@@ -368,13 +368,21 @@ Work 和 Art Book 裡點圖（作品、製作過程、畫冊跨頁）或畫冊�
 | 名稱 | 是什麼 |
 |---|---|
 | `ADMIN_PASSWORD` | 審核密碼 |
-| `TURNSTILE_SECRET` | Turnstile 驗證框的 Secret Key（Cloudflare 左邊選單 Application security → Turnstile → `board` 那列的 ⋯ → Edit Widget，最下面） |
+| `TURNSTILE_SECRET` | Turnstile 驗證框的 Secret Key（Cloudflare 左邊選單 Application security → Turnstile → `board` 那列的 ⋯ → Edit Widget，最下面）。驗證關閉時不設 |
 | `RESEND_API_KEY` | Resend 的 API key（resend.com → API Keys，權限選 Sending access） |
 | `NOTIFY_EMAIL` | 收通知的信箱，要跟註冊 Resend 的信箱一樣 |
 
+也可以不用終端機：Cloudflare 的 Workers & Pages → `board` → Settings → Variables and secrets → Add variable，填名稱和值、勾 Secret，再按部署。
+
+**重開驗證**：Cloudflare 上的驗證框 `board` 一直留著，兩步就能打開，順序不要反過來（先設後台的話，網站還沒送驗證，大家都會送不出去）：
+1. `js/board.js` 的 `BD_TS_KEY` 改成 `BD_LOCAL ? '1x00000000000000000000AA' : '0x4AAAAAAGT-3-bQwD_zvJc5'`，建置後上線
+2. 後台設回 `TURNSTILE_SECRET`（上面的表）
+
+要再關掉就反過來：先刪後台的 `TURNSTILE_SECRET`（`npx wrangler secret delete TURNSTILE_SECRET`），再把 `BD_TS_KEY` 改回空的上線。
+
 **改後台程式**：需要 Node.js。在 `worker` 資料夾執行 `npm install`，會裝回 `wrangler`（`node_modules` 不上傳）。
-- 本機測試：在 `worker` 資料夾放一個 `.dev.vars`（不上傳），寫上 `ADMIN_PASSWORD=`（自己定一個測試用的）和
-  `TURNSTILE_SECRET=1x0000000000000000000000000000000AA`（Cloudflare 的測試金鑰，一定通過）。
+- 本機測試：在 `worker` 資料夾放一個 `.dev.vars`（不上傳），寫上 `ADMIN_PASSWORD=`（自己定一個測試用的）。
+  驗證打開時，再加上 `TURNSTILE_SECRET=1x0000000000000000000000000000000AA`（Cloudflare 的測試金鑰，一定通過）。
   第一次先跑 `npx wrangler d1 execute board --local --file schema.sql` 建資料表，再跑 `npm run dev`。
   本機的網站（`localhost:8765`）會自動連到這個本機後台
 - 登入 Cloudflare（一台電腦一次）：`npx wrangler login --scopes account:read user:read workers:write workers_kv:write workers_routes:write workers_scripts:write workers_tail:read d1:write`。

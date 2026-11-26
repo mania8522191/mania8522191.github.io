@@ -5,7 +5,10 @@
    copy for the board; the owner's own pictures in a reply go as they are, with a small copy */
 const BD_LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);   // the local preview: the back end of `npm run dev`
 const BD_API = BD_LOCAL ? 'http://127.0.0.1:8787' : 'https://board.mania8522191.workers.dev';
-const BD_TS_KEY = BD_LOCAL ? '1x00000000000000000000AA' : '0x4AAAAAAGT-3-bQwD_zvJc5';   // Turnstile's site key, widget "board" (locally Cloudflare's test key: always passes)
+/* the spam check (Cloudflare Turnstile) is off while this is empty: no box, and a post goes without it. To turn it on
+   again, make it BD_LOCAL ? '1x00000000000000000000AA' : '0x4AAAAAAGT-3-bQwD_zvJc5' (the widget "board"; locally
+   Cloudflare's test key, which always passes), then set the back end's TURNSTILE_SECRET (tools/README.md: 留言板) */
+const BD_TS_KEY = '';
 const BD_PICS = 4, BD_SENT = 8 << 20, BD_OWN = 24 << 20, BD_SMALL = 1 << 20;   // what the back end takes
 const BD_ERRS = new Set(['name', 'empty', 'long', 'pics', 'pic', 'big', 'human', 'wait', 'slow', 'full', 'net', 'password', 'auth', 'setup', 'gone']);
 const bdForm = $('#bd-form'), bdPosts = $('#bd-posts'), bdRvPosts = $('#bd-rv-posts'), bdThumbsEl = $('#bd-thumbs'), bdDrop = $('#bd-drop');
@@ -222,6 +225,7 @@ function bdTsReset() {   // a token is good for one post
   bdTsToken = '';
   if (bdTs && bdTs !== 'loading' && window.turnstile) turnstile.reset(bdTs);
 }
+$('#bd-ts').hidden = !BD_TS_KEY;   // no room kept for a box that never comes
 
 /* ---------- the form ---------- */
 /* a picture drawn again, at most side px on its long side, as WebP (JPEG on white where the browser cannot write it),
@@ -318,7 +322,7 @@ bdForm.addEventListener('submit', async (e) => {
   const st = $('#bd-status'), send = $('#bd-send'), name = bdName.value.trim(), text = $('#bd-text').value.trim();
   if (!name) { bdSay(st, 'board.e.name'); bdName.focus(); return; }
   if (!text && !bdPicked.length) { bdSay(st, 'board.e.empty'); return; }
-  if (!bdTsToken) { bdSay(st, 'board.e.wait'); return; }
+  if (BD_TS_KEY && !bdTsToken) { bdSay(st, 'board.e.wait'); return; }
   bdBusy = true;
   send.disabled = true;
   bdSay(st, 'board.sending', { p: 0 });

@@ -3,12 +3,12 @@
    board shows only accepted ones. D1 (DB) keeps the posts and their pictures' details (schema.sql), KV (PICS) the
    pictures: each as sent (<id>/o) and a small copy for the board (<id>/s), both made in the sender's browser.
    The secrets are set with `npx wrangler secret put <NAME>`, never written in a file here: ADMIN_PASSWORD (the review
-   page's), TURNSTILE_SECRET (the spam check), RESEND_API_KEY and NOTIFY_EMAIL (an e-mail on each new post; without
-   them none is sent).
+   page's), RESEND_API_KEY and NOTIFY_EMAIL (an e-mail on each new post; without them none is sent), and
+   TURNSTILE_SECRET (the spam check: with it, a post must pass Cloudflare Turnstile; without it, none is asked for).
 
    GET    /posts?before=<at>             accepted posts, newest first, a page at a time
    GET    /pic/<id>/<o|s>                an accepted post's picture
-   POST   /posts                         a new post (form: name, text, lang, ts = the Turnstile token, o0 s0 … o3 s3)
+   POST   /posts                         a new post (form: name, text, lang, ts = the Turnstile token if asked for, o0 s0 … o3 s3)
    POST   /admin/login                   {password} → {token}; the rest need "Authorization: Bearer <token>"
    GET    /admin/posts?state=wait|shown  the posts waiting (or shown), and how many wait
    GET    /admin/pic/<id>/<o|s>          any post's picture
@@ -76,9 +76,10 @@ async function tooMany(env, ip, kind, rules) {   // rules: [[how many, in how ma
 }
 const hit = (env, ip, kind) => env.DB.prepare('INSERT INTO hits (ip, kind, at) VALUES (?, ?, ?)').bind(ip, kind, Date.now());
 
-/* the Turnstile check the form's widget did in the sender's browser */
+/* the Turnstile check the form's widget did in the sender's browser; none while TURNSTILE_SECRET is not set */
 async function human(req, env, token) {
-  if (!env.TURNSTILE_SECRET || !token) return false;
+  if (!env.TURNSTILE_SECRET) return true;
+  if (!token) return false;
   const body = new FormData();
   body.append('secret', env.TURNSTILE_SECRET);
   body.append('response', String(token));
