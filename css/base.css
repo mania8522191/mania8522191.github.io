@@ -57,6 +57,27 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav{position:relative}
 .nav-ink{position:absolute;left:0;bottom:-5px;height:1px;width:0;background:var(--mute);pointer-events:none;opacity:0;transition:transform .7s var(--ease-out),width .7s var(--ease-out),opacity .3s}
 .nav.has-ink a[aria-current="page"]::after{transform:scaleX(0)}
+/* Work and About: a name with a small chevron. When the mouse comes over it, on a click or a tap, or from the keyboard,
+   the header runs on below in a band with that part's pages side by side, their middle under the name (js/menu.js);
+   no box. While one of those pages is shown, the underline stays under the name, and in the band that page is grey
+   and underlined */
+.nav{align-items:baseline}
+.nav-grp{position:relative}
+.nav-top{display:inline-flex;align-items:baseline;gap:7px;padding:0;border:0;background:none;color:inherit;font:inherit;font-size:var(--fs-bar);letter-spacing:.02em;white-space:nowrap;cursor:pointer;transition:color .3s}
+.nav-top.on{color:var(--mute)}
+.nav-top:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
+.nav-lbl{position:relative}
+.nav-lbl::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right center;transition:transform .55s var(--ease-out)}
+.nav-top:hover .nav-lbl::after,.nav-top.on .nav-lbl::after{transform:scaleX(1);transform-origin:left center}
+.nav.has-ink .nav-top.on .nav-lbl::after{transform:scaleX(0)}
+.nav-car{display:inline-block;width:.34em;height:.34em;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:translateY(-.28em) rotate(45deg);transition:transform .45s var(--ease-out)}
+[aria-expanded="true"] > .nav-car{transform:translateY(.02em) rotate(-135deg)}
+.nav-sub{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + var(--head));display:flex;align-items:center;gap:clamp(28px,3vw,48px);padding:15px 0 17px var(--sub-x,0px);border-top:1px solid var(--line);background:var(--bg);box-shadow:0 26px 40px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .3s var(--ease-out),transform .45s var(--ease-out),visibility 0s linear .45s}
+.nav-sub::before{content:"";position:absolute;left:var(--br-x,0px);width:var(--br-w,0px);bottom:100%;height:calc(var(--head) / 2)}   /* the way down from the name, under it only, still counts as the band */
+.nav-grp.open .nav-sub{opacity:1;visibility:visible;transform:none;transition:opacity .3s var(--ease-out),transform .45s var(--ease-out),visibility 0s}
+.nav-sub a{padding:4px 0}
+.nav-sub a::after{bottom:-2px}
+.nav.has-ink .nav-sub a[aria-current="page"]::after{transform:scaleX(1)}
 /* category switch: a dark curtain sweeps up over the page with a fine gold edge, names where you are going,
    then lifts away with the gold edge trailing */
 .curtain{position:fixed;left:0;right:0;top:var(--head);bottom:0;z-index:95;overflow:hidden;pointer-events:none}

@@ -60,6 +60,27 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .nav{position:relative}
 .nav-ink{position:absolute;left:0;bottom:-5px;height:1px;width:0;background:var(--mute);pointer-events:none;opacity:0;transition:transform .7s var(--ease-out),width .7s var(--ease-out),opacity .3s}
 .nav.has-ink a[aria-current="page"]::after{transform:scaleX(0)}
+/* Work and About: a name with a small chevron. When the mouse comes over it, on a click or a tap, or from the keyboard,
+   the header runs on below in a band with that part's pages side by side, their middle under the name (js/menu.js);
+   no box. While one of those pages is shown, the underline stays under the name, and in the band that page is grey
+   and underlined */
+.nav{align-items:baseline}
+.nav-grp{position:relative}
+.nav-top{display:inline-flex;align-items:baseline;gap:7px;padding:0;border:0;background:none;color:inherit;font:inherit;font-size:var(--fs-bar);letter-spacing:.02em;white-space:nowrap;cursor:pointer;transition:color .3s}
+.nav-top.on{color:var(--mute)}
+.nav-top:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
+.nav-lbl{position:relative}
+.nav-lbl::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:1px;background:currentColor;transform:scaleX(0);transform-origin:right center;transition:transform .55s var(--ease-out)}
+.nav-top:hover .nav-lbl::after,.nav-top.on .nav-lbl::after{transform:scaleX(1);transform-origin:left center}
+.nav.has-ink .nav-top.on .nav-lbl::after{transform:scaleX(0)}
+.nav-car{display:inline-block;width:.34em;height:.34em;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:translateY(-.28em) rotate(45deg);transition:transform .45s var(--ease-out)}
+[aria-expanded="true"] > .nav-car{transform:translateY(.02em) rotate(-135deg)}
+.nav-sub{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + var(--head));display:flex;align-items:center;gap:clamp(28px,3vw,48px);padding:15px 0 17px var(--sub-x,0px);border-top:1px solid var(--line);background:var(--bg);box-shadow:0 26px 40px rgba(0,0,0,.35);opacity:0;visibility:hidden;transform:translateY(-8px);transition:opacity .3s var(--ease-out),transform .45s var(--ease-out),visibility 0s linear .45s}
+.nav-sub::before{content:"";position:absolute;left:var(--br-x,0px);width:var(--br-w,0px);bottom:100%;height:calc(var(--head) / 2)}   /* the way down from the name, under it only, still counts as the band */
+.nav-grp.open .nav-sub{opacity:1;visibility:visible;transform:none;transition:opacity .3s var(--ease-out),transform .45s var(--ease-out),visibility 0s}
+.nav-sub a{padding:4px 0}
+.nav-sub a::after{bottom:-2px}
+.nav.has-ink .nav-sub a[aria-current="page"]::after{transform:scaleX(1)}
 /* category switch: a dark curtain sweeps up over the page with a fine gold edge, names where you are going,
    then lifts away with the gold edge trailing */
 .curtain{position:fixed;left:0;right:0;top:var(--head);bottom:0;z-index:95;overflow:hidden;pointer-events:none}
@@ -1208,24 +1229,34 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .shot-thumbs{grid-template-columns:repeat(4,minmax(0,1fr))}
   .feats{grid-template-columns:minmax(0,1fr)}
 }
-/* the phone menu takes over below 1120px: narrower than that, the header has no room for the nine page links, the languages and the music button */
-@media (max-width:1119px){
+/* the phone menu below 960px: on phones, upright or turned, and upright tablets (the header's five names, the languages
+   and the music button would fit down to about 770px) */
+@media (max-width:959px){
   .nav,.site-head .lang,.site-head .snd{display:none}
   .menu-btn{display:inline-flex}
-  .m-nav{position:fixed;inset:0;z-index:19;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3.6vh,28px);background:var(--bg);padding:calc(var(--head) + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility 0s linear .45s}
+  .m-nav{position:fixed;inset:0;z-index:19;display:flex;flex-direction:column;align-items:center;gap:clamp(14px,3.6vh,28px);overflow-y:auto;overscroll-behavior:contain;background:var(--bg);padding:calc(var(--head) + env(safe-area-inset-top,0px) + 12px) max(16px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility 0s linear .45s}
+  .m-nav > :first-child{margin-top:auto}   /* in the middle while there is room; from the top, scrolling, when there is not */
+  .m-nav > :last-child{margin-bottom:auto}
   .menu-open .m-nav{opacity:1;visibility:visible;transition:opacity .45s var(--ease-out),visibility 0s}
   .menu-open body{overflow:hidden}
-  .m-nav a{font-family:var(--f-display);font-size:var(--fs-title);letter-spacing:.12em;text-decoration:none;opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease-out),transform .8s var(--ease-out),color .3s}
+  .m-nav a,.m-top{font-family:var(--f-display);font-size:var(--fs-title);letter-spacing:.12em;text-decoration:none;transition:color .3s}
   .m-nav a[aria-current="page"]{color:var(--mute)}
-  .menu-open .m-nav a{opacity:1;transform:none}
-  .menu-open .m-nav a:nth-child(2){transition-delay:.06s}
-  .menu-open .m-nav a:nth-child(3){transition-delay:.12s}
-  .menu-open .m-nav a:nth-child(4){transition-delay:.18s}
-  .menu-open .m-nav a:nth-child(5){transition-delay:.24s}
-  .menu-open .m-nav a:nth-child(6){transition-delay:.3s}
-  .menu-open .m-nav a:nth-child(7){transition-delay:.36s}
-  .menu-open .m-nav a:nth-child(8){transition-delay:.42s}
-  .menu-open .m-nav a:nth-child(9){transition-delay:.48s}
+  .m-nav > a,.m-grp{opacity:0;transform:translateY(22px);transition:opacity .6s var(--ease-out),transform .8s var(--ease-out),color .3s}
+  .menu-open .m-nav > a,.menu-open .m-grp{opacity:1;transform:none}
+  .menu-open .m-nav > :nth-child(2){transition-delay:.06s}
+  .menu-open .m-nav > :nth-child(3){transition-delay:.12s}
+  .menu-open .m-nav > :nth-child(4){transition-delay:.18s}
+  .menu-open .m-nav > :nth-child(5){transition-delay:.24s}
+  .m-grp{display:flex;flex-direction:column;align-items:center}
+  .m-top{display:inline-flex;align-items:baseline;gap:.32em;padding:0;border:0;background:none;color:var(--fg);cursor:pointer}
+  .m-top:focus-visible{outline:1px solid var(--fg);outline-offset:6px}
+  .m-top .nav-car{width:.2em;height:.2em}
+  .m-sub{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease-out)}
+  .m-sub > div{display:flex;flex-direction:column;align-items:center;gap:clamp(8px,1.6vh,14px);min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s linear .5s}
+  .m-grp.open .m-sub{grid-template-rows:1fr}
+  .m-grp.open .m-sub > div{visibility:visible;transition:visibility 0s}
+  .m-sub a{font-size:var(--fs-name);letter-spacing:.14em}
+  .m-sub a:first-child{margin-top:clamp(10px,2vh,16px)}
 }
 @media (max-width:560px){
   .g-grid{grid-template-columns:minmax(0,1fr)}

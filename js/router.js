@@ -67,6 +67,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
     a.toggleAttribute('aria-current', a.dataset.v.split(' ').includes(next));
     if (a.hasAttribute('aria-current')) a.setAttribute('aria-current', 'page');
   });
+  document.querySelectorAll('.nav-top').forEach((b) => b.classList.toggle('on', b.dataset.v.split(' ').includes(next)));
   moveInk(from === null);
   const root = VIEWS[next];
   if (!same) { root.style.animation = 'none'; void root.offsetWidth; root.style.animation = ''; }
@@ -172,10 +173,11 @@ navEl.classList.add('has-ink');
 function moveInk(instant) {
   const a = navEl.querySelector('a[aria-current="page"]');
   if (!a) { navInk.style.opacity = '0'; return; }
+  const g = a.closest('.nav-grp'), at = g ? g.querySelector('.nav-lbl') : a;   // a page of Work or About: under that name
   if (instant) navInk.style.transition = 'none';
   navInk.style.opacity = '1';
-  navInk.style.width = `${a.offsetWidth}px`;
-  navInk.style.transform = `translateX(${a.offsetLeft}px)`;
+  navInk.style.width = `${at.offsetWidth}px`;
+  navInk.style.transform = `translateX(${g ? g.offsetLeft + at.offsetLeft : a.offsetLeft}px)`;
   if (instant) { void navInk.offsetWidth; navInk.style.transition = ''; }
 }
 addEventListener('resize', () => moveInk(true));
