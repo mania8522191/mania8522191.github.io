@@ -1,4 +1,4 @@
-/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, board, lang-switch, sound, ../features/characters/main, ../features/ff47-gift/main, ../features/ff47-list/main, ../features/lollipop/main, ../features/sketch-compare/main, main. Edit those files, not this one. */
+/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, board, lang-switch, sound, ../features/ff47-list/main, main. Edit those files, not this one. */
 
 /* ==================== js/data.js ==================== */
 /* Site data. One item per line; the scripts in tools/ read and write this file (keep each list valid JSON).
@@ -123,10 +123,11 @@ const GOODS = [
   {"ev":"FF47","slug":"kikan","pg":8,"name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"parts":[[436,282,865,721],[151,187,587,639],[-59,78,384,384],[-61,298,344,345],[-51,603,322,316]]}
 ];
 
-/* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
+/* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred;
+   works (optional) = works on this site printed in it, so their tags' pages list the book (js/tag.js) */
 const BOOKS = [
-  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","pages":[[1400,493,5787,2039],[1400,493,5787,2039],[1400,493,5787,2039]]},
-  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","pages":[[1400,493,5788,2039],[1400,493,5788,2039],[1400,493,5788,2039]]},
+  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","works":["142549210","148068024","146954644","147595537"],"pages":[[1400,493,5787,2039],[1400,493,5787,2039],[1400,493,5787,2039]]},
+  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","works":["137386797","137332578","137308455"],"pages":[[1400,493,5788,2039],[1400,493,5788,2039],[1400,493,5788,2039]]},
   {"slug":"ff45","mat":"ivory","tk":0.027,"rtl":true,"ev":"FF45","t":"mania8522191 Original R18 Manga Project ROUGH BOOK 01","size":"a4sq","pp":40,"print":"mono","ym":"2025.08","pages":[[1400,700,5787,2894],[1400,700],[1400,700]],"blur":[1,2]},
   {"slug":"ff44","mat":"ivory","tk":0.027,"ev":"FF44","t":"MIRA93 vol.5","size":"a4sq","pp":36,"print":"color","ym":"2025.02","pages":[[1400,700,5787,2894],[1400,700,5787,2893],[1400,700,5787,2893]]},
   {"slug":"ff43","mat":"ivory","foil":"blue","ev":"FF43","t":"MIRA93 vol.3.5","size":"a4sq","pp":20,"print":"color","ym":"2024.08","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
@@ -136,6 +137,13 @@ const BOOKS = [
   {"slug":"ff38","mat":"matte","ev":"FF38","t":"Fimmel: Comet2","size":"b5","pp":28,"print":"color","ym":"2022.02","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]},
   {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]}
 ];
+
+/* the Fan Art wall's character buttons, each named as the tag its works carry (js/tag.js): "shown" always,
+   "more" behind "more characters"; a name without works is left out */
+const CHARACTERS = {
+  "shown":["miComet","星街すいせい","あのそよ"],
+  "more":["さくらみこ","宝鐘マリン","千早愛音","長崎そよ","おかころ","とこまち","がうる・ぐら","猫又おかゆ","戌神ころね","AZKi","森カリオペ","一伊那尓栖","ワトソン・アメリア","小鳥遊キアラ","戌亥とこ","天音かなた","桐生ココ","聖園ミカ","仲正イチカ","天童アリス","高垣楓","アドミラル・ヒッパー(アズールレーン)","プリンツ・オイゲン(アズールレーン)","アドミラル・グラーフ・シュペー(アズールレーン)","ドイッチュラント(アズールレーン)"]
+};
 
 /* conventions I take part in: js/event.js lists the ones not over yet as coming (the next one also on the home page),
    the rest as past. from / to: the first and last day; venue and city in each language */
@@ -190,8 +198,12 @@ const I18N = {
     "home.dot": "第 {n} 張：{t}",
     "snd.label": "背景音樂",
     "works.sub": "{a} — {b} · {n} 件作品 · 點選封面看完整作品",
+    "works.chars": "依角色或組合瀏覽",
+    "works.moreChars": "更多角色",
     "tag.sub": "{y} · {n} 件作品",
     "tag.sub1": "{y} · 1 件作品",
+    "tag.goods": "相關周邊：",
+    "tag.books": "收錄畫冊：",
     "cover.pages": "{n} 張",
     "cover.video": "▶ 過程影片",
     "wk.posted": "{d} 發表",
@@ -474,8 +486,12 @@ const I18N = {
     "home.dot": "Slide {n}: {t}",
     "snd.label": "Background music",
     "works.sub": "{a} — {b} · {n} works · Click a cover to see the full piece",
+    "works.chars": "Browse by character or duo",
+    "works.moreChars": "More characters",
     "tag.sub": "{y} · {n} works",
     "tag.sub1": "{y} · 1 work",
+    "tag.goods": "Related goods: ",
+    "tag.books": "In the art books: ",
     "cover.pages": "{n} images",
     "cover.video": "▶ Timelapse",
     "wk.posted": "Posted {d}",
@@ -758,8 +774,12 @@ const I18N = {
     "home.dot": "{n}枚目：{t}",
     "snd.label": "BGM",
     "works.sub": "{a} — {b} · 全{n}作品 · 表紙をクリックすると作品ページを開きます",
+    "works.chars": "キャラクター・ユニットから探す",
+    "works.moreChars": "もっと見る",
     "tag.sub": "{y} · 全{n}作品",
     "tag.sub1": "{y} · 1作品",
+    "tag.goods": "関連グッズ：",
+    "tag.books": "収録アートブック：",
     "cover.pages": "{n}枚",
     "cover.video": "▶ メイキング",
     "wk.posted": "{d} 投稿",
@@ -2608,6 +2628,7 @@ function indexWall() {
   const nsfw = wallCat === 'nsfw';   // no wall, year bar or sort menu: the blurred previews and the album link instead
   wall.hidden = yearsBar.hidden = nsfw;
   nsfwBox.hidden = !nsfw;
+  $('#fan-chars').hidden = wallCat !== 'fan';   // the character buttons (js/tag.js): fan art only
   YEARS = [...new Set(wallOrder.map((c) => c.dataset.date.slice(0, 4)))];
   yearHead.forEach((hd) => hd.remove());
   yearHead.clear();
@@ -2995,14 +3016,31 @@ function stopWorkVideo() {
 
 /* ==================== js/tag.js ==================== */
 /* Tag page */
-/* ---------- a tag's page (#t-<tag>, from the tags on a work page): every work with that tag, as covers on the works
-   wall's collage, in the wall's order (newest or oldest first). A cover opens its work, morphing as on the wall, and
+/* ---------- a tag's page (#t-<tag>, from the tags on a work page, or a character button on the Fan Art wall): every
+   work with that tag, as covers on the works wall's collage, in the wall's order (newest or oldest first), under
+   the goods and art books with them. A cover opens its work, morphing as on the wall, and
    Back comes to it again. Made anew for another tag; its words follow the language (tagText) ---------- */
 const tagWall = $('#tag-wall');
 const TAG_SEED = (WALL_SEED ^ 0x85ebca6b) >>> 0;   // an arrangement of its own, kept while browsing like the wall's
 let tagNow = null;   // the tag on the page
 const tagWorks = (tag) => WORKS.filter((w) => w.tags.includes(tag));
 const tagHref = (tag) => '#t-' + encodeURIComponent(tag);
+/* the Fan Art wall's character buttons (CHARACTERS in js/data.js): shortcuts to their tags' pages, the first few in
+   the row, the rest behind "more characters"; a name without works is left out */
+const charMore = $('#fan-chars-more'), charTg = $('#fan-chars-tg');
+const charLinks = (names) => names.filter((t) => tagWorks(t).length).map((t) => {
+  const a = el('a', '', t);
+  a.href = tagHref(t);
+  return a;
+});
+$('#fan-chars-in').append(...charLinks(CHARACTERS.shown));
+charMore.append(...charLinks(CHARACTERS.more));
+charTg.hidden = !charMore.children.length;
+function charFold(open = false) {   // "more characters" open or not; folded again when the Work part starts over
+  charMore.hidden = !open;
+  charTg.setAttribute('aria-expanded', String(open));
+}
+charTg.addEventListener('click', () => charFold(charMore.hidden));
 function renderTag(tag) {
   tagNow = tag;
   const works = tagWorks(tag).sort(byMade);
@@ -3031,6 +3069,18 @@ function tagText() {
   sub.dataset.i18n = vars.n === 1 ? 'tag.sub1' : 'tag.sub';
   sub.textContent = tr(sub.dataset.i18n, vars);
   tagWall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(3)]]));
+  tagLinks();
+}
+/* under the count: the goods and art books with its works. A book has them in its "works"; goods have them in
+   theirs, or hold a book that has them */
+function tagLinks() {
+  const ids = new Set(tagWorks(tagNow).map((w) => w.id));
+  const books = BOOKS.filter((b) => (b.works || []).some((id) => ids.has(id)));
+  const slugs = new Set(books.map((b) => b.slug));
+  const goods = GOODS.filter((g) => (g.works || []).some((id) => ids.has(id)) || (g.books || []).some((s) => slugs.has(s)));
+  linkLine($('#tag-goods'), tr('tag.goods'), goods.map((g) => [L(g.name), '#g-' + g.slug]));
+  linkLine($('#tag-books'), tr('tag.books'), books.map((b) => [b.t, '#ab-' + b.slug]));
+  $('#tag-rel').hidden = !goods.length && !books.length;
 }
 function layoutTag() {
   if (VIEWS.tag.hidden || !tagWall.clientWidth) return;
@@ -4122,7 +4172,7 @@ const PART = { work: 'works', tag: 'works', book: 'artbook', catalog: 'goods', i
 const partOf = (v) => PART[v] || v;
 function startOver(next) {
   const p = partOf(next);
-  if (p === 'works') setSort('new');   // (the category: in apply)
+  if (p === 'works') { setSort('new'); charFold(); }   // (the category: in apply)
   else if (p === 'artbook' && abSort !== 'new') { abSort = 'new'; if (abBuilt) renderBooks(); }
   else if (p === 'goods' && goodsOrder !== 'new') { goodsOrder = 'new'; if (goodsHeadings.size) renderGoods(); }
   else if (p === 'game') { if (shotAt) showShot(0, false); deckTrack.scrollLeft = 0; }
@@ -5168,129 +5218,6 @@ document.addEventListener('click', (e) => {
 }, true);
 document.addEventListener('visibilitychange', bgmSync);
 
-/* ==================== js/../features/characters/main.js ==================== */
-(() => {
-  const featured=['miComet','星街すいせい','あのそよ'];
-  const others=['さくらみこ','宝鐘マリン','千早愛音','長崎そよ','おかころ','とこまち','がうる・ぐら','猫又おかゆ','戌神ころね','AZKi','森カリオペ','一伊那尓栖','ワトソン・アメリア','小鳥遊キアラ','戌亥とこ','天音かなた','桐生ココ','聖園ミカ','仲正イチカ','天童アリス','高垣楓','アドミラル・ヒッパー(アズールレーン)','プリンツ・オイゲン(アズールレーン)','アドミラル・グラーフ・シュペー(アズールレーン)','ドイッチュラント(アズールレーン)'];
-  // Only illustrations identified in the book previews.
-  const bookWorks={ff47:['142549210','148068024','146954644','147595537'],ff46:['137386797','137332578','137308455']};
-  const nav=el('nav','character-nav'), title=el('span','character-label'), more=el('details'), toggle=el('summary');
-  function links(names) {
-    const list=el('div','character-links');
-    for(const name of names) {
-      if(!tagWorks(name).length)continue;
-      const a=el('a','',name);a.href=tagHref(name);list.append(a);
-    }
-    return list;
-  }
-  nav.id='work-characters';more.append(toggle,links(others));nav.append(title,links(featured),more);$('#works-sub').after(nav);
-  const related=el('section','tag-related');related.id='tag-related';tagWall.after(related);
-  function group(name,cards) {
-    if(!cards.length)return;
-    const heading=el('h3','gd-h',name), grid=el('div','character-cards');
-    for(const [href,text,image,book] of cards) {
-      const a=el('a'), img=el('img');a.href=href;img.alt='';img.src=image;img.loading='lazy';img.decoding='async';
-      if(book) {   // the spread is back cover, spine, front cover (the other way round in a right-bound book): show the front
-        const [W,H]=book.pages[0];img.className='book';img.style.aspectRatio=W/2+' / '+H;img.style.objectPosition=book.rtl ? 'left' : 'right';
-      }
-      a.append(img,el('span','',text));grid.append(a);
-    }
-    related.append(heading,grid);
-  }
-  function update() {
-    title.textContent=L({zh:'依角色或組合瀏覽',en:'Browse by character or duo',ja:'キャラクター・ユニットから探す'});
-    nav.setAttribute('aria-label',title.textContent);toggle.textContent=L({zh:'更多角色',en:'More characters',ja:'もっと見る'});
-    nav.hidden=view!=='works' || wallCat!=='fan';
-    if(view!=='tag')return;
-    const ids=new Set(tagWorks(tagNow).map(w=>w.id));
-    const books=BOOKS.filter(b=>bookWorks[b.slug]?.some(id=>ids.has(id)));
-    const slugs=new Set(books.map(b=>b.slug));
-    const goods=GOODS.filter(g=>g.works?.some(id=>ids.has(id)) || g.books?.some(s=>slugs.has(s)));
-    related.replaceChildren();related.hidden=!goods.length && !books.length;
-    group(L({zh:'相關周邊',en:'Related goods',ja:'関連グッズ'}),goods.map(g=>['#g-'+g.slug,L(g.name),goodsImage(g)[0]]));
-    group(L({zh:'收錄畫冊',en:'Art books featuring this work',ja:'収録画集'}),books.map(b=>['#ab-'+b.slug,b.t,'img/ab/'+b.slug+'_p0.webp',b]));
-  }
-  document.addEventListener('portfolio-view',update);
-  document.addEventListener('portfolio-language',update);
-})();
-
-/* ==================== js/../features/ff47-gift/main.js ==================== */
-/* FF47's new set A: once its goods are out, the paper bag can be lifted aside (a click or a tap on it, Enter, or the
-   button under the picture) or dragged away. Under it lies a souvenir card, which opens the two wallpapers */
-(() => {
-  const lift=el('button','gift-lift btn'), card=el('button','gift-card'), art=el('span','gift-art'), cap=el('span','gift-cap'), tray=el('div','gift-downloads');
-  const desktop=el('a','btn'), phone=el('a','btn');
-  let bag=null, revealed=false, showing=false, origin=null;
-  lift.id='ff47-gift-lift';card.id='ff47-gift-card';tray.id='ff47-gift-downloads';
-  lift.type=card.type='button';card.setAttribute('aria-controls',tray.id);
-  art.style.backgroundImage='url('+src('146954644',0)+')';   // the desktop wallpaper's picture, Chatter Chatter
-  card.append(art,cap);
-  for(const [link,name] of [[desktop,'desktop'],[phone,'phone']]) {
-    link.href='features/ff47-gift/art/'+name+'.jpg';link.download='MANIA-FF47-'+name+'.jpg';
-  }
-  tray.append(desktop,phone);itStage.append(card);itStage.closest('figure').append(lift,tray);
-  function display() {
-    const active=bag && itGd.classList.contains('cut');
-    lift.hidden=!active || revealed;card.hidden=!active || !revealed;tray.hidden=!active || !showing;
-    itGd.classList.toggle('gift-on',!card.hidden);   // the card lies under the goods: clicks between them reach it
-    card.setAttribute('aria-expanded',String(showing));
-  }
-  function reset() {
-    revealed=false;showing=false;origin=null;bag?.classList.remove('gift-moved');display();
-  }
-  /* the card where the bag was (r: the bag's box then), a little in from its left edge, in its upper part, inside the
-     frame: the bag lifted aside still lies over a corner of it */
-  function reveal(nudge,r) {
-    if (!bag || revealed || !itGd.classList.contains('cut')) return;
-    revealed=true;display();
-    const room=itStage.getBoundingClientRect(), w=card.offsetWidth*.6, h=card.offsetHeight*.6;
-    const x=Math.max(room.left+w,Math.min(room.right-w,r.left+r.width*.3)), y=Math.max(room.top+h,Math.min(room.bottom-h,r.top+r.height*.3));
-    card.style.left=((x-room.left)/room.width*100).toFixed(3)+'%';card.style.top=((y-room.top)/room.height*100).toFixed(3)+'%';
-    if (nudge || covered()>.6) bag.classList.add('gift-moved');   // lifted aside; or dragged, but not off the card yet
-    card.focus({preventScroll:true});
-  }
-  /* how much of the card the goods cover: what is on top at points across it */
-  function covered() {
-    const r=card.getBoundingClientRect();let k=0;
-    for(let i=1;i<5;i++)for(let j=1;j<5;j++){const e=document.elementFromPoint(r.left+r.width*i/5,r.top+r.height*j/5);if(e && !card.contains(e))k++;}
-    return k/16;
-  }
-  function liftBag() { if(bag)reveal(true,bag.getBoundingClientRect()); }
-  itGoods.addEventListener('pointerdown',e=>{
-    origin=null;
-    if(e.target===bag && itGd.classList.contains('cut') && e.button===0)origin={x:e.clientX,y:e.clientY,id:e.pointerId,r:bag.getBoundingClientRect()};
-  });
-  itGoods.addEventListener('pointerup',e=>{   // a click lifts it aside; a drag has moved it already
-    if(origin && origin.id===e.pointerId)reveal(Math.hypot(e.clientX-origin.x,e.clientY-origin.y)<8,origin.r);
-    origin=null;
-  });
-  itGoods.addEventListener('pointercancel',()=>{origin=null;});
-  itGoods.addEventListener('keydown',e=>{
-    if(e.target===bag && (e.key==='Enter' || e.key===' ')){e.preventDefault();e.stopPropagation();liftBag();}
-  });
-  lift.onclick=liftBag;
-  card.onclick=()=>{showing=!showing;display();if(showing)desktop.focus();};
-  function setup() {
-    const next=view==='item' && lastItem==='set-a' ? itGoods.querySelector('img[src$="goods-set-a-3.webp"]'):null;
-    if (bag!==next) {bag=next;reset();}
-    const liftText=L({zh:'移開紙袋',en:'Lift the paper bag',ja:'紙袋を動かす'});
-    lift.textContent=liftText;
-    cap.textContent=L({zh:'FF47 紀念卡',en:'FF47 souvenir card',ja:'FF47 記念カード'});
-    desktop.textContent=L({zh:'下載電腦桌布',en:'Desktop wallpaper',ja:'PC用壁紙'})+' · 3840 × 2160';
-    phone.textContent=L({zh:'下載手機桌布',en:'Phone wallpaper',ja:'スマホ用壁紙'})+' · 1290 × 2796';
-    if(bag)bag.setAttribute('aria-label',liftText);
-    sync();
-  }
-  function sync() {
-    const open=itGd.classList.contains('cut');
-    if(bag) {bag.tabIndex=open ? 0 : -1;bag.setAttribute('role','button');}
-    if (!open)reset();else display();
-  }
-  new MutationObserver(sync).observe(itGd,{attributes:true,attributeFilter:['class']});
-  document.addEventListener('portfolio-view',setup);
-  document.addEventListener('portfolio-language',setup);
-})();
-
 /* ==================== js/../features/ff47-list/main.js ==================== */
 (() => {
   const products = GOODS.filter(g => g.ev === 'FF47');
@@ -5322,7 +5249,7 @@ document.addEventListener('visibilitychange', bgmSync);
   }
   let rows = readRows(), downloadURL = '', revision = 0;
   const panel = el('details','ff-list'), summary = el('summary'), list = el('ul'), tally = el('strong');
-  const offer = el('p'), save = el('button','btn'), download = el('a'), feedback = el('span','ff-feedback');
+  const offer = el('p'), save = el('button','btn'), download = el('a','btn ghost'), feedback = el('span','ff-feedback');
   save.type = 'button'; feedback.setAttribute('role','status'); download.download = 'FF47-mania8522191.png';
   panel.append(summary,list,tally,offer,save,download,feedback);
   $('#catalog-goods').before(panel);
@@ -5355,8 +5282,9 @@ document.addEventListener('visibilitychange', bgmSync);
     return {line:word(promo && !single ? 'subtotal':'sum')+'  '+priceText(single ? value-50 : value),
       note:promo ? L(products.find(g => g.slug === 'set-b').note) : ''};
   }
-  function button(text, label, action) {
-    const node = el('button','ff-action',text);
+  /* the site's own buttons: the ring circles (.cat-btn) for − + ×, the gold pill (.btn) to add to the list */
+  function button(cls, text, label, action) {
+    const node = el('button',cls,text);
     node.type = 'button'; node.setAttribute('aria-label',label); node.addEventListener('click',action); return node;
   }
   function paint() {
@@ -5375,8 +5303,8 @@ document.addEventListener('visibilitychange', bgmSync);
         (list.querySelector('[data-entry="'+identify(row)+'"] button') || summary).focus({preventScroll:true});
       };
       li.dataset.entry = identify(row);
-      const more = button('+',word('qty')+' +1 '+label,() => change(1)); more.disabled = row.qty >= 99;
-      controls.append(button('−',word('qty')+' −1 '+label,() => change(-1)),more,button('×',word('remove')+' '+label,() => change(-row.qty)));
+      const more = button('cat-btn','+',word('qty')+' +1 '+label,() => change(1)); more.disabled = row.qty >= 99;
+      controls.append(button('cat-btn','−',word('qty')+' −1 '+label,() => change(-1)),more,button('cat-btn','×',word('remove')+' '+label,() => change(-row.qty)));
       li.append(photo,copy,controls);
       if (['set-a','set-b','kikan'].includes(row.slug)) {
         const note = el('input','ff-note'); note.type='text'; note.maxLength=80; note.value=row.note;
@@ -5406,7 +5334,7 @@ document.addEventListener('visibilitychange', bgmSync);
         if (old != null) select.value=old;
         controls.append(select);
       }
-      const add=button(word('add'),L(g.name)+' · '+word('add'),() => {
+      const add=button('btn',word('add'),L(g.name)+' · '+word('add'),() => {
         const variant=choices.length ? Number(select.value) : -1;
         const found=rows.find(r => r.slug===g.slug && r.variant===variant);
         if (found) found.qty=Math.min(99,found.qty+1);
@@ -5423,35 +5351,55 @@ document.addEventListener('visibilitychange', bgmSync);
     if (!entries.length) return;
     save.disabled=true;
     try {
+      /* in the site's colours and type: the name and the title in the display face, the rest in the body face, each
+         font loaded first for the characters drawn; a gold rule (as --ring-line) under the head */
+      const css=getComputedStyle(document.documentElement), v=k => css.getPropertyValue(k).trim();
+      const ink={bg:v('--bg'),card:v('--bg-2'),fg:v('--fg'),mute:v('--mute'),line:v('--line'),gold:v('--g-gold')};
+      const head=n => n+'px '+v('--f-display'), text=n => n+'px '+v('--f-body');
+      const brand='MANIA8522191 · FF47';
+      const drawn=brand+[word('title'),L(catalog.debut),sum.line,sum.note,...entries.map(r => title(r)+r.note+'×'+r.qty+priceText(product(r).price*r.qty))].join('');
+      await Promise.all([head(24),head(44),text(22),text(26),text(32)].map(f => document.fonts.load(f,drawn)));
       const canvas=el('canvas'), ctx=canvas.getContext('2d');
       canvas.width=920;
-      function lines(string,width) {
+      function lines(string,width,font) {   // the words in lines no wider than width, in that font
+        ctx.font=font;
         let line=''; const out=[];
         for (const ch of string) {
-          if (line && ctx.measureText(line+ch).width>width) {out.push(line); line='';}
+          if (line && ctx.measureText(line+ch).width>width) {   // an opening bracket goes down with what it opens
+            const open=/[「『（(【〈《“‘]+$/.exec(line)?.[0] || '', keep=open.length<line.length ? open : '';
+            out.push(line.slice(0,line.length-keep.length)); line=keep;
+          }
           line+=ch;
         }
         if(line)out.push(line); return out;
       }
-      ctx.font='26px sans-serif';
-      const layout=entries.map(r => ({row:r,labels:lines(title(r),535),notes:lines(r.note,535)}));
-      const noteLines=lines(sum.note,820);
-      const height=layout.reduce((n,l)=>n+Math.max(120,45+34*l.labels.length+30*l.notes.length),0);
-      canvas.height=218+height+104+noteLines.length*34;
-      ctx.fillStyle='#131316';ctx.fillRect(0,0,920,canvas.height);ctx.fillStyle='#d9bc89';ctx.font='24px sans-serif';ctx.fillText('MANIA8522191   /   FF47',44,52);
-      ctx.fillStyle='#fff';ctx.font='bold 44px sans-serif';ctx.fillText(word('title'),44,118);ctx.font='22px sans-serif';ctx.fillText(L(catalog.debut),44,168);
-      const photos=await Promise.all(entries.map(async row=>{const img=new Image();img.src=thumbnail(row);await img.decode();return img;}));
+      const layout=entries.map(r => ({row:r,labels:lines(title(r),535,text(26)),notes:lines(r.note,535,text(22))}));
+      const noteLines=lines(sum.note,820,text(22));
+      const tall=l => Math.max(120,45+34*l.labels.length+30*l.notes.length);
+      canvas.height=218+layout.reduce((n,l) => n+tall(l),0)+104+noteLines.length*34;
+      ctx.fillStyle=ink.bg; ctx.fillRect(0,0,920,canvas.height);
+      ctx.fillStyle=ink.gold; ctx.font=head(24); ctx.letterSpacing='3px'; ctx.fillText(brand,44,56); ctx.letterSpacing='0px';
+      ctx.fillStyle=ink.fg; ctx.font=head(44); ctx.fillText(word('title'),44,122);
+      ctx.fillStyle=ink.mute; ctx.font=text(22); ctx.fillText(L(catalog.debut),44,166);
+      const photos=await Promise.all(entries.map(async row => {const img=new Image(); img.src=thumbnail(row); await img.decode(); return img;}));
       let y=198;
-      layout.forEach(({row,labels,notes},i)=>{
-        const photo=photos[i], s=Math.min(96/photo.width,96/photo.height);
-        ctx.fillStyle='#343437';ctx.fillRect(44,y+10,96,96);ctx.drawImage(photo,44+(96-photo.width*s)/2,y+10+(96-photo.height*s)/2,photo.width*s,photo.height*s);
-        ctx.fillStyle='#fff';ctx.font='26px sans-serif';labels.forEach((t,j)=>ctx.fillText(t,164,y+39+j*34));
-        ctx.fillStyle='#d9bc89';ctx.font='22px sans-serif';notes.forEach((t,j)=>ctx.fillText(t,164,y+41+labels.length*34+j*30));
-        ctx.textAlign='right';ctx.fillText('×'+row.qty,874,y+40);ctx.fillText(priceText(product(row).price*row.qty),874,y+77);ctx.textAlign='left';
-        y+=Math.max(120,45+34*labels.length+30*notes.length);ctx.fillStyle='#444';ctx.fillRect(44,y,832,1);
+      ctx.fillStyle=ink.gold; ctx.globalAlpha=.42; ctx.fillRect(44,y,832,1); ctx.globalAlpha=1;
+      layout.forEach((l,i) => {
+        const {row,labels,notes}=l, photo=photos[i], s=Math.min(96/photo.width,96/photo.height);
+        ctx.fillStyle=ink.card; ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(44,y+12,96,96,8); else ctx.rect(44,y+12,96,96);
+        ctx.fill();
+        ctx.drawImage(photo,44+(96-photo.width*s)/2,y+12+(96-photo.height*s)/2,photo.width*s,photo.height*s);
+        ctx.fillStyle=ink.fg; ctx.font=text(26); labels.forEach((t,j) => ctx.fillText(t,164,y+41+j*34));
+        ctx.fillStyle=ink.gold; ctx.font=text(22); notes.forEach((t,j) => ctx.fillText(t,164,y+43+labels.length*34+j*30));
+        ctx.textAlign='right';
+        ctx.fillStyle=ink.mute; ctx.font=text(22); ctx.fillText('×'+row.qty,876,y+41);
+        ctx.fillStyle=ink.fg; ctx.font=text(26); ctx.fillText(priceText(product(row).price*row.qty),876,y+79);
+        ctx.textAlign='left';
+        y+=tall(l); ctx.fillStyle=ink.line; ctx.fillRect(44,y,832,1);
       });
-      ctx.font='bold 32px sans-serif';ctx.fillStyle='#ead1a5';ctx.fillText(sum.line,44,y+62);
-      ctx.font='22px sans-serif';noteLines.forEach((t,j)=>ctx.fillText(t,44,y+105+j*34));
+      ctx.fillStyle=ink.gold; ctx.font=text(32); ctx.fillText(sum.line,44,y+62);
+      ctx.fillStyle=ink.mute; ctx.font=text(22); noteLines.forEach((t,j) => ctx.fillText(t,44,y+105+j*34));
       const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
       if (!blob) throw new Error('PNG');
       if(version!==revision)return;
@@ -5464,119 +5412,6 @@ document.addEventListener('visibilitychange', bgmSync);
   addEventListener('storage',e=>{if(e.key===key || e.key===null){rows=readRows();invalidate();paint();}});
   document.addEventListener('portfolio-view',setup);
   document.addEventListener('portfolio-language',setup);
-})();
-
-/* ==================== js/../features/lollipop/main.js ==================== */
-/* The poster stays visible until all three aligned layers are decoded. */
-(() => {
-  const id = '137332578';
-  if (!(id in byId)) return;
-  const home = el('button','lollipop-entry'), work = el('button','lollipop-entry');
-  home.id = 'lollipop-home'; home.type = work.type = 'button';
-  $('#hero-ev').after(home); $('#wk-goods').after(work);
-  const dialog = el('dialog','lollipop-dialog'), frame = el('div','lollipop-scene'), bar = el('div','lollipop-bar');
-  const heading = el('h2','','miComet · Lollipop'), close = el('button','','×'), hint = el('p'), original = el('a');
-  const poster = el('img'), deck = el('div','lollipop-layers');
-  const motion = matchMedia('(prefers-reduced-motion: reduce)');
-  let loading = null;
-  dialog.id = 'lollipop-dialog'; heading.id = 'lollipop-heading'; hint.id = 'lollipop-help';
-  dialog.setAttribute('aria-labelledby',heading.id); frame.setAttribute('aria-describedby',hint.id);
-  close.type = 'button'; original.href = '#w-'+id;
-  poster.alt = ''; deck.setAttribute('aria-hidden','true'); frame.tabIndex = 0; frame.setAttribute('role','group');
-  frame.append(poster,deck); bar.append(heading,close); dialog.append(bar,frame,hint,original); document.body.append(dialog);
-  function offset(x,y) {
-    if (motion.matches) x = y = 0;
-    const d = Math.min(1,frame.clientWidth / 1500), px = (v,n) => Math.round(v * n * d)+'px';
-    frame.style.setProperty('--px',px(x,14)); frame.style.setProperty('--py',px(y,10));   // the whole picture
-    frame.style.setProperty('--lx',px(x,8)); frame.style.setProperty('--ly',px(y,6));   // the front layers, on top of that
-  }
-  function reset() { offset(0,0); }
-  function point(event) {
-    const r = frame.getBoundingClientRect();
-    const relative = (v,length) => Math.max(-1, Math.min(1, 2*v/length - 1));
-    offset(relative(event.clientX-r.left,r.width),relative(event.clientY-r.top,r.height));
-  }
-  function layers() {
-    if (loading || motion.matches) return;
-    const photos = ['back','figures','lights'].map(name => {
-      const im = el('img','lollipop-'+name); im.alt=''; im.draggable=false;
-      im.src='features/lollipop/art/'+name+'.webp'; return im;
-    });
-    loading=Promise.all(photos.map(im=>im.decode())).then(()=>deck.replaceChildren(...photos)).catch(()=>{loading=null;});
-  }
-  function open() {
-    poster.src='img/z/137332578.webp'; reset(); dialog.showModal(); layers(); close.focus();
-  }
-  function update() {
-    work.hidden = view !== 'work' || lastWork !== id;
-    home.textContent = 'Lollipop · '+L({zh:'互動插畫',en:'Interactive artwork',ja:'動かせるイラスト'});
-    work.textContent = L({zh:'打開互動插畫',en:'Open interactive artwork',ja:'動かせるイラストを開く'});
-    original.textContent = L({zh:'查看原作 →',en:'View original →',ja:'原画を見る →'});
-    const label = L({zh:'關閉',en:'Close',ja:'閉じる'}); close.setAttribute('aria-label',label);
-    frame.setAttribute('aria-label',heading.textContent);
-    hint.textContent = motion.matches ? L({zh:'已套用減少動態效果設定',en:'Reduced motion is on',ja:'視差効果をオフにしています'}) :
-      L({zh:'移動滑鼠、拖曳畫面，或用方向鍵移動畫面。',en:'Move the pointer, drag the artwork or use the arrow keys.',ja:'ポインター・ドラッグ・矢印キーで絵が動きます。'});
-  }
-  home.onclick = work.onclick = open; close.onclick = original.onclick = () => dialog.close();
-  dialog.addEventListener('click',e=>{
-    if (e.target!==dialog) return;
-    const r=dialog.getBoundingClientRect();
-    if(e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) dialog.close();
-  });
-  frame.addEventListener('pointerdown',e=>{frame.setPointerCapture(e.pointerId);point(e);});
-  frame.addEventListener('pointermove',e=>{if(e.pointerType==='mouse' || frame.hasPointerCapture(e.pointerId))point(e);});
-  for(const name of ['pointerleave','lostpointercapture']) frame.addEventListener(name,reset);
-  dialog.addEventListener('keydown',e=>{
-    const movement={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
-    if(movement) {e.stopPropagation();e.preventDefault();offset(...movement);}
-  });
-  dialog.addEventListener('keyup',e=>{if(e.key.startsWith('Arrow'))reset();});
-  motion.addEventListener('change',()=>{reset();update();if(dialog.open)layers();});
-  document.addEventListener('portfolio-view',()=>{if(dialog.open)dialog.close();update();});
-  document.addEventListener('portfolio-language',update);
-})();
-
-/* ==================== js/../features/sketch-compare/main.js ==================== */
-/* Keep the existing full-size pictures and viewer; the comparison is an optional view of an aligned pair. */
-(() => {
-  const panel = el('details', 'sketch-compare');
-  const summary = el('summary'), frame = el('div', 'sketch-frame'), slider = el('input');
-  const finished = el('img'), sketch = el('img'), line = el('span', 'sketch-divider');
-  const labels = el('div', 'sketch-labels'), left = el('span'), right = el('span');
-  let images = null, key = '';
-  [finished, sketch].forEach((im) => { im.alt = ''; im.draggable = false; });
-  slider.type = 'range'; slider.min = 0; slider.max = 100; slider.value = 50;
-  labels.append(left, right); frame.append(finished, sketch, line, slider); panel.append(summary, labels, frame);
-  panel.hidden = true;
-  $('#wk-imgs').before(panel);
-  function draw() { frame.style.setProperty('--sketch-split', slider.value + '%'); }
-  slider.addEventListener('input', draw);
-  slider.addEventListener('keydown', (e) => { if (['ArrowLeft','ArrowRight'].includes(e.key)) e.stopPropagation(); });
-  function load() {
-    if (!panel.open || !images) return;
-    finished.src = images[0].src; sketch.src = images[1].src;
-  }
-  panel.addEventListener('toggle', load);
-  function show() {
-    const w = view === 'work' && WORKS[byId[lastWork]], pair = w && lastPiece >= 0 && w.sk?.[lastPiece];
-    panel.hidden = !pair;
-    if (!pair) { key = ''; panel.open = false; images = null; return; }
-    const id = w.id + '/' + lastPiece;
-    if (key !== id) {
-      key = id; panel.open = false; slider.value = 50; draw();
-      const all = pieceImgs(w, lastPiece);
-      images = [all[0], all.find((im) => im.k === 'sketch')];
-      const [W,H] = images[0].d;
-      frame.style.aspectRatio = W + ' / ' + H;
-      frame.style.maxWidth = 'min(100%, calc(72svh * ' + W / H + '))';
-    }
-    left.textContent = L({zh:'草稿',en:'Sketch',ja:'ラフ'});
-    right.textContent = L({zh:'完稿',en:'Final',ja:'完成'});
-    summary.textContent = L({zh:'比較草稿與完稿',en:'Compare sketch and final',ja:'ラフと完成を比較'});
-    slider.setAttribute('aria-label',summary.textContent);
-  }
-  document.addEventListener('portfolio-view',show);
-  document.addEventListener('portfolio-language',show);
 })();
 
 /* ==================== js/main.js ==================== */

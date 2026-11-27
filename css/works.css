@@ -4,6 +4,21 @@
 /* a tag's page (js/tag.js): a gold TAG over the tag as the title, and how many works */
 .tag-k{margin:0 0 10px;text-align:center;font-size:var(--fs-label);letter-spacing:.32em;color:var(--g-gold)}
 .tag-title{letter-spacing:.02em;overflow-wrap:anywhere}
+/* under the count, centred like it: the goods and art books with the tag's works (.proj-goods lines) */
+.tag-rel{margin-top:14px;text-align:center}
+.tag-rel a{display:inline-block}   /* a name moves to the next line whole (a long one wraps inside itself) */
+/* the Fan Art wall's character buttons, under its sub line: the gold label, then the names as small pills in the
+   site's ring look (--ring-*, as .btn), lit gold on hover; "more characters" opens the rest in a row of their own */
+.fan-chars{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;max-width:900px;margin:18px auto 0}
+.fan-chars-k{margin-right:6px;color:var(--g-gold);font-size:var(--fs-small);letter-spacing:.06em}
+.fan-chars-in{display:contents}
+.fan-chars-more:not([hidden]){display:flex;flex-wrap:wrap;justify-content:center;gap:8px;flex-basis:100%;margin-top:2px}
+.fan-chars a,.fan-chars-tg{display:inline-flex;align-items:center;height:32px;padding:0 15px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);box-shadow:var(--ring-shadow);color:var(--fg);font:inherit;font-size:var(--fs-small);letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:border-color .35s,box-shadow .35s,color .35s}
+.fan-chars a:hover,.fan-chars-tg:hover{border-color:var(--g-gold);color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
+.fan-chars a:focus-visible,.fan-chars-tg:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
+.fan-chars-tg{color:var(--g-gold)}
+.fan-chars-tg::after{content:'';width:5px;height:5px;margin-left:9px;border:solid currentColor;border-width:0 1px 1px 0;transform:translateY(-2px) rotate(45deg);transition:transform .3s}
+.fan-chars-tg[aria-expanded="true"]::after{transform:translateY(1px) rotate(225deg)}
 #works{scroll-margin-top:calc(var(--head) + 24px)}
 /* the wall is also the timeline: each year opens with its number, a rule and how many works it holds */
 .wall-year{position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:clamp(12px,2vw,24px);pointer-events:none}

@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=604ee21f">
+<link rel="stylesheet" href="site.css?v=c26a0828">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -134,6 +134,8 @@ addEventListener('hashchange', function () {
       <h2 class="sec-title" id="works">WORKS</h2>
       <nav class="cats" id="cats" aria-label="作品分類" data-i18n-aria="works.cats"><a href="#fanart" data-cat="fan">Fan Art<span class="cats-n"></span></a><a href="#original" data-cat="original">Original Art<span class="cats-n"></span></a><a href="#nsfw" data-cat="nsfw">NSFW<span class="cats-n">18+</span></a></nav>
       <p class="sec-sub" id="works-sub" data-i18n="works.sub">2019 — 2026 · 53 件作品 · 點選封面看完整作品</p>
+      <!-- fan art only: shortcuts to the characters' tag pages (js/tag.js) -->
+      <nav class="fan-chars" id="fan-chars" aria-label="依角色或組合瀏覽" data-i18n-aria="works.chars"><span class="fan-chars-k" data-i18n="works.chars">依角色或組合瀏覽</span><span class="fan-chars-in" id="fan-chars-in"></span><button class="fan-chars-tg" id="fan-chars-tg" type="button" aria-expanded="false" aria-controls="fan-chars-more" data-i18n="works.moreChars">更多角色</button><div class="fan-chars-more" id="fan-chars-more" hidden></div></nav>
       <div class="years" id="years">
         <div class="years-row">
           <nav class="years-in" id="years-in" aria-label="依年份瀏覽" data-i18n-aria="years.nav"></nav>
@@ -161,12 +163,13 @@ addEventListener('hashchange', function () {
     </section>
   </div>
 
-  <!-- a tag: every work with it, on the wall's collage (js/tag.js) -->
+  <!-- a tag: every work with it, on the wall's collage, and the goods and art books with them (js/tag.js) -->
   <div class="view" id="v-tag" hidden>
     <section class="works in" aria-labelledby="tag-h">
       <p class="tag-k">TAG</p>
       <h2 class="sec-title tag-title" id="tag-h"></h2>
       <p class="sec-sub" id="tag-sub" data-i18n="tag.sub"></p>
+      <div class="tag-rel" id="tag-rel" hidden><p class="proj-goods" id="tag-goods" hidden></p><p class="proj-goods" id="tag-books" hidden></p></div>
       <div class="wall" id="tag-wall"></div>
     </section>
   </div>
@@ -647,6 +650,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=4db38110"></script>
+<script src="site.js?v=28c7c1df"></script>
 </body>
 </html>

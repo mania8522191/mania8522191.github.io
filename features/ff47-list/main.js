@@ -28,7 +28,7 @@
   }
   let rows = readRows(), downloadURL = '', revision = 0;
   const panel = el('details','ff-list'), summary = el('summary'), list = el('ul'), tally = el('strong');
-  const offer = el('p'), save = el('button','btn'), download = el('a'), feedback = el('span','ff-feedback');
+  const offer = el('p'), save = el('button','btn'), download = el('a','btn ghost'), feedback = el('span','ff-feedback');
   save.type = 'button'; feedback.setAttribute('role','status'); download.download = 'FF47-mania8522191.png';
   panel.append(summary,list,tally,offer,save,download,feedback);
   $('#catalog-goods').before(panel);
@@ -61,8 +61,9 @@
     return {line:word(promo && !single ? 'subtotal':'sum')+'  '+priceText(single ? value-50 : value),
       note:promo ? L(products.find(g => g.slug === 'set-b').note) : ''};
   }
-  function button(text, label, action) {
-    const node = el('button','ff-action',text);
+  /* the site's own buttons: the ring circles (.cat-btn) for − + ×, the gold pill (.btn) to add to the list */
+  function button(cls, text, label, action) {
+    const node = el('button',cls,text);
     node.type = 'button'; node.setAttribute('aria-label',label); node.addEventListener('click',action); return node;
   }
   function paint() {
@@ -81,8 +82,8 @@
         (list.querySelector('[data-entry="'+identify(row)+'"] button') || summary).focus({preventScroll:true});
       };
       li.dataset.entry = identify(row);
-      const more = button('+',word('qty')+' +1 '+label,() => change(1)); more.disabled = row.qty >= 99;
-      controls.append(button('−',word('qty')+' −1 '+label,() => change(-1)),more,button('×',word('remove')+' '+label,() => change(-row.qty)));
+      const more = button('cat-btn','+',word('qty')+' +1 '+label,() => change(1)); more.disabled = row.qty >= 99;
+      controls.append(button('cat-btn','−',word('qty')+' −1 '+label,() => change(-1)),more,button('cat-btn','×',word('remove')+' '+label,() => change(-row.qty)));
       li.append(photo,copy,controls);
       if (['set-a','set-b','kikan'].includes(row.slug)) {
         const note = el('input','ff-note'); note.type='text'; note.maxLength=80; note.value=row.note;
@@ -112,7 +113,7 @@
         if (old != null) select.value=old;
         controls.append(select);
       }
-      const add=button(word('add'),L(g.name)+' · '+word('add'),() => {
+      const add=button('btn',word('add'),L(g.name)+' · '+word('add'),() => {
         const variant=choices.length ? Number(select.value) : -1;
         const found=rows.find(r => r.slug===g.slug && r.variant===variant);
         if (found) found.qty=Math.min(99,found.qty+1);
@@ -129,35 +130,55 @@
     if (!entries.length) return;
     save.disabled=true;
     try {
+      /* in the site's colours and type: the name and the title in the display face, the rest in the body face, each
+         font loaded first for the characters drawn; a gold rule (as --ring-line) under the head */
+      const css=getComputedStyle(document.documentElement), v=k => css.getPropertyValue(k).trim();
+      const ink={bg:v('--bg'),card:v('--bg-2'),fg:v('--fg'),mute:v('--mute'),line:v('--line'),gold:v('--g-gold')};
+      const head=n => n+'px '+v('--f-display'), text=n => n+'px '+v('--f-body');
+      const brand='MANIA8522191 · FF47';
+      const drawn=brand+[word('title'),L(catalog.debut),sum.line,sum.note,...entries.map(r => title(r)+r.note+'×'+r.qty+priceText(product(r).price*r.qty))].join('');
+      await Promise.all([head(24),head(44),text(22),text(26),text(32)].map(f => document.fonts.load(f,drawn)));
       const canvas=el('canvas'), ctx=canvas.getContext('2d');
       canvas.width=920;
-      function lines(string,width) {
+      function lines(string,width,font) {   // the words in lines no wider than width, in that font
+        ctx.font=font;
         let line=''; const out=[];
         for (const ch of string) {
-          if (line && ctx.measureText(line+ch).width>width) {out.push(line); line='';}
+          if (line && ctx.measureText(line+ch).width>width) {   // an opening bracket goes down with what it opens
+            const open=/[「『（(【〈《“‘]+$/.exec(line)?.[0] || '', keep=open.length<line.length ? open : '';
+            out.push(line.slice(0,line.length-keep.length)); line=keep;
+          }
           line+=ch;
         }
         if(line)out.push(line); return out;
       }
-      ctx.font='26px sans-serif';
-      const layout=entries.map(r => ({row:r,labels:lines(title(r),535),notes:lines(r.note,535)}));
-      const noteLines=lines(sum.note,820);
-      const height=layout.reduce((n,l)=>n+Math.max(120,45+34*l.labels.length+30*l.notes.length),0);
-      canvas.height=218+height+104+noteLines.length*34;
-      ctx.fillStyle='#131316';ctx.fillRect(0,0,920,canvas.height);ctx.fillStyle='#d9bc89';ctx.font='24px sans-serif';ctx.fillText('MANIA8522191   /   FF47',44,52);
-      ctx.fillStyle='#fff';ctx.font='bold 44px sans-serif';ctx.fillText(word('title'),44,118);ctx.font='22px sans-serif';ctx.fillText(L(catalog.debut),44,168);
-      const photos=await Promise.all(entries.map(async row=>{const img=new Image();img.src=thumbnail(row);await img.decode();return img;}));
+      const layout=entries.map(r => ({row:r,labels:lines(title(r),535,text(26)),notes:lines(r.note,535,text(22))}));
+      const noteLines=lines(sum.note,820,text(22));
+      const tall=l => Math.max(120,45+34*l.labels.length+30*l.notes.length);
+      canvas.height=218+layout.reduce((n,l) => n+tall(l),0)+104+noteLines.length*34;
+      ctx.fillStyle=ink.bg; ctx.fillRect(0,0,920,canvas.height);
+      ctx.fillStyle=ink.gold; ctx.font=head(24); ctx.letterSpacing='3px'; ctx.fillText(brand,44,56); ctx.letterSpacing='0px';
+      ctx.fillStyle=ink.fg; ctx.font=head(44); ctx.fillText(word('title'),44,122);
+      ctx.fillStyle=ink.mute; ctx.font=text(22); ctx.fillText(L(catalog.debut),44,166);
+      const photos=await Promise.all(entries.map(async row => {const img=new Image(); img.src=thumbnail(row); await img.decode(); return img;}));
       let y=198;
-      layout.forEach(({row,labels,notes},i)=>{
-        const photo=photos[i], s=Math.min(96/photo.width,96/photo.height);
-        ctx.fillStyle='#343437';ctx.fillRect(44,y+10,96,96);ctx.drawImage(photo,44+(96-photo.width*s)/2,y+10+(96-photo.height*s)/2,photo.width*s,photo.height*s);
-        ctx.fillStyle='#fff';ctx.font='26px sans-serif';labels.forEach((t,j)=>ctx.fillText(t,164,y+39+j*34));
-        ctx.fillStyle='#d9bc89';ctx.font='22px sans-serif';notes.forEach((t,j)=>ctx.fillText(t,164,y+41+labels.length*34+j*30));
-        ctx.textAlign='right';ctx.fillText('×'+row.qty,874,y+40);ctx.fillText(priceText(product(row).price*row.qty),874,y+77);ctx.textAlign='left';
-        y+=Math.max(120,45+34*labels.length+30*notes.length);ctx.fillStyle='#444';ctx.fillRect(44,y,832,1);
+      ctx.fillStyle=ink.gold; ctx.globalAlpha=.42; ctx.fillRect(44,y,832,1); ctx.globalAlpha=1;
+      layout.forEach((l,i) => {
+        const {row,labels,notes}=l, photo=photos[i], s=Math.min(96/photo.width,96/photo.height);
+        ctx.fillStyle=ink.card; ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(44,y+12,96,96,8); else ctx.rect(44,y+12,96,96);
+        ctx.fill();
+        ctx.drawImage(photo,44+(96-photo.width*s)/2,y+12+(96-photo.height*s)/2,photo.width*s,photo.height*s);
+        ctx.fillStyle=ink.fg; ctx.font=text(26); labels.forEach((t,j) => ctx.fillText(t,164,y+41+j*34));
+        ctx.fillStyle=ink.gold; ctx.font=text(22); notes.forEach((t,j) => ctx.fillText(t,164,y+43+labels.length*34+j*30));
+        ctx.textAlign='right';
+        ctx.fillStyle=ink.mute; ctx.font=text(22); ctx.fillText('×'+row.qty,876,y+41);
+        ctx.fillStyle=ink.fg; ctx.font=text(26); ctx.fillText(priceText(product(row).price*row.qty),876,y+79);
+        ctx.textAlign='left';
+        y+=tall(l); ctx.fillStyle=ink.line; ctx.fillRect(44,y,832,1);
       });
-      ctx.font='bold 32px sans-serif';ctx.fillStyle='#ead1a5';ctx.fillText(sum.line,44,y+62);
-      ctx.font='22px sans-serif';noteLines.forEach((t,j)=>ctx.fillText(t,44,y+105+j*34));
+      ctx.fillStyle=ink.gold; ctx.font=text(32); ctx.fillText(sum.line,44,y+62);
+      ctx.fillStyle=ink.mute; ctx.font=text(22); noteLines.forEach((t,j) => ctx.fillText(t,44,y+105+j*34));
       const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
       if (!blob) throw new Error('PNG');
       if(version!==revision)return;

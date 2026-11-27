@@ -43,6 +43,7 @@
 }
 @media (max-width:560px){
   .g-grid{grid-template-columns:minmax(0,1fr)}
+  .fan-chars-k{flex-basis:100%;margin:0;text-align:center}   /* the character buttons' label on a line of its own */
   .g-card:first-child .g-img{width:100%}
   .catalog-cover{grid-template-columns:minmax(0,1fr)}
 }

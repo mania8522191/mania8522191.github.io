@@ -120,10 +120,11 @@ const GOODS = [
   {"ev":"FF47","slug":"kikan","pg":8,"name":{"zh":"既刊大禮包","en":"Back Catalog Bundle","ja":"既刊セット"},"eyebrow":{"zh":"既刊","en":"Back Catalog","ja":"既刊"},"price":700,"meta":{"zh":"既刊、資料夾、明信片組、吊飾等","en":"Back issues, clear files, postcards, keychains and more","ja":"既刊・クリアファイル・ポストカード・キーホルダーなど"},"list_title":"contents","items":{"zh":["既刊、資料夾、明信片組、吊飾⋯等","壓克力畫板（擇一）","紙袋（擇一）"],"en":["Back issues, clear files, postcard sets, keychains and more","Acrylic board (choose one)","Paper bag (choose one)"],"ja":["既刊・クリアファイル・ポストカードセット・キーホルダーなど","アクリルパネル（1種選択）","紙袋（1種選択）"]},"works":[],"parts":[[436,282,865,721],[151,187,587,639],[-59,78,384,384],[-61,298,344,345],[-51,603,322,316]]}
 ];
 
-/* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred */
+/* art books, newest first: pages[0] is the cover spread, then inside pages in order; blur = pages shown only blurred;
+   works (optional) = works on this site printed in it, so their tags' pages list the book (js/tag.js) */
 const BOOKS = [
-  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","pages":[[1400,493,5787,2039],[1400,493,5787,2039],[1400,493,5787,2039]]},
-  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","pages":[[1400,493,5788,2039],[1400,493,5788,2039],[1400,493,5788,2039]]},
+  {"slug":"ff47","mat":"gloss","ev":"FF47","t":"202602- 202608 mania8522191 ART BOOK 01","size":"a5land","pp":12,"print":"color","ym":"2026.08","works":["142549210","148068024","146954644","147595537"],"pages":[[1400,493,5787,2039],[1400,493,5787,2039],[1400,493,5787,2039]]},
+  {"slug":"ff46","mat":"ivory","ev":"FF46","t":"202505- 202602 HOSHIMACHI SUISEI ROUGH BOOK","size":"a5land","pp":12,"print":"color","ym":"2026.02","works":["137386797","137332578","137308455"],"pages":[[1400,493,5788,2039],[1400,493,5788,2039],[1400,493,5788,2039]]},
   {"slug":"ff45","mat":"ivory","tk":0.027,"rtl":true,"ev":"FF45","t":"mania8522191 Original R18 Manga Project ROUGH BOOK 01","size":"a4sq","pp":40,"print":"mono","ym":"2025.08","pages":[[1400,700,5787,2894],[1400,700],[1400,700]],"blur":[1,2]},
   {"slug":"ff44","mat":"ivory","tk":0.027,"ev":"FF44","t":"MIRA93 vol.5","size":"a4sq","pp":36,"print":"color","ym":"2025.02","pages":[[1400,700,5787,2894],[1400,700,5787,2893],[1400,700,5787,2893]]},
   {"slug":"ff43","mat":"ivory","foil":"blue","ev":"FF43","t":"MIRA93 vol.3.5","size":"a4sq","pp":20,"print":"color","ym":"2024.08","pages":[[1400,700,5787,2894],[1400,700,5787,2894],[1400,700,5787,2894]]},
@@ -133,6 +134,13 @@ const BOOKS = [
   {"slug":"ff38","mat":"matte","ev":"FF38","t":"Fimmel: Comet2","size":"b5","pp":28,"print":"color","ym":"2022.02","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]},
   {"slug":"ff37","mat":"ivory","ev":"FF37","t":"Fimmel: Comet","size":"b5","pp":20,"print":"color","ym":"2021.08","pages":[[1400,988,5018,3541],[1400,988,5015,3540],[1400,988,5015,3540]]}
 ];
+
+/* the Fan Art wall's character buttons, each named as the tag its works carry (js/tag.js): "shown" always,
+   "more" behind "more characters"; a name without works is left out */
+const CHARACTERS = {
+  "shown":["miComet","星街すいせい","あのそよ"],
+  "more":["さくらみこ","宝鐘マリン","千早愛音","長崎そよ","おかころ","とこまち","がうる・ぐら","猫又おかゆ","戌神ころね","AZKi","森カリオペ","一伊那尓栖","ワトソン・アメリア","小鳥遊キアラ","戌亥とこ","天音かなた","桐生ココ","聖園ミカ","仲正イチカ","天童アリス","高垣楓","アドミラル・ヒッパー(アズールレーン)","プリンツ・オイゲン(アズールレーン)","アドミラル・グラーフ・シュペー(アズールレーン)","ドイッチュラント(アズールレーン)"]
+};
 
 /* conventions I take part in: js/event.js lists the ones not over yet as coming (the next one also on the home page),
    the rest as past. from / to: the first and last day; venue and city in each language */

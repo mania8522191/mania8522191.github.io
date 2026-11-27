@@ -51,7 +51,7 @@ const PART = { work: 'works', tag: 'works', book: 'artbook', catalog: 'goods', i
 const partOf = (v) => PART[v] || v;
 function startOver(next) {
   const p = partOf(next);
-  if (p === 'works') setSort('new');   // (the category: in apply)
+  if (p === 'works') { setSort('new'); charFold(); }   // (the category: in apply)
   else if (p === 'artbook' && abSort !== 'new') { abSort = 'new'; if (abBuilt) renderBooks(); }
   else if (p === 'goods' && goodsOrder !== 'new') { goodsOrder = 'new'; if (goodsHeadings.size) renderGoods(); }
   else if (p === 'game') { if (shotAt) showShot(0, false); deckTrack.scrollLeft = 0; }
