@@ -1,4 +1,4 @@
-"""Swap the background of the catalog's pages (お品書き, FF47_CATALOG in js/data.js) for a new picture, and make from
+"""Swap the background of the catalog's pages (FF47's お品書き in js/data.js) for a new picture, and make from
 the same picture the background an item's picture widens over when its goods are taken out (img/goods-bg.webp), so
 the page and what widens beside it are one picture.
 
@@ -72,7 +72,7 @@ def pieces(pg, n):
     k = n / PAGE
     out = np.zeros((n, n), np.float32)
     for g in C.load('GOODS'):
-        if g.get('pg') != pg:
+        if g['ev'] != 'FF47' or g.get('pg') != pg:
             continue
         for i, (x, y, w, h) in enumerate(g['parts'], 1):
             with Image.open(os.path.join(C.ROOT, 'img', f'goods-{g["slug"]}-{i}.webp')) as im:
@@ -88,7 +88,7 @@ def main(argv):
     if len(argv) != 3:
         C.usage(__doc__)
     from psd_tools import PSDImage
-    cat = C.load('FF47_CATALOG')
+    cat = C.find(C.load('CATALOGS'), 'ev', 'FF47')
     names = [f'{cat["id"]}{"_p" + str(k) if k else ""}.webp' for k in range(len(cat['dims']))]
     pages = [published(name) for name in names]
     n = pages[0].width   # the full size; every page is the same square

@@ -133,5 +133,6 @@ function swapLang(l) {
   layoutWall();
   tagText();   // a tag's page: its count and its covers' words
   layoutTag();
+  document.dispatchEvent(new Event('portfolio-language'));
   backFit();   // the back button keeps to the title's words in the new language
 }

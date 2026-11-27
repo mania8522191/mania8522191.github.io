@@ -28,7 +28,7 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
       alt: tr('proc.alt', { t: L(w.t) }),
     }));
   },
-  catalog: () => galleryPages(FF47_CATALOG, tr('goods.catalog')),
+  catalog: (ev) => { const c = catalogByEvent.get(ev); return galleryPages(c, catalogName(c)); },
   work: (id) => {
     const w = WORKS[byId[id]];
     return galleryPages(w, L(w.t));
@@ -542,7 +542,7 @@ function zvMake(kind, key, set, from) {
 }
 /* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
 function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : kind === 'board' ? bdKeyNow : '';
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : kind === 'catalog' ? currentCatalog.ev : kind === 'board' ? bdKeyNow : '';
   const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
   const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
   if (same) { same.from = from; same.at0 = at; zvBack(same); return; }

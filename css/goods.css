@@ -52,7 +52,7 @@
    pill's and the corner buttons' line (--ring-*): on hover it lights up with their halo, and the page comes a little
    closer. The reveal's clip reaches past the frame, so it never cuts the halo off */
 .g-img{position:relative;display:block;width:100%;aspect-ratio:1;margin-bottom:14px;overflow:hidden;border:1px solid var(--ring-line);border-radius:14px;background:var(--bg-2)}
-.g-img img{position:absolute;inset:0;display:block;width:100%;height:100%;border-radius:13px}   /* (inside the 1 px frame) its own round corners: the page morph moves it without the frame */
+.g-img img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;border-radius:13px}   /* (inside the 1 px frame) its own round corners: the page morph moves it without the frame */
 [data-rv="clip"].g-card .mask{clip-path:inset(-12% -12% -18% -12%);transition:clip-path 1.3s var(--ease-out) var(--d,0s),border-color .35s,box-shadow .35s}
 [data-rv="clip"].g-card.rv-pre:not(.rv-in) .mask{clip-path:inset(100% -12% -18% -12%)}
 [data-rv="clip"].g-card .mask img{transition:transform .6s var(--ease-out)}
@@ -100,6 +100,8 @@
 .gd.cut .gd-stage::before{opacity:1}
 .gd-page,.gd-goods{position:absolute;left:0;top:0;width:var(--s);aspect-ratio:1}
 .gd-page{display:block;height:auto;z-index:2;border-radius:14px;transition:opacity .6s var(--ease-io)}   /* its own round corners: a morph moves it without its frame */
+.gd-stage:not([tabindex]){aspect-ratio:auto;cursor:auto}
+.gd-stage:not([tabindex]) .gd-page{position:relative;aspect-ratio:auto}
 .gd-goods{z-index:1}   /* its own layer: a piece brought to the front stays under the page */
 .gd-bg{position:absolute;left:0;top:0;display:block;width:auto;max-width:none;height:100%;pointer-events:none;transition:opacity .8s var(--ease-io)}
 .gd:not(.open) .gd-bg,.gd:not(.open) .gd-goods,.gd-swap .gd-bg,.gd-swap .gd-goods{visibility:hidden}   /* while closed the page covers them all, and the morphs move the page alone: they would show round it */

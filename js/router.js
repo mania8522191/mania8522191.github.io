@@ -17,11 +17,14 @@ function backTo(e) {
 function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
-  if (h === 'w-' + FF47_CATALOG.id) {
-    history.replaceState(history.state, '', '#g-ff47-catalog');
-    h = 'g-ff47-catalog';
+  const catalog = CATALOGS.find((c) => h === 'g-' + catalogSlug(c) || h === 'w-' + c.id);
+  if (catalog) {
+    if (h.startsWith('w-')) {
+      h = 'g-' + catalogSlug(catalog);
+      history.replaceState(history.state, '', '#' + h);
+    }
+    return { h, next: 'catalog', catalog };
   }
-  if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'board' || h === 'board-admin') return { h, next: 'board', idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
@@ -56,8 +59,9 @@ function startOver(next) {
 }
 
 /* swap the DOM to the requested view, then start watching its reveal elements */
-function apply({ h, next, idx, cat, piece = -1, tag }) {
+function apply({ h, next, idx, cat, piece = -1, tag, catalog }) {
   const from = view, fromPiece = lastPiece;
+  stopWorkVideo();
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
   const anew = from === null || partOf(from) !== partOf(next);
@@ -109,13 +113,13 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
     abYearsUpdate();
   } else if (next === 'catalog') {
     /* back from one of its goods: the page as it was left, that goods' card in view (backTo) */
-    const back = from === 'item' && lastItem && GOODS[bySlug[lastItem]].ev === FF47_CATALOG.ev;
-    renderCatalog(!back);
+    const back = from === 'item' && lastItem && GOODS[bySlug[lastItem]].ev === catalog.ev;
+    renderCatalog(catalog, !back);
     const card = back && document.getElementById('gc-' + lastItem);
     if (card) { backTo(card); els = pending(root); } else { scrollTo(0, 0); els = same ? pending(root) : prime(root); }
   } else if (next === 'goods') {
     if (!goodsHeadings.size) renderGoods();
-    const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && goodsList.querySelector('#gc-' + lastItem);
+    const card = from === 'catalog' ? catalogCards.get(currentCatalog.ev) : from === 'item' && lastItem && goodsList.querySelector('#gc-' + lastItem);
     if (card) { backTo(card); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
   } else {
@@ -123,6 +127,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   }
   if (next === 'goods') goodsYearsUpdate();
   view = next;
+  document.dispatchEvent(new Event('portfolio-view'));
   evenIntros();
   if (next === 'about') preloadAbout();
   if (next === 'board') boardShow(h === 'board-admin');
@@ -224,7 +229,10 @@ function upFrom() {
   const r = parse();
   if (r.next === 'work') return r.piece >= 0 ? '#w-' + WORKS[r.idx].id : WORKS[r.idx].cat === 'original' ? '#original' : '#fanart';
   if (r.next === 'tag') return '#work';
-  if (r.next === 'item') return GOODS[r.idx].ev === FF47_CATALOG.ev ? '#g-ff47-catalog' : '#goods';
+  if (r.next === 'item') {
+    const catalog = catalogByEvent.get(GOODS[r.idx].ev);
+    return catalog ? '#g-' + catalogSlug(catalog) : '#goods';
+  }
   if (r.next === 'catalog') return '#goods';
   if (r.next === 'book') return '#artbook';
   return '#home';   // (not reached: the button is only on the pages inside a part)

@@ -10,15 +10,29 @@ function price(g, label) {
 }
 
 /* ---------- goods list: by year, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
-   `ev`, "FF47") is under its year's heading: its catalog (FF47_CATALOG), which opens its own page (#g-ff47-catalog)
+   `ev`, "FF47") is under its year's heading: its catalog, which opens its own page (#g-ff47-catalog)
    with the event's goods under its pages; an event without a catalog lists its goods there. Only events that have
    goods or a catalog are listed ---------- */
 const goodsList = $('#g-list'), goodsBar = $('#g-years'), goodsNav = $('#g-years-in');
 const goodsHeadings = new Map();   // each year's heading, in the order shown
-const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
-const evYear = (ev) => (ev === FF47_CATALOG.ev ? FF47_CATALOG.d : (BOOKS.find((b) => b.ev === ev) || { ym: ev }).ym).slice(0, 4);   // its catalog's year, else its art book's
-const goodsYears = [...new Set(goodsEditions.map(evYear))];
-let goodsOrder = 'new', catalogCard = null;
+const catalogByEvent = new Map(CATALOGS.map((c) => [c.ev, c]));
+const catalogSlug = (c) => c.ev.toLowerCase() + '-catalog';
+const catalogName = (c) => tr('goods.catalog', { ev: c.ev });
+const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), ...catalogByEvent.keys()])];
+function evYear(ev) {
+  const date = catalogByEvent.get(ev)?.d || BOOKS.find((b) => b.ev === ev)?.ym || EVENTS.find((e) => e.name === evName(ev))?.from;
+  return date ? date.slice(0, 4) : String(GOODS.find((g) => g.ev === ev && g.year)?.year || ev);
+}
+const goodsYears = [...new Set(goodsEditions.map(evYear))].sort().reverse();
+const catalogCards = new Map();
+let goodsOrder = 'new', currentCatalog = null;
+
+/* A standalone product photo or the matching event's catalog page, in the same [path, width, height] format. */
+function goodsImage(g) {
+  if (g.image) return g.image;
+  const catalog = catalogByEvent.get(g.ev), dims = catalog?.dims[g.pg];
+  return dims ? [src(catalog.id, g.pg), dims[0], dims[1]] : null;
+}
 /* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
    language) */
 function goodsCard(g, i) {
@@ -28,11 +42,15 @@ function goodsCard(g, i) {
   a.dataset.rv = 'clip';
   a.dataset.d = `${(i % 3) * 0.1}s`;
   const box = el('span', 'g-img mask');
-  const img = el('img');
-  img.src = src(FF47_CATALOG.id, g.pg); [img.width, img.height] = FF47_CATALOG.dims[g.pg];
-  img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
-  box.appendChild(img);
-  a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
+  const media = goodsImage(g);
+  if (media) {
+    const img = el('img');
+    [img.src, img.width, img.height] = media;
+    img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
+    box.appendChild(img);
+    a.appendChild(box);
+  }
+  a.append(el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
   fillGoodsCard(a, g);
   return a;
 }
@@ -51,23 +69,21 @@ function goodsGrid(items) {
 /* the catalog's place in its year: its first three pages dealt as a hand of cards, as a collection's cover on the
    works wall, in page order from left to right, the first on top and each next one under it; then its event's full
    name (as big as an art book's event under its name), its own name, how many pages, and an arrow to its page */
-function catalogCover() {
+function catalogCover(catalog) {
   const a = el('a', 'catalog-cover');
-  a.id = 'gc-ff47-catalog';
-  a.href = '#g-ff47-catalog';
-  const hand = handOf(FF47_CATALOG.dims.slice(0, 3).map(([W, H], n) => [src(FF47_CATALOG.id, n), W, H]), true);
+  a.id = 'gc-' + catalogSlug(catalog);
+  a.href = '#g-' + catalogSlug(catalog);
+  const hand = handOf(catalog.dims.slice(0, 3).map(([W, H], n) => [src(catalog.id, n), W, H]), true);
   const fan = el('span', 'catalog-hand frame fan');
   fan.style.cssText = `--ar:${hand.r.toFixed(4)};--cw:${hand.cwp}`;
   fan.innerHTML = hand.cards;
   fan.append(...[...fan.children].reverse());   // the first page last, so in front
   const caption = el('span', 'catalog-caption');
-  const title = el('span', 'g-name', tr('goods.catalog'));
-  title.dataset.i18n = 'goods.catalog';
-  const count = el('span', 'g-meta', pagesText(FF47_CATALOG.dims.length));
-  count.id = 'catalog-cover-count';
+  const title = el('span', 'g-name');
+  const count = el('span', 'g-meta');
   const arrow = el('span', 'catalog-arrow', '→');
   arrow.setAttribute('aria-hidden', 'true');
-  caption.append(el('span', 'catalog-ev', evName(FF47_CATALOG.ev)), title, count, arrow);
+  caption.append(el('span', 'catalog-ev', evName(catalog.ev)), title, count, arrow);
   a.append(fan, caption);
   return a;
 }
@@ -90,8 +106,13 @@ function renderGoods() {
     goodsNav.append(button);
     const events = goodsEditions.filter((code) => evYear(code) === y);
     (goodsOrder === 'new' ? events : events.reverse()).forEach((code) => {
-      if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
-      else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
+      const catalog = catalogByEvent.get(code);
+      if (catalog) {
+        if (!catalogCards.has(code)) catalogCards.set(code, catalogCover(catalog));
+        section.append(catalogCards.get(code));
+      } else {
+        section.append(el('h3', 'catalog-ev', evName(code)), goodsGrid(GOODS.filter((g) => g.ev === code)));
+      }
     });
     return section;
   }));
@@ -101,8 +122,11 @@ function renderGoods() {
 function goodsText() {
   goodsSortText(goodsOrder, goodsYears[goodsYears.length - 1], goodsYears[0]);
   goodsNav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-label', tr('years.go', { y: b.dataset.y })));
-  const count = $('#catalog-cover-count');
-  if (count) count.textContent = pagesText(FF47_CATALOG.dims.length);
+  catalogCards.forEach((card, ev) => {
+    const catalog = catalogByEvent.get(ev);
+    card.querySelector('.g-name').textContent = catalogName(catalog);
+    card.querySelector('.g-meta').textContent = pagesText(catalog.dims.length);
+  });
 }
 /* the bar: a button goes to its year, the one in view lights up; another order lays the list out again, and the
    buttons slide to their new places */
@@ -118,14 +142,18 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
   if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
   goodsYearsUpdate();
 });
-/* ---------- the FF47 catalog's page: its date and page count; its pages side by side, to be dragged left and right;
+/* ---------- an event's catalog page: its date and page count; its pages side by side, to be dragged left and right;
    then the event's goods, the cards that open their item pages ---------- */
 const catalogPages = $('#catalog-pages');
-/* made once (its words then follow the language: catalogText, and the cards in js/lang-switch.js); `fresh`, not back
+/* rebuilt when the event changes (catalogText and js/lang-switch.js update the words); `fresh`, not back
    from one of its goods: from the first page */
-function renderCatalog(fresh) {
-  const catalog = FF47_CATALOG;
-  if (!catalogPages.children.length) {
+function renderCatalog(catalog, fresh) {
+  if (currentCatalog !== catalog) {
+    currentCatalog = catalog;
+    catalogDrag = catalogTo = null;
+    catalogPages.classList.remove('held');
+    $('#catalog-event').textContent = evName(catalog.ev);
+    $('#catalog-pixiv').href = 'https://www.pixiv.net/artworks/' + catalog.id;
     catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
       const img = el('img');
       img.src = src(catalog.id, i);
@@ -143,10 +171,12 @@ function renderCatalog(fresh) {
 }
 /* the words that change with the language: the date, the page count, each page's description */
 function catalogText() {
-  const catalog = FF47_CATALOG, m = catalog.dims.length;
+  if (!currentCatalog) return;
+  const catalog = currentCatalog, m = catalog.dims.length;
+  $('#catalog-title').textContent = catalogName(catalog);
   $('#catalog-date').textContent = tr('wk.posted', { d: dot(catalog.d) });
   $('#catalog-count').textContent = pagesText(m);
-  [...catalogPages.children].forEach((img, i) => { img.alt = tr('wk.imgAlt', { t: tr('goods.catalog'), n: i + 1, m }); });
+  [...catalogPages.children].forEach((img, i) => { img.alt = tr('wk.imgAlt', { t: catalogName(catalog), n: i + 1, m }); });
 }
 /* the pages side by side: the mouse drags them left and right (a finger swipes them, a trackpad scrolls them), and
    each comes to rest in the middle (scroll snap); a drag of a fifth of a page or more goes on to the next one. The
@@ -167,7 +197,7 @@ function catalogGo(i) {
   catalogPages.scrollTo({ left: Math.min(n - 1, Math.max(0, i)) * catalogStep(), behavior: CALM ? 'auto' : 'smooth' });
 }
 catalogPages.addEventListener('pointerdown', (e) => {
-  if (e.pointerType !== 'touch' && e.button === 0) catalogDrag = { x: e.clientX, left: catalogPages.scrollLeft, id: e.pointerId, moved: false };
+  if (catalogPages.childElementCount > 1 && e.pointerType !== 'touch' && e.button === 0) catalogDrag = { x: e.clientX, left: catalogPages.scrollLeft, id: e.pointerId, moved: false };
 });
 catalogPages.addEventListener('pointermove', (e) => {
   const d = catalogDrag;
@@ -248,9 +278,10 @@ function itemSwap(change, then) {
   });
 }
 function itemOpen() {
-  if (itGd.classList.contains('open')) return;
+  if (!itGoods.childElementCount || itGd.classList.contains('open')) return;
   const s = ++itStep;
   itemSwap(() => {
+    if (s !== itStep) return;
     itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1;
     /* the grown picture in view: where it was if it fits there, else as near as the screen lets it, never under the header */
     const r = itStage.getBoundingClientRect(), top = $('.site-head').getBoundingClientRect().bottom + 16;
@@ -308,9 +339,14 @@ function itemCentre() {
   ps.forEach((p) => { p.style.left = `${(parseFloat(p.style.left) + d).toFixed(3)}%`; p.dataset.mid = p.style.cssText; });   // (where ✕ gathers them first)
 }
 function itemClose(now) {
+  const s = ++itStep;
   if (!itGd.classList.contains('open')) return;
-  ++itStep;
-  const shut = () => { itGd.classList.remove('open', 'wide', 'plain'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
+  const shut = () => {
+    if (s !== itStep) return;
+    itGd.classList.remove('open', 'wide', 'plain');
+    itStage.setAttribute('role', 'button');
+    itStage.tabIndex = 0;
+  };
   const ps = [...itGoods.querySelectorAll('img')];
   itGoods.classList.remove('glide', 'home');   // (a close cut short leaves its class)
   itGd.classList.remove('cut');
@@ -366,12 +402,31 @@ function renderItem(i) {
   /* cross-link: the art books in it (books: their slugs) */
   linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
   /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
-  const [W, H] = FF47_CATALOG.dims[g.pg];
   itemClose(true);
-  itPage.src = src(FF47_CATALOG.id, g.pg); itPage.width = W; itPage.height = H;
+  const catalog = catalogByEvent.get(g.ev), media = goodsImage(g);
+  const parts = media ? (g.parts || []) : [];
+  const interactive = parts.length > 0;
+  itStage.closest('figure').hidden = !media;
+  itGd.querySelector('.gd-hint').hidden = !interactive;
+  if (media) [itPage.src, itPage.width, itPage.height] = media;
+  else itPage.removeAttribute('src');
   itPage.alt = tr('item.imgAlt', { t: L(g.name) });
-  itGoods.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
+  const bg = itStage.querySelector('.gd-bg');
+  if (interactive && catalog?.bg) bg.src = catalog.bg;
+  else bg.removeAttribute('src');
+  bg.hidden = !bg.hasAttribute('src');
+  if (interactive) {
+    itStage.setAttribute('role', 'button');
+    itStage.setAttribute('aria-label', tr('item.takeOut'));
+    itStage.tabIndex = 0;
+  } else {
+    itStage.removeAttribute('role');
+    itStage.removeAttribute('aria-label');
+    itStage.removeAttribute('tabindex');
+  }
+  itGoods.replaceChildren(...parts.map(([x, y, w, h], n) => {
     const p = el('img');
+    const [, W, H] = media;
     p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
     p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
@@ -384,7 +439,7 @@ function renderItem(i) {
   if (g.spec) rows.push([tr('spec.spec'), L(g.spec)]);
   if (g.items) rows.push([tr('spec.' + g.list_title), L(g.items)]);
   if (g.note) rows.push([tr('spec.offer'), L(g.note)]);
-  rows.push([tr('spec.debut'), tr('event')]);
+  rows.push([tr('spec.debut'), L(catalog?.debut) || evName(g.ev)]);
   $('#it-spec').replaceChildren(...rows.map(([k, v], n) => {
     const d = el('div');
     d.dataset.rv = 'up';
@@ -396,8 +451,8 @@ function renderItem(i) {
     return d;
   }));
 
-  $('#it-works-box').hidden = !g.works.length;
-  $('#it-works').replaceChildren(...g.works.filter((id) => id in byId).map((id, n) => {
+  $('#it-works-box').hidden = !g.works?.length;
+  $('#it-works').replaceChildren(...(g.works || []).filter((id) => id in byId).map((id, n) => {
     const w = WORKS[byId[id]];
     const a = el('a'); a.href = '#w-' + id;
     a.dataset.rv = 'up'; a.dataset.d = `${n * 0.1}s`;

@@ -34,6 +34,7 @@
 .zv-rs[data-d="nw"]{top:-5px;left:-5px;cursor:nwse-resize}
 .zv-rs[data-d="se"]::after{content:"";position:absolute;right:9px;bottom:9px;width:7px;height:7px;border-right:1px solid var(--g-gold);border-bottom:1px solid var(--g-gold);opacity:.55;pointer-events:none}   /* a mark: this corner can be dragged */
 @media (pointer:coarse){   /* fingers need more to hold */
+  .zw:not(.max):not(.pop) .zv-bar{padding-right:26px}   /* keep the close button clear of the 30px corner grip, which extends 25px inside */
   .zv-rs[data-d="s"]{bottom:-11px;height:22px}
   .zv-rs[data-d="e"]{right:-11px;width:22px}
   .zv-rs[data-d="w"]{left:-11px;width:22px}

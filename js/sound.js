@@ -4,7 +4,7 @@
 const BGM_SRC = 'audio/bgm.mp3', CLICK_SRC = 'audio/click.mp3';
 const BGM_VOL = 0.35, CLICK_VOL = 0.7;
 const sndBtns = document.querySelectorAll('.snd');
-let actx = null, clickBuf = null, bgm = null, bgmGain = null, bgmOn = false, bgmHeld = false, bgmRest = 0;
+let actx = null, clickBuf = null, bgm = null, bgmGain = null, bgmOn = false, bgmRest = 0;
 
 /* the click is fetched and decoded as the page loads (an offline context may decode before any touch), so that even
    the first click sounds */
@@ -73,7 +73,10 @@ function bgmPlay(on) {
 function bgmSet(on) {
   bgmOn = on;
   sndBtns.forEach((b) => b.setAttribute('aria-pressed', String(on)));
-  if (on || bgm) bgmPlay(on && !bgmHeld && !document.hidden);
+  bgmSync();
+}
+function bgmSync() {
+  if (bgmOn || bgm) bgmPlay(bgmOn && !document.hidden && !ytPlaying.size);
 }
 
 /* the buttons' tooltip, again after a language change (their spoken name comes from data-i18n-aria) */
@@ -88,7 +91,5 @@ addEventListener('keydown', sndWake, true);
 document.addEventListener('click', (e) => {
   if (!(e.target instanceof Element)) return;
   if (e.target.closest('a[href], button, [role="button"]')) sndClick();
-  if (window.SELF_HOSTED && e.target.closest('.tl-card')) { bgmHeld = true; if (bgmOn) bgmPlay(false); }   // the video has its own sound
 }, true);
-addEventListener('hashchange', () => { if (bgmHeld) { bgmHeld = false; if (bgmOn) bgmPlay(!document.hidden); } });
-document.addEventListener('visibilitychange', () => { if (bgmOn) bgmPlay(!document.hidden && !bgmHeld); });
+document.addEventListener('visibilitychange', bgmSync);

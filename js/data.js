@@ -103,7 +103,9 @@ const HOME_SLIDES = [
 
 /* the FF47 catalog (お品書き): with the goods, on a page of its own (#g-ff47-catalog), not on the works wall; its old
    address (#w-148499079) still leads there. ev: the event it is listed under on the goods page */
-const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]]};
+const CATALOGS = [
+  {"id":"148499079","ev":"FF47","d":"2026-08-16","dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]],"bg":"img/goods-bg.webp","debut":{"zh":"Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44","en":"Fancy Frontier 47 · Aug 21–22, 2026 · Taipei Expo Dome, booth J44","ja":"Fancy Frontier 47・2026.08.21–22・花博争艶館 J44"}}
+];
 /* goods, the newest event first (ev: the event, its section on the goods page), each event in its catalog's
    order (FF47: as in its お品書き) */
 const GOODS = [

@@ -37,9 +37,13 @@ def referenced():
     refs = set()
     texts = [open(os.path.join(C.ROOT, 'index.html'), encoding='utf-8').read()] + \
             [js(f) for f in os.listdir(os.path.join(C.ROOT, 'js')) if f.endswith('.js')]
+    import build
+    texts.extend(js(n + '.js') for n in build.JS if n.startswith('../features/'))
     for t in texts:   # paths written out in full
         refs |= set(re.findall(r'img/[\w./-]+\.(?:webp|png|jpg|gif|svg)', t))
-    for w in [*C.load('WORKS'), C.load('FF47_CATALOG')]:
+    catalogs = C.load('CATALOGS')
+    refs.update(c['bg'] for c in catalogs if c.get('bg'))
+    for w in [*C.load('WORKS'), *catalogs]:
         for n, d in enumerate(w['dims']):
             name = f'{w["id"]}{"_p" + str(n) if n else ""}.webp'
             refs.add(f'img/{name}')
@@ -71,7 +75,10 @@ def referenced():
         if b.get('foil'):
             refs.add(f'img/ab/{s}_foil.webp')
     for g in C.load('GOODS'):
-        refs |= {f'img/goods-{g["slug"]}-{n}.webp' for n in range(1, len(g['parts']) + 1)}   # its pieces (item page); its card is its catalog page
+        photo = g.get('image')
+        if isinstance(photo, list) and photo and isinstance(photo[0], str):
+            refs.add(photo[0])
+        refs |= {f'img/goods-{g["slug"]}-{n}.webp' for n in range(1, len(g.get('parts', [])) + 1)}   # its pieces (item page); its card is its catalog page
     game = js('game.js')
     art, cards, pairs = const(game, 'CHAR_ART'), const(game, 'CHAR_CARD'), const(game, 'PAIR_W')
     refs |= {f'img/char{n}.webp' for n in art} | {'img/char0.webp'}

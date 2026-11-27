@@ -1,0 +1,11 @@
+.character-nav{margin-block:0 clamp(20px,3vw,40px);display:flex;justify-content:center;align-items:baseline;flex-wrap:wrap;gap:8px 16px}
+.character-label,.character-nav summary{font-size:var(--fs-small);color:var(--g-gold)}.character-nav summary{cursor:pointer;padding:6px}
+.character-links{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 10px}
+.character-links a{border:1px solid var(--line);border-radius:2em;padding:5px 12px;font-size:var(--fs-small);text-decoration:none}
+.character-links a:hover,.character-links a:focus-visible{color:var(--g-gold);border-color:currentColor}
+.character-nav details[open]{flex-basis:100%;text-align:center}.character-nav details[open] .character-links{max-width:850px;margin:8px auto}
+.tag-related{margin-top:clamp(30px,6vw,76px)}.tag-related h3{margin:32px 0 14px}
+.character-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(175px,100%),1fr));gap:18px}
+.character-cards a{display:flex;align-items:center;gap:10px;font-size:var(--fs-small);overflow-wrap:anywhere;text-decoration:none}.character-cards a:hover{color:var(--g-gold)}
+.character-cards img{flex:none;width:58px;height:68px;object-fit:contain;background:var(--ring-bg);border-radius:4px}
+.character-cards img.book{width:68px;height:auto;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px var(--line)}   /* an art book: its front cover, cut from the cover spread; a fine edge shows a black cover on the black page */

@@ -1,4 +1,4 @@
-/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, board, lang-switch, sound, main. Edit those files, not this one. */
+/* Built by tools/build.py from js/*.js in this order: data, core, i18n, game, lightbox, menu, goods, event, wall, work, tag, artbook, book3d, motion, home, router, about, board, lang-switch, sound, ../features/characters/main, ../features/ff47-gift/main, ../features/ff47-list/main, ../features/lollipop/main, ../features/sketch-compare/main, main. Edit those files, not this one. */
 
 /* ==================== js/data.js ==================== */
 /* Site data. One item per line; the scripts in tools/ read and write this file (keep each list valid JSON).
@@ -106,7 +106,9 @@ const HOME_SLIDES = [
 
 /* the FF47 catalog (お品書き): with the goods, on a page of its own (#g-ff47-catalog), not on the works wall; its old
    address (#w-148499079) still leads there. ev: the event it is listed under on the goods page */
-const FF47_CATALOG = {"id":"148499079","ev":"FF47","d":"2026-08-16","dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]]};
+const CATALOGS = [
+  {"id":"148499079","ev":"FF47","d":"2026-08-16","dims":[[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500],[1200,1200,1500,1500]],"bg":"img/goods-bg.webp","debut":{"zh":"Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44","en":"Fancy Frontier 47 · Aug 21–22, 2026 · Taipei Expo Dome, booth J44","ja":"Fancy Frontier 47・2026.08.21–22・花博争艶館 J44"}}
+];
 /* goods, the newest event first (ev: the event, its section on the goods page), each event in its catalog's
    order (FF47: as in its お品書き) */
 const GOODS = [
@@ -223,7 +225,7 @@ const I18N = {
     "x.stats": "{rt} 次轉推，{like} 個喜歡",
     "yt.stats": "{v} 次觀看，{l} 個讚",
     "goods.sub": "依場次瀏覽周邊與品書。標示為場次價格，通販價格及庫存請以各賣場為準。",
-    "goods.catalog": "FF47 品書",
+    "goods.catalog": "{ev} 品書",
     "goods.all": "全部周邊",
     "catalog.strip": "品書：左右拖曳翻頁",
     "catalog.prev": "上一張",
@@ -247,7 +249,6 @@ const I18N = {
     "spec.designs": "款式",
     "spec.offer": "優惠",
     "spec.debut": "首賣",
-    "event": "Fancy Frontier 47・2026.08.21–22・花博爭豔館 J44",
     "game.coverAlt": "遊戲的戰場背景美術",
     "game.kicker": "INDIE GAME・開發中",
     "game.tag": "組牌決策 × 魔力場站位 × 回合資源管理",
@@ -508,7 +509,7 @@ const I18N = {
     "x.stats": "{rt} reposts, {like} likes",
     "yt.stats": "{v} views, {l} likes",
     "goods.sub": "Browse goods and catalogs by event. Prices are from the event. See each shop for current prices and stock.",
-    "goods.catalog": "FF47 Catalog",
+    "goods.catalog": "{ev} Catalog",
     "goods.all": "All goods",
     "catalog.strip": "Catalog: drag sideways to turn the pages",
     "catalog.prev": "Previous page",
@@ -532,7 +533,6 @@ const I18N = {
     "spec.designs": "Designs",
     "spec.offer": "Offer",
     "spec.debut": "Debut",
-    "event": "Fancy Frontier 47 · Aug 21–22, 2026 · Taipei Expo Dome, booth J44",
     "game.coverAlt": "Battlefield background art from the game",
     "game.kicker": "INDIE GAME · IN DEVELOPMENT",
     "game.tag": "Deckbuilding × Mana-field positioning × Turn resource management",
@@ -793,7 +793,7 @@ const I18N = {
     "x.stats": "リポスト {rt}・いいね {like}",
     "yt.stats": "{v} 回視聴・高評価 {l}",
     "goods.sub": "イベント別のグッズとお品書き。表示はイベント頒布価格です。通販価格と在庫は各ショップでご確認ください。",
-    "goods.catalog": "FF47 お品書き",
+    "goods.catalog": "{ev} お品書き",
     "goods.all": "グッズ一覧",
     "catalog.strip": "お品書き：左右にドラッグしてめくる",
     "catalog.prev": "前のページ",
@@ -817,7 +817,6 @@ const I18N = {
     "spec.designs": "種類",
     "spec.offer": "特典",
     "spec.debut": "初頒布",
-    "event": "Fancy Frontier 47・2026.08.21–22・花博争艶館 J44",
     "game.coverAlt": "ゲームの戦場背景アート",
     "game.kicker": "INDIE GAME・開発中",
     "game.tag": "デッキ構築 × 魔力場の位置取り × ターンごとの資源管理",
@@ -1259,7 +1258,7 @@ const ZV_SETS = {   // what a window steps through; made again in another langua
       alt: tr('proc.alt', { t: L(w.t) }),
     }));
   },
-  catalog: () => galleryPages(FF47_CATALOG, tr('goods.catalog')),
+  catalog: (ev) => { const c = catalogByEvent.get(ev); return galleryPages(c, catalogName(c)); },
   work: (id) => {
     const w = WORKS[byId[id]];
     return galleryPages(w, L(w.t));
@@ -1773,7 +1772,7 @@ function zvMake(kind, key, set, from) {
 }
 /* open a picture: in a new window, or the one it is open in already (in the dock too) comes to the front */
 function zvOpen(kind, i, from) {
-  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : kind === 'board' ? bdKeyNow : '';
+  const key = kind === 'work' || kind === 'proc' ? lastWork : kind === 'piece' ? `${lastWork}/${lastPiece}` : kind === 'book' ? lastBook : kind === 'catalog' ? currentCatalog.ev : kind === 'board' ? bdKeyNow : '';
   const set = ZV_SETS[kind](key), at = (i + set.length) % set.length;
   const same = zvWins.find((o) => !o.shut && o.kind === kind && o.key === key && o.at === at);
   if (same) { same.from = from; same.at0 = at; zvBack(same); return; }
@@ -1854,6 +1853,7 @@ function setMenu(open) {
   menuBtn.setAttribute('aria-expanded', String(open));
   menuBtn.querySelector('.menu-lbl').textContent = open ? 'CLOSE' : 'MENU';
   if (open) navGrps.forEach((g) => { if (g.classList.contains('m-grp')) grpSet(g, !!g.querySelector('a[aria-current="page"]')); });   // the shown page's list open
+  if (open) $('#m-nav').scrollTop = 0;
 }
 menuBtn.addEventListener('click', () => setMenu(!document.documentElement.classList.contains('menu-open')));
 $('#m-nav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });
@@ -1878,15 +1878,29 @@ function price(g, label) {
 }
 
 /* ---------- goods list: by year, on a timeline with a bar and a sort menu like the art books'. Each event (a goods'
-   `ev`, "FF47") is under its year's heading: its catalog (FF47_CATALOG), which opens its own page (#g-ff47-catalog)
+   `ev`, "FF47") is under its year's heading: its catalog, which opens its own page (#g-ff47-catalog)
    with the event's goods under its pages; an event without a catalog lists its goods there. Only events that have
    goods or a catalog are listed ---------- */
 const goodsList = $('#g-list'), goodsBar = $('#g-years'), goodsNav = $('#g-years-in');
 const goodsHeadings = new Map();   // each year's heading, in the order shown
-const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), FF47_CATALOG.ev])];   // GOODS lists the newest event first
-const evYear = (ev) => (ev === FF47_CATALOG.ev ? FF47_CATALOG.d : (BOOKS.find((b) => b.ev === ev) || { ym: ev }).ym).slice(0, 4);   // its catalog's year, else its art book's
-const goodsYears = [...new Set(goodsEditions.map(evYear))];
-let goodsOrder = 'new', catalogCard = null;
+const catalogByEvent = new Map(CATALOGS.map((c) => [c.ev, c]));
+const catalogSlug = (c) => c.ev.toLowerCase() + '-catalog';
+const catalogName = (c) => tr('goods.catalog', { ev: c.ev });
+const goodsEditions = [...new Set([...GOODS.map((g) => g.ev), ...catalogByEvent.keys()])];
+function evYear(ev) {
+  const date = catalogByEvent.get(ev)?.d || BOOKS.find((b) => b.ev === ev)?.ym || EVENTS.find((e) => e.name === evName(ev))?.from;
+  return date ? date.slice(0, 4) : String(GOODS.find((g) => g.ev === ev && g.year)?.year || ev);
+}
+const goodsYears = [...new Set(goodsEditions.map(evYear))].sort().reverse();
+const catalogCards = new Map();
+let goodsOrder = 'new', currentCatalog = null;
+
+/* A standalone product photo or the matching event's catalog page, in the same [path, width, height] format. */
+function goodsImage(g) {
+  if (g.image) return g.image;
+  const catalog = catalogByEvent.get(g.ev), dims = catalog?.dims[g.pg];
+  return dims ? [src(catalog.id, g.pg), dims[0], dims[1]] : null;
+}
 /* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
    language) */
 function goodsCard(g, i) {
@@ -1896,11 +1910,15 @@ function goodsCard(g, i) {
   a.dataset.rv = 'clip';
   a.dataset.d = `${(i % 3) * 0.1}s`;
   const box = el('span', 'g-img mask');
-  const img = el('img');
-  img.src = src(FF47_CATALOG.id, g.pg); [img.width, img.height] = FF47_CATALOG.dims[g.pg];
-  img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
-  box.appendChild(img);
-  a.append(box, el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
+  const media = goodsImage(g);
+  if (media) {
+    const img = el('img');
+    [img.src, img.width, img.height] = media;
+    img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
+    box.appendChild(img);
+    a.appendChild(box);
+  }
+  a.append(el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
   fillGoodsCard(a, g);
   return a;
 }
@@ -1919,23 +1937,21 @@ function goodsGrid(items) {
 /* the catalog's place in its year: its first three pages dealt as a hand of cards, as a collection's cover on the
    works wall, in page order from left to right, the first on top and each next one under it; then its event's full
    name (as big as an art book's event under its name), its own name, how many pages, and an arrow to its page */
-function catalogCover() {
+function catalogCover(catalog) {
   const a = el('a', 'catalog-cover');
-  a.id = 'gc-ff47-catalog';
-  a.href = '#g-ff47-catalog';
-  const hand = handOf(FF47_CATALOG.dims.slice(0, 3).map(([W, H], n) => [src(FF47_CATALOG.id, n), W, H]), true);
+  a.id = 'gc-' + catalogSlug(catalog);
+  a.href = '#g-' + catalogSlug(catalog);
+  const hand = handOf(catalog.dims.slice(0, 3).map(([W, H], n) => [src(catalog.id, n), W, H]), true);
   const fan = el('span', 'catalog-hand frame fan');
   fan.style.cssText = `--ar:${hand.r.toFixed(4)};--cw:${hand.cwp}`;
   fan.innerHTML = hand.cards;
   fan.append(...[...fan.children].reverse());   // the first page last, so in front
   const caption = el('span', 'catalog-caption');
-  const title = el('span', 'g-name', tr('goods.catalog'));
-  title.dataset.i18n = 'goods.catalog';
-  const count = el('span', 'g-meta', pagesText(FF47_CATALOG.dims.length));
-  count.id = 'catalog-cover-count';
+  const title = el('span', 'g-name');
+  const count = el('span', 'g-meta');
   const arrow = el('span', 'catalog-arrow', '→');
   arrow.setAttribute('aria-hidden', 'true');
-  caption.append(el('span', 'catalog-ev', evName(FF47_CATALOG.ev)), title, count, arrow);
+  caption.append(el('span', 'catalog-ev', evName(catalog.ev)), title, count, arrow);
   a.append(fan, caption);
   return a;
 }
@@ -1958,8 +1974,13 @@ function renderGoods() {
     goodsNav.append(button);
     const events = goodsEditions.filter((code) => evYear(code) === y);
     (goodsOrder === 'new' ? events : events.reverse()).forEach((code) => {
-      if (code === FF47_CATALOG.ev) section.append(catalogCard || (catalogCard = catalogCover()));   // dealt once a page load
-      else section.append(goodsGrid(GOODS.filter((g) => g.ev === code)));
+      const catalog = catalogByEvent.get(code);
+      if (catalog) {
+        if (!catalogCards.has(code)) catalogCards.set(code, catalogCover(catalog));
+        section.append(catalogCards.get(code));
+      } else {
+        section.append(el('h3', 'catalog-ev', evName(code)), goodsGrid(GOODS.filter((g) => g.ev === code)));
+      }
     });
     return section;
   }));
@@ -1969,8 +1990,11 @@ function renderGoods() {
 function goodsText() {
   goodsSortText(goodsOrder, goodsYears[goodsYears.length - 1], goodsYears[0]);
   goodsNav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-label', tr('years.go', { y: b.dataset.y })));
-  const count = $('#catalog-cover-count');
-  if (count) count.textContent = pagesText(FF47_CATALOG.dims.length);
+  catalogCards.forEach((card, ev) => {
+    const catalog = catalogByEvent.get(ev);
+    card.querySelector('.g-name').textContent = catalogName(catalog);
+    card.querySelector('.g-meta').textContent = pagesText(catalog.dims.length);
+  });
 }
 /* the bar: a button goes to its year, the one in view lights up; another order lays the list out again, and the
    buttons slide to their new places */
@@ -1986,14 +2010,18 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
   if (scrollY > top) scrollTo({ top, behavior: CALM ? 'auto' : 'smooth' });
   goodsYearsUpdate();
 });
-/* ---------- the FF47 catalog's page: its date and page count; its pages side by side, to be dragged left and right;
+/* ---------- an event's catalog page: its date and page count; its pages side by side, to be dragged left and right;
    then the event's goods, the cards that open their item pages ---------- */
 const catalogPages = $('#catalog-pages');
-/* made once (its words then follow the language: catalogText, and the cards in js/lang-switch.js); `fresh`, not back
+/* rebuilt when the event changes (catalogText and js/lang-switch.js update the words); `fresh`, not back
    from one of its goods: from the first page */
-function renderCatalog(fresh) {
-  const catalog = FF47_CATALOG;
-  if (!catalogPages.children.length) {
+function renderCatalog(catalog, fresh) {
+  if (currentCatalog !== catalog) {
+    currentCatalog = catalog;
+    catalogDrag = catalogTo = null;
+    catalogPages.classList.remove('held');
+    $('#catalog-event').textContent = evName(catalog.ev);
+    $('#catalog-pixiv').href = 'https://www.pixiv.net/artworks/' + catalog.id;
     catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
       const img = el('img');
       img.src = src(catalog.id, i);
@@ -2011,10 +2039,12 @@ function renderCatalog(fresh) {
 }
 /* the words that change with the language: the date, the page count, each page's description */
 function catalogText() {
-  const catalog = FF47_CATALOG, m = catalog.dims.length;
+  if (!currentCatalog) return;
+  const catalog = currentCatalog, m = catalog.dims.length;
+  $('#catalog-title').textContent = catalogName(catalog);
   $('#catalog-date').textContent = tr('wk.posted', { d: dot(catalog.d) });
   $('#catalog-count').textContent = pagesText(m);
-  [...catalogPages.children].forEach((img, i) => { img.alt = tr('wk.imgAlt', { t: tr('goods.catalog'), n: i + 1, m }); });
+  [...catalogPages.children].forEach((img, i) => { img.alt = tr('wk.imgAlt', { t: catalogName(catalog), n: i + 1, m }); });
 }
 /* the pages side by side: the mouse drags them left and right (a finger swipes them, a trackpad scrolls them), and
    each comes to rest in the middle (scroll snap); a drag of a fifth of a page or more goes on to the next one. The
@@ -2035,7 +2065,7 @@ function catalogGo(i) {
   catalogPages.scrollTo({ left: Math.min(n - 1, Math.max(0, i)) * catalogStep(), behavior: CALM ? 'auto' : 'smooth' });
 }
 catalogPages.addEventListener('pointerdown', (e) => {
-  if (e.pointerType !== 'touch' && e.button === 0) catalogDrag = { x: e.clientX, left: catalogPages.scrollLeft, id: e.pointerId, moved: false };
+  if (catalogPages.childElementCount > 1 && e.pointerType !== 'touch' && e.button === 0) catalogDrag = { x: e.clientX, left: catalogPages.scrollLeft, id: e.pointerId, moved: false };
 });
 catalogPages.addEventListener('pointermove', (e) => {
   const d = catalogDrag;
@@ -2116,9 +2146,10 @@ function itemSwap(change, then) {
   });
 }
 function itemOpen() {
-  if (itGd.classList.contains('open')) return;
+  if (!itGoods.childElementCount || itGd.classList.contains('open')) return;
   const s = ++itStep;
   itemSwap(() => {
+    if (s !== itStep) return;
     itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1;
     /* the grown picture in view: where it was if it fits there, else as near as the screen lets it, never under the header */
     const r = itStage.getBoundingClientRect(), top = $('.site-head').getBoundingClientRect().bottom + 16;
@@ -2176,9 +2207,14 @@ function itemCentre() {
   ps.forEach((p) => { p.style.left = `${(parseFloat(p.style.left) + d).toFixed(3)}%`; p.dataset.mid = p.style.cssText; });   // (where ✕ gathers them first)
 }
 function itemClose(now) {
+  const s = ++itStep;
   if (!itGd.classList.contains('open')) return;
-  ++itStep;
-  const shut = () => { itGd.classList.remove('open', 'wide', 'plain'); itStage.setAttribute('role', 'button'); itStage.tabIndex = 0; };
+  const shut = () => {
+    if (s !== itStep) return;
+    itGd.classList.remove('open', 'wide', 'plain');
+    itStage.setAttribute('role', 'button');
+    itStage.tabIndex = 0;
+  };
   const ps = [...itGoods.querySelectorAll('img')];
   itGoods.classList.remove('glide', 'home');   // (a close cut short leaves its class)
   itGd.classList.remove('cut');
@@ -2234,12 +2270,31 @@ function renderItem(i) {
   /* cross-link: the art books in it (books: their slugs) */
   linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
   /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
-  const [W, H] = FF47_CATALOG.dims[g.pg];
   itemClose(true);
-  itPage.src = src(FF47_CATALOG.id, g.pg); itPage.width = W; itPage.height = H;
+  const catalog = catalogByEvent.get(g.ev), media = goodsImage(g);
+  const parts = media ? (g.parts || []) : [];
+  const interactive = parts.length > 0;
+  itStage.closest('figure').hidden = !media;
+  itGd.querySelector('.gd-hint').hidden = !interactive;
+  if (media) [itPage.src, itPage.width, itPage.height] = media;
+  else itPage.removeAttribute('src');
   itPage.alt = tr('item.imgAlt', { t: L(g.name) });
-  itGoods.replaceChildren(...g.parts.map(([x, y, w, h], n) => {
+  const bg = itStage.querySelector('.gd-bg');
+  if (interactive && catalog?.bg) bg.src = catalog.bg;
+  else bg.removeAttribute('src');
+  bg.hidden = !bg.hasAttribute('src');
+  if (interactive) {
+    itStage.setAttribute('role', 'button');
+    itStage.setAttribute('aria-label', tr('item.takeOut'));
+    itStage.tabIndex = 0;
+  } else {
+    itStage.removeAttribute('role');
+    itStage.removeAttribute('aria-label');
+    itStage.removeAttribute('tabindex');
+  }
+  itGoods.replaceChildren(...parts.map(([x, y, w, h], n) => {
     const p = el('img');
+    const [, W, H] = media;
     p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
     p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
@@ -2252,7 +2307,7 @@ function renderItem(i) {
   if (g.spec) rows.push([tr('spec.spec'), L(g.spec)]);
   if (g.items) rows.push([tr('spec.' + g.list_title), L(g.items)]);
   if (g.note) rows.push([tr('spec.offer'), L(g.note)]);
-  rows.push([tr('spec.debut'), tr('event')]);
+  rows.push([tr('spec.debut'), L(catalog?.debut) || evName(g.ev)]);
   $('#it-spec').replaceChildren(...rows.map(([k, v], n) => {
     const d = el('div');
     d.dataset.rv = 'up';
@@ -2264,8 +2319,8 @@ function renderItem(i) {
     return d;
   }));
 
-  $('#it-works-box').hidden = !g.works.length;
-  $('#it-works').replaceChildren(...g.works.filter((id) => id in byId).map((id, n) => {
+  $('#it-works-box').hidden = !g.works?.length;
+  $('#it-works').replaceChildren(...(g.works || []).filter((id) => id in byId).map((id, n) => {
     const w = WORKS[byId[id]];
     const a = el('a'); a.href = '#w-' + id;
     a.dataset.rv = 'up'; a.dataset.d = `${n * 0.1}s`;
@@ -2382,9 +2437,9 @@ function coverText(a, t, meta, label) {
   a.querySelector('.ov-m').textContent = a.querySelector('.cap-m').textContent = meta;
   a.setAttribute('aria-label', label);
 }
-WORKS.forEach((w, i) => {
+WORKS.forEach((w) => {
   const picks = w.pieces ? coverPieces(w) : [0];
-  const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, i < 4);
+  const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, false);
   a.id = 'c-' + w.id;
   a.dataset.n = picks[picks.length - 1];   // the picture in front: the page morph lands on its piece (js/router.js)
   a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers
@@ -2907,7 +2962,7 @@ function workText(i, piece = -1) {
     box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
   }
   /* cross-link: the goods made from this piece */
-  linkLine($('#wk-goods'), tr('wk.madeGoods'), GOODS.filter((g) => g.works.includes(w.id)).map((g) => [L(g.name), '#g-' + g.slug]));
+  linkLine($('#wk-goods'), tr('wk.madeGoods'), GOODS.filter((g) => g.works?.includes(w.id)).map((g) => [L(g.name), '#g-' + g.slug]));
 
   const procs = $('#wk-proc-box').querySelectorAll('img');
   procs.forEach((im, n) => { im.alt = tr('proc.alt', { t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
@@ -2928,9 +2983,15 @@ function ytInline(card, id, t) {
     f.allowFullscreen = true;
     card.replaceWith(f);
     ytPlaying.set(f, card);
+    bgmSync();
   });
 }
-addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });
+function stopWorkVideo() {
+  if (!ytPlaying.size) return;
+  ytPlaying.forEach((card, f) => f.replaceWith(card));
+  ytPlaying.clear();
+  bgmSync();
+}
 
 /* ==================== js/tag.js ==================== */
 /* Tag page */
@@ -4027,11 +4088,14 @@ function backTo(e) {
 function parse() {
   let h = location.hash.slice(1);
   try { h = decodeURIComponent(h); } catch (e) { /* malformed shared URL: fall back to the home page */ }
-  if (h === 'w-' + FF47_CATALOG.id) {
-    history.replaceState(history.state, '', '#g-ff47-catalog');
-    h = 'g-ff47-catalog';
+  const catalog = CATALOGS.find((c) => h === 'g-' + catalogSlug(c) || h === 'w-' + c.id);
+  if (catalog) {
+    if (h.startsWith('w-')) {
+      h = 'g-' + catalogSlug(catalog);
+      history.replaceState(history.state, '', '#' + h);
+    }
+    return { h, next: 'catalog', catalog };
   }
-  if (h === 'g-ff47-catalog') return { h, next: 'catalog', idx: -1 };
   if (h === 'about' || h === 'contact' || h === 'goods' || h === 'game' || h === 'event') return { h, next: h, idx: -1 };
   if (h === 'board' || h === 'board-admin') return { h, next: 'board', idx: -1 };
   if (h === 'work' || h === 'timeline') return { h, next: 'works', idx: -1 };   // #timeline: an old address of the wall
@@ -4066,8 +4130,9 @@ function startOver(next) {
 }
 
 /* swap the DOM to the requested view, then start watching its reveal elements */
-function apply({ h, next, idx, cat, piece = -1, tag }) {
+function apply({ h, next, idx, cat, piece = -1, tag, catalog }) {
   const from = view, fromPiece = lastPiece;
+  stopWorkVideo();
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
   const anew = from === null || partOf(from) !== partOf(next);
@@ -4119,13 +4184,13 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
     abYearsUpdate();
   } else if (next === 'catalog') {
     /* back from one of its goods: the page as it was left, that goods' card in view (backTo) */
-    const back = from === 'item' && lastItem && GOODS[bySlug[lastItem]].ev === FF47_CATALOG.ev;
-    renderCatalog(!back);
+    const back = from === 'item' && lastItem && GOODS[bySlug[lastItem]].ev === catalog.ev;
+    renderCatalog(catalog, !back);
     const card = back && document.getElementById('gc-' + lastItem);
     if (card) { backTo(card); els = pending(root); } else { scrollTo(0, 0); els = same ? pending(root) : prime(root); }
   } else if (next === 'goods') {
     if (!goodsHeadings.size) renderGoods();
-    const card = from === 'catalog' ? $('#gc-ff47-catalog') : from === 'item' && lastItem && goodsList.querySelector('#gc-' + lastItem);
+    const card = from === 'catalog' ? catalogCards.get(currentCatalog.ev) : from === 'item' && lastItem && goodsList.querySelector('#gc-' + lastItem);
     if (card) { backTo(card); els = pending(root); }
     else { scrollTo({ top: 0, behavior }); els = same ? pending(root) : prime(root); }
   } else {
@@ -4133,6 +4198,7 @@ function apply({ h, next, idx, cat, piece = -1, tag }) {
   }
   if (next === 'goods') goodsYearsUpdate();
   view = next;
+  document.dispatchEvent(new Event('portfolio-view'));
   evenIntros();
   if (next === 'about') preloadAbout();
   if (next === 'board') boardShow(h === 'board-admin');
@@ -4234,7 +4300,10 @@ function upFrom() {
   const r = parse();
   if (r.next === 'work') return r.piece >= 0 ? '#w-' + WORKS[r.idx].id : WORKS[r.idx].cat === 'original' ? '#original' : '#fanart';
   if (r.next === 'tag') return '#work';
-  if (r.next === 'item') return GOODS[r.idx].ev === FF47_CATALOG.ev ? '#g-ff47-catalog' : '#goods';
+  if (r.next === 'item') {
+    const catalog = catalogByEvent.get(GOODS[r.idx].ev);
+    return catalog ? '#g-' + catalogSlug(catalog) : '#goods';
+  }
   if (r.next === 'catalog') return '#goods';
   if (r.next === 'book') return '#artbook';
   return '#home';   // (not reached: the button is only on the pages inside a part)
@@ -4998,6 +5067,7 @@ function swapLang(l) {
   layoutWall();
   tagText();   // a tag's page: its count and its covers' words
   layoutTag();
+  document.dispatchEvent(new Event('portfolio-language'));
   backFit();   // the back button keeps to the title's words in the new language
 }
 
@@ -5008,7 +5078,7 @@ function swapLang(l) {
 const BGM_SRC = 'audio/bgm.mp3', CLICK_SRC = 'audio/click.mp3';
 const BGM_VOL = 0.35, CLICK_VOL = 0.7;
 const sndBtns = document.querySelectorAll('.snd');
-let actx = null, clickBuf = null, bgm = null, bgmGain = null, bgmOn = false, bgmHeld = false, bgmRest = 0;
+let actx = null, clickBuf = null, bgm = null, bgmGain = null, bgmOn = false, bgmRest = 0;
 
 /* the click is fetched and decoded as the page loads (an offline context may decode before any touch), so that even
    the first click sounds */
@@ -5077,7 +5147,10 @@ function bgmPlay(on) {
 function bgmSet(on) {
   bgmOn = on;
   sndBtns.forEach((b) => b.setAttribute('aria-pressed', String(on)));
-  if (on || bgm) bgmPlay(on && !bgmHeld && !document.hidden);
+  bgmSync();
+}
+function bgmSync() {
+  if (bgmOn || bgm) bgmPlay(bgmOn && !document.hidden && !ytPlaying.size);
 }
 
 /* the buttons' tooltip, again after a language change (their spoken name comes from data-i18n-aria) */
@@ -5092,10 +5165,419 @@ addEventListener('keydown', sndWake, true);
 document.addEventListener('click', (e) => {
   if (!(e.target instanceof Element)) return;
   if (e.target.closest('a[href], button, [role="button"]')) sndClick();
-  if (window.SELF_HOSTED && e.target.closest('.tl-card')) { bgmHeld = true; if (bgmOn) bgmPlay(false); }   // the video has its own sound
 }, true);
-addEventListener('hashchange', () => { if (bgmHeld) { bgmHeld = false; if (bgmOn) bgmPlay(!document.hidden); } });
-document.addEventListener('visibilitychange', () => { if (bgmOn) bgmPlay(!document.hidden && !bgmHeld); });
+document.addEventListener('visibilitychange', bgmSync);
+
+/* ==================== js/../features/characters/main.js ==================== */
+(() => {
+  const featured=['miComet','星街すいせい','あのそよ'];
+  const others=['さくらみこ','宝鐘マリン','千早愛音','長崎そよ','おかころ','とこまち','がうる・ぐら','猫又おかゆ','戌神ころね','AZKi','森カリオペ','一伊那尓栖','ワトソン・アメリア','小鳥遊キアラ','戌亥とこ','天音かなた','桐生ココ','聖園ミカ','仲正イチカ','天童アリス','高垣楓','アドミラル・ヒッパー(アズールレーン)','プリンツ・オイゲン(アズールレーン)','アドミラル・グラーフ・シュペー(アズールレーン)','ドイッチュラント(アズールレーン)'];
+  // Only illustrations identified in the book previews.
+  const bookWorks={ff47:['142549210','148068024','146954644','147595537'],ff46:['137386797','137332578','137308455']};
+  const nav=el('nav','character-nav'), title=el('span','character-label'), more=el('details'), toggle=el('summary');
+  function links(names) {
+    const list=el('div','character-links');
+    for(const name of names) {
+      if(!tagWorks(name).length)continue;
+      const a=el('a','',name);a.href=tagHref(name);list.append(a);
+    }
+    return list;
+  }
+  nav.id='work-characters';more.append(toggle,links(others));nav.append(title,links(featured),more);$('#works-sub').after(nav);
+  const related=el('section','tag-related');related.id='tag-related';tagWall.after(related);
+  function group(name,cards) {
+    if(!cards.length)return;
+    const heading=el('h3','gd-h',name), grid=el('div','character-cards');
+    for(const [href,text,image,book] of cards) {
+      const a=el('a'), img=el('img');a.href=href;img.alt='';img.src=image;img.loading='lazy';img.decoding='async';
+      if(book) {   // the spread is back cover, spine, front cover (the other way round in a right-bound book): show the front
+        const [W,H]=book.pages[0];img.className='book';img.style.aspectRatio=W/2+' / '+H;img.style.objectPosition=book.rtl ? 'left' : 'right';
+      }
+      a.append(img,el('span','',text));grid.append(a);
+    }
+    related.append(heading,grid);
+  }
+  function update() {
+    title.textContent=L({zh:'依角色或組合瀏覽',en:'Browse by character or duo',ja:'キャラクター・ユニットから探す'});
+    nav.setAttribute('aria-label',title.textContent);toggle.textContent=L({zh:'更多角色',en:'More characters',ja:'もっと見る'});
+    nav.hidden=view!=='works' || wallCat!=='fan';
+    if(view!=='tag')return;
+    const ids=new Set(tagWorks(tagNow).map(w=>w.id));
+    const books=BOOKS.filter(b=>bookWorks[b.slug]?.some(id=>ids.has(id)));
+    const slugs=new Set(books.map(b=>b.slug));
+    const goods=GOODS.filter(g=>g.works?.some(id=>ids.has(id)) || g.books?.some(s=>slugs.has(s)));
+    related.replaceChildren();related.hidden=!goods.length && !books.length;
+    group(L({zh:'相關周邊',en:'Related goods',ja:'関連グッズ'}),goods.map(g=>['#g-'+g.slug,L(g.name),goodsImage(g)[0]]));
+    group(L({zh:'收錄畫冊',en:'Art books featuring this work',ja:'収録画集'}),books.map(b=>['#ab-'+b.slug,b.t,'img/ab/'+b.slug+'_p0.webp',b]));
+  }
+  document.addEventListener('portfolio-view',update);
+  document.addEventListener('portfolio-language',update);
+})();
+
+/* ==================== js/../features/ff47-gift/main.js ==================== */
+/* FF47's new set A: once its goods are out, the paper bag can be lifted aside (a click or a tap on it, Enter, or the
+   button under the picture) or dragged away. Under it lies a souvenir card, which opens the two wallpapers */
+(() => {
+  const lift=el('button','gift-lift btn'), card=el('button','gift-card'), art=el('span','gift-art'), cap=el('span','gift-cap'), tray=el('div','gift-downloads');
+  const desktop=el('a','btn'), phone=el('a','btn');
+  let bag=null, revealed=false, showing=false, origin=null;
+  lift.id='ff47-gift-lift';card.id='ff47-gift-card';tray.id='ff47-gift-downloads';
+  lift.type=card.type='button';card.setAttribute('aria-controls',tray.id);
+  art.style.backgroundImage='url('+src('146954644',0)+')';   // the desktop wallpaper's picture, Chatter Chatter
+  card.append(art,cap);
+  for(const [link,name] of [[desktop,'desktop'],[phone,'phone']]) {
+    link.href='features/ff47-gift/art/'+name+'.jpg';link.download='MANIA-FF47-'+name+'.jpg';
+  }
+  tray.append(desktop,phone);itStage.append(card);itStage.closest('figure').append(lift,tray);
+  function display() {
+    const active=bag && itGd.classList.contains('cut');
+    lift.hidden=!active || revealed;card.hidden=!active || !revealed;tray.hidden=!active || !showing;
+    itGd.classList.toggle('gift-on',!card.hidden);   // the card lies under the goods: clicks between them reach it
+    card.setAttribute('aria-expanded',String(showing));
+  }
+  function reset() {
+    revealed=false;showing=false;origin=null;bag?.classList.remove('gift-moved');display();
+  }
+  /* the card where the bag was (r: the bag's box then), a little in from its left edge, in its upper part, inside the
+     frame: the bag lifted aside still lies over a corner of it */
+  function reveal(nudge,r) {
+    if (!bag || revealed || !itGd.classList.contains('cut')) return;
+    revealed=true;display();
+    const room=itStage.getBoundingClientRect(), w=card.offsetWidth*.6, h=card.offsetHeight*.6;
+    const x=Math.max(room.left+w,Math.min(room.right-w,r.left+r.width*.3)), y=Math.max(room.top+h,Math.min(room.bottom-h,r.top+r.height*.3));
+    card.style.left=((x-room.left)/room.width*100).toFixed(3)+'%';card.style.top=((y-room.top)/room.height*100).toFixed(3)+'%';
+    if (nudge || covered()>.6) bag.classList.add('gift-moved');   // lifted aside; or dragged, but not off the card yet
+    card.focus({preventScroll:true});
+  }
+  /* how much of the card the goods cover: what is on top at points across it */
+  function covered() {
+    const r=card.getBoundingClientRect();let k=0;
+    for(let i=1;i<5;i++)for(let j=1;j<5;j++){const e=document.elementFromPoint(r.left+r.width*i/5,r.top+r.height*j/5);if(e && !card.contains(e))k++;}
+    return k/16;
+  }
+  function liftBag() { if(bag)reveal(true,bag.getBoundingClientRect()); }
+  itGoods.addEventListener('pointerdown',e=>{
+    origin=null;
+    if(e.target===bag && itGd.classList.contains('cut') && e.button===0)origin={x:e.clientX,y:e.clientY,id:e.pointerId,r:bag.getBoundingClientRect()};
+  });
+  itGoods.addEventListener('pointerup',e=>{   // a click lifts it aside; a drag has moved it already
+    if(origin && origin.id===e.pointerId)reveal(Math.hypot(e.clientX-origin.x,e.clientY-origin.y)<8,origin.r);
+    origin=null;
+  });
+  itGoods.addEventListener('pointercancel',()=>{origin=null;});
+  itGoods.addEventListener('keydown',e=>{
+    if(e.target===bag && (e.key==='Enter' || e.key===' ')){e.preventDefault();e.stopPropagation();liftBag();}
+  });
+  lift.onclick=liftBag;
+  card.onclick=()=>{showing=!showing;display();if(showing)desktop.focus();};
+  function setup() {
+    const next=view==='item' && lastItem==='set-a' ? itGoods.querySelector('img[src$="goods-set-a-3.webp"]'):null;
+    if (bag!==next) {bag=next;reset();}
+    const liftText=L({zh:'移開紙袋',en:'Lift the paper bag',ja:'紙袋を動かす'});
+    lift.textContent=liftText;
+    cap.textContent=L({zh:'FF47 紀念卡',en:'FF47 souvenir card',ja:'FF47 記念カード'});
+    desktop.textContent=L({zh:'下載電腦桌布',en:'Desktop wallpaper',ja:'PC用壁紙'})+' · 3840 × 2160';
+    phone.textContent=L({zh:'下載手機桌布',en:'Phone wallpaper',ja:'スマホ用壁紙'})+' · 1290 × 2796';
+    if(bag)bag.setAttribute('aria-label',liftText);
+    sync();
+  }
+  function sync() {
+    const open=itGd.classList.contains('cut');
+    if(bag) {bag.tabIndex=open ? 0 : -1;bag.setAttribute('role','button');}
+    if (!open)reset();else display();
+  }
+  new MutationObserver(sync).observe(itGd,{attributes:true,attributeFilter:['class']});
+  document.addEventListener('portfolio-view',setup);
+  document.addEventListener('portfolio-language',setup);
+})();
+
+/* ==================== js/../features/ff47-list/main.js ==================== */
+(() => {
+  const products = GOODS.filter(g => g.ev === 'FF47');
+  const catalog = catalogByEvent.get('FF47');
+  if (!catalog || !products.length) return;
+  const artOrder = { 'sign-board':[1,2,3,4], 'acrylic-board':[2,1,3], keychain:[2,1,3] };
+  const key = 'mania.ff47.wishlist.v1';
+  const words = {
+    title:['我的場販清單','My booth list','お買い物リスト'], add:['加入清單','Add to list','リストに追加'],
+    design:['款式','Design','絵柄'], qty:['數量','Quantity','数量'], empty:['清單裡還沒有商品。','Your list is empty.','リストは空です。'],
+    sum:['合計','Total','合計'], subtotal:['原價小計','Subtotal before offer','割引前小計'], save:['存成手機圖片','Save list as image','画像で保存'],
+    remove:['移除','Remove','削除'], added:['已加入','Added','追加しました'], note:['款式備註（選填）','Design note (optional)','絵柄のメモ（任意）'],
+    ready:['下載 PNG','Download PNG','PNGをダウンロード'], error:['圖片未能產生，請再試一次。','Image could not be created. Please retry.','画像を作成できませんでした。もう一度お試しください。']
+  };
+  const word = k => words[k][{zh:0,en:1,ja:2}[LANG]];
+  const variantNames = g => g.list_title === 'designs' ? L(g.items) : [];
+  const identify = row => row.slug + ':' + row.variant;
+  const priceText = n => 'NT$' + n.toLocaleString('en-US');
+  function readRows() {
+    try {
+      const data = JSON.parse(localStorage.getItem(key));
+      if (!Array.isArray(data)) return [];
+      return data.filter(r => {
+        const g = products.find(p => p.slug === r?.slug);
+        return g && Number.isInteger(r.qty) && r.qty > 0 && r.qty <= 99 && Number.isInteger(r.variant)
+          && (variantNames(g).length ? r.variant >= 0 && r.variant < variantNames(g).length : r.variant === -1);
+      }).map(r => ({slug:r.slug,variant:r.variant,qty:r.qty,note:String(r.note || '').slice(0,80)}));
+    } catch { return []; }
+  }
+  let rows = readRows(), downloadURL = '', revision = 0;
+  const panel = el('details','ff-list'), summary = el('summary'), list = el('ul'), tally = el('strong');
+  const offer = el('p'), save = el('button','btn'), download = el('a'), feedback = el('span','ff-feedback');
+  save.type = 'button'; feedback.setAttribute('role','status'); download.download = 'FF47-mania8522191.png';
+  panel.append(summary,list,tally,offer,save,download,feedback);
+  $('#catalog-goods').before(panel);
+  function invalidate() {
+    revision++;
+    if (downloadURL) URL.revokeObjectURL(downloadURL);
+    downloadURL = ''; download.hidden = true; download.removeAttribute('href'); feedback.textContent = '';
+  }
+  function storeRows() {
+    try {
+      if(rows.length) localStorage.setItem(key,JSON.stringify(rows));
+      else localStorage.removeItem(key);
+    } catch {}
+    invalidate();
+  }
+  function product(row) { return products.find(g => g.slug === row.slug); }
+  function thumbnail(row) {
+    const n = artOrder[row.slug]?.[row.variant];
+    return n ? 'img/goods-' + row.slug + '-' + n + '.webp' : goodsImage(product(row))[0];
+  }
+  function title(row) {
+    const g = product(row);
+    return [L(g.name),variantNames(g)[row.variant]].filter(Boolean).join(' · ');
+  }
+  function totals() {
+    const count = slug => rows.filter(r => r.slug === slug).reduce((n,r) => n+r.qty,0);
+    const value = rows.reduce((n,r) => n + r.qty * product(r).price,0);
+    const promo = count('set-b') && count('sign-board');
+    const single = promo && count('set-b') === 1 && count('sign-board') === 1;
+    return {line:word(promo && !single ? 'subtotal':'sum')+'  '+priceText(single ? value-50 : value),
+      note:promo ? L(products.find(g => g.slug === 'set-b').note) : ''};
+  }
+  function button(text, label, action) {
+    const node = el('button','ff-action',text);
+    node.type = 'button'; node.setAttribute('aria-label',label); node.addEventListener('click',action); return node;
+  }
+  function paint() {
+    const count = rows.reduce((n,r) => n+r.qty,0);
+    summary.textContent = word('title')+' ('+count+')';
+    list.replaceChildren();
+    if (!count) list.append(el('li','',word('empty')));
+    for (const row of rows) {
+      const li = el('li','ff-line'), photo = el('img'), copy = el('div'), controls = el('div','ff-controls');
+      photo.src = thumbnail(row); photo.alt = ''; photo.loading = 'lazy';
+      const label = title(row); copy.append(el('strong','',label),el('small','',priceText(product(row).price)+' × '+row.qty));
+      const change = delta => {
+        row.qty += delta;
+        if (!row.qty) rows = rows.filter(r => r !== row);
+        storeRows(); paint();
+        (list.querySelector('[data-entry="'+identify(row)+'"] button') || summary).focus({preventScroll:true});
+      };
+      li.dataset.entry = identify(row);
+      const more = button('+',word('qty')+' +1 '+label,() => change(1)); more.disabled = row.qty >= 99;
+      controls.append(button('−',word('qty')+' −1 '+label,() => change(-1)),more,button('×',word('remove')+' '+label,() => change(-row.qty)));
+      li.append(photo,copy,controls);
+      if (['set-a','set-b','kikan'].includes(row.slug)) {
+        const note = el('input','ff-note'); note.type='text'; note.maxLength=80; note.value=row.note;
+        note.placeholder=word('note'); note.setAttribute('aria-label',label+' '+word('note'));
+        note.addEventListener('input',() => { row.note=note.value; storeRows(); }); li.append(note);
+      }
+      list.append(li);
+    }
+    const sum = totals();
+    tally.textContent=sum.line; offer.textContent=sum.note; offer.hidden=!sum.note; tally.hidden=!count;
+    save.textContent=word('save'); save.disabled=!count; download.textContent=word('ready');
+  }
+  function setup() {
+    if (view !== 'catalog' || currentCatalog !== catalog) { panel.hidden=true; return; }
+    panel.hidden=false;
+    for (const g of products) {
+      const card=document.getElementById('gc-'+g.slug);
+      if (!card || !$('#catalog-goods').contains(card)) continue;
+      let wrap=card.closest('.ff-product');
+      if (!wrap) { wrap=el('div','ff-product'); card.before(wrap); wrap.append(card,el('div','ff-pick')); }
+      const controls=wrap.querySelector('.ff-pick'), old=controls.querySelector('select')?.value, choices=variantNames(g);
+      controls.replaceChildren();
+      const select=el('select');
+      if (choices.length) {
+        select.setAttribute('aria-label',L(g.name)+' · '+word('design'));
+        choices.forEach((name,i) => select.add(new Option(name,String(i))));
+        if (old != null) select.value=old;
+        controls.append(select);
+      }
+      const add=button(word('add'),L(g.name)+' · '+word('add'),() => {
+        const variant=choices.length ? Number(select.value) : -1;
+        const found=rows.find(r => r.slug===g.slug && r.variant===variant);
+        if (found) found.qty=Math.min(99,found.qty+1);
+        else rows.push({slug:g.slug,variant,qty:1,note:''});
+        storeRows(); paint(); status.textContent=word('added')+' ×'+(found?.qty || 1);
+      });
+      const status=el('small'); status.setAttribute('role','status');
+      controls.append(add,status);
+    }
+    invalidate(); paint();
+  }
+  async function exportImage() {
+    const version=revision, entries=rows.map(row=>({...row})), sum=totals();
+    if (!entries.length) return;
+    save.disabled=true;
+    try {
+      const canvas=el('canvas'), ctx=canvas.getContext('2d');
+      canvas.width=920;
+      function lines(string,width) {
+        let line=''; const out=[];
+        for (const ch of string) {
+          if (line && ctx.measureText(line+ch).width>width) {out.push(line); line='';}
+          line+=ch;
+        }
+        if(line)out.push(line); return out;
+      }
+      ctx.font='26px sans-serif';
+      const layout=entries.map(r => ({row:r,labels:lines(title(r),535),notes:lines(r.note,535)}));
+      const noteLines=lines(sum.note,820);
+      const height=layout.reduce((n,l)=>n+Math.max(120,45+34*l.labels.length+30*l.notes.length),0);
+      canvas.height=218+height+104+noteLines.length*34;
+      ctx.fillStyle='#131316';ctx.fillRect(0,0,920,canvas.height);ctx.fillStyle='#d9bc89';ctx.font='24px sans-serif';ctx.fillText('MANIA8522191   /   FF47',44,52);
+      ctx.fillStyle='#fff';ctx.font='bold 44px sans-serif';ctx.fillText(word('title'),44,118);ctx.font='22px sans-serif';ctx.fillText(L(catalog.debut),44,168);
+      const photos=await Promise.all(entries.map(async row=>{const img=new Image();img.src=thumbnail(row);await img.decode();return img;}));
+      let y=198;
+      layout.forEach(({row,labels,notes},i)=>{
+        const photo=photos[i], s=Math.min(96/photo.width,96/photo.height);
+        ctx.fillStyle='#343437';ctx.fillRect(44,y+10,96,96);ctx.drawImage(photo,44+(96-photo.width*s)/2,y+10+(96-photo.height*s)/2,photo.width*s,photo.height*s);
+        ctx.fillStyle='#fff';ctx.font='26px sans-serif';labels.forEach((t,j)=>ctx.fillText(t,164,y+39+j*34));
+        ctx.fillStyle='#d9bc89';ctx.font='22px sans-serif';notes.forEach((t,j)=>ctx.fillText(t,164,y+41+labels.length*34+j*30));
+        ctx.textAlign='right';ctx.fillText('×'+row.qty,874,y+40);ctx.fillText(priceText(product(row).price*row.qty),874,y+77);ctx.textAlign='left';
+        y+=Math.max(120,45+34*labels.length+30*notes.length);ctx.fillStyle='#444';ctx.fillRect(44,y,832,1);
+      });
+      ctx.font='bold 32px sans-serif';ctx.fillStyle='#ead1a5';ctx.fillText(sum.line,44,y+62);
+      ctx.font='22px sans-serif';noteLines.forEach((t,j)=>ctx.fillText(t,44,y+105+j*34));
+      const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+      if (!blob) throw new Error('PNG');
+      if(version!==revision)return;
+      if(downloadURL)URL.revokeObjectURL(downloadURL);
+      downloadURL=URL.createObjectURL(blob); download.href=downloadURL; download.hidden=false; download.click();
+    } catch { if(version===revision)feedback.textContent=word('error'); }
+    finally { save.disabled=!rows.length; }
+  }
+  save.addEventListener('click',exportImage);
+  addEventListener('storage',e=>{if(e.key===key || e.key===null){rows=readRows();invalidate();paint();}});
+  document.addEventListener('portfolio-view',setup);
+  document.addEventListener('portfolio-language',setup);
+})();
+
+/* ==================== js/../features/lollipop/main.js ==================== */
+/* The poster stays visible until all three aligned layers are decoded. */
+(() => {
+  const id = '137332578';
+  if (!(id in byId)) return;
+  const home = el('button','lollipop-entry'), work = el('button','lollipop-entry');
+  home.id = 'lollipop-home'; home.type = work.type = 'button';
+  $('#hero-ev').after(home); $('#wk-goods').after(work);
+  const dialog = el('dialog','lollipop-dialog'), frame = el('div','lollipop-scene'), bar = el('div','lollipop-bar');
+  const heading = el('h2','','miComet · Lollipop'), close = el('button','','×'), hint = el('p'), original = el('a');
+  const poster = el('img'), deck = el('div','lollipop-layers');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let loading = null;
+  dialog.id = 'lollipop-dialog'; heading.id = 'lollipop-heading'; hint.id = 'lollipop-help';
+  dialog.setAttribute('aria-labelledby',heading.id); frame.setAttribute('aria-describedby',hint.id);
+  close.type = 'button'; original.href = '#w-'+id;
+  poster.alt = ''; deck.setAttribute('aria-hidden','true'); frame.tabIndex = 0; frame.setAttribute('role','group');
+  frame.append(poster,deck); bar.append(heading,close); dialog.append(bar,frame,hint,original); document.body.append(dialog);
+  function offset(x,y) {
+    if (motion.matches) x = y = 0;
+    const d = Math.min(1,frame.clientWidth / 1500), px = (v,n) => Math.round(v * n * d)+'px';
+    frame.style.setProperty('--px',px(x,14)); frame.style.setProperty('--py',px(y,10));   // the whole picture
+    frame.style.setProperty('--lx',px(x,8)); frame.style.setProperty('--ly',px(y,6));   // the front layers, on top of that
+  }
+  function reset() { offset(0,0); }
+  function point(event) {
+    const r = frame.getBoundingClientRect();
+    const relative = (v,length) => Math.max(-1, Math.min(1, 2*v/length - 1));
+    offset(relative(event.clientX-r.left,r.width),relative(event.clientY-r.top,r.height));
+  }
+  function layers() {
+    if (loading || motion.matches) return;
+    const photos = ['back','figures','lights'].map(name => {
+      const im = el('img','lollipop-'+name); im.alt=''; im.draggable=false;
+      im.src='features/lollipop/art/'+name+'.webp'; return im;
+    });
+    loading=Promise.all(photos.map(im=>im.decode())).then(()=>deck.replaceChildren(...photos)).catch(()=>{loading=null;});
+  }
+  function open() {
+    poster.src='img/z/137332578.webp'; reset(); dialog.showModal(); layers(); close.focus();
+  }
+  function update() {
+    work.hidden = view !== 'work' || lastWork !== id;
+    home.textContent = 'Lollipop · '+L({zh:'互動插畫',en:'Interactive artwork',ja:'動かせるイラスト'});
+    work.textContent = L({zh:'打開互動插畫',en:'Open interactive artwork',ja:'動かせるイラストを開く'});
+    original.textContent = L({zh:'查看原作 →',en:'View original →',ja:'原画を見る →'});
+    const label = L({zh:'關閉',en:'Close',ja:'閉じる'}); close.setAttribute('aria-label',label);
+    frame.setAttribute('aria-label',heading.textContent);
+    hint.textContent = motion.matches ? L({zh:'已套用減少動態效果設定',en:'Reduced motion is on',ja:'視差効果をオフにしています'}) :
+      L({zh:'移動滑鼠、拖曳畫面，或用方向鍵移動畫面。',en:'Move the pointer, drag the artwork or use the arrow keys.',ja:'ポインター・ドラッグ・矢印キーで絵が動きます。'});
+  }
+  home.onclick = work.onclick = open; close.onclick = original.onclick = () => dialog.close();
+  dialog.addEventListener('click',e=>{
+    if (e.target!==dialog) return;
+    const r=dialog.getBoundingClientRect();
+    if(e.clientX<r.left || e.clientX>r.right || e.clientY<r.top || e.clientY>r.bottom) dialog.close();
+  });
+  frame.addEventListener('pointerdown',e=>{frame.setPointerCapture(e.pointerId);point(e);});
+  frame.addEventListener('pointermove',e=>{if(e.pointerType==='mouse' || frame.hasPointerCapture(e.pointerId))point(e);});
+  for(const name of ['pointerleave','lostpointercapture']) frame.addEventListener(name,reset);
+  dialog.addEventListener('keydown',e=>{
+    const movement={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+    if(movement) {e.stopPropagation();e.preventDefault();offset(...movement);}
+  });
+  dialog.addEventListener('keyup',e=>{if(e.key.startsWith('Arrow'))reset();});
+  motion.addEventListener('change',()=>{reset();update();if(dialog.open)layers();});
+  document.addEventListener('portfolio-view',()=>{if(dialog.open)dialog.close();update();});
+  document.addEventListener('portfolio-language',update);
+})();
+
+/* ==================== js/../features/sketch-compare/main.js ==================== */
+/* Keep the existing full-size pictures and viewer; the comparison is an optional view of an aligned pair. */
+(() => {
+  const panel = el('details', 'sketch-compare');
+  const summary = el('summary'), frame = el('div', 'sketch-frame'), slider = el('input');
+  const finished = el('img'), sketch = el('img'), line = el('span', 'sketch-divider');
+  const labels = el('div', 'sketch-labels'), left = el('span'), right = el('span');
+  let images = null, key = '';
+  [finished, sketch].forEach((im) => { im.alt = ''; im.draggable = false; });
+  slider.type = 'range'; slider.min = 0; slider.max = 100; slider.value = 50;
+  labels.append(left, right); frame.append(finished, sketch, line, slider); panel.append(summary, labels, frame);
+  panel.hidden = true;
+  $('#wk-imgs').before(panel);
+  function draw() { frame.style.setProperty('--sketch-split', slider.value + '%'); }
+  slider.addEventListener('input', draw);
+  slider.addEventListener('keydown', (e) => { if (['ArrowLeft','ArrowRight'].includes(e.key)) e.stopPropagation(); });
+  function load() {
+    if (!panel.open || !images) return;
+    finished.src = images[0].src; sketch.src = images[1].src;
+  }
+  panel.addEventListener('toggle', load);
+  function show() {
+    const w = view === 'work' && WORKS[byId[lastWork]], pair = w && lastPiece >= 0 && w.sk?.[lastPiece];
+    panel.hidden = !pair;
+    if (!pair) { key = ''; panel.open = false; images = null; return; }
+    const id = w.id + '/' + lastPiece;
+    if (key !== id) {
+      key = id; panel.open = false; slider.value = 50; draw();
+      const all = pieceImgs(w, lastPiece);
+      images = [all[0], all.find((im) => im.k === 'sketch')];
+      const [W,H] = images[0].d;
+      frame.style.aspectRatio = W + ' / ' + H;
+      frame.style.maxWidth = 'min(100%, calc(72svh * ' + W / H + '))';
+    }
+    left.textContent = L({zh:'草稿',en:'Sketch',ja:'ラフ'});
+    right.textContent = L({zh:'完稿',en:'Final',ja:'完成'});
+    summary.textContent = L({zh:'比較草稿與完稿',en:'Compare sketch and final',ja:'ラフと完成を比較'});
+    slider.setAttribute('aria-label',summary.textContent);
+  }
+  document.addEventListener('portfolio-view',show);
+  document.addEventListener('portfolio-language',show);
+})();
 
 /* ==================== js/main.js ==================== */
 /* Start-up: language buttons, routing, no saving the artwork, arrow keys */

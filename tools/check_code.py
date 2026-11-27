@@ -251,7 +251,7 @@ def findings():
         head = f'const {name} = '
         return json.JSONDecoder().raw_decode(data[data.index(head) + len(head):])[0] if head in data else None
 
-    for name in ('WORKS', 'GOODS', 'BOOKS', 'EVENTS'):
+    for name in ('WORKS', 'GOODS', 'CATALOGS', 'BOOKS', 'EVENTS'):
         items = listed(name)
         if items is None:
             out.append(f'js/data.js: {name} not found: update tools/check_code.py')
@@ -260,6 +260,18 @@ def findings():
             e = re.escape(k)
             if not re.search(rf'\.{e}(?![\w$])|[\'"`]{e}[\'"`]|[{{,]\s*{e}\s*[,}}=]', code):
                 out.append(f'js/data.js: the {name} field "{k}" is never read')
+    catalogs = {c['ev']: c for c in listed('CATALOGS') or []}
+    for g in listed('GOODS') or []:
+        photo = g.get('image')
+        if photo is not None:
+            if not (isinstance(photo, list) and len(photo) == 3 and isinstance(photo[0], str)
+                    and all(isinstance(v, int) and v > 0 for v in photo[1:])):
+                out.append(f'js/data.js: {g["slug"]} needs image [path, width, height]')
+        else:
+            pages = catalogs.get(g['ev'], {}).get('dims', [])
+            pg = g.get('pg')
+            if not isinstance(pg, int) or not 0 <= pg < len(pages):
+                out.append(f'js/data.js: {g["slug"]} needs a photo or a valid page in the {g["ev"]} catalog')
     works = {w['id'] for w in listed('WORKS') or []}
     for s in listed('HOME_SLIDES') or []:
         if s.get('id') not in works:

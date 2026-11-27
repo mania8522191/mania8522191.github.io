@@ -49,6 +49,7 @@ function setMenu(open) {
   menuBtn.setAttribute('aria-expanded', String(open));
   menuBtn.querySelector('.menu-lbl').textContent = open ? 'CLOSE' : 'MENU';
   if (open) navGrps.forEach((g) => { if (g.classList.contains('m-grp')) grpSet(g, !!g.querySelector('a[aria-current="page"]')); });   // the shown page's list open
+  if (open) $('#m-nav').scrollTop = 0;
 }
 menuBtn.addEventListener('click', () => setMenu(!document.documentElement.classList.contains('menu-open')));
 $('#m-nav').addEventListener('click', (e) => { if (e.target.closest('a')) setMenu(false); });

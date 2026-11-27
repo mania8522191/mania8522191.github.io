@@ -27,6 +27,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # for check_cod
 CSS = ['base', 'home', 'artbook', 'works', 'goods', 'nav', 'game', 'lightbox', 'about', 'event', 'board', 'motion', 'responsive']
 JS = ['data', 'core', 'i18n', 'game', 'lightbox', 'menu', 'goods', 'event', 'wall', 'work', 'tag', 'artbook', 'book3d', 'motion',
       'home', 'router', 'about', 'board', 'lang-switch', 'sound', 'main']
+# Each optional feature owns one directory; removing it and rebuilding removes it from both bundles.
+from pathlib import Path
+feature_root = Path(ROOT) / 'features'
+for path in sorted(feature_root.glob('*/style.css')):
+    CSS.append('../features/' + path.parent.name + '/style')
+for path in sorted(feature_root.glob('*/main.js')):
+    JS.insert(-1, '../features/' + path.parent.name + '/main')
 REF = re.compile(r'((?:href|src)=")(site\.(?:css|js))(?:\?v=\w*)?(")')
 
 

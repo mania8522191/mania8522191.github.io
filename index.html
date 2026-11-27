@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Shippori+Mincho:wght@400;500&family=Figtree:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap">
 <!-- site.css and site.js are built from css/ and js/ by tools/build.py; ?v= is their version stamp -->
-<link rel="stylesheet" href="site.css?v=90daa4f8">
+<link rel="stylesheet" href="site.css?v=604ee21f">
 <!-- visitor stats (GoatCounter; dashboard is private to the site owner). One count per page load, plus one per
      work / goods page opened so the dashboard shows which pieces people look at. -->
 <script data-goatcounter="https://mania8522191.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
@@ -151,9 +151,9 @@ addEventListener('hashchange', function () {
       <!-- NSFW: blurred previews only (the blur is baked into the files); the full pieces are in the cloud album -->
       <div class="nsfw" id="nsfw" hidden>
         <div class="nsfw-pics">
-          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up"><img src="img/nsfw/nsfw1.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="eager" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
-          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".1s"><img src="img/nsfw/nsfw2.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="eager" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
-          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".2s"><img src="img/nsfw/nsfw3.webp" width="600" height="429" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="eager" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
+          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up"><img src="img/nsfw/nsfw1.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="lazy" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
+          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".1s"><img src="img/nsfw/nsfw2.webp" width="600" height="750" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="lazy" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
+          <a class="nsfw-pic" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".2s"><img src="img/nsfw/nsfw3.webp" width="600" height="429" alt="模糊處理的成人向作品預覽" data-i18n-alt="nsfw.alt" loading="lazy" decoding="async"><span class="nsfw-tag" aria-hidden="true">18+</span></a>
         </div>
         <p class="nsfw-note" data-i18n="nsfw.note" data-rv="up" data-d=".25s">成人向作品不直接放在網站上。點圖片或下方按鈕，到 Google 雲端相簿看完整作品。</p>
         <a class="nsfw-go" href="https://drive.google.com/drive/folders/13iLkmzd5KRhpaBNY8aJSam84H7y5rGQI?usp=sharing" target="_blank" rel="noopener" data-rv="up" data-d=".35s"><span data-i18n="nsfw.go">前往 Google 雲端相簿</span><span aria-hidden="true">↗</span></a>
@@ -283,11 +283,11 @@ addEventListener('hashchange', function () {
   <article class="view in" id="v-catalog" hidden>
     <div class="proj">
       <header class="proj-head">
-        <p class="eyebrow">Fancy Frontier 47</p>
-        <h1 class="proj-title" data-i18n="goods.catalog">FF47 品書</h1>
+        <p class="eyebrow" id="catalog-event"></p>
+        <h1 class="proj-title" id="catalog-title"></h1>
         <ul class="proj-meta">
           <li id="catalog-date"></li><li id="catalog-count"></li>
-          <li><a href="https://www.pixiv.net/artworks/148499079" target="_blank" rel="noopener" data-i18n="wk.pixiv">在 pixiv 查看 ↗</a></li>
+          <li><a id="catalog-pixiv" target="_blank" rel="noopener" data-i18n="wk.pixiv">在 pixiv 查看 ↗</a></li>
         </ul>
       </header>
       <div class="cat-strip" id="catalog-pages" tabindex="0" role="region" aria-label="品書：左右拖曳翻頁" data-i18n-aria="catalog.strip"></div>
@@ -314,7 +314,7 @@ addEventListener('hashchange', function () {
       </header>
       <div class="gd-body">
         <figure class="gd-fig">
-          <div class="gd-stage" id="it-stage" role="button" tabindex="0" aria-label="點圖片拿出商品" data-i18n-aria="item.takeOut"><img class="gd-bg" src="img/goods-bg.webp" width="1800" height="1200" alt="" loading="lazy" decoding="async"><div class="gd-goods" id="it-goods"></div><img class="gd-page" id="it-page" alt=""></div>
+          <div class="gd-stage" id="it-stage"><img class="gd-bg" width="1800" height="1200" alt="" loading="lazy" decoding="async"><div class="gd-goods" id="it-goods"></div><img class="gd-page" id="it-page" alt=""></div>
           <button type="button" class="gd-out" id="it-out" aria-label="放回品書" data-i18n-aria="item.putBack">✕</button>
           <figcaption class="gd-hint" data-i18n="item.takeOut"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 5.5l13 13M18.5 5.5l-13 13"/><path d="M4.6 9.1V4.6h4.5M14.9 4.6h4.5v4.5M19.4 14.9v4.5h-4.5M9.1 19.4H4.6v-4.5"/></svg>點圖片拿出商品</figcaption>
         </figure>
@@ -410,7 +410,7 @@ addEventListener('hashchange', function () {
 
   <!-- about -->
   <section class="view about" id="v-about" hidden>
-    <img class="about-bg" src="img/hero.webp" width="2000" height="1333" alt="">
+    <img class="about-bg" loading="lazy" src="img/hero.webp" width="2000" height="1333" alt="">
     <div class="in">
       <h1 class="sec-title">ABOUT</h1>
       <div class="about-grid">
@@ -647,6 +647,6 @@ addEventListener('hashchange', function () {
   <div class="zv-chip"><button type="button" class="zv-chip-b"><img alt="" draggable="false"><span class="zv-chip-t"></span></button><button type="button" class="zv-chip-x" aria-label="關閉" title="關閉" data-i18n-aria="zv.close" data-i18n-title="zv.close"><svg class="zv-ic" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7"/></svg></button></div>
 </template>
 
-<script src="site.js?v=0c440b82"></script>
+<script src="site.js?v=4db38110"></script>
 </body>
 </html>

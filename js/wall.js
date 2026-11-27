@@ -66,9 +66,9 @@ function coverText(a, t, meta, label) {
   a.querySelector('.ov-m').textContent = a.querySelector('.cap-m').textContent = meta;
   a.setAttribute('aria-label', label);
 }
-WORKS.forEach((w, i) => {
+WORKS.forEach((w) => {
   const picks = w.pieces ? coverPieces(w) : [0];
-  const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, i < 4);
+  const a = makeCover('#w-' + w.id, picks.map((n) => [src(w.id, n), w.dims[n][0], w.dims[n][1]]), w.pos, false);
   a.id = 'c-' + w.id;
   a.dataset.n = picks[picks.length - 1];   // the picture in front: the page morph lands on its piece (js/router.js)
   a.dataset.date = madeOn(w);   // finished: the wall's order and its year headers

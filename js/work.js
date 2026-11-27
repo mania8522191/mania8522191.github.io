@@ -144,7 +144,7 @@ function workText(i, piece = -1) {
     box.querySelectorAll('img').forEach((img, n) => { img.alt = w.dims.length > 1 ? tr('wk.imgAlt', { t, n: n + 1, m: w.dims.length }) : t; });
   }
   /* cross-link: the goods made from this piece */
-  linkLine($('#wk-goods'), tr('wk.madeGoods'), GOODS.filter((g) => g.works.includes(w.id)).map((g) => [L(g.name), '#g-' + g.slug]));
+  linkLine($('#wk-goods'), tr('wk.madeGoods'), GOODS.filter((g) => g.works?.includes(w.id)).map((g) => [L(g.name), '#g-' + g.slug]));
 
   const procs = $('#wk-proc-box').querySelectorAll('img');
   procs.forEach((im, n) => { im.alt = tr('proc.alt', { t }) + (procs.length > 1 ? ` (${n + 1}/${procs.length})` : ''); });
@@ -165,6 +165,12 @@ function ytInline(card, id, t) {
     f.allowFullscreen = true;
     card.replaceWith(f);
     ytPlaying.set(f, card);
+    bgmSync();
   });
 }
-addEventListener('hashchange', () => { ytPlaying.forEach((card, f) => f.replaceWith(card)); ytPlaying.clear(); });
+function stopWorkVideo() {
+  if (!ytPlaying.size) return;
+  ytPlaying.forEach((card, f) => f.replaceWith(card));
+  ytPlaying.clear();
+  bgmSync();
+}

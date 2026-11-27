@@ -1,0 +1,17 @@
+.ff-list{max-width:780px;margin:0 auto clamp(30px,5vw,70px);padding:14px clamp(14px,3vw,32px);border-block:1px solid var(--line)}
+.ff-list summary{cursor:pointer;color:var(--g-gold);padding:8px 0;font-family:var(--f-display);font-size:var(--fs-lead)}
+.ff-list ul{list-style:none;padding:0;margin:12px 0}.ff-list li{margin:0;padding:12px 0}
+.ff-line{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:6px 12px;border-top:1px solid var(--line)}
+.ff-line img{width:54px;height:54px;object-fit:contain;background:var(--bg-2);border-radius:6px}
+.ff-line strong,.ff-line small{display:block}.ff-line small,.ff-feedback{color:var(--mute);font-size:var(--fs-small)}
+.ff-controls,.ff-pick{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.ff-note,.ff-pick select{font:inherit;color:var(--fg);background:var(--bg-2);border:1px solid var(--line);border-radius:5px;padding:6px 8px;min-width:0;max-width:100%}
+.ff-note{grid-column:2 / -1}.ff-pick select{width:100%;font-size:var(--fs-small)}
+.ff-action{background:transparent;color:var(--g-gold);border:1px solid var(--ring-line);border-radius:6px;padding:7px 12px;cursor:pointer;font:inherit}
+.ff-action:hover,.ff-action:focus-visible{border-color:var(--g-gold)}.ff-controls button{min-width:34px;padding:5px 8px}
+.ff-product{display:grid;align-content:start;gap:12px;min-width:0}.ff-product .g-card{grid-column:auto}
+@supports(grid-template-rows:subgrid){.ff-product{grid-row:span 5;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.ff-product .g-card{padding-bottom:0}.ff-pick{align-self:start}}
+.ff-pick{justify-content:center}.ff-pick small{font-size:var(--fs-small);color:var(--mute)}.ff-pick small:empty{display:none}
+.ff-list>strong,.ff-list>p{display:block;margin-bottom:12px}.ff-list>a,.ff-feedback{margin-inline-start:12px}
+@media(max-width:960px){.ff-product:first-child{grid-column:1 / -1}.ff-product:first-child .ff-pick{max-width:380px;margin:auto;width:100%}.ff-product:not(:first-child) .g-card:first-child .g-img{width:100%}}
+@media(max-width:480px){.ff-line{grid-template-columns:44px minmax(0,1fr)}.ff-line img{width:44px;height:44px}.ff-controls{grid-column:2}.ff-note{grid-column:1 / -1}}
