@@ -390,11 +390,20 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .tag-rel{margin-top:14px;text-align:center}
 .tag-rel a{display:inline-block}   /* a name moves to the next line whole (a long one wraps inside itself) */
 /* the Fan Art wall's character buttons, under its sub line: the gold label, then the names as small pills in the
-   site's ring look (--ring-*, as .btn), lit gold on hover; "more characters" opens the rest in a row of their own */
+   site's ring look (--ring-*, as .btn), lit gold on hover; "more characters" opens the rest under them */
 .fan-chars{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;max-width:900px;margin:18px auto 0}
 .fan-chars-k{margin-right:6px;color:var(--g-gold);font-size:var(--fs-small);letter-spacing:.06em}
 .fan-chars-in{display:contents}
-.fan-chars-more:not([hidden]){display:flex;flex-wrap:wrap;justify-content:center;gap:8px;flex-basis:100%;margin-top:2px}
+/* the rest open like the phone menu's groups (rows 0fr -> 1fr) and rise in one after another (--i, js/tag.js); closing,
+   they fade out fast (this selector outranks .fan-chars a's transition). The negative margin takes back the row's gap
+   while it is shut */
+.fan-chars-more{display:grid;grid-template-rows:0fr;flex-basis:100%;margin-top:-8px;transition:grid-template-rows .5s var(--ease-out)}
+.fan-chars-more>div{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s linear .5s}
+.fan-chars-more.open{grid-template-rows:1fr}
+.fan-chars-more.open>div{visibility:visible;transition:visibility 0s}
+.fan-chars-rest{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:8px 4px 6px}
+.fan-chars-more .fan-chars-rest a{opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s,border-color .35s,box-shadow .35s,color .35s}
+.fan-chars-more.open .fan-chars-rest a{opacity:1;transform:none;transition:opacity .5s var(--ease-out) calc(var(--i) * 15ms),transform .7s var(--ease-out) calc(var(--i) * 15ms),border-color .35s,box-shadow .35s,color .35s}
 .fan-chars a,.fan-chars-tg{display:inline-flex;align-items:center;height:32px;padding:0 15px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);box-shadow:var(--ring-shadow);color:var(--fg);font:inherit;font-size:var(--fs-small);letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:border-color .35s,box-shadow .35s,color .35s}
 .fan-chars a:hover,.fan-chars-tg:hover{border-color:var(--g-gold);color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
 .fan-chars a:focus-visible,.fan-chars-tg:focus-visible{outline:1px solid var(--fg);outline-offset:3px}
@@ -1314,7 +1323,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ff-list summary{display:flex;align-items:center;gap:12px;width:fit-content;margin:0 auto;padding:8px 0;list-style:none;cursor:pointer;color:var(--g-gold);font-family:var(--f-display);font-size:var(--fs-lead);letter-spacing:.06em}
 .ff-list summary::-webkit-details-marker{display:none}
 .ff-list summary::after{content:'';width:7px;height:7px;border:solid currentColor;border-width:0 1px 1px 0;transform:translateY(-3px) rotate(45deg);transition:transform .3s}
-.ff-list[open] summary::after{transform:translateY(2px) rotate(225deg)}
+.ff-list[open]:not(.ff-closing) summary::after{transform:translateY(2px) rotate(225deg)}   /* .ff-closing: on its way shut (main.js) */
+.ff-n{display:inline-block}   /* the count, which jumps when something is added */
 .ff-list summary:focus-visible{outline:1px solid var(--fg);outline-offset:4px}
 .ff-list ul{list-style:none;padding:0;margin:12px 0}.ff-list li{margin:0;padding:14px 0}
 .ff-line{display:grid;grid-template-columns:54px minmax(0,1fr) auto;align-items:center;gap:8px 14px;border-top:1px solid var(--line)}
@@ -1336,8 +1346,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @supports(grid-template-rows:subgrid){.ff-product{grid-row:span 5;grid-template-rows:subgrid;row-gap:6px;padding-bottom:clamp(44px,5vw,72px)}.ff-product .g-card{padding-bottom:0}.ff-pick{align-self:start}}
 .ff-pick{justify-content:center}.ff-pick small{font-size:var(--fs-small);color:var(--mute)}.ff-pick small:empty{display:none}
 /* the total in gold, the offer under it in grey, then the buttons */
-.ff-list>strong{display:block;margin:6px 0 4px;font-weight:400;color:var(--g-gold);letter-spacing:.06em;font-variant-numeric:tabular-nums}
-.ff-list>p{margin:0 0 16px;color:var(--mute);font-size:var(--fs-small)}
-.ff-list>a,.ff-feedback{margin-inline-start:12px}
+.ff-body>strong{display:block;margin:6px 0 4px;font-weight:400;color:var(--g-gold);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.ff-body>p{margin:0 0 16px;color:var(--mute);font-size:var(--fs-small)}
+.ff-body>a,.ff-feedback{margin-inline-start:12px}
 @media(max-width:960px){.ff-product:first-child{grid-column:1 / -1}.ff-product:first-child .ff-pick{max-width:380px;margin:auto;width:100%}.ff-product:not(:first-child) .g-card:first-child .g-img{width:100%}}
 @media(max-width:480px){.ff-line{grid-template-columns:44px minmax(0,1fr)}.ff-line img{width:44px;height:44px}.ff-controls{grid-column:2}.ff-note{grid-column:1 / -1}}

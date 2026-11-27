@@ -10,20 +10,24 @@ const tagWorks = (tag) => WORKS.filter((w) => w.tags.includes(tag));
 const tagHref = (tag) => '#t-' + encodeURIComponent(tag);
 /* the Fan Art wall's character buttons (CHARACTERS in js/data.js): shortcuts to their tags' pages, the first few in
    the row, the rest behind "more characters"; a name without works is left out */
-const charMore = $('#fan-chars-more'), charTg = $('#fan-chars-tg');
+const charMore = $('#fan-chars-more'), charRest = $('#fan-chars-rest'), charTg = $('#fan-chars-tg');
 const charLinks = (names) => names.filter((t) => tagWorks(t).length).map((t) => {
   const a = el('a', '', t);
   a.href = tagHref(t);
   return a;
 });
 $('#fan-chars-in').append(...charLinks(CHARACTERS.shown));
-charMore.append(...charLinks(CHARACTERS.more));
-charTg.hidden = !charMore.children.length;
-function charFold(open = false) {   // "more characters" open or not; folded again when the Work part starts over
-  charMore.hidden = !open;
+charRest.append(...charLinks(CHARACTERS.more).map((a, i) => {
+  a.style.setProperty('--i', i);   // its turn to rise in (css/works.css)
+  return a;
+}));
+charTg.hidden = !charRest.children.length;
+/* "more characters" open or not: css/works.css slides it open; folded again when the Work part starts over */
+function charFold(open = false) {
+  charMore.classList.toggle('open', open);
   charTg.setAttribute('aria-expanded', String(open));
 }
-charTg.addEventListener('click', () => charFold(charMore.hidden));
+charTg.addEventListener('click', () => charFold(!charMore.classList.contains('open')));
 function renderTag(tag) {
   tagNow = tag;
   const works = tagWorks(tag).sort(byMade);

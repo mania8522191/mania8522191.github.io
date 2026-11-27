@@ -29,8 +29,38 @@
   let rows = readRows(), downloadURL = '', revision = 0;
   const panel = el('details','ff-list'), summary = el('summary'), list = el('ul'), tally = el('strong');
   const offer = el('p'), save = el('button','btn'), download = el('a','btn ghost'), feedback = el('span','ff-feedback');
+  const body = el('div','ff-body'), head = el('span'), countBox = el('span','ff-n');
   save.type = 'button'; feedback.setAttribute('role','status'); download.download = 'FF47-mania8522191.png';
-  panel.append(summary,list,tally,offer,save,download,feedback);
+  body.append(list,tally,offer,save,download,feedback); summary.append(head); panel.append(summary,body);
+  /* motion in the site's ways (--ease-out; none when the visitor asks for less): the body slides open and shut like
+     the phone menu's groups, a line grows in or folds away, what changes rises into place, the count jumps */
+  const EASE = 'cubic-bezier(.16,1,.3,1)', calm = () => CALM || !body.animate;
+  const rise = (node, ms = 450) => { if (!calm()) node.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'none'}],{duration:ms,easing:EASE}); };
+  const bump = node => { if (!calm()) node.animate([{transform:'translateY(-3px) scale(1.3)'},{transform:'none'}],{duration:600,easing:EASE}); };
+  function fold(li, open) {   // a line from nothing to its full height, or back; returns the animation
+    const s = getComputedStyle(li), pt = parseFloat(s.paddingTop), pb = parseFloat(s.paddingBottom);
+    const full = {height:li.clientHeight-pt-pb+'px',paddingTop:pt+'px',paddingBottom:pb+'px',opacity:1};
+    const none = {height:'0px',paddingTop:'0px',paddingBottom:'0px',opacity:0};
+    li.style.overflow = 'hidden';
+    const a = li.animate(open ? [none,full] : [full,none],{duration:open ? 500 : 380,easing:EASE});
+    a.finished.then(() => { li.style.overflow = ''; },() => {});
+    return a;
+  }
+  let folding = null;
+  summary.addEventListener('click', e => {
+    if (calm()) return;   // then it opens and shuts at once, as a <details> does
+    e.preventDefault();
+    const closing = panel.open && !panel.classList.contains('ff-closing');
+    const from = panel.open ? body.getBoundingClientRect().height : 0, fade = folding ? +getComputedStyle(body).opacity : closing ? 1 : 0;
+    folding?.cancel();
+    panel.open = true; panel.classList.toggle('ff-closing',closing);
+    body.style.overflow = 'hidden';
+    folding = body.animate([{height:from+'px',opacity:fade},{height:(closing ? 0 : body.scrollHeight)+'px',opacity:closing ? 0 : 1}],{duration:500,easing:EASE});
+    folding.onfinish = () => {
+      folding = null; body.style.overflow = '';
+      if (closing) { panel.open = false; panel.classList.remove('ff-closing'); }
+    };
+  });
   $('#catalog-goods').before(panel);
   function invalidate() {
     revision++;
@@ -66,20 +96,28 @@
     const node = el('button',cls,text);
     node.type = 'button'; node.setAttribute('aria-label',label); node.addEventListener('click',action); return node;
   }
-  function paint() {
-    const count = rows.reduce((n,r) => n+r.qty,0);
-    summary.textContent = word('title')+' ('+count+')';
+  let drawn = new Map(), drawnCount = 0, drawnSum = '';   // what the last paint showed: each line's quantity, the count, the total
+  /* moved: after the visitor's own change, which then moves into place (not when the page or the language changes) */
+  function paint(moved = false) {
+    const count = rows.reduce((n,r) => n+r.qty,0), seen = moved && panel.open;
+    countBox.textContent = '('+count+')'; head.replaceChildren(word('title')+' ',countBox);
+    if (moved && count !== drawnCount) bump(countBox);
     list.replaceChildren();
-    if (!count) list.append(el('li','',word('empty')));
+    if (!count) { const none = el('li','',word('empty')); list.append(none); if (seen) rise(none); }
     for (const row of rows) {
       const li = el('li','ff-line'), photo = el('img'), copy = el('div'), controls = el('div','ff-controls');
       photo.src = thumbnail(row); photo.alt = ''; photo.loading = 'lazy';
-      const label = title(row); copy.append(el('strong','',label),el('small','',priceText(product(row).price)+' × '+row.qty));
+      const label = title(row), each = el('small','',priceText(product(row).price)+' × '+row.qty);
+      copy.append(el('strong','',label),each);
       const change = delta => {
-        row.qty += delta;
-        if (!row.qty) rows = rows.filter(r => r !== row);
-        storeRows(); paint();
-        (list.querySelector('[data-entry="'+identify(row)+'"] button') || summary).focus({preventScroll:true});
+        const done = () => {
+          row.qty = Math.max(0,row.qty+delta);
+          if (!row.qty) rows = rows.filter(r => r !== row);
+          storeRows(); paint(true);
+          (list.querySelector('[data-entry="'+identify(row)+'"] button') || summary).focus({preventScroll:true});
+        };
+        if (row.qty+delta > 0 || calm()) return done();
+        li.inert = true; fold(li,false).finished.then(done,done);   // the last one: the line folds away first
       };
       li.dataset.entry = identify(row);
       const more = button('cat-btn','+',word('qty')+' +1 '+label,() => change(1)); more.disabled = row.qty >= 99;
@@ -91,9 +129,14 @@
         note.addEventListener('input',() => { row.note=note.value; storeRows(); }); li.append(note);
       }
       list.append(li);
+      if (seen && !drawn.has(li.dataset.entry)) fold(li,true);
+      else if (seen && drawn.get(li.dataset.entry) !== row.qty) rise(each);
     }
-    const sum = totals();
+    const sum = totals(), hadNote = !offer.hidden;
     tally.textContent=sum.line; offer.textContent=sum.note; offer.hidden=!sum.note; tally.hidden=!count;
+    if (seen && count && sum.line !== drawnSum) rise(tally);
+    if (seen && sum.note && !hadNote) rise(offer);
+    drawn = new Map(rows.map(r => [identify(r),r.qty])); drawnCount = count; drawnSum = sum.line;
     save.textContent=word('save'); save.disabled=!count; download.textContent=word('ready');
   }
   function setup() {
@@ -118,7 +161,7 @@
         const found=rows.find(r => r.slug===g.slug && r.variant===variant);
         if (found) found.qty=Math.min(99,found.qty+1);
         else rows.push({slug:g.slug,variant,qty:1,note:''});
-        storeRows(); paint(); status.textContent=word('added')+' ×'+(found?.qty || 1);
+        storeRows(); paint(true); status.textContent=word('added')+' ×'+(found?.qty || 1); rise(status,400);
       });
       const status=el('small'); status.setAttribute('role','status');
       controls.append(add,status);
@@ -183,8 +226,8 @@
       if (!blob) throw new Error('PNG');
       if(version!==revision)return;
       if(downloadURL)URL.revokeObjectURL(downloadURL);
-      downloadURL=URL.createObjectURL(blob); download.href=downloadURL; download.hidden=false; download.click();
-    } catch { if(version===revision)feedback.textContent=word('error'); }
+      downloadURL=URL.createObjectURL(blob); download.href=downloadURL; download.hidden=false; rise(download); download.click();
+    } catch { if(version===revision){feedback.textContent=word('error'); rise(feedback);} }
     finally { save.disabled=!rows.length; }
   }
   save.addEventListener('click',exportImage);

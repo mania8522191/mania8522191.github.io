@@ -8,11 +8,20 @@
 .tag-rel{margin-top:14px;text-align:center}
 .tag-rel a{display:inline-block}   /* a name moves to the next line whole (a long one wraps inside itself) */
 /* the Fan Art wall's character buttons, under its sub line: the gold label, then the names as small pills in the
-   site's ring look (--ring-*, as .btn), lit gold on hover; "more characters" opens the rest in a row of their own */
+   site's ring look (--ring-*, as .btn), lit gold on hover; "more characters" opens the rest under them */
 .fan-chars{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;max-width:900px;margin:18px auto 0}
 .fan-chars-k{margin-right:6px;color:var(--g-gold);font-size:var(--fs-small);letter-spacing:.06em}
 .fan-chars-in{display:contents}
-.fan-chars-more:not([hidden]){display:flex;flex-wrap:wrap;justify-content:center;gap:8px;flex-basis:100%;margin-top:2px}
+/* the rest open like the phone menu's groups (rows 0fr -> 1fr) and rise in one after another (--i, js/tag.js); closing,
+   they fade out fast (this selector outranks .fan-chars a's transition). The negative margin takes back the row's gap
+   while it is shut */
+.fan-chars-more{display:grid;grid-template-rows:0fr;flex-basis:100%;margin-top:-8px;transition:grid-template-rows .5s var(--ease-out)}
+.fan-chars-more>div{min-height:0;overflow:hidden;visibility:hidden;transition:visibility 0s linear .5s}
+.fan-chars-more.open{grid-template-rows:1fr}
+.fan-chars-more.open>div{visibility:visible;transition:visibility 0s}
+.fan-chars-rest{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:8px 4px 6px}
+.fan-chars-more .fan-chars-rest a{opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s,border-color .35s,box-shadow .35s,color .35s}
+.fan-chars-more.open .fan-chars-rest a{opacity:1;transform:none;transition:opacity .5s var(--ease-out) calc(var(--i) * 15ms),transform .7s var(--ease-out) calc(var(--i) * 15ms),border-color .35s,box-shadow .35s,color .35s}
 .fan-chars a,.fan-chars-tg{display:inline-flex;align-items:center;height:32px;padding:0 15px;border:1px solid var(--ring-line);border-radius:999px;background:var(--ring-bg);box-shadow:var(--ring-shadow);color:var(--fg);font:inherit;font-size:var(--fs-small);letter-spacing:.04em;text-decoration:none;cursor:pointer;transition:border-color .35s,box-shadow .35s,color .35s}
 .fan-chars a:hover,.fan-chars-tg:hover{border-color:var(--g-gold);color:var(--g-gold);box-shadow:0 0 0 3px var(--ring-halo),var(--ring-shadow)}
 .fan-chars a:focus-visible,.fan-chars-tg:focus-visible{outline:1px solid var(--fg);outline-offset:3px}

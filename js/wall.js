@@ -237,7 +237,9 @@ function indexWall() {
   const nsfw = wallCat === 'nsfw';   // no wall, year bar or sort menu: the blurred previews and the album link instead
   wall.hidden = yearsBar.hidden = nsfw;
   nsfwBox.hidden = !nsfw;
-  $('#fan-chars').hidden = wallCat !== 'fan';   // the character buttons (js/tag.js): fan art only
+  const chars = $('#fan-chars'), back = chars.hidden && wallCat === 'fan';
+  chars.hidden = wallCat !== 'fan';   // the character buttons (js/tag.js): fan art only; back on it, they rise in with the covers
+  if (back && !CALM && !VIEWS.works.hidden) chars.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 800, easing: 'cubic-bezier(.16,1,.3,1)' });
   YEARS = [...new Set(wallOrder.map((c) => c.dataset.date.slice(0, 4)))];
   yearHead.forEach((hd) => hd.remove());
   yearHead.clear();
