@@ -46,6 +46,17 @@
 | `img/goods-<slug>-<n>.webp`、`img/goods-bg.webp` | 周邊商品頁：去背的商品（`goods_pieces.py`）、拿出商品時品書右邊展開的背景（`catalog_bg.py`） |
 | `img/share-og.jpg`、`img/share-x.jpg` | 分享預覽圖：網址貼到其他社群時顯示的圖（見「分享預覽圖」） |
 
+## 網址（mania8522191.com）
+
+網站的網址是 `https://mania8522191.com`（2026-11-28 起），舊的 `https://mania8522191.github.io` 會自動轉過來。
+- 網域在 Cloudflare 買的（Domains → Registrations），每年自動續約 US$11.17，註冊人資料不公開。
+- Cloudflare 的 DNS 有 4 筆 A（185.199.108–111.153）、4 筆 AAAA（2606:50c0:8000–8003::153）指向 GitHub Pages，
+  `www` 是 CNAME 到 `mania8522191.github.io`，全部「DNS only」（不要開橘色雲朵，GitHub 才能發 https 憑證）。
+  另有一筆 TXT `_github-pages-challenge-mania8522191`，是 GitHub 帳號的網域驗證，不要刪。
+- GitHub 的 repo 設定 → Pages → Custom domain 填 `mania8522191.com`，勾 Enforce HTTPS；repo 裡的 `CNAME` 檔就是這個設定，不要刪。
+- 網站裡寫著網址的地方：`index.html` 的分享預覽和語言連結、`tools/check_deploy.py`、留言板後台 `worker/wrangler.toml` 的
+  `SITE`（通知信裡的連結）和 `ORIGINS`（哪些網址可以用留言板；改了要 `npx wrangler deploy`）。
+
 ## 規則
 
 - **放大檢視一律用原尺寸**（`img/z/`、`img/ab/x/`、`img/proc/z/`），不縮小。只有頁面上的小圖會縮。
@@ -363,7 +374,7 @@ Illustrations 和 Art Books 裡點圖（作品、製作過程、畫冊跨頁）�
   它有哪些網址、各做什麼，寫在 `worker/src/index.js` 的開頭
 - 網站連到後台的網址（`BD_API`）和驗證框的 Site Key（`BD_TS_KEY`，空的就是不驗證）寫在 `js/board.js` 開頭，兩個都可以公開
 
-**審核**：打開 `https://mania8522191.github.io/#board-admin`（網站上沒有連結過去），輸入審核密碼。登入會記住 30 天；換了審核密碼，舊的登入就失效。
+**審核**：打開 `https://mania8522191.com/#board-admin`（網站上沒有連結過去），輸入審核密碼。登入會記住 30 天；換了審核密碼，舊的登入就失效。
 - 待審核：每則可以「接受並公開」或「刪除」。刪除會先問一次，刪了就救不回來，圖片也一起刪掉。
   圖片下面的「下載原檔」可以存下訪客傳的圖，拿去改
 - 回覆／改圖：寫回覆、加圖，按「儲存回覆」。第一張改圖跟訪客第一張圖的長寬比例一樣時，網站上兩張會疊在一起，可以左右拖曳比對

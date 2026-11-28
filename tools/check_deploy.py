@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import common as C   # noqa: E402
 
 REPO = 'mania8522191/mania8522191.github.io'
-SITE = 'https://mania8522191.github.io/'
+SITE = 'https://mania8522191.com/'   # the site's own domain since 2026-11-28 (CNAME)
 
 
 def get(url):

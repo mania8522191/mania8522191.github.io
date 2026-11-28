@@ -6,8 +6,9 @@ main = "src/index.js"
 compatibility_date = "2026-10-01"
 
 [vars]
-SITE = "https://mania8522191.github.io"
-ORIGINS = "https://mania8522191.github.io http://localhost:8765"   # the pages that may use it (the local preview too)
+SITE = "https://mania8522191.com"
+ORIGINS = "https://mania8522191.com https://www.mania8522191.com https://mania8522191.github.io http://localhost:8765"   # the pages that may use it
+# (the site's own domain since 2026-11-28; the old github.io address and the local preview too)
 
 [[d1_databases]]
 binding = "DB"
