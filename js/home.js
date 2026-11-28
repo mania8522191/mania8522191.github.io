@@ -21,13 +21,15 @@ function heroMake(item, i) {
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
   s.img.style.objectPosition = s.turn ? turnPos(s.pos || '50% 50%', s.turn) : s.pos || s.w.pos || '';
+  const picture = el('picture');
+  picture.append(s.img);
   if (s.turn) {   // a box as tall as the screen is wide, turned around its centre
     const t = el('div', 'hero-turn');
     t.style.setProperty('--turn', `${s.turn}deg`);
-    t.append(s.img);
+    t.append(picture);
     s.box.classList.add('turned');
     s.box.append(t);
-  } else s.box.append(s.img);
+  } else s.box.append(picture);
   s.dot = el('button', 'hero-dot');
   s.dot.type = 'button';
   s.dot.append(el('i'));
@@ -75,7 +77,13 @@ function heroLoad(s) {
   s.img.height = h;
   s.img.sizes = '100vw';   // until heroSizes knows how wide it shows
   heroSizes(s);
-  s.img.srcset = zw ? `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w` : `${page} ${w}w`;
+  if (zw) {
+    const phone = el('source');
+    phone.media = '(max-width: 600px), (pointer: coarse) and (max-height: 600px)';
+    phone.srcset = page;
+    s.img.before(phone);
+    s.img.srcset = `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w`;
+  }
   s.img.src = page;
 }
 
@@ -100,7 +108,11 @@ function heroShow(i) {
   heroCur = s;
   heroAt = i;
   heroLoad(s);
-  heroLoad(SLIDES[(i + 1) % SLIDES.length]);   // the next one, in the background
+  const preloadNext = () => {
+    if (view === 'home' && SLIDES[i] === s && heroCur === s) heroLoad(SLIDES[(i + 1) % SLIDES.length]);
+  };
+  if (s.img.complete) preloadNext();
+  else s.img.addEventListener('load', preloadNext, { once: true });
   s.box.classList.add('on');
   SLIDES.forEach((x, k) => x.dot.setAttribute('aria-current', String(k === i)));
   heroCap.href = '#w-' + s.w.id;
@@ -141,11 +153,7 @@ addEventListener('keydown', (e) => {
 function heroText() {
   SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: L(s.w.t) })));
 }
-heroPick();
 
-/* the corner buttons shown, top to bottom (each with its window; see below). Instagram's is left out for now, at the
-   user's wish (2026-11-17): its list is still kept up to date on GitHub; put 'ig' back between them to show it again */
-const SNS_ON = ['x', 'yt'];
 /* counts under a video or a post, each after its mark: views, likes (thumb: YouTube, heart: X), reposts; written
    short in the page's language (1.2萬, 1.2K, 1.2万), again on a language change */
 const STAT_ICON = {
@@ -205,30 +213,6 @@ fetch('yt-latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});   // no list: no button
 
-/* ---------- the newest posts on Instagram: ig-latest.json, with their pictures in img/ig/, which
-   .github/workflows/ig-latest.yml brings up to date every hour (tools/ig_latest.py). A click opens the post on
-   Instagram. ---------- */
-const igGrid = $('#ig-grid');
-function igText() {
-  igGrid.querySelectorAll('.ig-item').forEach((a) => a.setAttribute('aria-label', tr('ig.post', { d: dot(a.dataset.d) })));
-}
-if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
-  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-  .then(({ posts }) => {
-    igGrid.replaceChildren(...posts.map((p) => {
-      const a = el('a', p.kind === 'image' ? 'ig-item' : `ig-item ig-${p.kind}`), im = el('img');
-      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-      a.dataset.d = p.d;
-      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
-      a.append(im);
-      return a;
-    }));
-    igText();
-    $('#ig-btn').hidden = !posts.length;
-    snsFit();
-  })
-  .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): no button
-
 /* ---------- the newest five posts on X, the account's own with a picture (no reposts, replies, quotes, or posts of
    words only): x-latest.json, with their pictures in img/x/, which .github/workflows/x-latest.yml brings up to date
    every hour (tools/x_latest.py). Each is a cover like the works wall's with its picture whole; a post of several
@@ -239,9 +223,7 @@ const X_SEED = (WALL_SEED ^ 0x85ebca6b) >>> 0;   // an arrangement of its own, k
 function xText() {
   xWall.querySelectorAll('.cover').forEach((a) => {
     const d = dot(a.dataset.d), s = tr('x.stats', { rt: a.dataset.rt, like: a.dataset.like });
-    const row = stats([['rt', a.dataset.rt], ['heart', a.dataset.like]]);
-    row.title = s;
-    a.querySelector('.cap-m').replaceChildren(el('span', '', d), row);
+    a.querySelector('.st-row').title = s;
     a.setAttribute('aria-label', `${tr('x.post', { d })} ${s}`);
   });
   statText(xWall);
@@ -320,6 +302,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
       delete a.dataset.rv;   // no scroll reveal in a window
       a.dataset.d = p.d; a.dataset.rt = p.rt || 0; a.dataset.like = p.like || 0;
       a.querySelector('.cap-t').textContent = p.text;
+      a.querySelector('.cap-m').replaceWith(dateLine('cap-m', p.d, [['rt', p.rt], ['heart', p.like]]));
       return a;
     }));
     xText();
@@ -333,7 +316,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
    right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
    on a touch screen, and Esc. ---------- */
 const snsDock = $('#sns-dock');
-const SNS = SNS_ON.map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
+const SNS = [];
 let snsAt = null;   // the open one
 /* where a window sits (its bottom right corner on its button's) and how big it is open: its contents, no taller than
    the room between the header and the button (more than that scrolls with the wheel or a finger, with no scrollbar);
@@ -374,11 +357,6 @@ function snsMove(s, open) {
 function snsOver() {
   SNS.forEach((o) => o.btn.classList.toggle('over', SNS.some((s) => !s.pop.hidden && s.btn.offsetTop < o.btn.offsetTop)));
 }
-/* the window's gold line lights up while the pointer is on the window or its button, and dims when it leaves */
-SNS.forEach((s) => [s.pop, s.btn].forEach((e) => {
-  e.addEventListener('pointerenter', () => s.pop.classList.add('lit'));
-  e.addEventListener('pointerleave', () => s.pop.classList.remove('lit'));
-}));
 /* the open window fits its contents again: when they change size (another screen size, another language), when the
    screen gets taller or shorter, when a button comes */
 function snsFit() {
@@ -387,7 +365,6 @@ function snsFit() {
   snsAt.pop.style.width = `${w}px`; snsAt.pop.style.height = `${h}px`;
 }
 const snsWatch = new ResizeObserver(() => requestAnimationFrame(snsFit));
-SNS.forEach((s) => snsWatch.observe(s.pop.firstElementChild));
 addEventListener('resize', snsFit);
 /* open s (one of SNS), or shut the open one (null) */
 function snsSet(s) {
@@ -397,7 +374,18 @@ function snsSet(s) {
   if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
   snsDock.classList.toggle('open', !!s);   // the speech bubble steps aside (css/home.css .sns-tip)
 }
-SNS.forEach((s) => s.btn.addEventListener('click', () => snsSet(snsAt === s ? null : s)));
+function registerSns(btn) {
+  const pop = document.getElementById(btn.getAttribute('aria-controls'));
+  const s = { btn, pop };
+  SNS.push(s);
+  snsWatch.observe(pop.firstElementChild);
+  for (const node of [pop, btn]) {
+    node.addEventListener('pointerenter', () => pop.classList.add('lit'));
+    node.addEventListener('pointerleave', () => pop.classList.remove('lit'));
+  }
+  btn.addEventListener('click', () => snsSet(snsAt === s ? null : s));
+}
+snsDock.querySelectorAll('.sns-btn').forEach(registerSns);
 const snsOut = (e) => snsAt && e.target instanceof Element && !e.target.closest('.sns-dock');
 document.addEventListener('contextmenu', (e) => { if (snsOut(e)) { e.preventDefault(); snsSet(null); } });
 document.addEventListener('click', (e) => { if (snsOut(e) && matchMedia('(hover: none)').matches) snsSet(null); });

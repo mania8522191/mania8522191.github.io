@@ -11,7 +11,7 @@ const ZV_MIN_W = 240, ZV_MIN_H = 180;   // the smallest a window can be made
 const ZV_TOP = 3;   // the wheel zooms up to this many times a picture's actual size
 const ZV_POP = new Set(['shots', 'chars', 'cards']);   // the game page's pictures: the pop-up
 function galleryPages(w, t) {
-  return w.dims.map(([W, H, ZW, ZH], n) => ({
+  return w.dims.map(([W, H, ZW], n) => ({
     src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
     w: W, h: H, zw: ZW || W,
     no: `${n + 1} / ${w.dims.length}`, cap: t,
@@ -21,7 +21,7 @@ function galleryPages(w, t) {
 const ZV_SETS = {   // what a window steps through; made again in another language
   proc: (id) => {   // a work's process animations; the full-size one, where there is one, on zoom
     const w = WORKS[byId[id]], list = w.proc || [];
-    return list.map(([f, W, H, ZW, ZH], n) => ({
+    return list.map(([f, W, H, ZW], n) => ({
       src: `img/proc/${f}`, zsrc: ZW ? `img/proc/z/${f}` : null, eager: true,
       w: W, h: H, zw: ZW || W,
       no: `${n + 1} / ${list.length}`, cap: `${L(w.t)} · ${tr('proc.h')}`,
@@ -178,7 +178,7 @@ function zvShow(w, i, opening) {
   w.stage.scrollTo(0, 0);
   w.img.classList.remove('swap');
   if (!opening) { void w.img.offsetWidth; w.img.classList.add('swap'); }   // the next one swaps in; the first one flies in (zvFly)
-  if (w.kind === 'shots') showShot(w.at, false);
+  if (w.kind === 'shots' && w.at !== shotAt) showShot(w.at, false);
 }
 /* the picture that was clicked, where it is on the screen (null if it is not showing) */
 function zvRectOf(e) {

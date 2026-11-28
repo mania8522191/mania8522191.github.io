@@ -1,5 +1,3 @@
-/* Switching language: everything on screen is redrawn in place, with a short tween */
-/* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
 const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : e.id === 'tag-sub' ? tagVars() : { n: WORKS.length });
 /* a link with a logo in front (the footer's .sns) keeps the logo: only the text after it changes, so the link
    stays one piece of text and the language tween fades the logo with its name */
@@ -9,20 +7,55 @@ function setText(e, s) {
   else e.textContent = s;
 }
 /* the texts marked in the page, or in a part of it made later (a picture window: js/lightbox.js) */
+const textAttributes = '[data-i18n], [data-i18n-aria], [data-i18n-alt], [data-i18n-title]';
+function translateElement(e) {
+  const { i18n, i18nAria, i18nAlt, i18nTitle } = e.dataset;
+  if (i18n) setText(e, tr(i18n, subVars(e)));
+  if (i18nAria) e.setAttribute('aria-label', tr(i18nAria));
+  if (i18nAlt) e.alt = tr(i18nAlt);
+  if (i18nTitle) e.title = tr(i18nTitle);
+}
 function textsIn(root) {
-  root.querySelectorAll('[data-i18n]').forEach((e) => setText(e, tr(e.dataset.i18n, subVars(e))));
-  root.querySelectorAll('[data-i18n-aria]').forEach((e) => e.setAttribute('aria-label', tr(e.dataset.i18nAria)));
-  root.querySelectorAll('[data-i18n-alt]').forEach((e) => { e.alt = tr(e.dataset.i18nAlt); });
-  root.querySelectorAll('[data-i18n-title]').forEach((e) => { e.title = tr(e.dataset.i18nTitle); });
+  if (root.matches(textAttributes)) translateElement(root);
+  root.querySelectorAll(textAttributes).forEach(translateElement);
 }
 function applyStatic() {
-  textsIn(document);
+  for (const root of document.body.children) {
+    if (root.tagName !== 'MAIN') textsIn(root);
+  }
   document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
-  catText();
-  sortText();
-  paintAbout();
-  deckText();
-  yearText();
+}
+
+/* Hidden pages catch up the first time they are shown in this language. Detail pages already fill
+   their dynamic text in the router when a different work, product, or book is opened. */
+const translatedViews = new Set();
+function syncViewText(entering = false) {
+  if (!view || translatedViews.has(view)) return;
+  const root = VIEWS[view];
+  textsIn(root);
+  switch (view) {
+    case 'home': heroText(); heroEventText(); ytText(); xText(); break;
+    case 'event': eventText(); break;
+    case 'about': paintAbout(); break;
+    case 'game': gameText(); break;
+    case 'works':
+      catText(); sortText(); yearText();
+      wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
+      layoutWall();
+      break;
+    case 'tag': tagText(); layoutTag(); break;
+    case 'artbook': abText(); break;
+    case 'goods':
+    case 'catalog':
+      if (view === 'goods') goodsText();
+      else if (!entering) catalogText();
+      root.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
+      break;
+    case 'work': if (!entering) workText(byId[lastWork], lastPiece); break;
+    case 'book': if (!entering) bookText(byBook[lastBook]); break;
+    case 'item': if (!entering) itemText(bySlug[lastItem]); break;
+  }
+  translatedViews.add(view);
 }
 /* section intros reserve the height their longest language needs at this width, so switching language
    does not move everything below them */
@@ -83,20 +116,19 @@ function textIn(n) {
   n.animate([{ opacity: 0, filter: 'blur(4px)', offset: 0 }], { duration: 560, delay, easing: EASE_OUT, fill: 'backwards' });
   n.animate([{ transform: 'translateY(.45em)', offset: 0 }], { duration: 680, delay, easing: EASE_OUT, fill: 'backwards', composite: 'add' });
 }
-let langBusy = false, langNext = null;
+let langNext = null;
 function setLang(l) {
-  if (!I18N[l] || l === LANG) return;
+  if (!I18N[l] || (l === LANG && langNext === null)) return;
   document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
   if (CALM || !Element.prototype.animate) { swapLang(l); return; }
-  if (langBusy) { langNext = l; return; }
-  langBusy = true;
+  if (langNext !== null) { langNext = l; return; }
+  langNext = l;
   const outs = textOnScreen().flatMap(textOut);
   setTimeout(() => {
-    swapLang(l);
+    swapLang(langNext);
+    langNext = null;
     outs.forEach((a) => a.cancel());
     textOnScreen().forEach(textIn);
-    langBusy = false;
-    if (langNext && langNext !== LANG) { const n = langNext; langNext = null; setLang(n); } else langNext = null;
   }, 190);
 }
 function swapLang(l) {
@@ -107,32 +139,11 @@ function swapLang(l) {
   if (/[?&]lang=/.test(location.search)) {
     try { history.replaceState(history.state, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
+  translatedViews.clear();
   applyStatic();
+  syncViewText();
   zvLang();
-  heroText();
-  eventText();
-  ytText();
-  igText();
-  xText();
   sndText();
-  wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
-  goodsText();
-  catalogText();
-  document.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));   // on the goods list and the catalog's page
-  charList.querySelectorAll('.char').forEach((li, k) => {
-    const n = k + 1, btn = li.querySelector('.char-btn');
-    if (btn) btn.setAttribute('aria-label', tr(CHAR_CARD.has(n) ? 'chars.viewPair' : 'chars.view', { n }));
-    else li.querySelector('img').alt = tr('chars.tbd', { n });
-  });
-  shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
-  showShot(shotAt, false);
-  if (view === 'work') workText(byId[lastWork], lastPiece);
-  if (view === 'item') renderItem(bySlug[lastItem]);
-  abText();
-  if (view === 'book') bookText(byBook[lastBook]);
-  layoutWall();
-  tagText();   // a tag's page: its count and its covers' words
-  layoutTag();
   document.dispatchEvent(new Event('portfolio-language'));
   backFit();   // the back button keeps to the title's words in the new language
 }

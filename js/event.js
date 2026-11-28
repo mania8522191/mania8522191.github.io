@@ -20,6 +20,8 @@ evRows($('#ev-past'), evPast());
 /* the words that change with the language: the places, and the next event under the name on the home page */
 function eventText() {
   document.querySelectorAll('.ev').forEach((li) => { li.querySelector('.ev-p').textContent = evPlace(li._ev); });
+}
+function heroEventText() {
   const e = evNext()[0], a = $('#hero-ev');
   a.hidden = !e;
   if (!e) return;
@@ -28,4 +30,3 @@ function eventText() {
   a.querySelector('.hero-ev-p').textContent = evPlace(e);
   a.setAttribute('aria-label', tr('ev.hero', { n: e.name, d: evDays(e), p: evPlace(e) }));
 }
-eventText();

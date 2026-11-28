@@ -158,12 +158,25 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
 const SHOTS = ['shot1', 'shot2', 'shot3', 'shot4', 'shot5', 'shot6', 'shot7', 'shot8'];   // captions live in I18N
 const shotImg = $('#shot-img'), shotThumbs = $('#shot-thumbs');
 let shotAt = 0;
+function shotText() {
+  shotImg.alt = tr(SHOTS[shotAt]);
+  $('#shot-cap').textContent = shotImg.alt;
+}
+function gameText() {
+  deckText();
+  charList.querySelectorAll('.char').forEach((li, k) => {
+    const n = k + 1, btn = li.querySelector('.char-btn');
+    if (btn) btn.setAttribute('aria-label', tr(CHAR_CARD.has(n) ? 'chars.viewPair' : 'chars.view', { n }));
+    else li.querySelector('img').alt = tr('chars.tbd', { n });
+  });
+  shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
+  shotText();
+}
 function showShot(i, animate = true) {
   shotAt = (i + SHOTS.length) % SHOTS.length;
   shotImg.src = `img/shot${shotAt + 1}.webp`;
-  shotImg.alt = tr(SHOTS[shotAt]);
+  shotText();
   $('#shot-no').textContent = `${no2(shotAt + 1)} / ${no2(SHOTS.length)}`;
-  $('#shot-cap').textContent = tr(SHOTS[shotAt]);
   shotThumbs.querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', String(k === shotAt)));
   if (animate) { shotImg.classList.remove('swap'); void shotImg.offsetWidth; shotImg.classList.add('swap'); }
 }

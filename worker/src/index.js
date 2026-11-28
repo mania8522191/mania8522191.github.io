@@ -6,7 +6,7 @@
    page's), RESEND_API_KEY and NOTIFY_EMAIL (an e-mail on each new post; without them none is sent), and
    TURNSTILE_SECRET (the spam check: with it, a post must pass Cloudflare Turnstile; without it, none is asked for).
 
-   GET    /posts?before=<at>             accepted posts, newest first, a page at a time
+   GET    /posts?before=<at>&beforeId=<id>  accepted posts after that cursor, newest first
    GET    /pic/<id>/<o|s>                an accepted post's picture
    POST   /posts                         a new post (form: name, text, lang, ts = the Turnstile token if asked for, o0 s0 … o3 s3)
    POST   /admin/login                   {password} → {token}; the rest need "Authorization: Bearer <token>"
@@ -133,15 +133,32 @@ async function readPics(form, max) {
   }
   return { pics };
 }
-const savePics = (env, pics) => Promise.all(pics.flatMap((p) => [env.PICS.put(`${p.id}/o`, p.ob), env.PICS.put(`${p.id}/s`, p.sb)]));
 const dropPics = (env, ids) => Promise.all(ids.flatMap((id) => [env.PICS.delete(`${id}/o`), env.PICS.delete(`${id}/s`)]));
-const picRow = (env, p, post, who, n) => env.DB.prepare('INSERT INTO pics (id, post, who, n, type, w, h, stype, sw, sh) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-  .bind(p.id, post, who, n, p.oi.type, p.oi.w, p.oi.h, p.si.type, p.si.w, p.si.h);
+const picRow = (env, p, post, who, n, condition = '', params = []) => env.DB.prepare(
+  'INSERT INTO pics (id, post, who, n, type, w, h, stype, sw, sh) SELECT ?, id, ?, ?, ?, ?, ?, ?, ?, ? FROM posts WHERE id = ? ' + condition)
+  .bind(p.id, who, n, p.oi.type, p.oi.w, p.oi.h, p.si.type, p.si.w, p.si.h, post, ...params);
+
+async function commitPics(env, pics, statements) {
+  const ids = pics.map((p) => p.id);
+  try {
+    const writes = await Promise.allSettled(pics.flatMap((p) => [env.PICS.put(p.id + '/o', p.ob), env.PICS.put(p.id + '/s', p.sb)]));
+    const failed = writes.find((w) => w.status === 'rejected');
+    if (failed) throw failed.reason;
+    return await env.DB.batch(statements);
+  } catch (err) {
+    // Only remove uploads that never became part of a committed post.
+    if (ids.length) {
+      const used = (await env.DB.prepare(`SELECT id FROM pics WHERE id IN (${ids.map(() => '?').join(',')})`).bind(...ids).all()).results;
+      await dropPics(env, ids.filter((id) => !used.some((r) => r.id === id)));
+    }
+    throw err;
+  }
+}
 
 /* ---------- the board ---------- */
-async function list(env, state, before, admin) {
-  const rows = (await env.DB.prepare('SELECT id, at, name, text, lang, reply, reply_at FROM posts WHERE state = ? AND at < ? ORDER BY at DESC LIMIT ?')
-    .bind(state, before || 9e15, PAGE + 1).all()).results;
+async function list(env, state, params, admin) {
+  const rows = (await env.DB.prepare('SELECT id, at, name, text, lang, reply, reply_at FROM posts WHERE state = ? AND (at, id) < (?, ?) ORDER BY at DESC, id DESC LIMIT ?')
+    .bind(state, Number(params.get('before')) || 9e15, params.get('beforeId') || '', PAGE + 1).all()).results;
   const more = rows.length > PAGE;
   if (more) rows.pop();
   const ids = rows.map((r) => r.id);
@@ -180,13 +197,20 @@ async function newPost(req, env, ctx) {
   if (!text && !pics.length) return fail('empty');
   if ((await env.DB.prepare("SELECT COUNT(*) AS c FROM posts WHERE state = 'wait'").first()).c >= WAIT_MAX) return fail('full', 503);
   const id = newId(9), at = Date.now(), lang = ['zh', 'en', 'ja'].includes(form.get('lang')) ? form.get('lang') : 'zh';
-  await savePics(env, pics);
-  await env.DB.batch([
-    env.DB.prepare("INSERT INTO posts (id, at, name, text, lang, state) VALUES (?, ?, ?, ?, ?, 'wait')").bind(id, at, name, text, lang),
+  const [inserted] = await commitPics(env, pics, [
+    env.DB.prepare(`INSERT INTO posts (id, at, name, text, lang, state) SELECT ?, ?, ?, ?, ?, 'wait'
+      WHERE (SELECT COUNT(*) FROM posts WHERE state = 'wait') < ?
+        AND (SELECT COUNT(*) FROM hits WHERE ip = ? AND kind = 'post' AND at > ?) < 3
+        AND (SELECT COUNT(*) FROM hits WHERE ip = ? AND kind = 'post' AND at > ?) < 10`)
+      .bind(id, at, name, text, lang, WAIT_MAX, ip, at - 10 * MIN, ip, at - DAY),
     ...pics.map((p, n) => picRow(env, p, id, 'guest', n)),
-    hit(env, ip, 'post'),
+    env.DB.prepare("INSERT INTO hits (ip, kind, at) SELECT ?, 'post', at FROM posts WHERE id = ?").bind(ip, id),
     env.DB.prepare('DELETE FROM hits WHERE at < ?').bind(at - 2 * DAY),
   ]);
+  if (!inserted.meta.changes) {
+    await dropPics(env, pics.map((p) => p.id));
+    return await tooMany(env, ip, 'post', [[3, 10 * MIN], [10, DAY]]) ? fail('slow', 429) : fail('full', 503);
+  }
   ctx.waitUntil(notify(env, name, text, pics).catch((e) => console.error('mail', e)));
   return json({ ok: true }, 201);
 }
@@ -232,31 +256,37 @@ async function accept(env, id) {
 }
 
 async function reply(req, env, id) {
-  if (!(await env.DB.prepare('SELECT id FROM posts WHERE id = ?').bind(id).first())) return fail('gone', 404);
+  const post = await env.DB.prepare('SELECT reply_at FROM posts WHERE id = ?').bind(id).first();
+  if (!post) return fail('gone', 404);
   let form;
   try { form = await req.formData(); } catch (e) { return fail('form'); }
   const text = clean(form.get('text'));
   if (chars(text) > REPLY_MAX) return fail('long');
-  const mine = (await env.DB.prepare("SELECT id, n FROM pics WHERE post = ? AND who = 'reply' ORDER BY n").bind(id).all()).results;
+  if (form.has('version') && form.get('version') !== String(post.reply_at ?? '')) return fail('changed', 409);
+  const mine = (await env.DB.prepare("SELECT id, n, who, w, h, sw, sh FROM pics WHERE post = ? AND who = 'reply' ORDER BY n").bind(id).all()).results;
   const drop = String(form.get('drop') || '').split(','), gone = mine.filter((p) => drop.includes(p.id)), kept = mine.filter((p) => !drop.includes(p.id));
   const { pics, error } = await readPics(form, OWN_MAX);
   if (error) return fail(error);
   if (kept.length + pics.length > PICS_MAX) return fail('pics');
-  await savePics(env, pics);
-  const from = mine.length ? mine[mine.length - 1].n + 1 : 0, any = text || kept.length + pics.length;
-  await env.DB.batch([
-    env.DB.prepare('UPDATE posts SET reply = ?, reply_at = ? WHERE id = ?').bind(text || null, any ? Date.now() : null, id),
-    ...gone.map((p) => env.DB.prepare('DELETE FROM pics WHERE id = ?').bind(p.id)),
-    ...pics.map((p, k) => picRow(env, p, id, 'reply', from + k)),
+  const from = mine.length ? mine[mine.length - 1].n + 1 : 0;
+  const at = Math.max(Date.now(), (post.reply_at || 0) + 1);
+  const batch = await commitPics(env, pics, [
+    ...gone.map((p) => env.DB.prepare('DELETE FROM pics WHERE id = ? AND EXISTS (SELECT 1 FROM posts WHERE id = ? AND reply_at IS ?)').bind(p.id, id, post.reply_at)),
+    ...pics.map((p, k) => picRow(env, p, id, 'reply', from + k, 'AND reply_at IS ?', [post.reply_at])),
+    env.DB.prepare('UPDATE posts SET reply = ?, reply_at = ? WHERE id = ? AND reply_at IS ?').bind(text || null, at, id, post.reply_at),
   ]);
+  if (!batch.at(-1).meta.changes) {
+    await dropPics(env, pics.map((p) => p.id));
+    return fail('changed', 409);
+  }
   await dropPics(env, gone.map((p) => p.id));
-  return json({ ok: true });
+  const added = pics.map((p, i) => ({ id: p.id, n: from + i, who: 'reply', w: p.oi.w, h: p.oi.h, sw: p.si.w, sh: p.si.h }));
+  return json({ ok: true, reply: text || null, reply_at: at, pics: [...kept, ...added] });
 }
 
 async function remove(env, id) {
-  const ids = (await env.DB.prepare('SELECT id FROM pics WHERE post = ?').bind(id).all()).results.map((p) => p.id);
-  const r = await env.DB.batch([env.DB.prepare('DELETE FROM pics WHERE post = ?').bind(id), env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(id)]);
-  await dropPics(env, ids);
+  const r = await env.DB.batch([env.DB.prepare('DELETE FROM pics WHERE post = ? RETURNING id').bind(id), env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(id)]);
+  await dropPics(env, r[0].results.map((p) => p.id));
   return r[1].meta.changes ? json({ ok: true }) : fail('gone', 404);
 }
 
@@ -264,14 +294,14 @@ async function route(req, env, ctx, url, allowed) {
   const p = url.pathname.replace(/\/+$/, '') || '/', m = req.method;
   let x;
   if (m === 'GET' && p === '/') return json({ board: true });
-  if (m === 'GET' && p === '/posts') return list(env, 'shown', +url.searchParams.get('before'), false);
+  if (m === 'GET' && p === '/posts') return list(env, 'shown', url.searchParams, false);
   if (m === 'GET' && (x = /^\/pic\/(\w+)\/([os])$/.exec(p))) return pic(env, x[1], x[2], false);
   if (m === 'POST' && req.headers.get('Origin') && !allowed) return fail('origin', 403);   // a form on another site
   if (m === 'POST' && p === '/posts') return newPost(req, env, ctx);
   if (m === 'POST' && p === '/admin/login') return login(req, env);
   if (!p.startsWith('/admin/')) return fail('gone', 404);
   if (!(await isAdmin(req, env))) return fail('auth', 401);
-  if (m === 'GET' && p === '/admin/posts') return list(env, url.searchParams.get('state') === 'shown' ? 'shown' : 'wait', +url.searchParams.get('before'), true);
+  if (m === 'GET' && p === '/admin/posts') return list(env, url.searchParams.get('state') === 'shown' ? 'shown' : 'wait', url.searchParams, true);
   if (m === 'GET' && (x = /^\/admin\/pic\/(\w+)\/([os])$/.exec(p))) return pic(env, x[1], x[2], true);
   if (m === 'POST' && (x = /^\/admin\/posts\/(\w+)\/accept$/.exec(p))) return accept(env, x[1]);
   if (m === 'POST' && (x = /^\/admin\/posts\/(\w+)\/reply$/.exec(p))) return reply(req, env, x[1]);

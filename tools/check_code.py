@@ -21,6 +21,7 @@ import json
 import os
 import re
 import sys
+from html.parser import HTMLParser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build   # noqa: E402  (where the site is, and the order of css/ and js/)
@@ -59,6 +60,45 @@ def no_comments(text, kind):
 
 def has(name, text):
     return re.search(r'(?<![\w-])' + re.escape(name) + r'(?![\w-])', text) is not None
+
+
+class InlineScripts(HTMLParser):
+    """Collect inline JavaScript without mistaking page copy or JSON for references."""
+    def __init__(self):
+        super().__init__()
+        self.code = []
+        self.in_script = False
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == 'script':
+            kind = (attributes.get('type') or '').strip().lower().split(';')[0]
+            self.in_script = 'src' not in attributes and kind in ('', 'module', 'text/javascript', 'application/javascript')
+        self.code.extend(value for name, value in attrs if name.startswith('on') and value)
+
+    def handle_endtag(self, tag):
+        if tag == 'script':
+            self.in_script = False
+
+    def handle_data(self, data):
+        if self.in_script:
+            self.code.append(data)
+
+
+def unused_names(js, html):
+    inline = InlineScripts()
+    inline.feed(html)
+    inline.close()
+    # Ignore the dots on spread expressions, so ...name counts as a use of name.
+    uses = '\n'.join([*js.values(), no_comments('\n'.join(inline.code), 'js')]).replace('...', '   ')
+    seen = set()
+    for n, s in js.items():
+        for m in DECL.finditer(s):
+            name = next(g for g in m.groups() if g)
+            if name not in seen:
+                seen.add(name)
+                if len(re.findall(r'(?<![\w$.])' + re.escape(name) + r'(?![\w$])', uses)) < 2:
+                    yield f'js/{n}.js:{line(s, m.start())}: {name} is never used'
 
 
 def built(name, text, sep):
@@ -148,15 +188,7 @@ def findings():
                 out.append(f'{kind}/{f}: not in the list in tools/build.py, so the page never loads it')
 
     # functions and variables
-    uses = page.replace('...', '   ')   # ...name (spread) is a use of name
-    seen = set()
-    for n, s in js.items():
-        for m in DECL.finditer(s):
-            name = next(g for g in m.groups() if g)
-            if name not in seen:
-                seen.add(name)
-                if len(re.findall(r'(?<![\w$.])' + re.escape(name) + r'(?![\w$])', uses)) < 2:
-                    out.append(f'js/{n}.js:{line(s, m.start())}: {name} is never used')
+    out.extend(unused_names(js, html))
 
     # classes, ids, and declarations a later rule always overrides
     names, last = {}, {}

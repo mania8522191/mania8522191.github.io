@@ -152,8 +152,6 @@ const EVENTS = [
   {"name":"Fancy Frontier 47","from":"2026-08-21","to":"2026-08-23","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}}
 ];
 
-const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';
-
 /* ==================== js/core.js ==================== */
 /* Shared helpers: lookups, DOM shortcuts, the page views, cssUrl */
 const byId = Object.fromEntries(WORKS.map((w, i) => [w.id, i]));
@@ -174,11 +172,17 @@ const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), ta
 /* a page's cross-links, a line of them after its words ("這張插畫做成了周邊：A、B"); hidden when there are none.
    links: [words, address] */
 function linkLine(box, words, links) {
-  box.replaceChildren();
+  while (box.children.length > links.length) {
+    const last = box.lastElementChild;
+    last.previousSibling.remove();
+    last.remove();
+  }
   links.forEach(([t, href], k) => {
-    const a = el('a', '', t);
+    let a = box.children[k];
+    if (!a) { a = el('a'); box.append(document.createTextNode(''), a); }
+    a.previousSibling.data = k ? tr('list.sep') : words;
+    a.textContent = t;
     a.href = href;
-    box.append(k ? tr('list.sep') : words, a);
   });
   box.hidden = !links.length;
 }
@@ -226,9 +230,6 @@ const I18N = {
     "tl.play": "在 YouTube 播放：{t}",
     "yt.h": "最新繪圖直播",
     "yt.more": "在 YouTube 看更多 ↗",
-    "ig.h": "最新貼文",
-    "ig.more": "在 Instagram 看更多 ↗",
-    "ig.post": "在 Instagram 看這則貼文（{d}）",
     "x.h": "最新貼文",
     "sns.tip1": "最新",
     "sns.tip2": "動態",
@@ -248,6 +249,7 @@ const I18N = {
     "goods.shopBtn": "前往賣場 ↗",
     "item.buy": "到買動漫賣場購買 ↗",
     "item.takeOut": "點圖片拿出商品",
+    "item.retry": "商品圖片載入失敗，點一下重試",
     "item.putBack": "放回品書",
     "item.used": "使用插畫",
     "item.books": "內含畫冊：",
@@ -514,9 +516,6 @@ const I18N = {
     "tl.play": "Play on YouTube: {t}",
     "yt.h": "Latest drawing streams",
     "yt.more": "More on YouTube ↗",
-    "ig.h": "Latest posts",
-    "ig.more": "More on Instagram ↗",
-    "ig.post": "View this post on Instagram ({d})",
     "x.h": "Latest posts",
     "sns.tip1": "What’s",
     "sns.tip2": "new",
@@ -536,6 +535,7 @@ const I18N = {
     "goods.shopBtn": "Visit the shop ↗",
     "item.buy": "Buy at the MyACG shop ↗",
     "item.takeOut": "Click the picture to take the goods out",
+    "item.retry": "The product images could not load. Click to retry.",
     "item.putBack": "Put them back",
     "item.used": "Artwork used",
     "item.books": "Art book inside: ",
@@ -802,9 +802,6 @@ const I18N = {
     "tl.play": "YouTubeで再生：{t}",
     "yt.h": "最新のお絵描き配信",
     "yt.more": "YouTubeでもっと見る ↗",
-    "ig.h": "最新の投稿",
-    "ig.more": "Instagramでもっと見る ↗",
-    "ig.post": "Instagramでこの投稿を見る（{d}）",
     "x.h": "最新のポスト",
     "sns.tip1": "最新",
     "sns.tip2": "情報",
@@ -824,6 +821,7 @@ const I18N = {
     "goods.shopBtn": "ショップへ ↗",
     "item.buy": "買動漫ショップで購入 ↗",
     "item.takeOut": "画像をクリックしてグッズを取り出す",
+    "item.retry": "商品画像を読み込めませんでした。タップして再試行してください。",
     "item.putBack": "お品書きに戻す",
     "item.used": "使用イラスト",
     "item.books": "収録アートブック：",
@@ -1226,12 +1224,25 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(hove
 const SHOTS = ['shot1', 'shot2', 'shot3', 'shot4', 'shot5', 'shot6', 'shot7', 'shot8'];   // captions live in I18N
 const shotImg = $('#shot-img'), shotThumbs = $('#shot-thumbs');
 let shotAt = 0;
+function shotText() {
+  shotImg.alt = tr(SHOTS[shotAt]);
+  $('#shot-cap').textContent = shotImg.alt;
+}
+function gameText() {
+  deckText();
+  charList.querySelectorAll('.char').forEach((li, k) => {
+    const n = k + 1, btn = li.querySelector('.char-btn');
+    if (btn) btn.setAttribute('aria-label', tr(CHAR_CARD.has(n) ? 'chars.viewPair' : 'chars.view', { n }));
+    else li.querySelector('img').alt = tr('chars.tbd', { n });
+  });
+  shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
+  shotText();
+}
 function showShot(i, animate = true) {
   shotAt = (i + SHOTS.length) % SHOTS.length;
   shotImg.src = `img/shot${shotAt + 1}.webp`;
-  shotImg.alt = tr(SHOTS[shotAt]);
+  shotText();
   $('#shot-no').textContent = `${no2(shotAt + 1)} / ${no2(SHOTS.length)}`;
-  $('#shot-cap').textContent = tr(SHOTS[shotAt]);
   shotThumbs.querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', String(k === shotAt)));
   if (animate) { shotImg.classList.remove('swap'); void shotImg.offsetWidth; shotImg.classList.add('swap'); }
 }
@@ -1261,7 +1272,7 @@ const ZV_MIN_W = 240, ZV_MIN_H = 180;   // the smallest a window can be made
 const ZV_TOP = 3;   // the wheel zooms up to this many times a picture's actual size
 const ZV_POP = new Set(['shots', 'chars', 'cards']);   // the game page's pictures: the pop-up
 function galleryPages(w, t) {
-  return w.dims.map(([W, H, ZW, ZH], n) => ({
+  return w.dims.map(([W, H, ZW], n) => ({
     src: src(w.id, n), zsrc: ZW ? src(w.id, n).replace('img/', 'img/z/') : null,
     w: W, h: H, zw: ZW || W,
     no: `${n + 1} / ${w.dims.length}`, cap: t,
@@ -1271,7 +1282,7 @@ function galleryPages(w, t) {
 const ZV_SETS = {   // what a window steps through; made again in another language
   proc: (id) => {   // a work's process animations; the full-size one, where there is one, on zoom
     const w = WORKS[byId[id]], list = w.proc || [];
-    return list.map(([f, W, H, ZW, ZH], n) => ({
+    return list.map(([f, W, H, ZW], n) => ({
       src: `img/proc/${f}`, zsrc: ZW ? `img/proc/z/${f}` : null, eager: true,
       w: W, h: H, zw: ZW || W,
       no: `${n + 1} / ${list.length}`, cap: `${L(w.t)} · ${tr('proc.h')}`,
@@ -1428,7 +1439,7 @@ function zvShow(w, i, opening) {
   w.stage.scrollTo(0, 0);
   w.img.classList.remove('swap');
   if (!opening) { void w.img.offsetWidth; w.img.classList.add('swap'); }   // the next one swaps in; the first one flies in (zvFly)
-  if (w.kind === 'shots') showShot(w.at, false);
+  if (w.kind === 'shots' && w.at !== shotAt) showShot(w.at, false);
 }
 /* the picture that was clicked, where it is on the screen (null if it is not showing) */
 function zvRectOf(e) {
@@ -1892,8 +1903,10 @@ function price(g, label) {
   const p = el('span', 'price');
   if (g.was) p.appendChild(el('s', '', `NT$${g.was}`));
   p.appendChild(document.createTextNode(`NT$${g.price}`));
-  if (g.unit) p.appendChild(el('small', '', tr('price.per')));
-  if (label) p.appendChild(el('small', '', tr('price.event')));
+  for (const key of [g.unit && 'price.per', label && 'price.event'].filter(Boolean)) {
+    const note = el('small', '', tr(key));
+    note.dataset.i18n = key; p.appendChild(note);
+  }
   return p;
 }
 
@@ -1923,7 +1936,7 @@ function goodsImage(g) {
 }
 /* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
    language) */
-function goodsCard(g, i) {
+function goodsCard(g, i, inCatalog = false) {
   const a = el('a', 'g-card');
   a.href = '#g-' + g.slug;
   a.id = 'gc-' + g.slug;
@@ -1933,24 +1946,25 @@ function goodsCard(g, i) {
   const media = goodsImage(g);
   if (media) {
     const img = el('img');
-    [img.src, img.width, img.height] = media;
-    img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
+    img.width = media[1]; img.height = media[2];
+    img.alt = ''; img.decoding = 'async';
+    if (inCatalog) img.dataset.src = media[0];
+    else { img.loading = i < 3 ? 'eager' : 'lazy'; img.src = media[0]; }
     box.appendChild(img);
     a.appendChild(box);
   }
-  a.append(el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
+  a.append(el('span', 'g-name'), el('span', 'g-meta'), price(g, false));
   fillGoodsCard(a, g);
   return a;
 }
 function fillGoodsCard(a, g) {
   a.querySelector('.g-name').textContent = L(g.name);
   a.querySelector('.g-meta').textContent = L(g.meta);
-  a.querySelector('.price').replaceWith(price(g, false));
 }
 /* goods as cards, three to a row */
 function goodsGrid(items) {
   const grid = el('div', 'g-grid');
-  grid.append(...items.map(goodsCard));
+  grid.append(...items.map((g, i) => goodsCard(g, i)));
   return grid;
 }
 
@@ -2033,10 +2047,26 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
 /* ---------- an event's catalog page: its date and page count; its pages side by side, to be dragged left and right;
    then the event's goods, the cards that open their item pages ---------- */
 const catalogPages = $('#catalog-pages');
+function loadCatalogImage(img) {
+  if (!img?.dataset.src) return;
+  img.src = img.dataset.src;
+  delete img.dataset.src;
+  catalogObserver?.unobserve(img);
+}
+const catalogObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  for (const entry of entries) if (entry.isIntersecting) loadCatalogImage(entry.target);
+}, { rootMargin: '40px' }) : null;
+function watchCatalogImages(root) {
+  for (const img of root.querySelectorAll('img[data-src]')) {
+    if (catalogObserver) catalogObserver.observe(img);
+    else { img.loading = 'lazy'; loadCatalogImage(img); }
+  }
+}
 /* rebuilt when the event changes (catalogText and js/lang-switch.js update the words); `fresh`, not back
    from one of its goods: from the first page */
 function renderCatalog(catalog, fresh) {
   if (currentCatalog !== catalog) {
+    catalogObserver?.disconnect();
     currentCatalog = catalog;
     catalogDrag = catalogTo = null;
     catalogPages.classList.remove('held');
@@ -2044,19 +2074,27 @@ function renderCatalog(catalog, fresh) {
     $('#catalog-pixiv').href = 'https://www.pixiv.net/artworks/' + catalog.id;
     catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
       const img = el('img');
-      img.src = src(catalog.id, i);
+      if (i === 0) { img.fetchPriority = 'high'; img.src = src(catalog.id, i); }
+      else img.dataset.src = src(catalog.id, i);
       img.width = width; img.height = height;
-      img.loading = i < 3 ? 'eager' : 'lazy';
       img.decoding = 'async';
       img.draggable = false;
       return img;
     }));
-    $('#catalog-goods').replaceChildren(...GOODS.filter((g) => g.ev === catalog.ev).map(goodsCard));
+    const grid = $('#catalog-goods');
+    grid.replaceChildren(...GOODS.filter((g) => g.ev === catalog.ev).map((g, i) => goodsCard(g, i, true)));
+    watchCatalogImages(grid);
   }
   if (fresh) catalogPages.scrollLeft = 0;
   catalogText();
   catalogAt();
 }
+// Load the other visible pages once the cover is ready. Scrolling and the arrows can request a page sooner.
+function catalogCoverReady(e) {
+  if (e.target === catalogPages.firstElementChild) watchCatalogImages(catalogPages);
+}
+catalogPages.addEventListener('load', catalogCoverReady, true);
+catalogPages.addEventListener('error', catalogCoverReady, true);
 /* the words that change with the language: the date, the page count, each page's description */
 function catalogText() {
   if (!currentCatalog) return;
@@ -2075,6 +2113,7 @@ const catalogStep = () => { const [a, b] = catalogPages.children; return b ? b.o
 function catalogAt() {
   const step = catalogStep(), n = catalogPages.children.length;
   const i = step ? Math.min(n - 1, Math.max(0, Math.round(catalogPages.scrollLeft / step))) : 0;
+  loadCatalogImage(catalogPages.children[i]);
   $('#catalog-at').textContent = `${i + 1} / ${n}`;
   $('#catalog-prev').disabled = i === 0;
   $('#catalog-next').disabled = i === n - 1;
@@ -2082,6 +2121,7 @@ function catalogAt() {
 }
 function catalogGo(i) {
   const n = catalogPages.children.length;
+  loadCatalogImage(catalogPages.children[i]);
   catalogPages.scrollTo({ left: Math.min(n - 1, Math.max(0, i)) * catalogStep(), behavior: CALM ? 'auto' : 'smooth' });
 }
 catalogPages.addEventListener('pointerdown', (e) => {
@@ -2146,6 +2186,7 @@ catalogPages.addEventListener('click', (e) => {
    scrolls the page. ✕ goes back the same steps: the pieces go home as the background fades in, the picture narrows to
    the page, the page fades in over them, the page shrinks back */
 const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
+const itHint = itGd.querySelector('.gd-hint');
 const FADE = 600, WIDEN = 700, BG = 800;   // ms (css/goods.css): the page's fade, the widening (and the goods' move), the background's fade
 let itTop = 0, itStep = 0;   // the pieces' stacking; the steps under way (a newer open or close calls off the older)
 /* the picture's next step after ms, unless an open or a close has begun since */
@@ -2165,12 +2206,31 @@ function itemSwap(change, then) {
     then();
   });
 }
-function itemOpen() {
-  if (!itGoods.childElementCount || itGd.classList.contains('open')) return;
+async function itemOpen() {
+  if (!itGoods.childElementCount || itGd.classList.contains('open') || itStage.hasAttribute('aria-busy')) return;
   const s = ++itStep;
+  itStage.setAttribute('aria-busy', 'true');
+  const bg = itStage.querySelector('.gd-bg');
+  const pictures = [...itGoods.children];
+  if (bg.dataset.src) pictures.push(bg);
+  const ready = await Promise.allSettled(pictures.map((img) => {
+    if (!img.hasAttribute('src') || (img.complete && !img.naturalWidth)) img.src = img.dataset.src;
+    return img.decode();
+  }));
+  if (s !== itStep) return;
+  itStage.removeAttribute('aria-busy');
+  if (view !== 'item') return;
+  if (ready.some((result) => result.status === 'rejected')) {
+    itHint.dataset.i18n = 'item.retry';
+    setText(itHint, tr('item.retry'));
+    itStage.setAttribute('aria-label', tr('item.retry'));
+    return;
+  }
+  itHint.dataset.i18n = 'item.takeOut';
+  setText(itHint, tr('item.takeOut'));
   itemSwap(() => {
     if (s !== itStep) return;
-    itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1;
+    itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.removeAttribute('aria-label'); itStage.tabIndex = -1;
     /* the grown picture in view: where it was if it fits there, else as near as the screen lets it, never under the header */
     const r = itStage.getBoundingClientRect(), top = $('.site-head').getBoundingClientRect().bottom + 16;
     scrollBy(0, r.top - Math.max(top, Math.min(r.top, innerHeight - 16 - r.height)));
@@ -2187,7 +2247,6 @@ function itemOpen() {
 /* a piece's shape, row by row: where it is at least half opaque, as [left, right] in its own width (0–1), null for a
    clear row; read once from its picture (the site's own, so a canvas may read it) */
 const itInk = new Map();
-const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 3000 }) : setTimeout(f, 400));
 function itemInk(p) {
   if (itInk.has(p.src)) return itInk.get(p.src);
   if (!p.complete || !p.naturalWidth) return null;
@@ -2228,11 +2287,13 @@ function itemCentre() {
 }
 function itemClose(now) {
   const s = ++itStep;
+  itStage.removeAttribute('aria-busy');
   if (!itGd.classList.contains('open')) return;
   const shut = () => {
     if (s !== itStep) return;
     itGd.classList.remove('open', 'wide', 'plain');
     itStage.setAttribute('role', 'button');
+    itStage.setAttribute('aria-label', tr('item.takeOut'));
     itStage.tabIndex = 0;
   };
   const ps = [...itGoods.querySelectorAll('img')];
@@ -2284,28 +2345,24 @@ itGoods.addEventListener('pointerdown', (e) => {
 });
 function renderItem(i) {
   const g = GOODS[i];
-  $('#it-lab').textContent = L(g.eyebrow);
-  $('#it-title').textContent = L(g.name);
-  $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* cross-link: the art books in it (books: their slugs) */
-  linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
   /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
   itemClose(true);
   const catalog = catalogByEvent.get(g.ev), media = goodsImage(g);
   const parts = media ? (g.parts || []) : [];
   const interactive = parts.length > 0;
   itStage.closest('figure').hidden = !media;
-  itGd.querySelector('.gd-hint').hidden = !interactive;
+  itHint.hidden = !interactive;
+  itHint.dataset.i18n = 'item.takeOut';
+  setText(itHint, tr('item.takeOut'));
   if (media) [itPage.src, itPage.width, itPage.height] = media;
   else itPage.removeAttribute('src');
-  itPage.alt = tr('item.imgAlt', { t: L(g.name) });
   const bg = itStage.querySelector('.gd-bg');
-  if (interactive && catalog?.bg) bg.src = catalog.bg;
-  else bg.removeAttribute('src');
-  bg.hidden = !bg.hasAttribute('src');
+  bg.removeAttribute('src');
+  bg.dataset.src = interactive ? catalog?.bg || '' : '';
+  bg.hidden = !bg.dataset.src;
+  bg.loading = 'eager';   // the source is set only after the visitor opens the item
   if (interactive) {
     itStage.setAttribute('role', 'button');
-    itStage.setAttribute('aria-label', tr('item.takeOut'));
     itStage.tabIndex = 0;
   } else {
     itStage.removeAttribute('role');
@@ -2315,27 +2372,23 @@ function renderItem(i) {
   itGoods.replaceChildren(...parts.map(([x, y, w, h], n) => {
     const p = el('img');
     const [, W, H] = media;
-    p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
+    p.dataset.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
     p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
   }));
-  /* their shapes read ahead while nothing moves, so the widening doesn't wait on them (itemCentre) */
-  for (const p of itGoods.children) p.decode().then(() => idle(() => itemInk(p)), () => {});
-
-  const rows = [];
-  if (g.size) rows.push([tr('spec.size'), L(g.size)]);
-  if (g.spec) rows.push([tr('spec.spec'), L(g.spec)]);
-  if (g.items) rows.push([tr('spec.' + g.list_title), L(g.items)]);
-  if (g.note) rows.push([tr('spec.offer'), L(g.note)]);
-  rows.push([tr('spec.debut'), L(catalog?.debut) || evName(g.ev)]);
-  $('#it-spec').replaceChildren(...rows.map(([k, v], n) => {
+  $('#it-price').replaceChildren(...price(g, true).childNodes);
+  const rows = [
+    ['spec.size', g.size], ['spec.spec', g.spec], ['spec.' + g.list_title, g.items],
+    ['spec.offer', g.note], ['spec.debut', catalog?.debut || evName(g.ev)],
+  ].filter(([, value]) => value);
+  $('#it-spec').replaceChildren(...rows.map(([key, value], n) => {
     const d = el('div');
     d.dataset.rv = 'up';
     d.dataset.d = `${n * 0.07}s`;
-    const dd = el('dd');
-    if (Array.isArray(v)) { const ol = el('ol'); v.forEach((t) => ol.appendChild(el('li', '', t))); dd.appendChild(ol); }
-    else dd.textContent = v;
-    d.append(el('dt', '', k), dd);
+    const dt = el('dt', '', tr(key)), dd = el('dd');
+    dt.dataset.i18n = key;
+    dd._value = value;
+    d.append(dt, dd);
     return d;
   }));
 
@@ -2345,14 +2398,34 @@ function renderItem(i) {
     const a = el('a'); a.href = '#w-' + id;
     a.dataset.rv = 'up'; a.dataset.d = `${n * 0.1}s`;
     const im = el('img'); im.src = src(id, 0); im.alt = ''; im.loading = 'lazy'; im.style.objectPosition = w.pos;
-    a.append(im, el('span', '', L(w.t)));
+    a.append(im, el('span'));
     return a;
   }));
 
   const p = GOODS[(i - 1 + GOODS.length) % GOODS.length];
   const nx = GOODS[(i + 1) % GOODS.length];
-  $('#it-prev').href = '#g-' + p.slug; $('#it-prev-t').textContent = L(p.name);
-  $('#it-next').href = '#g-' + nx.slug; $('#it-next-t').textContent = L(nx.name);
+  $('#it-prev').href = '#g-' + p.slug;
+  $('#it-next').href = '#g-' + nx.slug;
+  itemText(i);
+}
+
+function itemText(i) {
+  const g = GOODS[i];
+  $('#it-lab').textContent = L(g.eyebrow);
+  $('#it-title').textContent = L(g.name);
+  linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
+  itPage.alt = tr('item.imgAlt', { t: L(g.name) });
+  if (itStage.getAttribute('role') === 'button') itStage.setAttribute('aria-label', tr(itHint.dataset.i18n));
+  $('#it-spec').querySelectorAll('dd').forEach((dd) => {
+    const value = L(dd._value);
+    if (!Array.isArray(value)) { dd.textContent = value; return; }
+    const list = dd.firstElementChild || dd.appendChild(el('ol'));
+    while (list.childElementCount > value.length) list.lastElementChild.remove();
+    value.forEach((t, index) => { (list.children[index] || list.appendChild(el('li'))).textContent = t; });
+  });
+  $('#it-works').querySelectorAll('a').forEach((a) => { a.lastElementChild.textContent = L(WORKS[byId[a.hash.slice(3)]].t); });
+  $('#it-prev-t').textContent = L(GOODS[(i - 1 + GOODS.length) % GOODS.length].name);
+  $('#it-next-t').textContent = L(GOODS[(i + 1) % GOODS.length].name);
 }
 
 /* ==================== js/event.js ==================== */
@@ -2378,6 +2451,8 @@ evRows($('#ev-past'), evPast());
 /* the words that change with the language: the places, and the next event under the name on the home page */
 function eventText() {
   document.querySelectorAll('.ev').forEach((li) => { li.querySelector('.ev-p').textContent = evPlace(li._ev); });
+}
+function heroEventText() {
   const e = evNext()[0], a = $('#hero-ev');
   a.hidden = !e;
   if (!e) return;
@@ -2386,7 +2461,6 @@ function eventText() {
   a.querySelector('.hero-ev-p').textContent = evPlace(e);
   a.setAttribute('aria-label', tr('ev.hero', { n: e.name, d: evDays(e), p: evPlace(e) }));
 }
-eventText();
 
 /* ==================== js/wall.js ==================== */
 /* Works wall: categories, year headers and bar, sort menu, the cover layout */
@@ -3215,14 +3289,13 @@ function bookText(i) {
   $('#bk-date').textContent = tr('bk.date', { d: b.ym });
   $('#bk-ev').textContent = evName(b.ev);
   $('#bk-pages').textContent = pagesText(b.pages.length);
-  const spec = (k, v) => { const d = el('div'); d.append(el('dt', '', tr('bk.spec.' + k)), el('dd', '', v)); return d; };
-  $('#bk-spec').replaceChildren(   // size, pages, printing from the book's 品書; the cover paper is its material
-    spec('size', tr('bk.size.' + b.size)),
-    spec('pages', tr('bk.pp', { n: b.pp })),
-    spec('print', tr('bk.print.' + b.print)),
-    spec('cover', tr('bk.mat.' + (b.mat || 'gloss')) + (b.foil ? tr('bk.foil.' + b.foil) : '')),
-  );
-  $('#bk-spec').setAttribute('aria-label', tr('bk.spec'));
+  const values = [
+    tr('bk.size.' + b.size),
+    tr('bk.pp', { n: b.pp }),
+    tr('bk.print.' + b.print),
+    tr('bk.mat.' + (b.mat || 'gloss')) + (b.foil ? tr('bk.foil.' + b.foil) : ''),
+  ];
+  $('#bk-spec').querySelectorAll('dd').forEach((dd, index) => { dd.textContent = values[index]; });
   /* cross-link: the goods it comes in */
   linkLine($('#bk-goods'), tr('bk.goods'), GOODS.filter((g) => (g.books || []).includes(b.slug)).map((g) => [L(g.name), '#g-' + g.slug]));
   $('#bk-imgs').querySelectorAll('img').forEach((img) => {
@@ -3737,13 +3810,15 @@ function heroMake(item, i) {
   s.img.alt = '';   // the title is in the link under the carousel
   s.img.decoding = 'async';
   s.img.style.objectPosition = s.turn ? turnPos(s.pos || '50% 50%', s.turn) : s.pos || s.w.pos || '';
+  const picture = el('picture');
+  picture.append(s.img);
   if (s.turn) {   // a box as tall as the screen is wide, turned around its centre
     const t = el('div', 'hero-turn');
     t.style.setProperty('--turn', `${s.turn}deg`);
-    t.append(s.img);
+    t.append(picture);
     s.box.classList.add('turned');
     s.box.append(t);
-  } else s.box.append(s.img);
+  } else s.box.append(picture);
   s.dot = el('button', 'hero-dot');
   s.dot.type = 'button';
   s.dot.append(el('i'));
@@ -3791,7 +3866,13 @@ function heroLoad(s) {
   s.img.height = h;
   s.img.sizes = '100vw';   // until heroSizes knows how wide it shows
   heroSizes(s);
-  s.img.srcset = zw ? `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w` : `${page} ${w}w`;
+  if (zw) {
+    const phone = el('source');
+    phone.media = '(max-width: 600px), (pointer: coarse) and (max-height: 600px)';
+    phone.srcset = page;
+    s.img.before(phone);
+    s.img.srcset = `${page} ${w}w, ${page.replace('img/', 'img/z/')} ${zw}w`;
+  }
   s.img.src = page;
 }
 
@@ -3816,7 +3897,11 @@ function heroShow(i) {
   heroCur = s;
   heroAt = i;
   heroLoad(s);
-  heroLoad(SLIDES[(i + 1) % SLIDES.length]);   // the next one, in the background
+  const preloadNext = () => {
+    if (view === 'home' && SLIDES[i] === s && heroCur === s) heroLoad(SLIDES[(i + 1) % SLIDES.length]);
+  };
+  if (s.img.complete) preloadNext();
+  else s.img.addEventListener('load', preloadNext, { once: true });
   s.box.classList.add('on');
   SLIDES.forEach((x, k) => x.dot.setAttribute('aria-current', String(k === i)));
   heroCap.href = '#w-' + s.w.id;
@@ -3857,11 +3942,7 @@ addEventListener('keydown', (e) => {
 function heroText() {
   SLIDES.forEach((s, i) => s.dot.setAttribute('aria-label', tr('home.dot', { n: i + 1, t: L(s.w.t) })));
 }
-heroPick();
 
-/* the corner buttons shown, top to bottom (each with its window; see below). Instagram's is left out for now, at the
-   user's wish (2026-11-17): its list is still kept up to date on GitHub; put 'ig' back between them to show it again */
-const SNS_ON = ['x', 'yt'];
 /* counts under a video or a post, each after its mark: views, likes (thumb: YouTube, heart: X), reposts; written
    short in the page's language (1.2萬, 1.2K, 1.2万), again on a language change */
 const STAT_ICON = {
@@ -3921,30 +4002,6 @@ fetch('yt-latest.json', { cache: 'no-cache' })
   })
   .catch(() => {});   // no list: no button
 
-/* ---------- the newest posts on Instagram: ig-latest.json, with their pictures in img/ig/, which
-   .github/workflows/ig-latest.yml brings up to date every hour (tools/ig_latest.py). A click opens the post on
-   Instagram. ---------- */
-const igGrid = $('#ig-grid');
-function igText() {
-  igGrid.querySelectorAll('.ig-item').forEach((a) => a.setAttribute('aria-label', tr('ig.post', { d: dot(a.dataset.d) })));
-}
-if (SNS_ON.includes('ig')) fetch('ig-latest.json', { cache: 'no-cache' })
-  .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-  .then(({ posts }) => {
-    igGrid.replaceChildren(...posts.map((p) => {
-      const a = el('a', p.kind === 'image' ? 'ig-item' : `ig-item ig-${p.kind}`), im = el('img');
-      a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-      a.dataset.d = p.d;
-      im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.src = p.img;
-      a.append(im);
-      return a;
-    }));
-    igText();
-    $('#ig-btn').hidden = !posts.length;
-    snsFit();
-  })
-  .catch(() => {});   // no list yet (before the IG_TOKEN secret is set): no button
-
 /* ---------- the newest five posts on X, the account's own with a picture (no reposts, replies, quotes, or posts of
    words only): x-latest.json, with their pictures in img/x/, which .github/workflows/x-latest.yml brings up to date
    every hour (tools/x_latest.py). Each is a cover like the works wall's with its picture whole; a post of several
@@ -3955,9 +4012,7 @@ const X_SEED = (WALL_SEED ^ 0x85ebca6b) >>> 0;   // an arrangement of its own, k
 function xText() {
   xWall.querySelectorAll('.cover').forEach((a) => {
     const d = dot(a.dataset.d), s = tr('x.stats', { rt: a.dataset.rt, like: a.dataset.like });
-    const row = stats([['rt', a.dataset.rt], ['heart', a.dataset.like]]);
-    row.title = s;
-    a.querySelector('.cap-m').replaceChildren(el('span', '', d), row);
+    a.querySelector('.st-row').title = s;
     a.setAttribute('aria-label', `${tr('x.post', { d })} ${s}`);
   });
   statText(xWall);
@@ -4036,6 +4091,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
       delete a.dataset.rv;   // no scroll reveal in a window
       a.dataset.d = p.d; a.dataset.rt = p.rt || 0; a.dataset.like = p.like || 0;
       a.querySelector('.cap-t').textContent = p.text;
+      a.querySelector('.cap-m').replaceWith(dateLine('cap-m', p.d, [['rt', p.rt], ['heart', p.like]]));
       return a;
     }));
     xText();
@@ -4049,7 +4105,7 @@ fetch('x-latest.json', { cache: 'no-cache' })
    right. The same button closes it back into the ring, and so do a right-click anywhere outside it, a tap outside it
    on a touch screen, and Esc. ---------- */
 const snsDock = $('#sns-dock');
-const SNS = SNS_ON.map((k) => ({ btn: $(`#${k}-btn`), pop: $(`#home-${k}`) }));
+const SNS = [];
 let snsAt = null;   // the open one
 /* where a window sits (its bottom right corner on its button's) and how big it is open: its contents, no taller than
    the room between the header and the button (more than that scrolls with the wheel or a finger, with no scrollbar);
@@ -4090,11 +4146,6 @@ function snsMove(s, open) {
 function snsOver() {
   SNS.forEach((o) => o.btn.classList.toggle('over', SNS.some((s) => !s.pop.hidden && s.btn.offsetTop < o.btn.offsetTop)));
 }
-/* the window's gold line lights up while the pointer is on the window or its button, and dims when it leaves */
-SNS.forEach((s) => [s.pop, s.btn].forEach((e) => {
-  e.addEventListener('pointerenter', () => s.pop.classList.add('lit'));
-  e.addEventListener('pointerleave', () => s.pop.classList.remove('lit'));
-}));
 /* the open window fits its contents again: when they change size (another screen size, another language), when the
    screen gets taller or shorter, when a button comes */
 function snsFit() {
@@ -4103,7 +4154,6 @@ function snsFit() {
   snsAt.pop.style.width = `${w}px`; snsAt.pop.style.height = `${h}px`;
 }
 const snsWatch = new ResizeObserver(() => requestAnimationFrame(snsFit));
-SNS.forEach((s) => snsWatch.observe(s.pop.firstElementChild));
 addEventListener('resize', snsFit);
 /* open s (one of SNS), or shut the open one (null) */
 function snsSet(s) {
@@ -4113,7 +4163,18 @@ function snsSet(s) {
   if (s) { s.btn.setAttribute('aria-expanded', 'true'); snsMove(s, true); }
   snsDock.classList.toggle('open', !!s);   // the speech bubble steps aside (css/home.css .sns-tip)
 }
-SNS.forEach((s) => s.btn.addEventListener('click', () => snsSet(snsAt === s ? null : s)));
+function registerSns(btn) {
+  const pop = document.getElementById(btn.getAttribute('aria-controls'));
+  const s = { btn, pop };
+  SNS.push(s);
+  snsWatch.observe(pop.firstElementChild);
+  for (const node of [pop, btn]) {
+    node.addEventListener('pointerenter', () => pop.classList.add('lit'));
+    node.addEventListener('pointerleave', () => pop.classList.remove('lit'));
+  }
+  btn.addEventListener('click', () => snsSet(snsAt === s ? null : s));
+}
+snsDock.querySelectorAll('.sns-btn').forEach(registerSns);
 const snsOut = (e) => snsAt && e.target instanceof Element && !e.target.closest('.sns-dock');
 document.addEventListener('contextmenu', (e) => { if (snsOut(e)) { e.preventDefault(); snsSet(null); } });
 document.addEventListener('click', (e) => { if (snsOut(e) && matchMedia('(hover: none)').matches) snsSet(null); });
@@ -4188,6 +4249,7 @@ function startOver(next) {
 /* swap the DOM to the requested view, then start watching its reveal elements */
 function apply({ h, next, idx, cat, piece = -1, tag, catalog }) {
   const from = view, fromPiece = lastPiece;
+  if (from === 'item' && next !== 'item') itemClose(true);
   stopWorkVideo();
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
@@ -4254,11 +4316,12 @@ function apply({ h, next, idx, cat, piece = -1, tag, catalog }) {
   }
   if (next === 'goods') goodsYearsUpdate();
   view = next;
+  syncViewText(true);
   document.dispatchEvent(new Event('portfolio-view'));
   evenIntros();
   if (next === 'about') preloadAbout();
   if (next === 'board') boardShow(h === 'board-admin');
-  if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
+  if (next === 'home') heroPick();
   heroPlay();   // the carousel moves on only while the home page is shown
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
@@ -4294,9 +4357,9 @@ function curtainTo(r) {
         curtainEl.classList.remove('cur-in', 'cur-out');
         curtainBusy = false;
         if (location.hash !== shown) route();   // another tab was chosen while the curtain was up
-      }, 700);
-    }, 400);
-  }, 540);
+      }, 260);
+    }, 90);
+  }, 200);
 }
 const navEl = $('.nav'), navInk = el('span', 'nav-ink');
 navInk.setAttribute('aria-hidden', 'true');
@@ -4988,8 +5051,6 @@ async function bdSaveOrig(p, q, at) {   // a picture as it was sent, saved (to p
 }
 
 /* ==================== js/lang-switch.js ==================== */
-/* Switching language: everything on screen is redrawn in place, with a short tween */
-/* language switching: static text via data-i18n*, everything drawn by script is refreshed in place */
 const subVars = (e) => (e.id === 'works-sub' ? catVars() : e.id === 'ab-sub' ? abVars() : e.id === 'tag-sub' ? tagVars() : { n: WORKS.length });
 /* a link with a logo in front (the footer's .sns) keeps the logo: only the text after it changes, so the link
    stays one piece of text and the language tween fades the logo with its name */
@@ -4999,20 +5060,55 @@ function setText(e, s) {
   else e.textContent = s;
 }
 /* the texts marked in the page, or in a part of it made later (a picture window: js/lightbox.js) */
+const textAttributes = '[data-i18n], [data-i18n-aria], [data-i18n-alt], [data-i18n-title]';
+function translateElement(e) {
+  const { i18n, i18nAria, i18nAlt, i18nTitle } = e.dataset;
+  if (i18n) setText(e, tr(i18n, subVars(e)));
+  if (i18nAria) e.setAttribute('aria-label', tr(i18nAria));
+  if (i18nAlt) e.alt = tr(i18nAlt);
+  if (i18nTitle) e.title = tr(i18nTitle);
+}
 function textsIn(root) {
-  root.querySelectorAll('[data-i18n]').forEach((e) => setText(e, tr(e.dataset.i18n, subVars(e))));
-  root.querySelectorAll('[data-i18n-aria]').forEach((e) => e.setAttribute('aria-label', tr(e.dataset.i18nAria)));
-  root.querySelectorAll('[data-i18n-alt]').forEach((e) => { e.alt = tr(e.dataset.i18nAlt); });
-  root.querySelectorAll('[data-i18n-title]').forEach((e) => { e.title = tr(e.dataset.i18nTitle); });
+  if (root.matches(textAttributes)) translateElement(root);
+  root.querySelectorAll(textAttributes).forEach(translateElement);
 }
 function applyStatic() {
-  textsIn(document);
+  for (const root of document.body.children) {
+    if (root.tagName !== 'MAIN') textsIn(root);
+  }
   document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === LANG)));
-  catText();
-  sortText();
-  paintAbout();
-  deckText();
-  yearText();
+}
+
+/* Hidden pages catch up the first time they are shown in this language. Detail pages already fill
+   their dynamic text in the router when a different work, product, or book is opened. */
+const translatedViews = new Set();
+function syncViewText(entering = false) {
+  if (!view || translatedViews.has(view)) return;
+  const root = VIEWS[view];
+  textsIn(root);
+  switch (view) {
+    case 'home': heroText(); heroEventText(); ytText(); xText(); break;
+    case 'event': eventText(); break;
+    case 'about': paintAbout(); break;
+    case 'game': gameText(); break;
+    case 'works':
+      catText(); sortText(); yearText();
+      wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
+      layoutWall();
+      break;
+    case 'tag': tagText(); layoutTag(); break;
+    case 'artbook': abText(); break;
+    case 'goods':
+    case 'catalog':
+      if (view === 'goods') goodsText();
+      else if (!entering) catalogText();
+      root.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));
+      break;
+    case 'work': if (!entering) workText(byId[lastWork], lastPiece); break;
+    case 'book': if (!entering) bookText(byBook[lastBook]); break;
+    case 'item': if (!entering) itemText(bySlug[lastItem]); break;
+  }
+  translatedViews.add(view);
 }
 /* section intros reserve the height their longest language needs at this width, so switching language
    does not move everything below them */
@@ -5073,20 +5169,19 @@ function textIn(n) {
   n.animate([{ opacity: 0, filter: 'blur(4px)', offset: 0 }], { duration: 560, delay, easing: EASE_OUT, fill: 'backwards' });
   n.animate([{ transform: 'translateY(.45em)', offset: 0 }], { duration: 680, delay, easing: EASE_OUT, fill: 'backwards', composite: 'add' });
 }
-let langBusy = false, langNext = null;
+let langNext = null;
 function setLang(l) {
-  if (!I18N[l] || l === LANG) return;
+  if (!I18N[l] || (l === LANG && langNext === null)) return;
   document.querySelectorAll('.lang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === l)));
   if (CALM || !Element.prototype.animate) { swapLang(l); return; }
-  if (langBusy) { langNext = l; return; }
-  langBusy = true;
+  if (langNext !== null) { langNext = l; return; }
+  langNext = l;
   const outs = textOnScreen().flatMap(textOut);
   setTimeout(() => {
-    swapLang(l);
+    swapLang(langNext);
+    langNext = null;
     outs.forEach((a) => a.cancel());
     textOnScreen().forEach(textIn);
-    langBusy = false;
-    if (langNext && langNext !== LANG) { const n = langNext; langNext = null; setLang(n); } else langNext = null;
   }, 190);
 }
 function swapLang(l) {
@@ -5097,32 +5192,11 @@ function swapLang(l) {
   if (/[?&]lang=/.test(location.search)) {
     try { history.replaceState(history.state, '', location.pathname + location.search.replace(/([?&]lang=)(zh|en|ja)/, '$1' + l) + location.hash); } catch (e) { /* keep the address as is */ }
   }
+  translatedViews.clear();
   applyStatic();
+  syncViewText();
   zvLang();
-  heroText();
-  eventText();
-  ytText();
-  igText();
-  xText();
   sndText();
-  wall.querySelectorAll('.cover').forEach((a) => fillCover(a, WORKS[byId[a.id.slice(2)]]));
-  goodsText();
-  catalogText();
-  document.querySelectorAll('.g-card').forEach((a) => fillGoodsCard(a, GOODS[bySlug[a.id.slice(3)]]));   // on the goods list and the catalog's page
-  charList.querySelectorAll('.char').forEach((li, k) => {
-    const n = k + 1, btn = li.querySelector('.char-btn');
-    if (btn) btn.setAttribute('aria-label', tr(CHAR_CARD.has(n) ? 'chars.viewPair' : 'chars.view', { n }));
-    else li.querySelector('img').alt = tr('chars.tbd', { n });
-  });
-  shotThumbs.querySelectorAll('button').forEach((b, i) => b.setAttribute('aria-label', tr('shots.thumb', { n: i + 1, t: tr(SHOTS[i]) })));
-  showShot(shotAt, false);
-  if (view === 'work') workText(byId[lastWork], lastPiece);
-  if (view === 'item') renderItem(bySlug[lastItem]);
-  abText();
-  if (view === 'book') bookText(byBook[lastBook]);
-  layoutWall();
-  tagText();   // a tag's page: its count and its covers' words
-  layoutTag();
   document.dispatchEvent(new Event('portfolio-language'));
   backFit();   // the back button keeps to the title's words in the new language
 }

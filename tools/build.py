@@ -80,7 +80,7 @@ def report():
     import check_images
     found = check_code.findings() + check_images.findings()
     if not found:
-        print('no leftovers: every function, style, text, data field, picture and sound is in use; every text size is one of the nine')
+        print('no unused code or assets detected; text sizes pass')
         return 0
     print(f'leftovers ({len(found)}): clean them up before going live (if one is in fact used, improve tools/check_code.py)')
     for f in found:

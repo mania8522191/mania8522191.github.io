@@ -87,19 +87,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .curtain[hidden]{display:none}
 .curtain .c2{position:absolute;inset:0;background:var(--bg-2);clip-path:inset(100% 0 0 0)}
 .curtain .ln{position:absolute;left:0;right:0;top:100%;height:2px;background:var(--g-gold);opacity:0}
-.curtain.cur-in .c2{clip-path:inset(0 0 0 0);transition:clip-path .5s cubic-bezier(.76,0,.24,1)}
-.curtain.cur-in .ln-a{top:0;opacity:1;transition:top .5s cubic-bezier(.76,0,.24,1),opacity .08s}
-.curtain.cur-out .c2{clip-path:inset(0 0 100% 0);transition:clip-path .62s cubic-bezier(.76,0,.24,1)}
+.curtain.cur-in .c2{clip-path:inset(0 0 0 0);transition:clip-path .19s cubic-bezier(.76,0,.24,1)}
+.curtain.cur-in .ln-a{top:0;opacity:1;transition:top .19s cubic-bezier(.76,0,.24,1),opacity .08s}
+.curtain.cur-out .c2{clip-path:inset(0 0 100% 0);transition:clip-path .24s cubic-bezier(.76,0,.24,1)}
 .curtain.cur-out .ln-a{opacity:0;transition:opacity .18s}
-.curtain.cur-out .ln-b{top:0;opacity:1;transition:top .62s cubic-bezier(.76,0,.24,1),opacity .08s}
+.curtain.cur-out .ln-b{top:0;opacity:1;transition:top .24s cubic-bezier(.76,0,.24,1),opacity .08s}
 .curtain-label{position:absolute;inset:0;z-index:1;display:grid;place-content:center;justify-items:center;gap:12px;padding:0 16px;text-align:center}
 .curtain-t{display:flex;overflow:hidden;font-family:var(--f-display);font-size:var(--fs-hero);line-height:1.15;letter-spacing:.14em;padding-left:.14em}
-.curtain-t span{display:inline-block;transform:translateY(108%);transition:transform .5s var(--ease-out) calc(var(--i) * 24ms + .12s)}
+.curtain-t span{display:inline-block;transform:translateY(108%);transition:transform .15s var(--ease-out) calc(var(--i) * 8ms + .03s)}
 .curtain.cur-in .curtain-t span{transform:none}
-.curtain.cur-out .curtain-t span{transform:translateY(-108%);transition:transform .38s cubic-bezier(.76,0,.24,1) calc(var(--i) * 14ms)}
-.curtain-s{font-size:var(--fs-label);letter-spacing:.3em;color:var(--g-gold);opacity:0;transform:translateY(8px);transition:opacity .4s .32s,transform .5s var(--ease-out) .32s}
+.curtain.cur-out .curtain-t span{transform:translateY(-108%);transition:transform .15s cubic-bezier(.76,0,.24,1) calc(var(--i) * 8ms)}
+.curtain-s{font-size:var(--fs-label);letter-spacing:.3em;color:var(--g-gold);opacity:0;transform:translateY(8px);transition:opacity .13s .08s,transform .15s var(--ease-out) .08s}
 .curtain.cur-in .curtain-s{opacity:1;transform:none}
-.curtain.cur-out .curtain-s{opacity:0;transform:translateY(-6px);transition:opacity .2s,transform .3s}
+.curtain.cur-out .curtain-s{opacity:0;transform:translateY(-6px);transition:opacity .12s,transform .16s}
 
 /* views */
 .view{animation:enter .55s ease both}
@@ -114,13 +114,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .hero-slide{position:absolute;inset:0;overflow:hidden;opacity:0;transform:scale(1.06);transition:opacity 1.4s var(--ease-io),transform 0s 1.4s}
 .hero-slide.on{opacity:1;transform:none;transition:opacity 1.4s var(--ease-io),transform 7s var(--ease-out)}
 .hero-media img{display:block;width:100%;height:100%;max-width:none;object-fit:cover}
+.hero-media picture{display:block;width:100%;height:100%}
 /* a slide with turn in HOME_SLIDES: the picture lies on its side, in a box as tall as the screen is wide */
 .hero-slide.turned{container-type:size}
 .hero-turn{position:absolute;left:50%;top:50%;width:100cqh;height:100cqw;transform:translate(-50%,-50%) rotate(var(--turn))}
 .hero-txt{will-change:transform}   /* not opacity: that would cut the event pill's blur off from the pictures behind it */
 .hero-name .hl{display:inline-block}
 /* at the foot of the carousel: the title of the work shown (a link to it), and a dot for each work */
-/* the latest videos and Instagram posts (js/home.js): a round button for each, with its logo, in the bottom right
+/* the latest videos and X posts (js/home.js): a round button for each, with its logo, in the bottom right
    corner of the home page. A button's ring opens into its window: it stretches toward the top left from where the
    button is, keeping the ring's curve at all four corners, and the logo stays at the bottom right corner (pressing it
    again closes the window back into the ring). Whatever the window grows over stays under it. */
@@ -164,7 +165,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sns-body{min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;display:grid;justify-items:center;gap:8px;padding:0 28px}
 .sns-body::-webkit-scrollbar{display:none}
 .sns-in>.home-more{flex:none;align-self:center;display:flex;align-items:center;min-height:var(--b);margin:4px 0 0}
-#home-ig .sns-in{width:min(600px,calc(100vw - 46px))}   /* room for a scrollbar beside the page */
 /* X: a logo's width of room on each side, so the posts stay in the middle, clear of the logo's corner */
 #home-x .sns-body{padding:0 calc(var(--b) + 16px)}
 .sns-pop .tl-h{margin:0;font-size:var(--fs-name)}
@@ -182,16 +182,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .st-row{display:inline-flex;gap:12px;letter-spacing:.02em}   /* too long beside the date: the counts go under it, whole */
 .st{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
 .st svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-/* posts: three across, cut to 4:5 as on an Instagram profile; a video or an album has Instagram's mark in its
-   corner (a play sign; a filled square with an outlined one behind it) */
-.ig-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin-top:6px}
-.ig-item{position:relative;display:block;aspect-ratio:4 / 5;overflow:hidden;background:var(--bg-2)}
-.ig-item img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
-.ig-item:hover img{transform:scale(1.04)}
-.ig-video::after,.ig-album::before,.ig-album::after{content:"";position:absolute;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}   /* above the picture, also while it grows on hover */
-.ig-video::after{top:10px;right:10px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff}
-.ig-album::before{top:9px;right:9px;width:12px;height:12px;border:2px solid #fff;border-radius:3px}
-.ig-album::after{top:14px;right:14px;width:12px;height:12px;border-radius:3px;background:#fff}
 /* X posts (only those with a picture): covers like the works wall's (css/works.css) with the whole picture, or a hand
    of cards for a post of several (laid out by xLayout in js/home.js); under each, always, its first words (two lines),
    then its date and its counts, each on a line of its own */
@@ -210,7 +200,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 @media (max-width:720px){
   .sns-dock{--b:46px;bottom:max(72px,calc(env(safe-area-inset-bottom,0px) + 14px))}
   .sns-tip-b{--d:56px}
-  .sns-in,#home-ig .sns-in{width:calc(100vw - 30px);padding:20px 0 0}
+  .sns-in{width:calc(100vw - 30px);padding:20px 0 0}
   .sns-body,#home-x .sns-body{padding:0 16px}
   .yt-grid{grid-template-columns:minmax(0,1fr);gap:14px}
   .yt-item{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:12px}
@@ -593,6 +583,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
    the arrows, in the corner buttons' look (--ring-*), and the count; then the event's goods */
 .cat-strip{--p:min(68svh,680px,84vw);display:flex;gap:clamp(14px,2vw,28px);padding:6px 0 18px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;cursor:grab;outline-offset:6px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 calc((100% - var(--p)) / 2),#000 calc((100% + var(--p)) / 2),transparent);mask-image:linear-gradient(90deg,transparent,#000 calc((100% - var(--p)) / 2),#000 calc((100% + var(--p)) / 2),transparent)}   /* the pages beside the middle one fade towards the sides */
 .cat-strip::-webkit-scrollbar{display:none}
+.cat-strip img:not([src]){visibility:hidden}
 .cat-strip::before,.cat-strip::after{content:"";flex:none;width:calc((100% - var(--p)) / 2 - clamp(14px,2vw,28px))}
 .cat-strip.held{scroll-snap-type:none;cursor:grabbing}
 .cat-strip img{flex:none;width:var(--p);height:auto;scroll-snap-align:center;box-shadow:0 14px 36px rgba(0,0,0,.55);-webkit-user-select:none;user-select:none}
@@ -654,6 +645,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
    (the corner buttons' look) puts them back, the same steps the other way */
 .gd-fig{--s:100%;position:relative;margin:0;container-type:inline-size}
 .gd-stage{position:relative;width:100%;aspect-ratio:1;overflow:hidden;border-radius:14px;cursor:pointer;outline-offset:4px}
+.gd-stage[aria-busy="true"]{cursor:progress}
+.gd-stage[aria-busy="true"]::after{content:"";position:absolute;z-index:3;inset:auto 12px 12px auto;width:20px;height:20px;border:2px solid var(--bg);border-top-color:var(--g-gold);border-radius:50%;animation:gd-loading .7s linear infinite}
+@keyframes gd-loading{to{transform:rotate(1turn)}}
+@media(prefers-reduced-motion:reduce){.gd-stage[aria-busy="true"]::after{animation:none}}
 .gd-stage::before{content:"";position:absolute;inset:0;border:1px solid var(--ring-line);border-radius:inherit;opacity:0;transition:opacity .8s var(--ease-io);pointer-events:none}
 .gd.cut .gd-stage::before{opacity:1}
 .gd-page,.gd-goods{position:absolute;left:0;top:0;width:var(--s);aspect-ratio:1}

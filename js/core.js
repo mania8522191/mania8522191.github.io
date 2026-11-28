@@ -17,11 +17,17 @@ const VIEWS = { home: $('#v-home'), works: $('#v-works'), work: $('#v-work'), ta
 /* a page's cross-links, a line of them after its words ("這張插畫做成了周邊：A、B"); hidden when there are none.
    links: [words, address] */
 function linkLine(box, words, links) {
-  box.replaceChildren();
+  while (box.children.length > links.length) {
+    const last = box.lastElementChild;
+    last.previousSibling.remove();
+    last.remove();
+  }
   links.forEach(([t, href], k) => {
-    const a = el('a', '', t);
+    let a = box.children[k];
+    if (!a) { a = el('a'); box.append(document.createTextNode(''), a); }
+    a.previousSibling.data = k ? tr('list.sep') : words;
+    a.textContent = t;
     a.href = href;
-    box.append(k ? tr('list.sep') : words, a);
   });
   box.hidden = !links.length;
 }

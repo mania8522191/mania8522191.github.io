@@ -61,6 +61,7 @@ function startOver(next) {
 /* swap the DOM to the requested view, then start watching its reveal elements */
 function apply({ h, next, idx, cat, piece = -1, tag, catalog }) {
   const from = view, fromPiece = lastPiece;
+  if (from === 'item' && next !== 'item') itemClose(true);
   stopWorkVideo();
   zvPage(next);   // another part of the site: the picture windows close
   const same = from === next;
@@ -127,11 +128,12 @@ function apply({ h, next, idx, cat, piece = -1, tag, catalog }) {
   }
   if (next === 'goods') goodsYearsUpdate();
   view = next;
+  syncViewText(true);
   document.dispatchEvent(new Event('portfolio-view'));
   evenIntros();
   if (next === 'about') preloadAbout();
   if (next === 'board') boardShow(h === 'board-admin');
-  if (next === 'home' && from !== null) heroPick();   // every press of Home: a new pick of works for the carousel
+  if (next === 'home') heroPick();
   heroPlay();   // the carousel moves on only while the home page is shown
   snsShow(next === 'home');   // and the corner buttons for the latest videos and posts are there
   watch(els);
@@ -167,9 +169,9 @@ function curtainTo(r) {
         curtainEl.classList.remove('cur-in', 'cur-out');
         curtainBusy = false;
         if (location.hash !== shown) route();   // another tab was chosen while the curtain was up
-      }, 700);
-    }, 400);
-  }, 540);
+      }, 260);
+    }, 90);
+  }, 200);
 }
 const navEl = $('.nav'), navInk = el('span', 'nav-ink');
 navInk.setAttribute('aria-hidden', 'true');

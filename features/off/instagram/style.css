@@ -1,0 +1,12 @@
+#home-ig .sns-in{width:min(600px,calc(100vw - 46px))}   /* room for a scrollbar beside the page */
+/* posts: three across, cut to 4:5 as on an Instagram profile; a video or an album has Instagram's mark in its
+   corner (a play sign; a filled square with an outlined one behind it) */
+.ig-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;margin-top:6px}
+.ig-item{position:relative;display:block;aspect-ratio:4 / 5;overflow:hidden;background:var(--bg-2)}
+.ig-item img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.ig-item:hover img{transform:scale(1.04)}
+.ig-video::after,.ig-album::before,.ig-album::after{content:"";position:absolute;z-index:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}   /* above the picture, also while it grows on hover */
+.ig-video::after{top:10px;right:10px;border-style:solid;border-width:7px 0 7px 12px;border-color:transparent transparent transparent #fff}
+.ig-album::before{top:9px;right:9px;width:12px;height:12px;border:2px solid #fff;border-radius:3px}
+.ig-album::after{top:14px;right:14px;width:12px;height:12px;border-radius:3px;background:#fff}
+@media (max-width:720px){#home-ig .sns-in{width:calc(100vw - 30px)}}

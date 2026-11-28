@@ -148,5 +148,3 @@ const EVENTS = [
   {"name":"Fancy Frontier 48","from":"2027-02-19","to":"2027-02-21","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}},
   {"name":"Fancy Frontier 47","from":"2026-08-21","to":"2026-08-23","venue":{"zh":"花博爭豔館","en":"Expo Dome","ja":"花博争艶館"},"city":{"zh":"台北","en":"Taipei","ja":"台北"}}
 ];
-
-const SHOP = 'https://www.myacg.com.tw/seller_market.php?seller=217467';

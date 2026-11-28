@@ -116,14 +116,13 @@ function bookText(i) {
   $('#bk-date').textContent = tr('bk.date', { d: b.ym });
   $('#bk-ev').textContent = evName(b.ev);
   $('#bk-pages').textContent = pagesText(b.pages.length);
-  const spec = (k, v) => { const d = el('div'); d.append(el('dt', '', tr('bk.spec.' + k)), el('dd', '', v)); return d; };
-  $('#bk-spec').replaceChildren(   // size, pages, printing from the book's 品書; the cover paper is its material
-    spec('size', tr('bk.size.' + b.size)),
-    spec('pages', tr('bk.pp', { n: b.pp })),
-    spec('print', tr('bk.print.' + b.print)),
-    spec('cover', tr('bk.mat.' + (b.mat || 'gloss')) + (b.foil ? tr('bk.foil.' + b.foil) : '')),
-  );
-  $('#bk-spec').setAttribute('aria-label', tr('bk.spec'));
+  const values = [
+    tr('bk.size.' + b.size),
+    tr('bk.pp', { n: b.pp }),
+    tr('bk.print.' + b.print),
+    tr('bk.mat.' + (b.mat || 'gloss')) + (b.foil ? tr('bk.foil.' + b.foil) : ''),
+  ];
+  $('#bk-spec').querySelectorAll('dd').forEach((dd, index) => { dd.textContent = values[index]; });
   /* cross-link: the goods it comes in */
   linkLine($('#bk-goods'), tr('bk.goods'), GOODS.filter((g) => (g.books || []).includes(b.slug)).map((g) => [L(g.name), '#g-' + g.slug]));
   $('#bk-imgs').querySelectorAll('img').forEach((img) => {

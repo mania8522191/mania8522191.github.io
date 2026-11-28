@@ -4,8 +4,10 @@ function price(g, label) {
   const p = el('span', 'price');
   if (g.was) p.appendChild(el('s', '', `NT$${g.was}`));
   p.appendChild(document.createTextNode(`NT$${g.price}`));
-  if (g.unit) p.appendChild(el('small', '', tr('price.per')));
-  if (label) p.appendChild(el('small', '', tr('price.event')));
+  for (const key of [g.unit && 'price.per', label && 'price.event'].filter(Boolean)) {
+    const note = el('small', '', tr(key));
+    note.dataset.i18n = key; p.appendChild(note);
+  }
   return p;
 }
 
@@ -35,7 +37,7 @@ function goodsImage(g) {
 }
 /* a goods card: its page of the catalog (pg), then its name, contents and price (fillGoodsCard, again in another
    language) */
-function goodsCard(g, i) {
+function goodsCard(g, i, inCatalog = false) {
   const a = el('a', 'g-card');
   a.href = '#g-' + g.slug;
   a.id = 'gc-' + g.slug;
@@ -45,24 +47,25 @@ function goodsCard(g, i) {
   const media = goodsImage(g);
   if (media) {
     const img = el('img');
-    [img.src, img.width, img.height] = media;
-    img.alt = ''; img.loading = i < 3 ? 'eager' : 'lazy'; img.decoding = 'async';
+    img.width = media[1]; img.height = media[2];
+    img.alt = ''; img.decoding = 'async';
+    if (inCatalog) img.dataset.src = media[0];
+    else { img.loading = i < 3 ? 'eager' : 'lazy'; img.src = media[0]; }
     box.appendChild(img);
     a.appendChild(box);
   }
-  a.append(el('span', 'g-name'), el('span', 'g-meta'), el('span', 'price'));
+  a.append(el('span', 'g-name'), el('span', 'g-meta'), price(g, false));
   fillGoodsCard(a, g);
   return a;
 }
 function fillGoodsCard(a, g) {
   a.querySelector('.g-name').textContent = L(g.name);
   a.querySelector('.g-meta').textContent = L(g.meta);
-  a.querySelector('.price').replaceWith(price(g, false));
 }
 /* goods as cards, three to a row */
 function goodsGrid(items) {
   const grid = el('div', 'g-grid');
-  grid.append(...items.map(goodsCard));
+  grid.append(...items.map((g, i) => goodsCard(g, i)));
   return grid;
 }
 
@@ -145,10 +148,26 @@ const goodsSortText = sortControl($('#g-sort'), (dir) => {
 /* ---------- an event's catalog page: its date and page count; its pages side by side, to be dragged left and right;
    then the event's goods, the cards that open their item pages ---------- */
 const catalogPages = $('#catalog-pages');
+function loadCatalogImage(img) {
+  if (!img?.dataset.src) return;
+  img.src = img.dataset.src;
+  delete img.dataset.src;
+  catalogObserver?.unobserve(img);
+}
+const catalogObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+  for (const entry of entries) if (entry.isIntersecting) loadCatalogImage(entry.target);
+}, { rootMargin: '40px' }) : null;
+function watchCatalogImages(root) {
+  for (const img of root.querySelectorAll('img[data-src]')) {
+    if (catalogObserver) catalogObserver.observe(img);
+    else { img.loading = 'lazy'; loadCatalogImage(img); }
+  }
+}
 /* rebuilt when the event changes (catalogText and js/lang-switch.js update the words); `fresh`, not back
    from one of its goods: from the first page */
 function renderCatalog(catalog, fresh) {
   if (currentCatalog !== catalog) {
+    catalogObserver?.disconnect();
     currentCatalog = catalog;
     catalogDrag = catalogTo = null;
     catalogPages.classList.remove('held');
@@ -156,19 +175,27 @@ function renderCatalog(catalog, fresh) {
     $('#catalog-pixiv').href = 'https://www.pixiv.net/artworks/' + catalog.id;
     catalogPages.replaceChildren(...catalog.dims.map(([width, height], i) => {
       const img = el('img');
-      img.src = src(catalog.id, i);
+      if (i === 0) { img.fetchPriority = 'high'; img.src = src(catalog.id, i); }
+      else img.dataset.src = src(catalog.id, i);
       img.width = width; img.height = height;
-      img.loading = i < 3 ? 'eager' : 'lazy';
       img.decoding = 'async';
       img.draggable = false;
       return img;
     }));
-    $('#catalog-goods').replaceChildren(...GOODS.filter((g) => g.ev === catalog.ev).map(goodsCard));
+    const grid = $('#catalog-goods');
+    grid.replaceChildren(...GOODS.filter((g) => g.ev === catalog.ev).map((g, i) => goodsCard(g, i, true)));
+    watchCatalogImages(grid);
   }
   if (fresh) catalogPages.scrollLeft = 0;
   catalogText();
   catalogAt();
 }
+// Load the other visible pages once the cover is ready. Scrolling and the arrows can request a page sooner.
+function catalogCoverReady(e) {
+  if (e.target === catalogPages.firstElementChild) watchCatalogImages(catalogPages);
+}
+catalogPages.addEventListener('load', catalogCoverReady, true);
+catalogPages.addEventListener('error', catalogCoverReady, true);
 /* the words that change with the language: the date, the page count, each page's description */
 function catalogText() {
   if (!currentCatalog) return;
@@ -187,6 +214,7 @@ const catalogStep = () => { const [a, b] = catalogPages.children; return b ? b.o
 function catalogAt() {
   const step = catalogStep(), n = catalogPages.children.length;
   const i = step ? Math.min(n - 1, Math.max(0, Math.round(catalogPages.scrollLeft / step))) : 0;
+  loadCatalogImage(catalogPages.children[i]);
   $('#catalog-at').textContent = `${i + 1} / ${n}`;
   $('#catalog-prev').disabled = i === 0;
   $('#catalog-next').disabled = i === n - 1;
@@ -194,6 +222,7 @@ function catalogAt() {
 }
 function catalogGo(i) {
   const n = catalogPages.children.length;
+  loadCatalogImage(catalogPages.children[i]);
   catalogPages.scrollTo({ left: Math.min(n - 1, Math.max(0, i)) * catalogStep(), behavior: CALM ? 'auto' : 'smooth' });
 }
 catalogPages.addEventListener('pointerdown', (e) => {
@@ -258,6 +287,7 @@ catalogPages.addEventListener('click', (e) => {
    scrolls the page. ✕ goes back the same steps: the pieces go home as the background fades in, the picture narrows to
    the page, the page fades in over them, the page shrinks back */
 const itGd = $('#v-item .gd'), itStage = $('#it-stage'), itPage = $('#it-page'), itGoods = $('#it-goods');
+const itHint = itGd.querySelector('.gd-hint');
 const FADE = 600, WIDEN = 700, BG = 800;   // ms (css/goods.css): the page's fade, the widening (and the goods' move), the background's fade
 let itTop = 0, itStep = 0;   // the pieces' stacking; the steps under way (a newer open or close calls off the older)
 /* the picture's next step after ms, unless an open or a close has begun since */
@@ -277,12 +307,31 @@ function itemSwap(change, then) {
     then();
   });
 }
-function itemOpen() {
-  if (!itGoods.childElementCount || itGd.classList.contains('open')) return;
+async function itemOpen() {
+  if (!itGoods.childElementCount || itGd.classList.contains('open') || itStage.hasAttribute('aria-busy')) return;
   const s = ++itStep;
+  itStage.setAttribute('aria-busy', 'true');
+  const bg = itStage.querySelector('.gd-bg');
+  const pictures = [...itGoods.children];
+  if (bg.dataset.src) pictures.push(bg);
+  const ready = await Promise.allSettled(pictures.map((img) => {
+    if (!img.hasAttribute('src') || (img.complete && !img.naturalWidth)) img.src = img.dataset.src;
+    return img.decode();
+  }));
+  if (s !== itStep) return;
+  itStage.removeAttribute('aria-busy');
+  if (view !== 'item') return;
+  if (ready.some((result) => result.status === 'rejected')) {
+    itHint.dataset.i18n = 'item.retry';
+    setText(itHint, tr('item.retry'));
+    itStage.setAttribute('aria-label', tr('item.retry'));
+    return;
+  }
+  itHint.dataset.i18n = 'item.takeOut';
+  setText(itHint, tr('item.takeOut'));
   itemSwap(() => {
     if (s !== itStep) return;
-    itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.tabIndex = -1;
+    itGd.classList.add('open'); itStage.removeAttribute('role'); itStage.removeAttribute('aria-label'); itStage.tabIndex = -1;
     /* the grown picture in view: where it was if it fits there, else as near as the screen lets it, never under the header */
     const r = itStage.getBoundingClientRect(), top = $('.site-head').getBoundingClientRect().bottom + 16;
     scrollBy(0, r.top - Math.max(top, Math.min(r.top, innerHeight - 16 - r.height)));
@@ -299,7 +348,6 @@ function itemOpen() {
 /* a piece's shape, row by row: where it is at least half opaque, as [left, right] in its own width (0–1), null for a
    clear row; read once from its picture (the site's own, so a canvas may read it) */
 const itInk = new Map();
-const idle = (f) => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 3000 }) : setTimeout(f, 400));
 function itemInk(p) {
   if (itInk.has(p.src)) return itInk.get(p.src);
   if (!p.complete || !p.naturalWidth) return null;
@@ -340,11 +388,13 @@ function itemCentre() {
 }
 function itemClose(now) {
   const s = ++itStep;
+  itStage.removeAttribute('aria-busy');
   if (!itGd.classList.contains('open')) return;
   const shut = () => {
     if (s !== itStep) return;
     itGd.classList.remove('open', 'wide', 'plain');
     itStage.setAttribute('role', 'button');
+    itStage.setAttribute('aria-label', tr('item.takeOut'));
     itStage.tabIndex = 0;
   };
   const ps = [...itGoods.querySelectorAll('img')];
@@ -396,28 +446,24 @@ itGoods.addEventListener('pointerdown', (e) => {
 });
 function renderItem(i) {
   const g = GOODS[i];
-  $('#it-lab').textContent = L(g.eyebrow);
-  $('#it-title').textContent = L(g.name);
-  $('#it-price').replaceChildren(...price(g, true).childNodes);
-  /* cross-link: the art books in it (books: their slugs) */
-  linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
   /* the picture: its page of the catalog, and under it the cut-out pieces (parts), in the page's pixels */
   itemClose(true);
   const catalog = catalogByEvent.get(g.ev), media = goodsImage(g);
   const parts = media ? (g.parts || []) : [];
   const interactive = parts.length > 0;
   itStage.closest('figure').hidden = !media;
-  itGd.querySelector('.gd-hint').hidden = !interactive;
+  itHint.hidden = !interactive;
+  itHint.dataset.i18n = 'item.takeOut';
+  setText(itHint, tr('item.takeOut'));
   if (media) [itPage.src, itPage.width, itPage.height] = media;
   else itPage.removeAttribute('src');
-  itPage.alt = tr('item.imgAlt', { t: L(g.name) });
   const bg = itStage.querySelector('.gd-bg');
-  if (interactive && catalog?.bg) bg.src = catalog.bg;
-  else bg.removeAttribute('src');
-  bg.hidden = !bg.hasAttribute('src');
+  bg.removeAttribute('src');
+  bg.dataset.src = interactive ? catalog?.bg || '' : '';
+  bg.hidden = !bg.dataset.src;
+  bg.loading = 'eager';   // the source is set only after the visitor opens the item
   if (interactive) {
     itStage.setAttribute('role', 'button');
-    itStage.setAttribute('aria-label', tr('item.takeOut'));
     itStage.tabIndex = 0;
   } else {
     itStage.removeAttribute('role');
@@ -427,27 +473,23 @@ function renderItem(i) {
   itGoods.replaceChildren(...parts.map(([x, y, w, h], n) => {
     const p = el('img');
     const [, W, H] = media;
-    p.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
+    p.dataset.src = `img/goods-${g.slug}-${n + 1}.webp`; p.width = w; p.height = h; p.alt = ''; p.draggable = false; p.decoding = 'async';
     p.style.cssText = p.dataset.home = `left:${(x / W * 100).toFixed(3)}%;top:${(y / H * 100).toFixed(3)}%;width:${(w / W * 100).toFixed(3)}%`;
     return p;
   }));
-  /* their shapes read ahead while nothing moves, so the widening doesn't wait on them (itemCentre) */
-  for (const p of itGoods.children) p.decode().then(() => idle(() => itemInk(p)), () => {});
-
-  const rows = [];
-  if (g.size) rows.push([tr('spec.size'), L(g.size)]);
-  if (g.spec) rows.push([tr('spec.spec'), L(g.spec)]);
-  if (g.items) rows.push([tr('spec.' + g.list_title), L(g.items)]);
-  if (g.note) rows.push([tr('spec.offer'), L(g.note)]);
-  rows.push([tr('spec.debut'), L(catalog?.debut) || evName(g.ev)]);
-  $('#it-spec').replaceChildren(...rows.map(([k, v], n) => {
+  $('#it-price').replaceChildren(...price(g, true).childNodes);
+  const rows = [
+    ['spec.size', g.size], ['spec.spec', g.spec], ['spec.' + g.list_title, g.items],
+    ['spec.offer', g.note], ['spec.debut', catalog?.debut || evName(g.ev)],
+  ].filter(([, value]) => value);
+  $('#it-spec').replaceChildren(...rows.map(([key, value], n) => {
     const d = el('div');
     d.dataset.rv = 'up';
     d.dataset.d = `${n * 0.07}s`;
-    const dd = el('dd');
-    if (Array.isArray(v)) { const ol = el('ol'); v.forEach((t) => ol.appendChild(el('li', '', t))); dd.appendChild(ol); }
-    else dd.textContent = v;
-    d.append(el('dt', '', k), dd);
+    const dt = el('dt', '', tr(key)), dd = el('dd');
+    dt.dataset.i18n = key;
+    dd._value = value;
+    d.append(dt, dd);
     return d;
   }));
 
@@ -457,12 +499,32 @@ function renderItem(i) {
     const a = el('a'); a.href = '#w-' + id;
     a.dataset.rv = 'up'; a.dataset.d = `${n * 0.1}s`;
     const im = el('img'); im.src = src(id, 0); im.alt = ''; im.loading = 'lazy'; im.style.objectPosition = w.pos;
-    a.append(im, el('span', '', L(w.t)));
+    a.append(im, el('span'));
     return a;
   }));
 
   const p = GOODS[(i - 1 + GOODS.length) % GOODS.length];
   const nx = GOODS[(i + 1) % GOODS.length];
-  $('#it-prev').href = '#g-' + p.slug; $('#it-prev-t').textContent = L(p.name);
-  $('#it-next').href = '#g-' + nx.slug; $('#it-next-t').textContent = L(nx.name);
+  $('#it-prev').href = '#g-' + p.slug;
+  $('#it-next').href = '#g-' + nx.slug;
+  itemText(i);
+}
+
+function itemText(i) {
+  const g = GOODS[i];
+  $('#it-lab').textContent = L(g.eyebrow);
+  $('#it-title').textContent = L(g.name);
+  linkLine($('#it-books'), tr('item.books'), (g.books || []).filter((s) => s in byBook).map((s) => [BOOKS[byBook[s]].t, '#ab-' + s]));
+  itPage.alt = tr('item.imgAlt', { t: L(g.name) });
+  if (itStage.getAttribute('role') === 'button') itStage.setAttribute('aria-label', tr(itHint.dataset.i18n));
+  $('#it-spec').querySelectorAll('dd').forEach((dd) => {
+    const value = L(dd._value);
+    if (!Array.isArray(value)) { dd.textContent = value; return; }
+    const list = dd.firstElementChild || dd.appendChild(el('ol'));
+    while (list.childElementCount > value.length) list.lastElementChild.remove();
+    value.forEach((t, index) => { (list.children[index] || list.appendChild(el('li'))).textContent = t; });
+  });
+  $('#it-works').querySelectorAll('a').forEach((a) => { a.lastElementChild.textContent = L(WORKS[byId[a.hash.slice(3)]].t); });
+  $('#it-prev-t').textContent = L(GOODS[(i - 1 + GOODS.length) % GOODS.length].name);
+  $('#it-next-t').textContent = L(GOODS[(i + 1) % GOODS.length].name);
 }

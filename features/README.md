@@ -12,6 +12,7 @@
 
 | 資料夾 | 功能與入口 |
 | --- | --- |
+| `off/instagram/` | 首頁右下角的 Instagram 最新貼文。貼文清單沿用現有的排程更新。 |
 | `off/lollipop/` | 首頁和 miComet「Lollipop」作品頁的互動插畫，三層圖跟著滑鼠或手指晃動。支援方向鍵及減少動態效果設定。 |
 | `off/sketch-compare/` | 《VTuber 塗鴉合集》內有草稿的單張作品頁，用拉桿比較草稿與完稿。 |
 
