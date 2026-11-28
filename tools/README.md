@@ -61,8 +61,8 @@
   - 遮 Email：Security → Settings 的 Email Address Obfuscation，網頁原始碼裡的 Gmail 會被藏起來，訪客照常看得到。
   - 流量統計：帳號的 Web analytics（自動加在網頁上，不用 cookie）。
   - DNSSEC：DNS → Settings。
-  - 短網址：帳號的 Bulk redirects，清單 `short_links`（302）：`/shop` 買動漫、`/melon`、`/x`、`/ig`、`/yt`、`/pixiv`、
-    `/discord`、`/event`、`/goods`。要加或改，就改這份清單。
+  - 短網址：帳號的 Bulk redirects，清單 `short_links`（302）：`/event` 場次頁、`/goods` 周邊頁。要加或改，就改這份清單。
+    外部網站（賣場、社群）不做短網址，直接用原本的網址。
   - 想回到直接連 GitHub：把那 9 筆改回 DNS only，上面這些功能就一起停用。
 - GitHub 的 repo 設定 → Pages → Custom domain 填 `mania8522191.com`，勾 Enforce HTTPS；repo 裡的 `CNAME` 檔就是這個設定，不要刪。
 - `tools/check_deploy.py` 直接向 GitHub 拿檔案比對，因為 Cloudflare 會改寫首頁（遮 Email、加統計）。
