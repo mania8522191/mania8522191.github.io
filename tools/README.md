@@ -51,9 +51,21 @@
 網站的網址是 `https://mania8522191.com`（2026-11-28 起），舊的 `https://mania8522191.github.io` 會自動轉過來。
 - 網域在 Cloudflare 買的（Domains → Registrations），每年自動續約 US$11.17，註冊人資料不公開。
 - Cloudflare 的 DNS 有 4 筆 A（185.199.108–111.153）、4 筆 AAAA（2606:50c0:8000–8003::153）指向 GitHub Pages，
-  `www` 是 CNAME 到 `mania8522191.github.io`，全部「DNS only」（不要開橘色雲朵，GitHub 才能發 https 憑證）。
-  另有一筆 TXT `_github-pages-challenge-mania8522191`，是 GitHub 帳號的網域驗證，不要刪。
+  `www` 是 CNAME 到 `mania8522191.github.io`。這 9 筆是 Proxied（橘色雲朵）：訪客先到 Cloudflare，再由它向 GitHub 拿網頁。
+  SSL/TLS 模式要是 Full（不能用 Flexible，會無限轉址）。GitHub 設定頁的 DNS 檢查可能顯示警告，不影響網站。
+  另有一筆 TXT `_github-pages-challenge-mania8522191`（DNS only），是 GitHub 帳號的網域驗證，不要刪。
+- 經過 Cloudflare 才有的功能（2026-11-28 開）：
+  - 擋 AI 訓練爬蟲：Security → Settings → AI Crawler and Agent access policies，Training 設 Block（搜尋引擎照常放行）。
+  - 防盜連：Security → Settings 的 Hotlink Protection（只管 jpg/png/gif），加上 Security rules 的自訂規則
+    「Hotlink: site pictures only on this site」：`/img/` 的檔案被別的網站引用就擋（直接開、分享預覽不受影響）。
+  - 遮 Email：Security → Settings 的 Email Address Obfuscation，網頁原始碼裡的 Gmail 會被藏起來，訪客照常看得到。
+  - 流量統計：帳號的 Web analytics（自動加在網頁上，不用 cookie）。
+  - DNSSEC：DNS → Settings。
+  - 短網址：帳號的 Bulk redirects，清單 `short_links`（302）：`/shop` 買動漫、`/melon`、`/x`、`/ig`、`/yt`、`/pixiv`、
+    `/discord`、`/event`、`/goods`。要加或改，就改這份清單。
+  - 想回到直接連 GitHub：把那 9 筆改回 DNS only，上面這些功能就一起停用。
 - GitHub 的 repo 設定 → Pages → Custom domain 填 `mania8522191.com`，勾 Enforce HTTPS；repo 裡的 `CNAME` 檔就是這個設定，不要刪。
+- `tools/check_deploy.py` 直接向 GitHub 拿檔案比對，因為 Cloudflare 會改寫首頁（遮 Email、加統計）。
 - 網站裡寫著網址的地方：`index.html` 的分享預覽和語言連結、`tools/check_deploy.py`、留言板後台 `worker/wrangler.toml` 的
   `SITE`（通知信裡的連結）和 `ORIGINS`（哪些網址可以用留言板；改了要 `npx wrangler deploy`）。
 
